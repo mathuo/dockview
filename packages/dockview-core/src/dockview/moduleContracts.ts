@@ -54,6 +54,13 @@ export interface IContextMenuHost {
     readonly options: DockviewComponentOptions;
     readonly api: DockviewApi;
     readonly tabGroupColorPalette: TabGroupColorPalette;
+    /**
+     * The PinnedTabs module service, or `undefined` when that module is not
+     * registered. The tab context menu auto-injects a Pin/Unpin item only when
+     * this is present (and pinning is enabled) — an optional enhancement, never
+     * a hard dependency.
+     */
+    readonly pinnedTabsService: IPinnedTabsService | undefined;
     getPopupServiceForGroup(group: DockviewGroupPanel): PopupService;
 }
 

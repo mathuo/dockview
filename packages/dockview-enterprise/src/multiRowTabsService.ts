@@ -13,6 +13,52 @@ function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
     return typeof overflow === 'object' && overflow?.mode === 'wrap';
 }
 
+const VERTICAL_TABS_CLASS = 'dv-tabs-container-vertical';
+const TAB_CLASS = 'dv-tab';
+
+/**
+ * The wrapped-row neighbour of `current` one row up or down, or `undefined` when
+ * there is no row in that direction. Tabs are bucketed into rows by `offsetTop`
+ * (the same signal `countRows` uses); within the target row the tab whose
+ * horizontal centre is nearest `current`'s is chosen — so Up/Down lands on the
+ * geometrically-aligned tab rather than a fixed index. Pure geometry (reads
+ * layout only) so it is unit-testable with mocked offsets.
+ */
+export function findVerticalNeighbour(
+    tabs: HTMLElement[],
+    current: HTMLElement,
+    direction: 'up' | 'down'
+): HTMLElement | undefined {
+    const rowTops = Array.from(new Set(tabs.map((t) => t.offsetTop))).sort(
+        (a, b) => a - b
+    );
+    const currentRow = rowTops.indexOf(current.offsetTop);
+    const targetTop =
+        rowTops[direction === 'up' ? currentRow - 1 : currentRow + 1];
+    if (targetTop === undefined) {
+        // Already on the top / bottom row — no wrap-around.
+        return undefined;
+    }
+
+    const centre = (tab: HTMLElement): number =>
+        tab.offsetLeft + tab.offsetWidth / 2;
+    const currentCentre = centre(current);
+
+    let best: HTMLElement | undefined;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const tab of tabs) {
+        if (tab.offsetTop !== targetTop) {
+            continue;
+        }
+        const distance = Math.abs(centre(tab) - currentCentre);
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            best = tab;
+        }
+    }
+    return best;
+}
+
 /**
  * The row cap from `overflow.maxRows`, normalised to a positive integer, or
  * `undefined` for unbounded wrap (the default, and any non-positive / non-finite
@@ -131,6 +177,7 @@ class WrapController extends CompositeDisposable {
     private _forcedIds: ReadonlySet<string> = new Set();
     private _observer: ResizeObserver | undefined;
     private _pendingMeasure: { win: Window; handle: number } | undefined;
+    private _detachRowNav: (() => void) | undefined;
 
     constructor(
         private readonly group: DockviewGroupPanel,
@@ -175,6 +222,7 @@ class WrapController extends CompositeDisposable {
                     this.scheduleMeasure(list)
                 );
                 this._observer.observe(list);
+                this.attachRowNav(list);
             }
             this.measure();
         } else if (this._wrapped) {
@@ -192,6 +240,70 @@ class WrapController extends CompositeDisposable {
             list.classList.add(CAPPED_CLASS);
             list.style.setProperty(MAX_ROWS_VAR, String(this._maxRows));
         }
+    }
+
+    /**
+     * Add cross-row keyboard nav. Core's tab-strip roving handles Left/Right/
+     * Home/End within a single visual line; when tabs wrap, ArrowUp/ArrowDown
+     * should step between rows too. A capture-phase listener claims only Up/Down
+     * (leaving core's keys untouched) and moves the roving focus to the
+     * nearest-aligned tab in the row above / below. Only wired while the strip is
+     * actually wrapping; the handler re-checks the wrap + horizontal guards so a
+     * stale class can't re-enable it.
+     */
+    private attachRowNav(list: HTMLElement): void {
+        if (this._detachRowNav) {
+            return;
+        }
+        const handler = (event: Event): void =>
+            this.onRowKeyDown(event as KeyboardEvent, list);
+        list.addEventListener('keydown', handler, /* capture */ true);
+        this._detachRowNav = () =>
+            list.removeEventListener('keydown', handler, true);
+    }
+
+    private onRowKeyDown(event: KeyboardEvent, list: HTMLElement): void {
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+            return;
+        }
+        // Inert unless the strip is currently wrapping a horizontal header —
+        // mirror the wrap gate (`apply`) and core's `:not(...-vertical)` guard.
+        if (
+            !list.classList.contains(WRAP_CLASS) ||
+            list.classList.contains(VERTICAL_TABS_CLASS)
+        ) {
+            return;
+        }
+        // Only when a tab element itself holds focus, never a control inside a
+        // custom tab renderer (matches core's `_onKeyDown` target check).
+        const focused = event.target;
+        if (
+            !(focused instanceof HTMLElement) ||
+            !focused.classList.contains(TAB_CLASS)
+        ) {
+            return;
+        }
+        const tabs = Array.from(
+            list.querySelectorAll<HTMLElement>(`.${TAB_CLASS}`)
+        );
+        const target = findVerticalNeighbour(
+            tabs,
+            focused,
+            event.key === 'ArrowUp' ? 'up' : 'down'
+        );
+        if (!target) {
+            return;
+        }
+        // Claim the key so the list doesn't scroll and core's bubble-phase
+        // handler doesn't also see it.
+        event.preventDefault();
+        event.stopPropagation();
+        // Move the roving tabindex the way core's `_focusTab` does: the target
+        // becomes the sole tab-stop, then takes DOM focus.
+        for (const tab of tabs) {
+            tab.tabIndex = tab === target ? 0 : -1;
+        }
+        target.focus();
     }
 
     private scheduleMeasure(list: HTMLElement): void {
@@ -249,6 +361,8 @@ class WrapController extends CompositeDisposable {
         this._pendingMeasure = undefined;
         this._observer?.disconnect();
         this._observer = undefined;
+        this._detachRowNav?.();
+        this._detachRowNav = undefined;
         this._rowCount = 0;
         this._maxRows = undefined;
         this._wrapped = false;

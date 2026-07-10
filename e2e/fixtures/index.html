@@ -88,6 +88,11 @@
                 // the pin/unpin flow can be driven from the menu without changing
                 // the item count the base context-menu spec asserts.
                 const pinMenu = params.get('pinmenu') === '1';
+                // `?pinautoinject=1` exercises the module auto-injecting the
+                // built-in Pin/Unpin item even though the app returns none. Off
+                // by default (`contextMenuItem: false`) so the base context-menu
+                // spec keeps seeing exactly its app-supplied items.
+                const pinAutoInject = params.get('pinautoinject') === '1';
                 const dockview = new lib.DockviewComponent(el, {
                     keyboardNavigation: true,
                     overflow,
@@ -98,6 +103,7 @@
                         enabled: true,
                         mode: pinnedMode,
                         compact: params.get('compact') === '1',
+                        contextMenuItem: pinAutoInject,
                     },
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).

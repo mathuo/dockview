@@ -131,6 +131,11 @@ export interface DockviewKeybindings {
     focusPrevGroup: string;
     /** Move focus from panel content to the focused group's tab strip. Default `ctrl+shift+\`. */
     focusTabs: string;
+    /**
+     * Pin / unpin the active panel's tab. Default `ctrl+shift+enter`. Inert
+     * unless the pinned-tabs feature is enabled (`pinnedTabs.enabled`).
+     */
+    togglePin: string;
 }
 
 export interface KeyboardNavigationOptions {

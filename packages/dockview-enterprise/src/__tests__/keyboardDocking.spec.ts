@@ -273,6 +273,92 @@ describe('accessibility: tab switching', () => {
 });
 
 /**
+ * Pin / unpin the active panel by keyboard — Ctrl+Shift+Enter by default,
+ * rebindable via `keymap.togglePin`. Inert unless `pinnedTabs.enabled`.
+ */
+describe('accessibility: toggle pin', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (
+        keyboardNavigation: boolean | { keymap?: Record<string, string> },
+        pinnedTabs?: { enabled?: boolean }
+    ): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+            pinnedTabs,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const twoTabs = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+    };
+
+    const pressTogglePin = (): void => {
+        fireEvent.keyDown(dockview.element, {
+            key: 'Enter',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Ctrl+Shift+Enter pins then unpins the active panel', () => {
+        make(true, { enabled: true });
+        twoTabs(); // p2 active
+        expect(dockview.activePanel?.api.isPinned).toBe(false);
+
+        pressTogglePin();
+        expect(dockview.activePanel?.api.isPinned).toBe(true);
+
+        pressTogglePin();
+        expect(dockview.activePanel?.api.isPinned).toBe(false);
+    });
+
+    test('no-op when pinnedTabs is not enabled', () => {
+        make(true); // pinnedTabs undefined
+        twoTabs();
+
+        pressTogglePin();
+        expect(dockview.activePanel?.api.isPinned).toBe(false);
+    });
+
+    test('a rebound keymap.togglePin is honoured (default no longer fires)', () => {
+        make({ keymap: { togglePin: 'alt+p' } }, { enabled: true });
+        twoTabs();
+
+        // default binding overridden — Ctrl+Shift+Enter does nothing now
+        pressTogglePin();
+        expect(dockview.activePanel?.api.isPinned).toBe(false);
+
+        fireEvent.keyDown(dockview.element, { key: 'p', altKey: true });
+        expect(dockview.activePanel?.api.isPinned).toBe(true);
+    });
+
+    test('keeps focus inside the dock after toggling', () => {
+        make(true, { enabled: true });
+        twoTabs();
+        const group = dockview.activeGroup!;
+        // pinning re-orders the strip, which can strand focus on <body>
+        const spy = jest.spyOn(group.model, 'focusContent');
+
+        pressTogglePin();
+
+        expect(dockview.activePanel?.api.isPinned).toBe(true);
+        expect(spy).toHaveBeenCalled();
+    });
+});
+
+/**
  * Jump focus from panel content into the active group's tab strip
  * (Ctrl+Shift+\ by default), from where the tablist's own roving-tabindex
  * arrow navigation takes over.

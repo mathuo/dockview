@@ -1282,4 +1282,163 @@ describe('ContextMenuController', () => {
             expect(setPinned).toHaveBeenCalledWith(false);
         });
     });
+
+    describe('auto-injected Pin/Unpin item', () => {
+        const pinPanel = (isPinned = false, setPinned = jest.fn()) =>
+            fromPartial<IDockviewPanel>({
+                api: { isPinned, setPinned, close: jest.fn() },
+            });
+
+        function makePinAccessor(overrides: {
+            pinnedTabs?: any;
+            hasService?: boolean;
+            getTabContextMenuItems?: jest.Mock;
+        }) {
+            const openPopover = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close: jest.fn(),
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    pinnedTabs: overrides.pinnedTabs,
+                    getTabContextMenuItems: overrides.getTabContextMenuItems,
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+                pinnedTabsService:
+                    overrides.hasService === false ? undefined : ({} as any),
+            });
+            return { accessor, openPopover };
+        }
+
+        const labels = (menuEl: HTMLElement): string[] =>
+            Array.from(menuEl.querySelectorAll('.dv-context-menu-item')).map(
+                (el) => el.textContent ?? ''
+            );
+
+        test('prepends Pin/Unpin when enabled, service present, no app callback', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true },
+            });
+            const controller = new ContextMenuController(accessor);
+            const setPinned = jest.fn();
+
+            controller.show(
+                pinPanel(false, setPinned),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(labels(menuEl)).toEqual(['Pin tab']);
+
+            fireEvent.click(menuEl.querySelector('.dv-context-menu-item')!);
+            expect(setPinned).toHaveBeenCalledWith(true);
+        });
+
+        test('renders "Unpin tab" for an already-pinned panel', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                pinPanel(true),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(labels(menuEl)).toEqual(['Unpin tab']);
+        });
+
+        test('prepends Pin/Unpin ahead of the app-supplied items, preserving them', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true },
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['close', 'closeOthers']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                pinPanel(),
+                makeGroup([pinPanel()]),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(labels(menuEl)).toEqual([
+                'Pin tab',
+                'Close',
+                'Close Others',
+            ]);
+        });
+
+        test('does not inject when contextMenuItem is false', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true, contextMenuItem: false },
+            });
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.show(pinPanel(), makeGroup(), event);
+
+            // No app items + suppressed pin => no menu at all.
+            expect(openPopover).not.toHaveBeenCalled();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        test('injects by default when contextMenuItem is unset', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                pinPanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(labels(menuEl)).toContain('Pin tab');
+        });
+
+        test('does not inject when the PinnedTabs module is absent', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: true },
+                hasService: false,
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                pinPanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            expect(openPopover).not.toHaveBeenCalled();
+        });
+
+        test('does not inject when pinnedTabs is not enabled', () => {
+            const { accessor, openPopover } = makePinAccessor({
+                pinnedTabs: { enabled: false },
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                pinPanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(labels(menuEl)).toEqual(['Close']);
+        });
+    });
 });

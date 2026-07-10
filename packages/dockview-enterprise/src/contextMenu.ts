@@ -183,22 +183,55 @@ export class ContextMenuController implements IContextMenuService {
         return buildItem(label, close, () => tabGroup.toggle());
     }
 
+    /**
+     * Whether to auto-inject the built-in Pin/Unpin item at the top of the tab
+     * menu. True only when the PinnedTabs module is registered, pinning is
+     * enabled, and the app has not opted out via `pinnedTabs.contextMenuItem:
+     * false` (the item is on by default). This keeps pinning reachable from the
+     * menu without the app having to return `'pin'` from
+     * `getTabContextMenuItems` itself.
+     */
+    private _shouldInjectPin(): boolean {
+        const pinnedTabs = this.accessor.options.pinnedTabs;
+        return (
+            !!this.accessor.pinnedTabsService &&
+            !!pinnedTabs?.enabled &&
+            pinnedTabs.contextMenuItem !== false
+        );
+    }
+
+    /**
+     * The tab menu items: the app's own items (if any) with the built-in
+     * `'pin'` item prepended when {@link _shouldInjectPin} applies — so the app
+     * keeps full control of its list, and pinning is added without disturbing
+     * it. Reuses the existing `'pin'` token rendering below.
+     */
+    private _resolveTabItems(
+        panel: IDockviewPanel,
+        group: DockviewGroupPanel,
+        event: MouseEvent
+    ): ContextMenuItem[] {
+        const appItems =
+            this.accessor.options.getTabContextMenuItems?.({
+                panel,
+                group,
+                api: this.accessor.api,
+                event,
+            }) ?? [];
+
+        return this._shouldInjectPin() ? ['pin', ...appItems] : appItems;
+    }
+
     show(
         panel: IDockviewPanel,
         group: DockviewGroupPanel,
         event: MouseEvent
     ): void {
-        if (!this.accessor.options.getTabContextMenuItems) {
-            return;
-        }
-
-        const items: ContextMenuItem[] =
-            this.accessor.options.getTabContextMenuItems({
-                panel,
-                group,
-                api: this.accessor.api,
-                event,
-            });
+        const items: ContextMenuItem[] = this._resolveTabItems(
+            panel,
+            group,
+            event
+        );
 
         if (items.length === 0) {
             return;

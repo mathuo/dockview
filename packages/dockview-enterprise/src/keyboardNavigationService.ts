@@ -16,6 +16,11 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
     focusNextGroup: 'f6',
     focusPrevGroup: 'shift+f6',
     focusTabs: 'ctrl+shift+\\',
+    // A Ctrl-based combo that steers clear of OS/browser-reserved shortcuts
+    // (unlike, say, `ctrl+shift+p`, which is Firefox's private-window key), and
+    // whose key is unchanged by Shift so it matches reliably across keyboard
+    // layouts. Rebindable via `keymap.togglePin`.
+    togglePin: 'ctrl+shift+enter',
 };
 
 /**
@@ -28,6 +33,8 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
  *   group in sequence.
  * - **Focus the tab strip** (`Ctrl+Shift+\`) — jump focus from panel content to
  *   the active group's tab strip (the strip's roving-tabindex takes over).
+ * - **Toggle pin** (`Ctrl+Shift+Enter`) — pin / unpin the active panel's tab.
+ *   Inert unless the pinned-tabs feature is enabled.
  * - **Focus restore on close** — when removing a panel/group pulls focus out of
  *   the dock, focus returns to the neighbour the layout just activated instead
  *   of being stranded on `<body>`.
@@ -277,6 +284,9 @@ export class KeyboardNavigationService
         } else if (matchesBinding(e, keymap.focusTabs)) {
             this._consume(e);
             this._focusTabs();
+        } else if (matchesBinding(e, keymap.togglePin)) {
+            this._consume(e);
+            this._togglePin();
         }
     }
 
@@ -286,6 +296,24 @@ export class KeyboardNavigationService
         // Jump from panel content to the active group's tab strip; the
         // tablist's own roving-tabindex handler takes over from there.
         this.host.activeGroup?.model.focusActiveTab();
+    }
+
+    private _togglePin(): void {
+        // Inert unless the pinned-tabs feature is enabled — the binding is dead
+        // weight without it. (`setPinned` is itself gated in core, but guarding
+        // here also skips the needless refocus below when nothing can change.)
+        if (!this.host.options.pinnedTabs?.enabled) {
+            return;
+        }
+        const panel = this.host.activePanel;
+        if (!panel) {
+            return;
+        }
+        panel.api.setPinned(!panel.api.isPinned);
+        // Pinning re-orders the strip (pinned-first), which can strand focus on
+        // <body>; return it to the active content the same way the other
+        // actions do.
+        this._restoreFocus();
     }
 
     private _switchTab(reverse: boolean): void {
