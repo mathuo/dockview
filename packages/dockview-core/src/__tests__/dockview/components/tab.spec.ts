@@ -30,6 +30,72 @@ describe('tab', () => {
         expect(cut.element.className).toBe('dv-tab dv-inactive-tab');
     });
 
+    test('sets an explicit aria-label from the panel title so the name is not computed from contents (which would swallow the close button label)', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+            options: {},
+        });
+        const groupMock = jest.fn();
+
+        const cut = new Tab(
+            { id: 'panelId', title: 'My Panel' } as IDockviewPanel,
+            accessor,
+            new groupMock()
+        );
+
+        expect(cut.element.getAttribute('aria-label')).toBe('My Panel');
+    });
+
+    test('aria-label falls back to the panel id when there is no title', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+            options: {},
+        });
+        const groupMock = jest.fn();
+
+        const cut = new Tab(
+            { id: 'panelId' } as IDockviewPanel,
+            accessor,
+            new groupMock()
+        );
+
+        expect(cut.element.getAttribute('aria-label')).toBe('panelId');
+    });
+
+    test('aria-label follows onDidTitleChange', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+            options: {},
+        });
+        const groupMock = jest.fn();
+
+        let titleListener: ((e: { title: string }) => void) | undefined;
+        const cut = new Tab(
+            fromPartial<IDockviewPanel>({
+                id: 'panelId',
+                title: 'Initial',
+                api: fromPartial({
+                    onDidTitleChange: (fn: (e: { title: string }) => void) => {
+                        titleListener = fn;
+                        return { dispose: jest.fn() };
+                    },
+                }),
+            }),
+            accessor,
+            new groupMock()
+        );
+
+        expect(cut.element.getAttribute('aria-label')).toBe('Initial');
+        titleListener?.({ title: 'Renamed' });
+        expect(cut.element.getAttribute('aria-label')).toBe('Renamed');
+    });
+
     test('that active tab has active-tab class', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidOptionsChange: jest

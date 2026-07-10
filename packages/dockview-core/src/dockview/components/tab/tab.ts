@@ -86,6 +86,15 @@ export class Tab extends CompositeDisposable {
         this._element.id = nextTabId();
         this._element.setAttribute('role', 'tab');
         this._element.setAttribute('aria-selected', 'false');
+        // Give the tab an explicit accessible name (the panel title) so its
+        // WAI-ARIA name isn't computed from its subtree — otherwise it would
+        // swallow the close button's "Close {title}" label, and the tabpanel
+        // (which is `aria-labelledby` this tab) would inherit that clutter.
+        // Kept in sync with `onDidTitleChange` below.
+        this._element.setAttribute(
+            'aria-label',
+            this.panel.title ?? this.panel.id
+        );
         // Panel identity on the tab element so the multi-row wrap controller can
         // map a wrapped tab (read for its `offsetTop` row) back to its panel id
         // when computing the surplus set that spills to the overflow dropdown.
@@ -227,6 +236,12 @@ export class Tab extends CompositeDisposable {
             }),
             this.panel.api?.onDidChangePinned?.(() => {
                 this._updatePinnedClasses();
+            }) ?? { dispose: () => {} },
+            this.panel.api?.onDidTitleChange?.((event) => {
+                this._element.setAttribute(
+                    'aria-label',
+                    event.title ?? this.panel.id
+                );
             }) ?? { dispose: () => {} },
             addDisposableListener(this._element, 'dragend', () => {
                 // The shared onDragEnd handler already fires _onDragEnd via
