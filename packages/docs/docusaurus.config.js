@@ -142,6 +142,10 @@ const config = {
             };
         },
     ],
+    // Consent-gated analytics: this module shows the cookie banner and only
+    // loads Google Analytics after the visitor opts in. Shared with the
+    // enterprise app so one choice covers the whole dockview.dev domain.
+    clientModules: [require.resolve('./src/consent.js')],
     presets: [
         [
             'classic',
@@ -169,11 +173,10 @@ const config = {
                 theme: {
                     customCss: require.resolve('./src/css/custom.scss'),
                 },
-                gtag: process.env.CI
-                    ? {
-                          trackingID: 'G-KXGC1C9ZHC',
-                      }
-                    : undefined,
+                // Google Analytics is now loaded by src/consent.js, and only
+                // after the visitor accepts analytics cookies. The built-in
+                // fire-on-load gtag plugin is intentionally not used, so GA is
+                // not loaded before consent (PECR, shared privacy policy).
             }),
         ],
     ],
@@ -399,6 +402,13 @@ const config = {
                                 // the sitemap link above).
                                 label: 'Privacy policy',
                                 href: 'pathname:///enterprise/privacy',
+                            },
+                            {
+                                // Opens the cookie-consent preferences modal
+                                // (vanilla-cookieconsent auto-binds the data-cc
+                                // attribute), letting visitors change or
+                                // withdraw analytics consent at any time.
+                                html: '<button type="button" class="footer__link-item" data-cc="show-preferencesModal" style="background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left">Cookie settings</button>',
                             },
                         ],
                     },

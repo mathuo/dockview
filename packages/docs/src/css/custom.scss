@@ -849,3 +849,20 @@ html.dv-demo-route .main-wrapper {
 [data-theme='dark'] .feature-check {
     color: #3fb950;
 }
+
+// ── Cookie-consent banner (vanilla-cookieconsent) ──────────────
+// Match the brand accent, radius and font. Scoped one level deeper than the
+// library's own #cc-main defaults so these win regardless of stylesheet order.
+// Visibility is driven from a body class (see src/consent.js), because
+// Docusaurus rewrites the html class and strips cookieconsent's show classes.
+html #cc-main {
+    --cc-font-family: var(--ifm-font-family-base);
+    --cc-btn-primary-bg: var(--ifm-color-primary);
+    --cc-btn-primary-border-color: var(--ifm-color-primary);
+    --cc-btn-primary-hover-bg: var(--ifm-color-primary-dark);
+    --cc-btn-primary-hover-border-color: var(--ifm-color-primary-dark);
+    --cc-link-color: var(--ifm-color-primary);
+    --cc-toggle-on-bg: var(--ifm-color-primary);
+    --cc-btn-border-radius: var(--dv-radius-sm);
+    --cc-modal-border-radius: var(--dv-radius);
+}

@@ -11,7 +11,8 @@
         "docs:version": "docusaurus docs:version",
         "typecheck": "tsc",
         "build-templates": "node scripts/buildTemplates.mjs",
-        "build-templates:local": "node scripts/buildTemplates.mjs --local"
+        "build-templates:local": "node scripts/buildTemplates.mjs --local",
+        "record-clips": "node scripts/record/recordClips.mjs"
     },
     "browserslist": {
         "production": [
@@ -36,7 +37,8 @@
         "dockview": "^7.0.2",
         "dockview-react": "^7.0.2",
         "prism-react-renderer": "^2.4.1",
-        "source-map-loader": "^5.0.0"
+        "source-map-loader": "^5.0.0",
+        "vanilla-cookieconsent": "^3.1.0"
     },
     "devDependencies": {
         "@docusaurus/plugin-client-redirects": "^3.10.1",
