@@ -91,7 +91,8 @@ export class Tab extends CompositeDisposable {
         // when computing the surplus set that spills to the overflow dropdown.
         // Tab-specific attribute name so it doesn't collide with generic
         // `[data-panel-id]` lookups elsewhere (e.g. the overlay render container).
-        this._element.setAttribute('data-tab-panel-id', this.panel.id);
+        // `dataset.tabPanelId` maps to the `data-tab-panel-id` attribute.
+        this._element.dataset.tabPanelId = this.panel.id;
         const contentContainerId = this.group?.model?.contentContainerId;
         if (contentContainerId) {
             this._element.setAttribute('aria-controls', contentContainerId);

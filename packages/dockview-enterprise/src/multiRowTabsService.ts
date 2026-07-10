@@ -79,8 +79,9 @@ function measureRows(
     const surplus: string[] = [];
     for (const tab of tabs) {
         if (tab.offsetTop >= capTop) {
-            const id = tab.getAttribute('data-tab-panel-id');
-            if (id !== null) {
+            // `dataset.tabPanelId` maps to the `data-tab-panel-id` attribute.
+            const id = tab.dataset.tabPanelId;
+            if (id !== undefined) {
                 surplus.push(id);
             }
         }
