@@ -106,6 +106,32 @@ describe('accessibility: keyboard docking', () => {
         expect(dockview.groups).toHaveLength(2);
     });
 
+    test('shows a visible on-screen hint mirroring the narration and removes it on cancel', () => {
+        make(true);
+        twoGroups();
+        const hint = (): HTMLElement | null =>
+            container.querySelector('.dv-keyboard-docking-hint');
+
+        expect(hint()).toBeNull();
+
+        // Target phase: the on-screen hint carries the same guidance the
+        // LiveRegion speaks, and is aria-hidden so it is not announced twice.
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        expect(hint()?.textContent).toContain('Moving P2');
+        expect(hint()?.textContent).toContain('Escape to cancel');
+        expect(hint()?.getAttribute('aria-hidden')).toBe('true');
+
+        // Follows the phase change into the edge phase.
+        fireEvent.keyDown(dockview.element, { key: 'ArrowRight' });
+        fireEvent.keyDown(dockview.element, { key: 'Enter' });
+        expect(hint()?.textContent).toContain('Tab into');
+
+        // Removed once the move ends (edge → target → cancel).
+        fireEvent.keyDown(dockview.element, { key: 'Escape' });
+        fireEvent.keyDown(dockview.element, { key: 'Escape' });
+        expect(hint()).toBeNull();
+    });
+
     test('renders the drop preview during the move and clears it on cancel', () => {
         make(true);
         twoGroups();

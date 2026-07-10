@@ -84,6 +84,8 @@ export class KeyboardDockingService
 {
     private _move: MoveState | null = null;
     private _preview: IDisposable | undefined;
+    /** On-screen hint mirroring the SR narration during an armed move. */
+    private _hint: HTMLElement | undefined;
 
     constructor(private readonly host: IKeyboardNavigationHost) {
         super();
@@ -285,18 +287,20 @@ export class KeyboardDockingService
 
         const name = group.activePanel?.title ?? group.id;
         const m = this._messages;
-        if (move.phase === 'target') {
-            this.host.announce(
-                m.movePickTarget(
-                    this._label(move.source),
-                    name,
-                    move.groupIndex + 1,
-                    move.groups.length
-                )
-            );
-        } else {
-            this.host.announce(m.movePickEdge(move.position, name));
-        }
+        const message =
+            move.phase === 'target'
+                ? m.movePickTarget(
+                      this._label(move.source),
+                      name,
+                      move.groupIndex + 1,
+                      move.groups.length
+                  )
+                : m.movePickEdge(move.position, name);
+        // The same guidance goes to assistive tech (LiveRegion) and to the
+        // on-screen hint, so sighted keyboard users see the arrows/Enter/Escape
+        // affordance the narration describes.
+        this.host.announce(message);
+        this._showHint(message);
     }
 
     private _commit(): void {
@@ -337,6 +341,7 @@ export class KeyboardDockingService
 
     private _exit(): void {
         this._clearPreview();
+        this._hideHint();
         this._move = null;
         this.host.rootElement.removeAttribute(KEYBOARD_MOVE_ATTRIBUTE);
     }
@@ -344,6 +349,28 @@ export class KeyboardDockingService
     private _clearPreview(): void {
         this._preview?.dispose();
         this._preview = undefined;
+    }
+
+    /**
+     * Show a visible on-screen hint carrying the same guidance the LiveRegion
+     * speaks. `aria-hidden` because the LiveRegion already announces it (avoids
+     * a double read); it is a purely visual affordance. Styleable via
+     * `.dv-keyboard-docking-hint`.
+     */
+    private _showHint(text: string): void {
+        if (!this._hint) {
+            const doc = this.host.rootElement.ownerDocument;
+            this._hint = doc.createElement('div');
+            this._hint.className = 'dv-keyboard-docking-hint';
+            this._hint.setAttribute('aria-hidden', 'true');
+            this.host.rootElement.appendChild(this._hint);
+        }
+        this._hint.textContent = text;
+    }
+
+    private _hideHint(): void {
+        this._hint?.remove();
+        this._hint = undefined;
     }
 
     private _consume(e: KeyboardEvent): void {
