@@ -139,7 +139,81 @@ As a small team, price this to fund the headcount it implies.
 
 ---
 
-## 4. Suggested build order
+## 4. Net-new feature territory (no competitor precedent)
+
+Everything above closes gaps against competitors or the code's own reserved surfaces. This
+section is greenfield: features no docking library ships, matched to dockview's actual buyer
+verticals (trading/monitoring terminals, IDE-like tools, dashboards, scientific viz).
+
+### A. Vertical-defining modules (buyers already pay other vendors for these)
+
+**A1. Linked panel channels (`channels` module)**
+Bloomberg/TradingView-style color-channel linking: assign panels to a channel (color chip —
+the tab-group chips UI is already the natural affordance) and panels in the same channel share
+context — a symbol change in one propagates to the rest. Under it, a typed inter-panel message
+bus (publish/subscribe with channel scoping, request/reply, late-joiner replay) that also works
+across popout windows. *Why:* trading terminals are dockview's richest vertical and every one
+of them hand-builds exactly this; no layout library offers it. It's also the missing
+"application layer" that Lumino has (message passing) and dockview deliberately lacks.
+
+**A2. Command palette + panel quick-open (`palette` module)**
+Ctrl+Shift+P palette pre-wired with every layout command (move/float/popout/pin/maximize/
+undo…), and Ctrl+P fuzzy quick-open over panels — plus an extension point for app commands.
+The command inventory already exists as API methods and keyboard-docking actions; this is the
+discoverable UI over it. Pairs with (and upsells) keyboard docking and navigation.
+
+**A3. Agent-ready layout control (`agent` module)**
+A declarative layout-intent API ("open X next to Y", "focus the logs", "save this as
+perspective Z") with validation and dry-run, plus an official MCP server / tool schema so
+in-app copilots and agents can drive the workspace safely. Every enterprise app is embedding
+an assistant in 2026; "the docking library your copilot can operate" is a first-mover claim
+no competitor is positioned to make. The `'user'`/`'api'` origin tagging on mutation events
+already provides the audit distinction agents need.
+
+### B. Service-backed features (Tiptap pattern — gate what needs a backend; recurring revenue)
+
+**B1. Dockview Cloud workspaces** — cross-device workspace sync for end users, team layout
+templates ("push this workspace to the team"), and follow-mode presence (see a colleague's
+active panel, Figma/Live Share-style). Converts the one-time per-dev license into MRR and is
+inherently ungameable — the value is the service, not the client code.
+
+**B2. Workspace analytics** — privacy-safe usage events (panel opens/closes/dwell/resize,
+layout churn) with an aggregation dashboard, so product teams learn which panels users
+actually use. The mutation-transaction event stream is the ready-made instrumentation point.
+
+### C. Platform & governance moat
+
+**C1. Layout DevTools + testing kit** — a browser-devtools panel visualizing the layout tree,
+serialized-state diffing, and time-travel scrubbing over layout history; plus Playwright
+fixtures, layout assertion matchers, and a visual-regression harness. DX tooling of this kind
+(ag-Grid has nothing comparable) compounds adoption; the history module already stores the
+timeline.
+
+**C2. Native shell pack (Electron/Tauri)** — tear-out to real native windows (not browser
+popouts), OS window-manager/taskbar integration, `getScreenDetails()` multi-monitor placement.
+Extends the Tier 1 multi-window work to the desktop-shell apps (IDEs, terminals) that are
+dockview's most natural heavy users.
+
+**C3. Governance & policy module** — admin-defined layout policy as data: non-closable/
+non-movable panels by role, allowed-layout constraints, kiosk/locked presets, and audit-trail
+export built on the origin-tagged mutation events. Sells to the same procurement motion as
+the compliance pack; no UI library does layout governance at all.
+
+**C4. Untrusted-panel sandboxing** — a first-class security boundary for apps hosting
+third-party or plugin panels: iframe/worker isolation per panel, a capability-scoped panel
+API (what a sandboxed panel may know/do), and postMessage plumbing that survives moves,
+floats, and popouts. Turns "we host plugins" customers (the hardest enterprise segment) from
+hand-rolling iframes into buyers.
+
+**Where to start among these:** A1 (channels) and A2 (palette) are the strongest — modest,
+self-contained client modules with obvious demos and a vertical that already pays for the
+capability elsewhere. A3 (agent/MCP) is the cheapest differentiation per unit of effort and
+markets itself. B1 (cloud) is the long-term revenue-model play but needs service operations;
+sequence it after the client-side wins.
+
+---
+
+## 5. Suggested build order
 
 1. **AdvancedOverflowModule + pinned separate-row + maxRows** — reserved surfaces, fastest
    new line items on the feature table.
