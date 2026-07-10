@@ -63,6 +63,8 @@
                     onActivated,
                     onDeactivated,
                     watchEffect,
+                    provide,
+                    inject,
                 } = window.Vue;
                 const { DockviewVue } = window['dockview-vue'];
 
@@ -80,8 +82,14 @@
                         deactivated: 0,
                         count: 0,
                         text: '',
+                        injected: null,
                     });
                 }
+
+                // Token a panel resolves through `inject` — provided by Root,
+                // above the DockviewVue host. Reaching it from a teleported panel
+                // proves live component-tree ancestry (the other half of #1369).
+                const SHARED_TOKEN = 'shared-token';
 
                 // Inner panel content. Wrapped by `<keep-alive>` in PanelWrapper
                 // below so switching the active panel DEACTIVATES/REACTIVATES this
@@ -95,6 +103,10 @@
                         const rec = record(props.pid);
                         const count = ref(rec.count);
                         const text = ref(rec.text);
+                        // Resolved through the Vue component tree, across the
+                        // <Teleport> boundary, from Root's `provide`.
+                        const injected = inject(SHARED_TOKEN, 'not-injected');
+                        rec.injected = injected;
                         // Imperative setters so a test can seed state without
                         // depending on the panel currently being in the DOM.
                         rec.setCount = (v) => {
@@ -121,12 +133,13 @@
                             rec.count = count.value;
                             rec.text = text.value;
                         });
-                        return { pid: props.pid, count, text };
+                        return { pid: props.pid, count, text, injected };
                     },
                     template: `
                         <div class="vue-panel" :data-pid="pid">
                             <span class="pid">{{ pid }}</span>
                             <span class="count">{{ count }}</span>
+                            <span class="injected">{{ injected }}</span>
                             <input class="field" v-model="text" />
                             <button class="inc" @click="count++">inc</button>
                         </div>`,
@@ -165,6 +178,9 @@
                     name: 'Root',
                     components: { DockviewVue },
                     setup() {
+                        // Provide a value above the host so a teleported panel
+                        // can `inject` it (proves live tree ancestry).
+                        provide(SHARED_TOKEN, 'from-root');
                         return {
                             components: { panel: PanelWrapper },
                             onReady: (event) => {
@@ -225,8 +241,24 @@
                         const r = record(id);
                         return { count: r.count, text: r.text };
                     },
+                    // Value a panel resolved via `inject`.
+                    injected: (id) => record(id).injected,
                     popoutActiveGroup: () =>
                         dvApi.addPopoutGroup(dvApi.activeGroup),
+                    // Add a fresh panel and move it to the right of the current
+                    // popout group, so the popout window hosts a second group.
+                    splitIntoPopout: (id) => {
+                        const popoutGroup = dvApi.getPopouts()[0].group;
+                        panels[id] = dvApi.addPanel({
+                            id,
+                            component: 'panel',
+                            title: id,
+                        });
+                        panels[id].api.moveTo({
+                            group: popoutGroup,
+                            position: 'right',
+                        });
+                    },
                     closePopout: () => dvApi.getPopouts()[0].group.api.close(),
                     popoutCount: () => dvApi.getPopouts().length,
                     groupCount: () => dvApi.groups.length,

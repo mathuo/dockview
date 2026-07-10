@@ -134,4 +134,103 @@ test.describe('dockview-vue <keep-alive>', () => {
             await page.evaluate(() => (window as any).__vue.groupCount())
         ).toBe(1);
     });
+
+    test('provide/inject reaches a teleported panel and survives a popout round-trip', async ({
+        page,
+        context,
+    }) => {
+        await open(page);
+
+        // Root `provide`s a value above the DockviewVue host; a teleported panel
+        // must resolve it through the (live) component tree.
+        await page.evaluate(() => (window as any).__vue.addPanel('one'));
+
+        const injected = page.locator('[data-pid="one"] .injected');
+        await expect(injected).toHaveText('from-root');
+        expect(
+            await page.evaluate(() => (window as any).__vue.injected('one'))
+        ).toBe('from-root');
+
+        // The injected value must still resolve after the panel is teleported
+        // into a popout window (the tree ancestry is what popout mustn't sever).
+        const [win] = await Promise.all([
+            context.waitForEvent('page'),
+            page.evaluate(() => (window as any).__vue.popoutActiveGroup()),
+        ]);
+        await (win as Page).waitForLoadState();
+        await expect(win.locator('[data-pid="one"] .injected')).toHaveText(
+            'from-root'
+        );
+
+        // ...and after it is evacuated back to the main window.
+        await win.close({ runBeforeUnload: true });
+        await expect
+            .poll(() =>
+                page.evaluate(() => (window as any).__vue.popoutCount())
+            )
+            .toBe(0);
+        await expect(injected).toHaveText('from-root');
+    });
+
+    test('closing a multi-group popout evacuates every group with state intact and no remounts', async ({
+        page,
+        context,
+    }) => {
+        await open(page);
+
+        // A single group popped out, then a second group split into the popout's
+        // own gridview — so the popout window hosts two groups.
+        await page.evaluate(() => (window as any).__vue.addPanel('alpha'));
+        await expect(page.locator('[data-pid="alpha"] .field')).toBeVisible();
+        await page.locator('[data-pid="alpha"] .field').fill('alpha-state');
+
+        const [win] = await Promise.all([
+            context.waitForEvent('page'),
+            page.evaluate(() => (window as any).__vue.popoutActiveGroup()),
+        ]);
+        await (win as Page).waitForLoadState();
+
+        await page.evaluate(() =>
+            (window as any).__vue.splitIntoPopout('gamma')
+        );
+
+        // Both panels live in the popout; seed the second one there.
+        const gammaInPopout = win.locator('[data-pid="gamma"] .field');
+        await expect(gammaInPopout).toBeVisible();
+        await gammaInPopout.fill('gamma-state');
+        await expect(win.locator('.dv-tabs-container')).toHaveCount(2);
+        await expect(page.locator('[data-pid="alpha"]')).toHaveCount(0);
+
+        const beforeGamma = await page.evaluate(() =>
+            (window as any).__vue.counters('gamma')
+        );
+        expect(beforeGamma).toMatchObject({ mounted: 1, unmounted: 0 });
+
+        // Close the popout window → BOTH groups evacuate back to the opener.
+        await win.close({ runBeforeUnload: true });
+
+        await expect
+            .poll(() =>
+                page.evaluate(() => (window as any).__vue.popoutCount())
+            )
+            .toBe(0);
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__vue.groupCount()))
+            .toBe(2);
+
+        // Both panels are back, with their state, and neither was destroyed —
+        // no popout member was stranded on teardown.
+        await expect(page.locator('[data-pid="alpha"] .field')).toHaveValue(
+            'alpha-state'
+        );
+        await expect(page.locator('[data-pid="gamma"] .field')).toHaveValue(
+            'gamma-state'
+        );
+        expect(
+            await page.evaluate(() => (window as any).__vue.counters('alpha'))
+        ).toMatchObject({ mounted: 1, unmounted: 0 });
+        expect(
+            await page.evaluate(() => (window as any).__vue.counters('gamma'))
+        ).toMatchObject({ mounted: 1, unmounted: 0 });
+    });
 });
