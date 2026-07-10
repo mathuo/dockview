@@ -189,6 +189,62 @@ test.describe('pinned tabs', () => {
         ).toBe(true);
     });
 
+    test('separate-row: dragging a row tab out into the main strip unpins it', async ({
+        page,
+    }) => {
+        await setup(page, { mode: 'separate-row', dnd: 'html5' });
+        // Pin a & b (row [a, b]); c stays unpinned and visible in the strip.
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['a', 'b', 'c'], ['a', 'b'])
+        );
+        await expect(page.locator('.dv-pinned-row .dv-pinned-tab')).toHaveText([
+            'a',
+            'b',
+        ]);
+
+        // Drag the row tab 'a' down onto the unpinned main-strip tab 'c'. The
+        // row sets the same PanelTransfer the main tab would, so the strip's
+        // native drop target accepts it; a drop in the unpinned region unpins.
+        await page.evaluate(() => {
+            const rowTab = Array.from(
+                document.querySelectorAll('.dv-pinned-row .dv-pinned-tab')
+            ).find((el) => el.textContent?.includes('a')) as HTMLElement;
+            const mainC = Array.from(
+                document.querySelectorAll('.dv-tabs-container .dv-tab')
+            ).find(
+                (el) =>
+                    el.textContent?.includes('c') &&
+                    (el as HTMLElement).offsetParent !== null
+            ) as HTMLElement;
+            const rect = mainC.getBoundingClientRect();
+            // Right zone of 'c' → land past the pin boundary (unpinned region).
+            const x = rect.right - 3;
+            const y = rect.top + rect.height / 2;
+            const fire = (el: Element, type: string) =>
+                el.dispatchEvent(
+                    new DragEvent(type, {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: x,
+                        clientY: y,
+                    })
+                );
+            fire(rowTab, 'dragstart');
+            fire(mainC, 'dragenter');
+            fire(mainC, 'dragover');
+            fire(mainC, 'drop');
+            rowTab.dispatchEvent(new DragEvent('dragend', { bubbles: true }));
+        });
+
+        // 'a' is unpinned and gone from the row (only 'b' remains pinned).
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.isPinned('a')))
+            .toBe(false);
+        await expect(page.locator('.dv-pinned-row .dv-pinned-tab')).toHaveText([
+            'b',
+        ]);
+    });
+
     test('default: a pinned tab keeps its title and shows a pin glyph', async ({
         page,
     }) => {

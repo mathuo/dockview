@@ -1,6 +1,7 @@
 export {
     getPaneData,
     getPanelData,
+    LocalSelectionTransfer,
     PaneTransfer,
     PanelTransfer,
 } from './dnd/dataTransfer';

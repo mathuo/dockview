@@ -1,5 +1,9 @@
 import { fireEvent } from '@testing-library/dom';
-import { DockviewComponent, IContentRenderer } from 'dockview-core';
+import {
+    DockviewComponent,
+    getPanelData,
+    IContentRenderer,
+} from 'dockview-core';
 import {
     computePinnedFirstOrder,
     computePinnedRowDropIndex,
@@ -523,6 +527,64 @@ describe('pinned tabs — reorder guard', () => {
             expect(setPinned).toHaveBeenCalledWith(false);
         });
     });
+
+    // A drag that originated in the pinned second row always flips (unpins) a
+    // drop past the boundary — the row is the only handle on the tab, so a
+    // drag-out is a deliberate unpin regardless of the clamp/flip option.
+    describe('row-originated drag (unpin-by-drag-out)', () => {
+        test('a drag out of the row unpins even in clamp mode', async () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true, setPinned },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p');
+            // Not clamped back to the boundary — the drop index is honoured…
+            expect(svc.resolveDropIndex(g, 'p', 1)).toBe(1);
+            await Promise.resolve();
+            // …and the panel unpins.
+            expect(setPinned).toHaveBeenCalledWith(false);
+        });
+
+        test('the forced flip ends with the drag (clamp restored)', () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true, setPinned },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p');
+            svc.endRowDrag();
+            // Back to clamp — a pinned tab is pinned-clamped to the boundary.
+            expect(svc.resolveDropIndex(g, 'p', 1)).toBe(0);
+            expect(setPinned).not.toHaveBeenCalled();
+        });
+
+        test('the forced flip is scoped to the row-dragged panel only', () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const g = grp([
+                { id: 'p1', pinned: true },
+                { id: 'p2', pinned: true },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p1');
+            // p2 is not the row-dragged panel → still clamped to its boundary.
+            expect(svc.resolveDropIndex(g, 'p2', 2)).toBe(1);
+        });
+    });
 });
 
 describe('pinned tabs — serialization', () => {
@@ -878,6 +940,27 @@ describe('pinned tabs — separate-row mode', () => {
 
         expect(moveTo).not.toHaveBeenCalled();
         expect(order()).toEqual(['a', 'b']);
+    });
+
+    test('a row tab drag exposes the panel payload for the main strip, then clears it', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = setupThreePinned(dockview);
+        mockRowGeometry();
+        const rowTab = rowTabs().find(
+            (el) => (el as HTMLElement).dataset.panelId === 'a'
+        )!;
+
+        // dragstart mirrors the main tab's payload so the main strip's drop
+        // targets accept the drag (viewId/groupId/panelId all match).
+        rowTab.dispatchEvent(new MouseEvent('dragstart', { bubbles: true }));
+        const data = getPanelData();
+        expect(data?.panelId).toBe('a');
+        expect(data?.groupId).toBe(a.api.group.id);
+        expect(data?.viewId).toBe(dockview.id);
+
+        // dragend releases the shared payload so it can't leak past the drag.
+        rowTab.dispatchEvent(new MouseEvent('dragend', { bubbles: true }));
+        expect(getPanelData()).toBeUndefined();
     });
 
     test('a pinned panel moved into a group renders in that group row', () => {

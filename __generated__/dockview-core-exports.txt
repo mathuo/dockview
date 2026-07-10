@@ -199,6 +199,7 @@ LayoutHistoryOptions
 LayoutPriority
 LiveRegionEvent
 LiveRegionModule
+LocalSelectionTransfer
 MaximizedChanged
 MaximizedViewChanged
 MeasuredValue
