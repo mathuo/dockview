@@ -586,3 +586,38 @@
         padding-left: 16px;
     }
 }
+
+/*
+ * Advanced overflow popover (AdvancedOverflowModule): the same container as the
+ * free list, upgraded in place with a search input, a scrollable listbox, and a
+ * keyboard-highlighted active row. Styles live in core so the module ships no
+ * CSS; they are inert unless the module renders this body.
+ */
+.dv-tabs-overflow-container.dv-tabs-overflow-advanced {
+    min-width: 220px;
+
+    .dv-tabs-overflow-search {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 6px 8px;
+        border: none;
+        border-bottom: 1px solid var(--dv-tab-divider-color);
+        outline: none;
+        font-size: inherit;
+        font-family: inherit;
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+        background-color: var(--dv-group-view-background-color);
+    }
+
+    .dv-tabs-overflow-list {
+        display: flex;
+        flex-direction: column;
+        outline: none;
+    }
+
+    .dv-tab.dv-tabs-overflow-option--focused {
+        outline: 1px solid var(--dv-tab-divider-color);
+        outline-offset: -1px;
+        background-color: var(--dv-icon-hover-background-color);
+    }
+}

@@ -25,6 +25,8 @@ import {
 } from './tabOverflowControl';
 import { DockviewHeaderDirection } from '../../options';
 import { applyTabGroupAccent } from '../../tabGroupAccent';
+import { IAdvancedOverflowRenderContext } from '../../moduleContracts';
+import { PopupService } from '../popupService';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent | PointerEvent;
@@ -514,145 +516,219 @@ export class TabsContainer
                 { capture: true }
             ),
             addDisposableListener(root, 'click', (event) => {
-                const el = document.createElement('div');
-                el.style.overflow = 'auto';
-                el.className = 'dv-tabs-overflow-container';
-
-                // Build lookup: panelId → tabGroup for overflow groups
-                const overflowGroupSet = new Set(this._overflowTabGroups);
-                const allTabGroups = this.group.model.getTabGroups();
-                const panelToGroup = new Map<
-                    string,
-                    (typeof allTabGroups)[0]
-                >();
-                for (const tg of allTabGroups) {
-                    if (overflowGroupSet.has(tg.id)) {
-                        for (const pid of tg.panelIds) {
-                            panelToGroup.set(pid, tg);
-                        }
-                    }
-                }
-
-                // Track which groups have already been rendered
-                const renderedGroups = new Set<string>();
-
-                for (const tab of this.tabs.tabs.filter((tab) =>
-                    this._overflowTabs.includes(tab.panel.id)
-                )) {
-                    const tg = panelToGroup.get(tab.panel.id);
-
-                    // If this tab belongs to an overflow group, render the
-                    // group header before its first member tab.
-                    if (tg && !renderedGroups.has(tg.id)) {
-                        renderedGroups.add(tg.id);
-
-                        const groupHeader = document.createElement('div');
-                        groupHeader.className = 'dv-tabs-overflow-group-header';
-
-                        const colorDot = document.createElement('span');
-                        colorDot.className = 'dv-tabs-overflow-group-color';
-                        applyTabGroupAccent(
-                            colorDot,
-                            tg.color,
-                            this.accessor.tabGroupColorPalette
-                        );
-                        groupHeader.appendChild(colorDot);
-
-                        const labelSpan = document.createElement('span');
-                        labelSpan.className = 'dv-tabs-overflow-group-label';
-                        labelSpan.textContent = tg.label || tg.id;
-                        groupHeader.appendChild(labelSpan);
-
-                        if (tg.collapsed) {
-                            const badge = document.createElement('span');
-                            badge.className =
-                                'dv-tabs-overflow-group-collapsed-badge';
-                            badge.textContent = `${tg.panelIds.length}`;
-                            groupHeader.appendChild(badge);
-                        }
-
-                        groupHeader.addEventListener('click', () => {
-                            this.accessor
-                                .getPopupServiceForGroup(this.group)
-                                .close();
-                            if (tg.collapsed) {
-                                tg.expand();
-                            }
-                            // Activate the first panel in the group
-                            const firstPanelId = tg.panelIds[0];
-                            if (firstPanelId) {
-                                const panel = this.group.panels.find(
-                                    (p) => p.id === firstPanelId
-                                );
-                                this.accessor.withOrigin('user', () =>
-                                    panel?.api.setActive()
-                                );
-                            }
-                        });
-
-                        el.appendChild(groupHeader);
-                    }
-
-                    const panelObject = this.group.panels.find(
-                        (panel) => panel === tab.panel
-                    )!;
-
-                    const tabComponent =
-                        panelObject.view.createTabRenderer('headerOverflow');
-
-                    const child = tabComponent.element;
-
-                    const wrapper = document.createElement('div');
-                    toggleClass(wrapper, 'dv-tab', true);
-                    toggleClass(
-                        wrapper,
-                        'dv-active-tab',
-                        panelObject.api.isActive
-                    );
-                    toggleClass(
-                        wrapper,
-                        'dv-inactive-tab',
-                        !panelObject.api.isActive
-                    );
-                    if (tg) {
-                        toggleClass(wrapper, 'dv-tab--grouped', true);
-                    }
-
-                    wrapper.addEventListener('click', (event) => {
-                        this.accessor
-                            .getPopupServiceForGroup(this.group)
-                            .close();
-
-                        if (event.defaultPrevented) {
-                            return;
-                        }
-
-                        if (tg?.collapsed) {
-                            tg.expand();
-                        }
-                        tab.element.scrollIntoView();
-                        this.accessor.withOrigin('user', () =>
-                            tab.panel.api.setActive()
-                        );
-                    });
-                    wrapper.appendChild(child);
-
-                    el.appendChild(wrapper);
-                }
-
                 const relativeParent = findRelativeZIndexParent(root);
+                const anchor = {
+                    x: event.clientX,
+                    y: event.clientY,
+                    zIndex: relativeParent?.style.zIndex
+                        ? `calc(${relativeParent.style.zIndex} * 2)`
+                        : undefined,
+                };
 
-                this.accessor
-                    .getPopupServiceForGroup(this.group)
-                    .openPopover(el, {
-                        x: event.clientX,
-                        y: event.clientY,
-                        zIndex: relativeParent?.style.zIndex
-                            ? `calc(${relativeParent.style.zIndex} * 2)`
-                            : undefined,
+                const context = this.createOverflowRenderContext(root, anchor);
+
+                // When the AdvancedOverflowModule is registered it upgrades the
+                // dropdown in place (search + MRU + keyboard), building AND
+                // opening the popover itself. Absent (the free path), core
+                // renders the flat list and opens it — byte-identical to before.
+                const advancedOverflow = this.accessor.advancedOverflowService;
+                if (advancedOverflow) {
+                    advancedOverflow.renderOverflow({
+                        group: this.group,
+                        overflowTabs: [...this._overflowTabs],
+                        overflowTabGroups: [...this._overflowTabGroups],
+                        context,
                     });
+                } else {
+                    context.open(this.renderFreeOverflowList(context));
+                }
             })
         );
+    }
+
+    /**
+     * Build the core row/header builders + popover control shared by the free
+     * overflow list and the advanced overflow module. Everything the module
+     * needs to rebuild the dropdown body in a custom order lives here, so the
+     * row DOM, group-header DOM, click-to-activate, and (critically) the
+     * window-bound popover open/close stay in core — the module never captures
+     * the wrong `window` for a popped-out group.
+     */
+    private createOverflowRenderContext(
+        root: HTMLElement,
+        anchor: { x: number; y: number; zIndex?: string }
+    ): IAdvancedOverflowRenderContext {
+        // Build lookup: panelId → tabGroup for overflow groups.
+        const overflowGroupSet = new Set(this._overflowTabGroups);
+        const allTabGroups = this.group.model.getTabGroups();
+        type OverflowTabGroup = (typeof allTabGroups)[number];
+        const panelToGroup = new Map<string, OverflowTabGroup>();
+        const groupById = new Map<string, OverflowTabGroup>();
+        for (const tg of allTabGroups) {
+            groupById.set(tg.id, tg);
+            if (overflowGroupSet.has(tg.id)) {
+                for (const pid of tg.panelIds) {
+                    panelToGroup.set(pid, tg);
+                }
+            }
+        }
+
+        const popup = (): PopupService =>
+            this.accessor.getPopupServiceForGroup(this.group);
+
+        const buildGroupHeader = (tg: OverflowTabGroup): HTMLElement => {
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'dv-tabs-overflow-group-header';
+
+            const colorDot = document.createElement('span');
+            colorDot.className = 'dv-tabs-overflow-group-color';
+            applyTabGroupAccent(
+                colorDot,
+                tg.color,
+                this.accessor.tabGroupColorPalette
+            );
+            groupHeader.appendChild(colorDot);
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'dv-tabs-overflow-group-label';
+            labelSpan.textContent = tg.label || tg.id;
+            groupHeader.appendChild(labelSpan);
+
+            if (tg.collapsed) {
+                const badge = document.createElement('span');
+                badge.className = 'dv-tabs-overflow-group-collapsed-badge';
+                badge.textContent = `${tg.panelIds.length}`;
+                groupHeader.appendChild(badge);
+            }
+
+            groupHeader.addEventListener('click', () => {
+                popup().close();
+                if (tg.collapsed) {
+                    tg.expand();
+                }
+                // Activate the first panel in the group.
+                const firstPanelId = tg.panelIds[0];
+                if (firstPanelId) {
+                    const panel = this.group.panels.find(
+                        (p) => p.id === firstPanelId
+                    );
+                    this.accessor.withOrigin('user', () =>
+                        panel?.api.setActive()
+                    );
+                }
+            });
+
+            return groupHeader;
+        };
+
+        return {
+            overflowGroupIdForPanel: (panelId) => panelToGroup.get(panelId)?.id,
+            buildGroupHeader: (tabGroupId) => {
+                const tg = groupById.get(tabGroupId);
+                if (!tg || !overflowGroupSet.has(tg.id)) {
+                    return undefined;
+                }
+                return buildGroupHeader(tg);
+            },
+            buildRow: (panelId) => {
+                const panel = this.group.panels.find((p) => p.id === panelId);
+                if (!panel) {
+                    return undefined;
+                }
+                const tab = this.tabs.tabs.find((t) => t.panel.id === panelId);
+                const tg = panelToGroup.get(panelId);
+
+                const tabComponent =
+                    panel.view.createTabRenderer('headerOverflow');
+                const child = tabComponent.element;
+
+                const wrapper = document.createElement('div');
+                toggleClass(wrapper, 'dv-tab', true);
+                toggleClass(wrapper, 'dv-active-tab', panel.api.isActive);
+                toggleClass(wrapper, 'dv-inactive-tab', !panel.api.isActive);
+                if (tg) {
+                    toggleClass(wrapper, 'dv-tab--grouped', true);
+                }
+
+                const doActivate = (): void => {
+                    if (tg?.collapsed) {
+                        tg.expand();
+                    }
+                    tab?.element.scrollIntoView();
+                    this.accessor.withOrigin('user', () =>
+                        panel.api.setActive()
+                    );
+                };
+
+                wrapper.addEventListener('click', (event) => {
+                    popup().close();
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+                    doActivate();
+                });
+                wrapper.appendChild(child);
+
+                return {
+                    element: wrapper,
+                    panel,
+                    activate: () => {
+                        popup().close();
+                        doActivate();
+                    },
+                };
+            },
+            open: (body) => {
+                popup().openPopover(body, anchor);
+            },
+            close: () => popup().close(),
+            focusTrigger: () => {
+                // The chevron root isn't focusable by default; make it so the
+                // Esc-restores-focus behaviour lands somewhere sensible.
+                root.tabIndex = -1;
+                root.focus();
+            },
+        };
+    }
+
+    /**
+     * The free (module-absent) overflow list: the flat `.dv-tabs-overflow-container`
+     * body with a group header before the first member tab of each overflow
+     * group, in tab (DOM) order. Reuses the shared row/header builders so it
+     * stays identical to the advanced path's per-row DOM.
+     */
+    private renderFreeOverflowList(
+        context: IAdvancedOverflowRenderContext
+    ): HTMLElement {
+        const el = document.createElement('div');
+        el.style.overflow = 'auto';
+        el.className = 'dv-tabs-overflow-container';
+
+        // Track which groups have already been rendered.
+        const renderedGroups = new Set<string>();
+
+        for (const tab of this.tabs.tabs.filter((tab) =>
+            this._overflowTabs.includes(tab.panel.id)
+        )) {
+            const tgId = context.overflowGroupIdForPanel(tab.panel.id);
+
+            // If this tab belongs to an overflow group, render the group header
+            // before its first member tab.
+            if (tgId && !renderedGroups.has(tgId)) {
+                renderedGroups.add(tgId);
+                const header = context.buildGroupHeader(tgId);
+                if (header) {
+                    el.appendChild(header);
+                }
+            }
+
+            const row = context.buildRow(tab.panel.id);
+            if (row) {
+                el.appendChild(row.element);
+            }
+        }
+
+        return el;
     }
 
     updateDragAndDropState(): void {

@@ -20,6 +20,7 @@ import { ILiveRegionService } from './liveRegionService';
 import {
     IKeyboardNavigationService,
     IAdvancedDnDService,
+    IAdvancedOverflowService,
     IAutoHideEdgeGroupService,
     IAutoEdgeGroupService,
     IContextMenuService,
@@ -52,6 +53,7 @@ export interface ServiceCollection {
     autoEdgeGroupService?: IAutoEdgeGroupService;
     multiRowTabsService?: IMultiRowTabsService;
     pinnedTabsService?: IPinnedTabsService;
+    advancedOverflowService?: IAdvancedOverflowService;
 }
 
 export interface DockviewModule<THost = unknown> {

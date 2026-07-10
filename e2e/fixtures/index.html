@@ -55,6 +55,9 @@
                 // `?maxRows=N` caps the header at N rows (surplus spills to the
                 // dropdown).
                 const maxRowsParam = params.get('maxRows');
+                // `?overflow=advanced` enables the AdvancedOverflowModule
+                // (searchable / MRU overflow dropdown) so the advanced popover
+                // can be exercised; other specs are unaffected.
                 const overflow =
                     params.get('overflow') === 'wrap'
                         ? {
@@ -63,7 +66,9 @@
                                   ? { maxRows: Number(maxRowsParam) }
                                   : {}),
                           }
-                        : undefined;
+                        : params.get('overflow') === 'advanced'
+                          ? { search: true, mru: true }
+                          : undefined;
                 // `?smooth=1` turns on the smooth tab reorder animation (needed
                 // to exercise the 2-D cross-row wrap reorder path).
                 const theme =

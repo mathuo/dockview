@@ -224,6 +224,11 @@ export {
     ITabGroupChipsService,
     IPinnedTabsHost,
     IPinnedTabsService,
+    IAdvancedOverflowHost,
+    IAdvancedOverflowService,
+    IAdvancedOverflowRenderContext,
+    AdvancedOverflowRenderParams,
+    IOverflowRow,
 } from './dockview/moduleContracts';
 export { resolveMessages } from './dockview/accessibilityMessages';
 export {

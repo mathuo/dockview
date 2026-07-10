@@ -103,6 +103,7 @@ import {
     SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
     IPinnedTabsService,
+    IAdvancedOverflowService,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
@@ -1413,6 +1414,13 @@ export class DockviewComponent
         // Owned by PinnedTabsModule — undefined when the module is not
         // registered, so callers must `?.`-guard.
         return this._moduleRegistry.services.pinnedTabsService;
+    }
+
+    get advancedOverflowService(): IAdvancedOverflowService | undefined {
+        // Owned by AdvancedOverflowModule — undefined when the module is not
+        // registered, so callers must `?.`-guard (the free flat overflow list
+        // renders in that case).
+        return this._moduleRegistry.services.advancedOverflowService;
     }
 
     /**
