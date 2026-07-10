@@ -386,6 +386,7 @@ const config = {
                             {
                                 label: 'Sitemap',
                                 href: 'pathname:///sitemap.xml',
+                                target: '_self',
                             },
                             {
                                 label: 'Licensing',
@@ -402,6 +403,7 @@ const config = {
                                 // the sitemap link above).
                                 label: 'Privacy policy',
                                 href: 'pathname:///enterprise/privacy',
+                                target: '_self',
                             },
                             {
                                 // Opens the cookie-consent preferences modal

@@ -7,9 +7,11 @@
 // visitor would be asked once per app instead of once per domain.
 //
 // Google Analytics is hard-gated: gtag.js is not loaded until the visitor
-// accepts the analytics category, matching the shared privacy policy at
-// /enterprise/privacy. Active in production builds only, which replaces the
-// old fire-on-load gtag plugin that ran unconditionally in CI.
+// accepts the analytics category, and only in production, matching the shared
+// privacy policy at /enterprise/privacy. This replaces the old fire-on-load
+// gtag plugin that ran unconditionally in CI. The consent plugin itself
+// initialises in every environment (the banner only auto-shows in production)
+// so the footer "Cookie settings" control also works in local development.
 
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
@@ -53,7 +55,10 @@ function initConsent() {
                 : host;
 
         const syncAnalytics = () => {
-            if (CookieConsent.acceptedCategory('analytics')) {
+            if (
+                CookieConsent.acceptedCategory('analytics') &&
+                process.env.NODE_ENV === 'production'
+            ) {
                 loadGoogleAnalytics();
             }
         };
@@ -73,7 +78,24 @@ function initConsent() {
         const mirrorHide = ({ modalName }) =>
             document.body.classList.remove(showClassFor(modalName));
 
+        // cookieconsent binds [data-cc] triggers with per-element listeners at
+        // init time, so the footer "Cookie settings" button loses its handler
+        // after a Docusaurus client-side navigation recreates it. Delegate from
+        // the document so whichever button is currently mounted keeps working.
+        document.addEventListener('click', (event) => {
+            const trigger = event.target?.closest?.(
+                '[data-cc="show-preferencesModal"]'
+            );
+            if (trigger) {
+                event.preventDefault();
+                CookieConsent.showPreferences();
+            }
+        });
+
         return CookieConsent.run({
+            // Only auto-show the banner in production. In dev the plugin still
+            // initialises (so "Cookie settings" works) but stays silent.
+            autoShow: process.env.NODE_ENV === 'production',
             guiOptions: {
                 consentModal: { layout: 'box', position: 'bottom left' },
                 preferencesModal: { layout: 'box' },
@@ -152,11 +174,7 @@ function initConsent() {
     });
 }
 
-if (
-    ExecutionEnvironment.canUseDOM &&
-    process.env.NODE_ENV === 'production' &&
-    !started
-) {
+if (ExecutionEnvironment.canUseDOM && !started) {
     started = true;
     // Defer until after the page has loaded and Docusaurus has hydrated, so the
     // banner is initialised against a settled DOM rather than mid-render.
