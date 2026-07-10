@@ -6,7 +6,8 @@ import Layout from '@theme/Layout';
 const TURNSTILE_SITE_KEY = '0x4AAAAAADx1eYe1Ro1u3YUq';
 
 // Cloudflare's visible "always passes" TEST site key. Used on localhost so
-// local dev doesn't depend on the real widget's domain allowlist or network.
+// local dev doesn't depend on the real widget's domain allowlist or network —
+// pair it with the matching TEST secret in the worker's .dev.vars.
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 
 function turnstileSiteKey(): string {
@@ -22,10 +23,10 @@ function turnstileSiteKey(): string {
 const TURNSTILE_SCRIPT =
     'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
-// Both website forms share one intake endpoint on the licensing worker under
-// /enterprise. Same origin as the docs site in production; in local dev the
-// worker runs on :4000.
-function newsletterApiUrl(): string {
+// The contact API lives on the licensing worker under /enterprise, alongside
+// the trial endpoint. Same origin as the docs site in production; in local dev
+// the worker runs on :4000.
+function contactApiUrl(): string {
     if (
         typeof window !== 'undefined' &&
         window.location.hostname === 'localhost'
@@ -57,6 +58,7 @@ interface FormState {
     lastName: string;
     email: string;
     company: string;
+    message: string;
 }
 
 type FieldErrors = Partial<Record<keyof FormState, string>>;
@@ -70,8 +72,24 @@ function Field(props: {
     type?: string;
     placeholder?: string;
     required?: boolean;
+    multiline?: boolean;
     error?: string;
 }) {
+    const inputStyle: React.CSSProperties = {
+        width: '100%',
+        padding: '10px 12px',
+        borderRadius: 8,
+        border: `1px solid ${
+            props.error
+                ? 'var(--ifm-color-danger)'
+                : 'var(--ifm-color-emphasis-300)'
+        }`,
+        background: 'var(--ifm-background-color)',
+        color: 'var(--ifm-font-color-base)',
+        fontSize: '0.95rem',
+        fontFamily: 'inherit',
+    };
+
     return (
         <label style={{ display: 'block' }}>
             <span
@@ -96,25 +114,23 @@ function Field(props: {
                     </span>
                 )}
             </span>
-            <input
-                type={props.type ?? 'text'}
-                value={props.value}
-                placeholder={props.placeholder}
-                onChange={(e) => props.onChange(e.target.value)}
-                style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: `1px solid ${
-                        props.error
-                            ? 'var(--ifm-color-danger)'
-                            : 'var(--ifm-color-emphasis-300)'
-                    }`,
-                    background: 'var(--ifm-background-color)',
-                    color: 'var(--ifm-font-color-base)',
-                    fontSize: '0.95rem',
-                }}
-            />
+            {props.multiline ? (
+                <textarea
+                    value={props.value}
+                    placeholder={props.placeholder}
+                    rows={5}
+                    onChange={(e) => props.onChange(e.target.value)}
+                    style={{ ...inputStyle, resize: 'vertical' }}
+                />
+            ) : (
+                <input
+                    type={props.type ?? 'text'}
+                    value={props.value}
+                    placeholder={props.placeholder}
+                    onChange={(e) => props.onChange(e.target.value)}
+                    style={inputStyle}
+                />
+            )}
             {props.error && (
                 <span
                     style={{
@@ -131,13 +147,15 @@ function Field(props: {
     );
 }
 
-function NewsletterForm() {
+function ContactForm() {
     const [form, setForm] = React.useState<FormState>({
         firstName: '',
         lastName: '',
         email: '',
         company: '',
+        message: '',
     });
+    const [subscribeNewsletter, setSubscribeNewsletter] = React.useState(true);
     const [errors, setErrors] = React.useState<FieldErrors>({});
     const [status, setStatus] = React.useState<Status>('idle');
     const [message, setMessage] = React.useState('');
@@ -187,6 +205,7 @@ function NewsletterForm() {
         if (!form.email.trim()) next.email = 'Email is required.';
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
             next.email = 'Please enter a valid email address.';
+        if (!form.message.trim()) next.message = 'Please enter a message.';
         setErrors(next);
         return Object.keys(next).length === 0;
     }
@@ -203,7 +222,7 @@ function NewsletterForm() {
         setStatus('submitting');
         setMessage('');
         try {
-            const res = await fetch(newsletterApiUrl(), {
+            const res = await fetch(contactApiUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -211,7 +230,8 @@ function NewsletterForm() {
                     lastName: form.lastName.trim(),
                     email: form.email.trim().toLowerCase(),
                     company: form.company.trim() || undefined,
-                    newsletter: true,
+                    message: form.message.trim(),
+                    newsletter: subscribeNewsletter,
                     turnstileToken: token,
                 }),
             });
@@ -245,16 +265,21 @@ function NewsletterForm() {
                     background: 'var(--ifm-card-background-color)',
                 }}
             >
-                <h2 style={{ marginTop: 0 }}>Almost there</h2>
+                <h2 style={{ marginTop: 0 }}>Thanks for getting in touch</h2>
                 <p
                     style={{
                         color: 'var(--ifm-color-content-secondary)',
                         marginBottom: 0,
                     }}
                 >
-                    Check your inbox at{' '}
+                    We&rsquo;ve received your message and will reply soon. Please
+                    check your inbox at{' '}
                     <strong>{form.email.trim().toLowerCase()}</strong> and
-                    confirm your email to finish subscribing.
+                    confirm your email address
+                    {subscribeNewsletter
+                        ? ' to finish subscribing to our newsletter'
+                        : ''}
+                    .
                 </p>
             </div>
         );
@@ -312,6 +337,35 @@ function NewsletterForm() {
                 onChange={(v) => update('company', v)}
                 placeholder="Acme Corp"
             />
+            <Field
+                label="Message"
+                value={form.message}
+                onChange={(v) => update('message', v)}
+                placeholder="How can we help?"
+                required
+                multiline
+                error={errors.message}
+            />
+
+            <label
+                style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                }}
+            >
+                <input
+                    type="checkbox"
+                    checked={subscribeNewsletter}
+                    onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                    style={{ marginTop: 3 }}
+                />
+                <span>
+                    Subscribe to our newsletter for updates and releases.
+                </span>
+            </label>
 
             <div ref={widgetRef} />
 
@@ -332,17 +386,29 @@ function NewsletterForm() {
                 disabled={status === 'submitting'}
                 style={{ width: '100%' }}
             >
-                {status === 'submitting' ? 'Subscribing…' : 'Subscribe'}
+                {status === 'submitting' ? 'Sending…' : 'Send message'}
             </button>
+
+            <p
+                style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--ifm-color-content-secondary)',
+                    margin: 0,
+                    textAlign: 'center',
+                }}
+            >
+                By submitting this form you agree to our{' '}
+                <a href="/enterprise/privacy">privacy policy</a>.
+            </p>
         </form>
     );
 }
 
-export default function Newsletter(): JSX.Element {
+export default function Contact(): JSX.Element {
     return (
         <Layout
-            title="Newsletter"
-            description="Subscribe to the Dockview newsletter for updates, releases, and tips."
+            title="Contact us"
+            description="Get in touch with the Dockview team."
         >
             <main>
                 <div
@@ -353,28 +419,22 @@ export default function Newsletter(): JSX.Element {
                         minHeight: '60vh',
                     }}
                 >
-                    <h1 style={{ marginBottom: 8 }}>Newsletter</h1>
+                    <h1 style={{ marginBottom: 8 }}>Contact us</h1>
                     <p
                         style={{
                             color: 'var(--ifm-color-content-secondary)',
                             marginBottom: 32,
                         }}
                     >
-                        Sign up for updates related to the Dockview project:
-                        new releases, features, and tips.
+                        Questions about licensing, Enterprise features or
+                        anything else? Send us a message and we&rsquo;ll get back
+                        to you. You can also email{' '}
+                        <a href="mailto:contact@dockview.dev">
+                            contact@dockview.dev
+                        </a>
+                        .
                     </p>
-                    <NewsletterForm />
-                    <p
-                        style={{
-                            fontSize: '0.8rem',
-                            color: 'var(--ifm-color-content-secondary)',
-                            marginTop: '1rem',
-                            textAlign: 'center',
-                        }}
-                    >
-                        We do not share or sell your details. Unsubscribe at any
-                        time.
-                    </p>
+                    <ContactForm />
                 </div>
             </main>
         </Layout>

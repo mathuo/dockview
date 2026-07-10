@@ -225,81 +225,6 @@
     display: block;
 }
 
-// ─── Features ─────────────────────────────────────────────────────────────────
-
-.features-section {
-    padding: 88px 0;
-    background: var(--ifm-background-surface-color);
-    border-bottom: 1px solid var(--ifm-toc-border-color);
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-
-    @media (min-width: 640px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 996px) {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-.feature-card {
-    background: var(--ifm-background-color);
-    border: 1px solid var(--dv-border);
-    border-radius: var(--dv-radius);
-    padding: 26px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-shadow: var(--dv-shadow-sm);
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease;
-
-    &:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--dv-shadow-md);
-        border-color: var(--dv-border-strong);
-    }
-}
-
-.feature-card-icon {
-    color: var(--ifm-color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 11px;
-    background: var(--dv-accent-soft);
-    border: 1px solid var(--dv-accent-soft-hover);
-
-    svg {
-        width: 22px;
-        height: 22px;
-    }
-}
-
-.feature-card-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    margin: 0;
-    color: var(--ifm-heading-color);
-}
-
-.feature-card-description {
-    font-size: 0.9rem;
-    line-height: 1.65;
-    color: var(--ifm-color-content-secondary);
-    margin: 0;
-}
-
 // ─── Frameworks ───────────────────────────────────────────────────────────────
 
 .frameworks-section {
@@ -422,7 +347,6 @@
     }
 
     .hero-fw-btn,
-    .feature-card,
     .framework-item {
         transition: none;
     }

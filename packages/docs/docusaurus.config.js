@@ -385,8 +385,20 @@ const config = {
                                 href: 'pathname:///sitemap.xml',
                             },
                             {
+                                label: 'Licensing',
+                                to: '/docs/overview/features',
+                            },
+                            {
                                 label: 'Contact us',
-                                to: '/contact-us',
+                                to: '/contact',
+                            },
+                            {
+                                // /enterprise is the separate worker deployment,
+                                // not a Docusaurus route — use pathname:// so the
+                                // broken-link checker doesn't validate it (same as
+                                // the sitemap link above).
+                                label: 'Privacy policy',
+                                href: 'pathname:///enterprise/privacy',
                             },
                         ],
                     },

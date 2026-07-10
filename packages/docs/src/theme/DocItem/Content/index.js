@@ -29,6 +29,7 @@ export default function DocItemContent({ children }) {
     const syntheticTitle = useSyntheticTitle();
     const { frontMatter } = useDoc();
     const isEnterprise = Boolean(frontMatter.enterprise);
+    const showFrameworkSelector = !frontMatter.hide_framework_selector;
     return (
         <div className={clsx(ThemeClassNames.docs.docMarkdown, 'markdown')}>
             {syntheticTitle && (
@@ -47,7 +48,7 @@ export default function DocItemContent({ children }) {
                                         <EnterpriseBadge variant="title" />
                                     )}
                                 </div>
-                                <FrameworkSelector />
+                                {showFrameworkSelector && <FrameworkSelector />}
                             </div>
                         }
                     </Heading>

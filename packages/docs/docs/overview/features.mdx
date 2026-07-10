@@ -2,6 +2,7 @@
 title: Licensing
 sidebar_position: 0.5
 description: "Compare Dockview and Dockview Enterprise feature by feature, and purchase an Enterprise licence."
+hide_framework_selector: true
 ---
 
 <div className="pricing-editions">
@@ -16,7 +17,10 @@ description: "Compare Dockview and Dockview Enterprise feature by feature, and p
         <div className="pricing-edition__price">Commercial licence<span className="pricing-edition__price-note">Free 30-day trial</span></div>
         <p className="pricing-edition__tagline">Enterprise-ready docking engine, direct support and priority feature requests.</p>
         <div className="pricing-edition__cta">
-            <a className="button button--primary" href="/enterprise">Purchase a licence →</a>
+            <div className="pricing-edition__cta-row">
+                <a className="button button--primary" href="/enterprise">Purchase a licence →</a>
+                <a className="button button--secondary" href="/contact">Contact us</a>
+            </div>
             <a className="pricing-edition__trial" href="/trial">or start a free 30-day trial</a>
         </div>
     </div>
@@ -148,6 +152,5 @@ description: "Compare Dockview and Dockview Enterprise feature by feature, and p
 
 ## See also
 
-- [Editions](/docs/overview/editions): which edition is right for you and what Enterprise adds
 - [Quickstart](/docs/overview/quickstart): get a layout on screen in a few lines
 - [Theming](/docs/core/theming): built-in themes and CSS-variable customisation
