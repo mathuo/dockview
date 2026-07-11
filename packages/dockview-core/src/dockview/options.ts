@@ -657,6 +657,14 @@ export interface PinnedTabsOptions {
      * back, matching Chrome, where pinning is an explicit action only.
      */
     togglePinOnCrossBoundaryDrag?: boolean;
+    /**
+     * In `'inline'` mode, keep pinned tabs frozen to the left edge when the tab
+     * strip scrolls horizontally (Chrome-style sticky columns); each pinned tab
+     * sits at the cumulative width of the pinned tabs before it. Default true;
+     * set `false` to let pinned tabs scroll away with the rest. Ignored in
+     * `'separate-row'` mode, where the pinned row is always visible.
+     */
+    stickyScroll?: boolean;
     /** Add a Pin/Unpin item to the tab context menu (requires ContextMenuModule). Default true. */
     contextMenuItem?: boolean;
 }

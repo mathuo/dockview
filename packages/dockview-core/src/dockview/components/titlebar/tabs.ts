@@ -36,6 +36,25 @@ import {
     TabReorderController,
 } from './tabReorderController';
 
+/**
+ * Cumulative left offsets for a contiguous run of sticky pinned tabs. Tab `i`
+ * freezes at the summed width of every pinned tab before it, so the pinned block
+ * stays packed against the left edge as the strip scrolls (the first tab sits at
+ * 0, the second at the first tab's width, and so on). Pure — no DOM — so the
+ * geometry-free offset math is unit testable (jsdom has no layout).
+ *
+ * @param widths pinned tab widths, in strip order
+ */
+export function computeStickyOffsets(widths: number[]): number[] {
+    const offsets: number[] = [];
+    let accumulated = 0;
+    for (const width of widths) {
+        offsets.push(accumulated);
+        accumulated += width;
+    }
+    return offsets;
+}
+
 export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
@@ -65,6 +84,14 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
      * (no DOM reads) — it runs inside the overflow filter.
      */
     private _forcedOverflow: (panelId: string) => boolean = () => false;
+    /**
+     * When true, pinned (overflow-excluded) tabs stick to the left edge as the
+     * strip scrolls horizontally (Chrome-style frozen columns) — wired by the
+     * PinnedTabs module in inline mode. Each pinned tab is given a cumulative
+     * `--dv-pinned-sticky-left` offset. Defaults to off so behaviour is
+     * unchanged when the module is absent.
+     */
+    private _pinnedSticky = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _voidContainerListeners: IDisposable | null = null;
 
@@ -162,6 +189,72 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         if (this._showTabsOverflowControl) {
             this.toggleDropdown({ reset: false });
         }
+        // The pinned set may have changed alongside overflow (pin/unpin), so
+        // recompute the sticky offsets too.
+        this._applyPinnedSticky();
+    }
+
+    /**
+     * Enable/disable sticky-on-scroll for pinned tabs (inline mode) — wired by
+     * the PinnedTabs module. When on, pinned (overflow-excluded) tabs are frozen
+     * to the left edge as the strip scrolls, each at the cumulative width of the
+     * pinned tabs before it; when off, the sticky styling is cleared. The
+     * offsets are scroll-invariant, so they are recomputed only on resize,
+     * horizontal scroll (a cheap self-heal after a reorder), and pinned-set
+     * changes — not continuously.
+     */
+    setPinnedSticky(enabled: boolean): void {
+        if (this._pinnedSticky === enabled) {
+            return;
+        }
+        this._pinnedSticky = enabled;
+        this._applyPinnedSticky();
+    }
+
+    /**
+     * Measure the pinned (overflow-excluded) tabs in strip order and give each a
+     * cumulative `--dv-pinned-sticky-left` offset + the `dv-tab--pinned-sticky`
+     * class, so the CSS `position: sticky` rule freezes them to the left edge.
+     * Clears the styling from any tab that is no longer pinned, and from all
+     * tabs when the feature is off. Reads every width before writing to avoid
+     * interleaving layout reads and writes.
+     */
+    private _applyPinnedSticky(): void {
+        const pinned = this._pinnedSticky
+            ? this._tabs.filter((tab) =>
+                  this._overflowExclude(tab.value.panel.id)
+              )
+            : [];
+        const pinnedSet = new Set(pinned.map((tab) => tab.value.element));
+
+        // Clear stale styling from tabs that are no longer sticky-pinned.
+        for (const tab of this._tabs) {
+            const el = tab.value.element;
+            if (
+                !pinnedSet.has(el) &&
+                el.classList.contains('dv-tab--pinned-sticky')
+            ) {
+                el.classList.remove('dv-tab--pinned-sticky');
+                el.style.removeProperty('--dv-pinned-sticky-left');
+            }
+        }
+
+        if (pinned.length === 0) {
+            return;
+        }
+
+        const widths = pinned.map(
+            (tab) => tab.value.element.getBoundingClientRect().width
+        );
+        const offsets = computeStickyOffsets(widths);
+        pinned.forEach((tab, index) => {
+            const el = tab.value.element;
+            el.classList.add('dv-tab--pinned-sticky');
+            el.style.setProperty(
+                '--dv-pinned-sticky-left',
+                `${offsets[index]}px`
+            );
+        });
     }
 
     get showTabsOverflowControl(): boolean {
@@ -183,12 +276,17 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 observer.onDidChange((event) => {
                     const hasOverflow = event.hasScrollX || event.hasScrollY;
                     this.toggleDropdown({ reset: !hasOverflow });
+                    // A resize can change tab widths, so refresh sticky offsets.
+                    this._applyPinnedSticky();
                     if (this._tabGroupManager.groupUnderlines.size > 0) {
                         this._tabGroupManager.positionUnderlines();
                     }
                 }),
                 addDisposableListener(this._tabsList, 'scroll', () => {
                     this.toggleDropdown({ reset: false });
+                    // Cheap self-heal: re-assert sticky offsets on scroll (the
+                    // only time they are visible) so any prior reorder settles.
+                    this._applyPinnedSticky();
                     if (this._tabGroupManager.groupUnderlines.size > 0) {
                         this._tabGroupManager.positionUnderlines();
                     }

@@ -396,6 +396,44 @@ describe('pinned tabs — integration', () => {
 
         spy.mockRestore();
     });
+
+    // Spy on `setPinnedSticky` on the header prototype before the next group is
+    // created so its group-add wiring call is captured.
+    const captureStickyCalls = (
+        dockview: DockviewComponent,
+        anchor: { api: any }
+    ): boolean[] => {
+        const spy = jest.spyOn(
+            Object.getPrototypeOf(anchor.api.group.model.header),
+            'setPinnedSticky'
+        );
+        dockview.addPanel({
+            id: 'fresh',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const calls = spy.mock.calls.map((c) => c[0] as boolean);
+        spy.mockRestore();
+        return calls;
+    };
+
+    test('inline mode wires each group for sticky-on-scroll pinned tabs', () => {
+        const dockview = make({ enabled: true });
+        const anchor = dockview.addPanel({ id: 'a', component: 'default' });
+        expect(captureStickyCalls(dockview, anchor)).toEqual([true]);
+    });
+
+    test('stickyScroll: false opts a group out of sticky wiring', () => {
+        const dockview = make({ enabled: true, stickyScroll: false });
+        const anchor = dockview.addPanel({ id: 'a', component: 'default' });
+        expect(captureStickyCalls(dockview, anchor)).toEqual([]);
+    });
+
+    test('separate-row mode does not use sticky (the row is always visible)', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const anchor = dockview.addPanel({ id: 'a', component: 'default' });
+        expect(captureStickyCalls(dockview, anchor)).toEqual([]);
+    });
 });
 
 describe('pinned tabs — reorder guard', () => {
