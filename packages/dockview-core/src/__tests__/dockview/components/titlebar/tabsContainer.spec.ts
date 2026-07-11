@@ -1180,6 +1180,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 
@@ -1322,6 +1323,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 
@@ -1454,6 +1456,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 

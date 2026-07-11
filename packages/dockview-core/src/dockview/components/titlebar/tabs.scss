@@ -613,6 +613,28 @@
         background-color: var(--dv-tab-divider-color);
     }
 
+    // The "Pinned" section header (pinned tabs that clipped out of the strip).
+    // Reuses the group-header layout but is a static label, not a click target.
+    .dv-tabs-overflow-pinned-header {
+        cursor: default;
+
+        &:hover {
+            background-color: transparent;
+        }
+
+        .dv-tabs-overflow-pinned-icon {
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+            opacity: 0.7;
+
+            .dv-svg {
+                width: 11px;
+                height: 11px;
+            }
+        }
+    }
+
     .dv-tab.dv-tab--grouped {
         padding-left: 16px;
     }

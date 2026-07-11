@@ -27,6 +27,7 @@ import { DockviewHeaderDirection } from '../../options';
 import { applyTabGroupAccent } from '../../tabGroupAccent';
 import { IAdvancedOverflowRenderContext } from '../../moduleContracts';
 import { PopupService } from '../popupService';
+import { createPinButton } from '../../../svg';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent | PointerEvent;
@@ -117,6 +118,10 @@ export class TabsContainer
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
     private _overflowTabGroups: string[] = [];
+    /** Pinned tabs that have clipped out of the strip — rendered in a "Pinned"
+     *  section at the top of the dropdown. Empty unless the PinnedTabs module is
+     *  active and the pinned block itself overflows. */
+    private _overflowPinnedTabs: string[] = [];
     private readonly _dropdownDisposable = new MutableDisposable();
 
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
@@ -471,14 +476,18 @@ export class TabsContainer
     private toggleDropdown(options: {
         tabs: string[];
         tabGroups: string[];
+        pinnedTabs: string[];
         reset: boolean;
     }): void {
         const tabs = options.reset ? [] : options.tabs;
         const tabGroups = options.reset ? [] : options.tabGroups;
+        const pinnedTabs = options.reset ? [] : options.pinnedTabs;
         this._overflowTabs = tabs;
         this._overflowTabGroups = tabGroups;
+        this._overflowPinnedTabs = pinnedTabs;
 
-        const totalCount = this._overflowTabs.length;
+        const totalCount =
+            this._overflowTabs.length + this._overflowPinnedTabs.length;
 
         if (totalCount > 0 && this.dropdownPart) {
             this.dropdownPart.update({ tabs: totalCount });
@@ -537,6 +546,7 @@ export class TabsContainer
                         group: this.group,
                         overflowTabs: [...this._overflowTabs],
                         overflowTabGroups: [...this._overflowTabGroups],
+                        pinnedOverflowTabs: [...this._overflowPinnedTabs],
                         context,
                     });
                 } else {
@@ -630,6 +640,22 @@ export class TabsContainer
                 }
                 return buildGroupHeader(tg);
             },
+            buildPinnedHeader: () => {
+                const header = document.createElement('div');
+                header.className =
+                    'dv-tabs-overflow-group-header dv-tabs-overflow-pinned-header';
+
+                const glyph = createPinButton();
+                glyph.classList.add('dv-tabs-overflow-pinned-icon');
+                header.appendChild(glyph);
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'dv-tabs-overflow-group-label';
+                labelSpan.textContent = 'Pinned';
+                header.appendChild(labelSpan);
+
+                return header;
+            },
             buildRow: (panelId) => {
                 const panel = this.group.panels.find((p) => p.id === panelId);
                 if (!panel) {
@@ -703,6 +729,19 @@ export class TabsContainer
         const el = document.createElement('div');
         el.style.overflow = 'auto';
         el.className = 'dv-tabs-overflow-container';
+
+        // Pinned tabs that clipped out of the strip render first, under a
+        // dedicated "Pinned" header, so an overflowing pinned block stays
+        // reachable ahead of the regular overflow rows.
+        if (this._overflowPinnedTabs.length > 0) {
+            el.appendChild(context.buildPinnedHeader());
+            for (const panelId of this._overflowPinnedTabs) {
+                const row = context.buildRow(panelId);
+                if (row) {
+                    el.appendChild(row.element);
+                }
+            }
+        }
 
         // Track which groups have already been rendered.
         const renderedGroups = new Set<string>();

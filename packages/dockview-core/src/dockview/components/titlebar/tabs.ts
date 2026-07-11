@@ -124,6 +124,13 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _onOverflowTabsChange = new Emitter<{
         tabs: string[];
         tabGroups: string[];
+        /**
+         * Overflow-excluded (pinned) tabs that have themselves clipped out of
+         * the strip. Rendered in a dedicated "Pinned" section at the top of the
+         * dropdown so an overflowing pinned block stays reachable. Empty unless
+         * the {@link _overflowExclude} predicate is wired (PinnedTabs module).
+         */
+        pinnedTabs: string[];
         reset: boolean;
     }>();
     readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
@@ -1073,6 +1080,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             this._onOverflowTabsChange.fire({
                 tabs: [],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: true,
             });
             return;
@@ -1090,6 +1098,27 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                             )))
             )
             .map((x) => x.value.panel.id);
+
+        // Pinned (overflow-excluded) tabs are normally kept out of the dropdown
+        // entirely. The exception is when the pinned block *itself* overflows:
+        // a pinned tab that is laid out (has width) yet clipped is unreachable
+        // in the strip, so it is surfaced in a "Pinned" section at the top of
+        // the dropdown. A zero-width tab is not clipped-but-hidden — it is a
+        // pinned tab whose main-strip copy is display:none (separate-row mode,
+        // where the row already provides access), so it is skipped.
+        const pinnedTabs = options.reset
+            ? []
+            : this._tabs
+                  .filter(
+                      (tab) =>
+                          this._overflowExclude(tab.value.panel.id) &&
+                          tab.value.element.getBoundingClientRect().width > 0 &&
+                          !isChildEntirelyVisibleWithinParent(
+                              tab.value.element,
+                              this._tabsList
+                          )
+                  )
+                  .map((x) => x.value.panel.id);
 
         // Detect tab groups whose chip is clipped or whose tabs are all
         // in the overflow set (e.g. collapsed groups scrolled out of view).
@@ -1131,7 +1160,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             }
         }
 
-        this._onOverflowTabsChange.fire({ tabs, tabGroups, reset: false });
+        this._onOverflowTabsChange.fire({
+            tabs,
+            tabGroups,
+            pinnedTabs,
+            reset: false,
+        });
     }
 
     updateDragAndDropState(): void {

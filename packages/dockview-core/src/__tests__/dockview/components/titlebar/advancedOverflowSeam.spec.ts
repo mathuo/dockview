@@ -91,6 +91,44 @@ describe('advanced overflow seam — free fallback (no module)', () => {
         dockview.dispose();
     });
 
+    test('renders a "Pinned" section (header + rows) at the top for clipped pinned tabs', () => {
+        const dockview = make();
+        const panels = ['a', 'b', 'c'].map((id) =>
+            dockview.addPanel({ id, component: 'default', title: id })
+        );
+
+        // Drive the render seam directly with a pinned bucket — jsdom has no
+        // geometry, so the clip detection can't be triggered through layout.
+        const header = panels[0].group.model.header as any;
+        header.toggleDropdown({
+            tabs: ['c'],
+            tabGroups: [],
+            pinnedTabs: ['a', 'b'],
+            reset: false,
+        });
+
+        const root = container.querySelector<HTMLElement>(
+            '.dv-tabs-overflow-dropdown-root'
+        )!;
+        fireEvent.click(root);
+
+        const body = container.querySelector('.dv-tabs-overflow-container')!;
+        const pinnedHeader = body.querySelector(
+            '.dv-tabs-overflow-pinned-header'
+        );
+        expect(pinnedHeader).toBeTruthy();
+        expect(pinnedHeader!.textContent).toContain('Pinned');
+
+        // The pinned rows render first (under the header), ahead of the regular
+        // overflow row.
+        const rowIds = Array.from(
+            body.querySelectorAll<HTMLElement>('.dv-tab')
+        ).map((el) => el.textContent!.trim());
+        expect(rowIds).toEqual(['a', 'b', 'c']);
+
+        dockview.dispose();
+    });
+
     test('clicking a free row activates its panel and closes the popover', () => {
         const dockview = make();
         const panels = ['a', 'b', 'c'].map((id) =>
