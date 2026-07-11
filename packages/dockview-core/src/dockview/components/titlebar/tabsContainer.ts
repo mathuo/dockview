@@ -737,14 +737,16 @@ export class TabsContainer
 
         // Pinned tabs that clipped out of the strip render first, under a
         // dedicated "Pinned" header, so an overflowing pinned block stays
-        // reachable ahead of the regular overflow rows.
-        if (this._overflowPinnedTabs.length > 0) {
+        // reachable ahead of the regular overflow rows. Build the rows first and
+        // only add the header if at least one survived (a panel can close
+        // between the overflow event and this click) — no orphan header.
+        const pinnedRows = this._overflowPinnedTabs
+            .map((panelId) => context.buildRow(panelId))
+            .filter((row): row is NonNullable<typeof row> => row != null);
+        if (pinnedRows.length > 0) {
             el.appendChild(context.buildPinnedHeader());
-            for (const panelId of this._overflowPinnedTabs) {
-                const row = context.buildRow(panelId);
-                if (row) {
-                    el.appendChild(row.element);
-                }
+            for (const row of pinnedRows) {
+                el.appendChild(row.element);
             }
         }
 

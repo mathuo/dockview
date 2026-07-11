@@ -1,7 +1,4 @@
-import {
-    Tabs,
-    computeStickyOffsets,
-} from '../../../../dockview/components/titlebar/tabs';
+import { Tabs } from '../../../../dockview/components/titlebar/tabs';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
@@ -40,56 +37,41 @@ function createTabs(): Tabs {
     return new Tabs(group, accessor, { showTabsOverflowControl: true });
 }
 
-/** jsdom has no layout — stub each tab's measured width. */
-function giveWidth(tabs: Tabs, id: string, width: number): void {
-    const tab = tabs.tabs.find((t) => t.panel.id === id)!;
-    tab.element.getBoundingClientRect = () =>
-        ({
-            width,
-            height: 20,
-            left: 0,
-            top: 0,
-            right: width,
-            bottom: 20,
-            x: 0,
-            y: 0,
-            toJSON: () => ({}),
-        }) as DOMRect;
+/** jsdom has no layout — stub a tab's `offsetLeft` (its natural in-flow x, the
+ *  value the sticky offset is derived from). */
+function giveOffset(tabs: Tabs, id: string, offsetLeft: number): void {
+    const el = tabs.tabs.find((t) => t.panel.id === id)!.element;
+    Object.defineProperty(el, 'offsetLeft', {
+        configurable: true,
+        get: () => offsetLeft,
+    });
 }
 
 function stickyOffset(tabs: Tabs, id: string): string | undefined {
-    const tab = tabs.tabs.find((t) => t.panel.id === id)!;
-    const el = tab.element;
+    const el = tabs.tabs.find((t) => t.panel.id === id)!.element;
     if (!el.classList.contains('dv-tab--pinned-sticky')) {
         return undefined;
     }
     return el.style.getPropertyValue('--dv-pinned-sticky-left');
 }
 
-describe('computeStickyOffsets', () => {
-    test('cumulative left offsets over the pinned widths', () => {
-        expect(computeStickyOffsets([])).toEqual([]);
-        expect(computeStickyOffsets([100])).toEqual([0]);
-        expect(computeStickyOffsets([100, 80, 60])).toEqual([0, 100, 180]);
-    });
-});
-
 describe('tabs — sticky pinned tabs', () => {
-    test('setPinnedSticky freezes pinned tabs at cumulative offsets', () => {
+    test('setPinnedSticky freezes pinned tabs at their natural offsets', () => {
         const tabs = createTabs();
         tabs.openPanel(createMockPanel('a'));
         tabs.openPanel(createMockPanel('b'));
         tabs.openPanel(createMockPanel('c'));
 
-        // a + b are pinned; give them measurable widths.
+        // a + b are pinned; give them natural positions (b sits after a, so its
+        // offset carries a's width + any theme margins for free).
         tabs.setOverflowExclude((id) => id === 'a' || id === 'b');
-        giveWidth(tabs, 'a', 100);
-        giveWidth(tabs, 'b', 80);
+        giveOffset(tabs, 'a', 0);
+        giveOffset(tabs, 'b', 108);
 
         tabs.setPinnedSticky(true);
 
         expect(stickyOffset(tabs, 'a')).toBe('0px');
-        expect(stickyOffset(tabs, 'b')).toBe('100px');
+        expect(stickyOffset(tabs, 'b')).toBe('108px');
         // The unpinned tab is never sticky.
         expect(stickyOffset(tabs, 'c')).toBeUndefined();
         tabs.element.remove();
@@ -99,7 +81,7 @@ describe('tabs — sticky pinned tabs', () => {
         const tabs = createTabs();
         tabs.openPanel(createMockPanel('a'));
         tabs.setOverflowExclude((id) => id === 'a');
-        giveWidth(tabs, 'a', 100);
+        giveOffset(tabs, 'a', 0);
         tabs.setPinnedSticky(true);
         expect(stickyOffset(tabs, 'a')).toBe('0px');
 
@@ -115,13 +97,14 @@ describe('tabs — sticky pinned tabs', () => {
         tabs.openPanel(createMockPanel('a'));
         tabs.openPanel(createMockPanel('b'));
         tabs.setOverflowExclude((id) => id === 'a' || id === 'b');
-        giveWidth(tabs, 'a', 100);
-        giveWidth(tabs, 'b', 80);
+        giveOffset(tabs, 'a', 0);
+        giveOffset(tabs, 'b', 108);
         tabs.setPinnedSticky(true);
-        expect(stickyOffset(tabs, 'b')).toBe('100px');
+        expect(stickyOffset(tabs, 'b')).toBe('108px');
 
-        // 'a' is unpinned — the predicate change fires a recompute, so 'b'
-        // becomes the first (and only) pinned tab at offset 0.
+        // 'a' is unpinned and (in the real strip) 'b' shifts left to the front;
+        // the predicate change fires a recompute that reads b's new offset.
+        giveOffset(tabs, 'b', 0);
         tabs.setOverflowExclude((id) => id === 'b');
         expect(stickyOffset(tabs, 'a')).toBeUndefined();
         expect(stickyOffset(tabs, 'b')).toBe('0px');
@@ -132,7 +115,7 @@ describe('tabs — sticky pinned tabs', () => {
         const tabs = createTabs();
         tabs.openPanel(createMockPanel('a'));
         tabs.setOverflowExclude((id) => id === 'a');
-        giveWidth(tabs, 'a', 100);
+        giveOffset(tabs, 'a', 0);
 
         // Never enabled — no sticky styling appears.
         expect(stickyOffset(tabs, 'a')).toBeUndefined();

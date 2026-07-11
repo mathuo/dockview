@@ -215,6 +215,25 @@ describe('OverflowListView — pinned overflow section', () => {
         view.dispose();
     });
 
+    test('no orphan "Pinned" header when the pinned rows fail to build', () => {
+        const { context, opened } = makeFakeContext();
+        // Every row fails to build (e.g. its panel closed just before render).
+        context.buildRow = () => undefined as any;
+        const view = new OverflowListView(
+            makeParams([{ id: 'a', title: 'alpha' }], [], context, ['a']),
+            { search: { scope: 'overflow' } },
+            new MruTracker(),
+            false
+        );
+        view.open();
+
+        expect(
+            opened.body!.querySelector('.dv-tabs-overflow-pinned-header')
+        ).toBeNull();
+        expect(optionRows(opened.body)).toEqual([]);
+        view.dispose();
+    });
+
     test('group-scoped search does not duplicate a pinned tab in the main list', () => {
         const { context, opened } = makeFakeContext();
         const panels = [

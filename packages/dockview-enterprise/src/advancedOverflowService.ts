@@ -75,7 +75,6 @@ export class OverflowListView extends CompositeDisposable {
      *  section above the main list, and excluded from it to avoid a duplicate
      *  row when the search scope is the whole group. */
     private readonly _pinnedIds: string[];
-    private readonly _pinnedSet: Set<string>;
     private readonly _titleOf = new Map<string, string>();
 
     /** The rendered rows in display order (group headers excluded). */
@@ -102,7 +101,7 @@ export class OverflowListView extends CompositeDisposable {
         }
 
         this._pinnedIds = [...params.pinnedOverflowTabs];
-        this._pinnedSet = new Set(this._pinnedIds);
+        const pinnedSet = new Set(this._pinnedIds);
 
         this._baseIds = (
             this._search.enabled && this._search.scope === 'group'
@@ -111,7 +110,7 @@ export class OverflowListView extends CompositeDisposable {
         )
             // The pinned section renders these separately at the top; keep them
             // out of the main list so a `group`-scoped search shows no dup.
-            .filter((id) => !this._pinnedSet.has(id));
+            .filter((id) => !pinnedSet.has(id));
 
         this._body = document.createElement('div');
         this._body.style.overflow = 'auto';
@@ -254,15 +253,21 @@ export class OverflowListView extends CompositeDisposable {
 
         // Pinned tabs that clipped out of the strip render first, under a
         // dedicated "Pinned" header, filtered by the same query. They keep
-        // their pinned (strip) order rather than joining the MRU sort.
+        // their pinned (strip) order rather than joining the MRU sort. Append
+        // the rows first, then add the header only if at least one survived
+        // (a panel can close between the overflow event and this render) — no
+        // orphan header.
         const pinnedMatches = this._pinnedIds.filter((id) =>
             matchesQuery(this._titleOf.get(id) ?? id, query)
         );
-        if (pinnedMatches.length > 0) {
-            this._list.appendChild(context.buildPinnedHeader());
-            for (const id of pinnedMatches) {
-                this._appendRow(id);
-            }
+        for (const id of pinnedMatches) {
+            this._appendRow(id);
+        }
+        if (this._rows.length > 0) {
+            this._list.insertBefore(
+                context.buildPinnedHeader(),
+                this._rows[0].element
+            );
         }
 
         const filtered = this._orderedIds().filter((id) =>
