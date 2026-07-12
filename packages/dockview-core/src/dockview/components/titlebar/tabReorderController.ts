@@ -39,6 +39,19 @@ export interface TabAnimationState {
  * needs to reach back into the owning `Tabs` instance is funnelled through
  * this interface so the boundary stays explicit.
  */
+/** A wrapped drop candidate: a tab's list index and its live bounding rect. */
+interface WrappedTabEntry {
+    index: number;
+    rect: DOMRect;
+}
+
+/** A run of wrapped tabs on one line (row or column), with its cross-axis span. */
+interface WrappedLine {
+    start: number;
+    end: number;
+    items: WrappedTabEntry[];
+}
+
 export interface ITabReorderHost {
     /** Live tab list (the `_tabs` array of the owning `Tabs`). */
     readonly tabItems: IValueDisposable<Tab>[];
@@ -733,24 +746,9 @@ export class TabReorderController extends CompositeDisposable {
         clientX: number,
         clientY: number
     ): number {
-        const sourceId = this._animState?.sourceTabId;
-        const sourceGroupIds = this._animState?.sourceGroupPanelIds;
         const isVertical = this._direction === 'vertical';
 
-        const entries: { index: number; rect: DOMRect }[] = [];
-        for (let i = 0; i < this._tabs.length; i++) {
-            const tab = this._tabs[i].value;
-            if (tab.panel.id === sourceId) {
-                continue;
-            }
-            if (sourceGroupIds?.has(tab.panel.id)) {
-                continue;
-            }
-            entries.push({
-                index: i,
-                rect: tab.element.getBoundingClientRect(),
-            });
-        }
+        const entries = this._wrappedDragEntries();
         if (entries.length === 0) {
             return this._tabs.length;
         }
@@ -768,13 +766,65 @@ export class TabReorderController extends CompositeDisposable {
         const mainSize = (r: DOMRect): number =>
             isVertical ? r.height : r.width;
 
-        // Bucket into lines by cross-axis start (2px tolerance for sub-pixel
-        // rounding).
-        const lines: {
-            start: number;
-            end: number;
-            items: typeof entries;
-        }[] = [];
+        const lines = this._bucketWrappedLines(entries, crossStart, crossEnd);
+
+        // Pick the line whose cross span contains the pointer; if the pointer is
+        // in an inter-line gap (or before/after all lines), pick the nearest
+        // line — NOT a blanket clamp to the last line.
+        const line =
+            lines.find(
+                (l) => crossPointer >= l.start && crossPointer <= l.end
+            ) ?? this._nearestWrappedLine(lines, crossPointer);
+
+        // Within the line, insert before the first tab whose main-axis midpoint
+        // is past the pointer; past all of them → after the line's last tab.
+        const items = [...line.items].sort(
+            (a, b) => mainStart(a.rect) - mainStart(b.rect)
+        );
+        for (const item of items) {
+            const midpoint = mainStart(item.rect) + mainSize(item.rect) / 2;
+            if (mainPointer < midpoint) {
+                return item.index;
+            }
+        }
+        return items[items.length - 1].index + 1;
+    }
+
+    /**
+     * The wrapped drop candidates: each non-source tab's list index + live
+     * rect. The drag source (and any grouped tabs moving with it) are excluded
+     * so their own positions don't bias the hit-test.
+     */
+    private _wrappedDragEntries(): WrappedTabEntry[] {
+        const sourceId = this._animState?.sourceTabId;
+        const sourceGroupIds = this._animState?.sourceGroupPanelIds;
+        const entries: WrappedTabEntry[] = [];
+        for (let i = 0; i < this._tabs.length; i++) {
+            const tab = this._tabs[i].value;
+            if (tab.panel.id === sourceId) {
+                continue;
+            }
+            if (sourceGroupIds?.has(tab.panel.id)) {
+                continue;
+            }
+            entries.push({
+                index: i,
+                rect: tab.element.getBoundingClientRect(),
+            });
+        }
+        return entries;
+    }
+
+    /**
+     * Bucket entries into lines by cross-axis start (2px tolerance for sub-pixel
+     * rounding), sorted along the cross axis.
+     */
+    private _bucketWrappedLines(
+        entries: WrappedTabEntry[],
+        crossStart: (r: DOMRect) => number,
+        crossEnd: (r: DOMRect) => number
+    ): WrappedLine[] {
+        const lines: WrappedLine[] = [];
         for (const entry of entries) {
             const s = crossStart(entry.rect);
             const line = lines.find((l) => Math.abs(l.start - s) <= 2);
@@ -790,37 +840,22 @@ export class TabReorderController extends CompositeDisposable {
             }
         }
         lines.sort((a, b) => a.start - b.start);
+        return lines;
+    }
 
-        // Pick the line whose cross span contains the pointer; if the pointer is
-        // in an inter-line gap (or before/after all lines), pick the nearest
-        // line by cross distance — NOT a blanket clamp to the last line, which
-        // would misroute a between-lines hover to the final line.
-        let line = lines.find(
-            (l) => crossPointer >= l.start && crossPointer <= l.end
+    /** The line nearest `crossPointer` by cross-axis distance (gap fallback). */
+    private _nearestWrappedLine(
+        lines: WrappedLine[],
+        crossPointer: number
+    ): WrappedLine {
+        const distance = (l: WrappedLine): number =>
+            crossPointer < l.start
+                ? l.start - crossPointer
+                : crossPointer - l.end;
+        return lines.reduce(
+            (nearest, l) => (distance(l) < distance(nearest) ? l : nearest),
+            lines[0]
         );
-        if (!line) {
-            const distance = (l: (typeof lines)[number]) =>
-                crossPointer < l.start
-                    ? l.start - crossPointer
-                    : crossPointer - l.end;
-            line = lines.reduce(
-                (nearest, l) => (distance(l) < distance(nearest) ? l : nearest),
-                lines[0]
-            );
-        }
-
-        // Within the line, insert before the first tab whose main-axis midpoint
-        // is past the pointer; past all of them → after the line's last tab.
-        const items = line.items.sort(
-            (a, b) => mainStart(a.rect) - mainStart(b.rect)
-        );
-        for (const item of items) {
-            const midpoint = mainStart(item.rect) + mainSize(item.rect) / 2;
-            if (mainPointer < midpoint) {
-                return item.index;
-            }
-        }
-        return items[items.length - 1].index + 1;
     }
 
     private updateWrapDropIndicator(index: number): void {

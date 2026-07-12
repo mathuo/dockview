@@ -340,7 +340,7 @@ describe('WrapTabGroupIndicator continuation markers', () => {
         (indicator as any)._positionUnderlinesSync();
 
         // First row is the chip's row (no marker); one marker on row 2.
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(1);
 
         indicator.dispose();
     });
@@ -359,7 +359,7 @@ describe('WrapTabGroupIndicator continuation markers', () => {
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
 
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(2);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(2);
 
         indicator.dispose();
     });
@@ -376,7 +376,7 @@ describe('WrapTabGroupIndicator continuation markers', () => {
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
 
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
 
         indicator.dispose();
     });
@@ -413,12 +413,12 @@ describe('WrapTabGroupIndicator continuation markers', () => {
 
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(1);
 
         // Both tabs now on the same row → marker pool shrinks to zero.
         tabMap.set('b', makeTab(0, 50));
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
 
         indicator.dispose();
     });
@@ -434,11 +434,11 @@ describe('WrapTabGroupIndicator continuation markers', () => {
 
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(1);
 
         tabsList.classList.remove('dv-tabs-container--wrap');
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
 
         indicator.dispose();
     });
@@ -454,11 +454,11 @@ describe('WrapTabGroupIndicator continuation markers', () => {
 
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(1);
 
         // Group no longer active → its underline and markers are cleaned up.
         indicator.syncUnderlineElements(new Set());
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
 
         indicator.dispose();
     });
@@ -474,10 +474,10 @@ describe('WrapTabGroupIndicator continuation markers', () => {
 
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(1);
 
         indicator.dispose();
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
     });
 });
 
@@ -538,7 +538,7 @@ describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
         const d = path.getAttribute('d') ?? '';
         // two columns → two `M` (move) commands
         const moves = d.match(/M [\d.]+,[\d.]+/g) ?? [];
-        expect(moves.length).toBe(2);
+        expect(moves).toHaveLength(2);
         // each segment is vertical: the two points of a segment share their x
         const segments = d.trim().split(/M /).filter(Boolean);
         for (const seg of segments) {
@@ -562,7 +562,7 @@ describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
         const { indicator, tabsList } = setup(tabMap, tg);
         (indicator as any)._positionUnderlinesSync();
 
-        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+        expect(tabsList.querySelectorAll(CONTINUATION)).toHaveLength(0);
 
         indicator.dispose();
     });
@@ -580,7 +580,7 @@ describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
         (indicator as any)._positionUnderlinesSync();
 
         const markers = tabsList.querySelectorAll<HTMLElement>(CONTINUATION);
-        expect(markers.length).toBe(1);
+        expect(markers).toHaveLength(1);
         const marker = markers[0];
         // pip at the column top, centred horizontally on the 40..90 column
         expect(marker.style.top).toBe('0px');
@@ -605,7 +605,7 @@ describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
         (indicator as any)._positionUnderlinesSync();
 
         const markers = tabsList.querySelectorAll<HTMLElement>(CONTINUATION);
-        expect(markers.length).toBe(1);
+        expect(markers).toHaveLength(1);
         // the marker is over the left column (centre of 0..50 → 25 − 4)
         expect(markers[0].style.left).toBe(`${(0 + 50) / 2 - 4}px`);
 

@@ -22,6 +22,17 @@ export const TAB_GROUP_CHIP_CONTINUATION_CLASS =
 /** Diameter (px) of a continuation pip; mirrors the CSS size. */
 const CONTINUATION_PIP_SIZE = 8;
 
+/**
+ * A maximal run of a group's tabs on one wrapped line — a row (horizontal
+ * header) or a column (vertical header) — in container-relative coordinates.
+ */
+interface WrappedRun {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+}
+
 export interface TabGroupIndicatorContext {
     readonly tabsList: HTMLElement;
     getTabGroups(): readonly ITabGroup[];
@@ -397,43 +408,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             return;
         }
 
-        // Bucket the group's tabs into line-runs by their cross-axis offset
-        // (rows by `top`, columns by `left`), with a 2px sub-pixel tolerance.
-        type Run = { top: number; bottom: number; left: number; right: number };
-        const runs: Run[] = [];
-        // The run holding the group's first tab is the chip's line; it gets no
-        // continuation marker. Tracked by reference so it is correct regardless
-        // of axis or header side (a `vertical-rl` first column is right-most,
-        // not left-most).
-        let firstRun: Run | undefined;
-        for (const pid of tg.panelIds) {
-            const te = tabMap.get(pid);
-            if (!te) {
-                continue;
-            }
-            const r = te.value.element.getBoundingClientRect();
-            if (r.width === 0 && r.height === 0) {
-                continue; // hidden / collapsed
-            }
-            const top = r.top - containerRect.top;
-            const bottom = r.bottom - containerRect.top;
-            const left = r.left - containerRect.left;
-            const right = r.right - containerRect.left;
-            const key = isVertical ? left : top;
-            let run = runs.find(
-                (x) => Math.abs((isVertical ? x.left : x.top) - key) <= 2
-            );
-            if (run) {
-                run.top = Math.min(run.top, top);
-                run.bottom = Math.max(run.bottom, bottom);
-                run.left = Math.min(run.left, left);
-                run.right = Math.max(run.right, right);
-            } else {
-                run = { top, bottom, left, right };
-                runs.push(run);
-            }
-            firstRun ??= run;
-        }
+        const { runs, firstRun } = this._computeWrappedRuns(
+            tg,
+            containerRect,
+            tabMap,
+            isVertical
+        );
 
         if (runs.length === 0) {
             underline.style.display = 'none';
@@ -487,25 +467,94 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             ? headerPosition === 'right'
             : headerPosition === 'bottom';
 
+        path.setAttribute(
+            'd',
+            this._wrappedPathData(
+                runs,
+                isVertical,
+                inverted,
+                minLeft,
+                minTop,
+                t
+            )
+        );
+    }
+
+    /**
+     * Bucket a group's visible tabs into line-runs by their cross-axis offset
+     * (rows by `top`, columns by `left`), with a 2px sub-pixel tolerance.
+     * `firstRun` is the run holding the group's first tab (the chip's line) —
+     * tracked by reference so it is correct regardless of axis or header side (a
+     * `vertical-rl` first column is right-most, not left-most).
+     */
+    private _computeWrappedRuns(
+        tg: ITabGroup,
+        containerRect: DOMRect,
+        tabMap: Map<string, IValueDisposable<Tab>>,
+        isVertical: boolean
+    ): { runs: WrappedRun[]; firstRun: WrappedRun | undefined } {
+        const runs: WrappedRun[] = [];
+        let firstRun: WrappedRun | undefined;
+        for (const pid of tg.panelIds) {
+            const te = tabMap.get(pid);
+            if (!te) {
+                continue;
+            }
+            const r = te.value.element.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) {
+                continue; // hidden / collapsed
+            }
+            const top = r.top - containerRect.top;
+            const bottom = r.bottom - containerRect.top;
+            const left = r.left - containerRect.left;
+            const right = r.right - containerRect.left;
+            const key = isVertical ? left : top;
+            let run = runs.find(
+                (x) => Math.abs((isVertical ? x.left : x.top) - key) <= 2
+            );
+            if (run) {
+                run.top = Math.min(run.top, top);
+                run.bottom = Math.max(run.bottom, bottom);
+                run.left = Math.min(run.left, left);
+                run.right = Math.max(run.right, right);
+            } else {
+                run = { top, bottom, left, right };
+                runs.push(run);
+            }
+            firstRun ??= run;
+        }
+        return { runs, firstRun };
+    }
+
+    /**
+     * Build the SVG `path` data for a group's per-line underline segments: a
+     * horizontal segment along each row's edge (`svg-y` offset by `minTop`) or a
+     * vertical segment down each column's leading edge (`svg-x` offset by
+     * `minLeft`). `inverted` moves the line to the header-facing edge.
+     */
+    private _wrappedPathData(
+        runs: readonly WrappedRun[],
+        isVertical: boolean,
+        inverted: boolean,
+        minLeft: number,
+        minTop: number,
+        t: number
+    ): string {
         let d = '';
         for (const run of runs) {
             if (isVertical) {
-                // Vertical segment down the column's leading edge; svg-x is
-                // container-x minus the element's `minLeft` origin.
                 const x = inverted
                     ? run.right - minLeft - t / 2
                     : run.left - minLeft + t / 2;
                 d += `M ${x},${run.top} L ${x},${run.bottom} `;
             } else {
-                // Horizontal segment along the row's edge; svg-y is container-y
-                // minus the element's `minTop` origin.
                 const y = inverted
                     ? run.top - minTop + t / 2
                     : run.bottom - minTop - t / 2;
                 d += `M ${run.left},${y} L ${run.right},${y} `;
             }
         }
-        path.setAttribute('d', d.trim());
+        return d.trim();
     }
 
     /**
@@ -523,15 +572,8 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
      */
     private _positionContinuationMarkers(
         groupId: string,
-        runs: readonly {
-            top: number;
-            bottom: number;
-            left: number;
-            right: number;
-        }[],
-        firstRun:
-            | { top: number; bottom: number; left: number; right: number }
-            | undefined,
+        runs: readonly WrappedRun[],
+        firstRun: WrappedRun | undefined,
         color: string,
         isVertical: boolean
     ): void {
