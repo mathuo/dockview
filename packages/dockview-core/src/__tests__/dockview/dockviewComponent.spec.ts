@@ -1943,6 +1943,42 @@ describe('dockviewComponent', () => {
     });
 
     describe('serialization', () => {
+        test('reuseExistingPanels replaces panel params rather than merging', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+                params: { a: 1, b: 2 },
+            });
+
+            const state = dockview.toJSON();
+            // the saved state drops `b`, keeping only `a`
+            (state.panels['panel1'] as any).params = { a: 9 };
+
+            dockview.fromJSON(state, { reuseExistingPanels: true });
+
+            // reuse must restore exactly the saved params (no stale `b: 2`),
+            // matching the non-reuse deserialization path
+            expect(dockview.getGroupPanel('panel1')!.params).toEqual({ a: 9 });
+
+            dockview.dispose();
+        });
+
         test('reuseExistingPanels true', () => {
             const parts: PanelContentPartTest[] = [];
 
@@ -11351,6 +11387,58 @@ describe('dockviewComponent', () => {
             expect(finalSize).toBe(initialSize);
 
             dv.dispose();
+        });
+
+        test('edge group size constraints survive a toJSON/fromJSON round-trip on a fresh component', () => {
+            const c1 = document.createElement('div');
+            const dv = new DockviewComponent(c1, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dv.layout(1000, 800);
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                minimumSize: 150,
+                maximumSize: 400,
+            });
+
+            const state = dv.toJSON();
+            dv.dispose();
+
+            // a fresh component that has NOT called addEdgeGroup — fromJSON must
+            // auto-create the edge group with the serialized constraints
+            const c2 = document.createElement('div');
+            const fresh = new DockviewComponent(c2, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            fresh.layout(1000, 800);
+            fresh.fromJSON(state);
+
+            const view = (fresh as any)._shellManager._rightView;
+            expect(view).toBeDefined();
+            expect(view.configuredMaximumSize).toBe(400);
+            expect(view.configuredMinimumSize).toBe(150);
+
+            fresh.dispose();
         });
 
         test('toJSON includes edgeGroups field for configured positions', () => {

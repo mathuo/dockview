@@ -820,7 +820,6 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
 
     setActivePanel(panel: IDockviewPanel): void {
         const isVertical = this._direction === 'vertical';
-        let running = 0;
 
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
@@ -830,26 +829,30 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 const element = tab.value.element;
                 const parentElement = element.parentElement!;
 
+                // Use the element's own offset (relative to the scroll
+                // container) rather than accumulating tab client sizes, which
+                // omits tab margins and any in-flow group chips between tabs
+                // and so undershoots the active tab's real position.
                 if (isVertical) {
+                    const start = element.offsetTop;
                     if (
-                        running < parentElement.scrollTop ||
-                        running + element.clientHeight >
+                        start < parentElement.scrollTop ||
+                        start + element.offsetHeight >
                             parentElement.scrollTop + parentElement.clientHeight
                     ) {
-                        parentElement.scrollTop = running;
+                        parentElement.scrollTop = start;
                     }
-                } else if (
-                    running < parentElement.scrollLeft ||
-                    running + element.clientWidth >
-                        parentElement.scrollLeft + parentElement.clientWidth
-                ) {
-                    parentElement.scrollLeft = running;
+                } else {
+                    const start = element.offsetLeft;
+                    if (
+                        start < parentElement.scrollLeft ||
+                        start + element.offsetWidth >
+                            parentElement.scrollLeft + parentElement.clientWidth
+                    ) {
+                        parentElement.scrollLeft = start;
+                    }
                 }
             }
-
-            running += isVertical
-                ? tab.value.element.clientHeight
-                : tab.value.element.clientWidth;
         }
 
         // Reposition underlines so the wrap-around follows the new active tab

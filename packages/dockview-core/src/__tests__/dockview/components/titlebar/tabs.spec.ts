@@ -816,6 +816,42 @@ describe('tabs', () => {
         });
     });
 
+    describe('setActivePanel scroll-into-view', () => {
+        test('scrolls to the active tab offsetLeft, accounting for gaps/margins', () => {
+            const { tabs } = createTabsForDropTest();
+
+            const panels = [
+                createMockPanel('p0'),
+                createMockPanel('p1'),
+                createMockPanel('p2'),
+            ];
+            panels.forEach((p) => tabs.openPanel(p));
+
+            const elements = (tabs as any)._tabs.map(
+                (t: any) => t.value.element as HTMLElement
+            );
+
+            // 25px gaps between tabs (margins / group chips) mean each tab's
+            // real offsetLeft exceeds the running sum of client widths
+            const offsets = [0, 125, 250];
+            elements.forEach((el: HTMLElement, i: number) => {
+                jest.spyOn(el, 'offsetLeft', 'get').mockReturnValue(offsets[i]);
+                jest.spyOn(el, 'offsetWidth', 'get').mockReturnValue(100);
+                jest.spyOn(el, 'clientWidth', 'get').mockReturnValue(100);
+            });
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            jest.spyOn(tabsList, 'clientWidth', 'get').mockReturnValue(150);
+            tabsList.scrollLeft = 0;
+
+            // activating the last (overflowed) tab must scroll to its true
+            // offsetLeft (250), not the accumulated client-width sum (200)
+            tabs.setActivePanel(panels[2]);
+
+            expect(tabsList.scrollLeft).toBe(250);
+        });
+    });
+
     describe('showTabsOverflowControl', () => {
         test('disabling at runtime disposes the overflow observer', () => {
             const { tabs } = createTabsForDropTest();

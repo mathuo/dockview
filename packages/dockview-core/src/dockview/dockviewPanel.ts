@@ -245,7 +245,13 @@ export class DockviewPanel
         this._maximumWidth = state.maximumWidth;
         this._minimumWidth = state.minimumWidth;
 
-        this.update({ params: state.params ?? {} });
+        // Replace the params wholesale rather than merging via `update`:
+        // deserialization must restore exactly the saved params, so stale keys
+        // present on the reused live panel but absent from the saved state
+        // don't leak through (matching the fresh-panel `init` path).
+        this._params = state.params ?? {};
+        this.view.update({ params: this._params });
+
         this.setTitle(state.title ?? this.id);
         this.setRenderer(state.renderer ?? this.accessor.renderer);
         // Honour the serialized pinned flag only when pinning is enabled (see

@@ -23,23 +23,37 @@ import { AngularPanePart } from '../paneview/angular-pane-part';
 
 export class AngularFrameworkComponentFactory {
     constructor(
-        private readonly components: Record<
-            string,
-            Type<any> | TemplateRef<any>
-        >,
+        private components: Record<string, Type<any> | TemplateRef<any>>,
         private readonly injector: Injector,
         private readonly environmentInjector?: EnvironmentInjector,
-        private readonly tabComponents?: Record<
+        private tabComponents?: Record<string, Type<any> | TemplateRef<any>>,
+        private watermarkComponent?: Type<any> | TemplateRef<any>,
+        private headerActionsComponents?: Record<
             string,
             Type<any> | TemplateRef<any>
         >,
-        private readonly watermarkComponent?: Type<any> | TemplateRef<any>,
-        private readonly headerActionsComponents?: Record<
-            string,
-            Type<any> | TemplateRef<any>
-        >,
-        private readonly defaultTabComponent?: Type<any> | TemplateRef<any>
+        private defaultTabComponent?: Type<any> | TemplateRef<any>
     ) {}
+
+    /**
+     * Refresh the component maps in place so that rebinding an `@Input()`
+     * component map (e.g. `[components]`) after init is honoured. The core
+     * calls the factory live on each panel creation, so updating these
+     * references is enough — no re-init required.
+     */
+    updateComponents(maps: {
+        components: Record<string, Type<any> | TemplateRef<any>>;
+        tabComponents?: Record<string, Type<any> | TemplateRef<any>>;
+        watermarkComponent?: Type<any> | TemplateRef<any>;
+        headerActionsComponents?: Record<string, Type<any> | TemplateRef<any>>;
+        defaultTabComponent?: Type<any> | TemplateRef<any>;
+    }): void {
+        this.components = maps.components;
+        this.tabComponents = maps.tabComponents;
+        this.watermarkComponent = maps.watermarkComponent;
+        this.headerActionsComponents = maps.headerActionsComponents;
+        this.defaultTabComponent = maps.defaultTabComponent;
+    }
 
     // For DockviewComponent
     createDockviewComponent(options: CreateComponentOptions): IContentRenderer {

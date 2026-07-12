@@ -217,6 +217,38 @@ describe('PointerDragController', () => {
         document.body.removeChild(targetEl);
     });
 
+    test('cancel() fires onDragEnd (dropped=false) so consumers reset', () => {
+        const controller = PointerDragController.getInstance();
+
+        const onDragEndEvent = jest.fn();
+        const dispose = controller.onDragEnd(onDragEndEvent);
+        const onDragEndCallback = jest.fn();
+
+        controller.beginDrag({
+            pointerEvent: makePointerEvent('pointermove', {
+                clientX: 5,
+                clientY: 5,
+            }),
+            source: document.createElement('div'),
+            getData: () => ({ dispose: jest.fn() }),
+            onDragEnd: onDragEndCallback,
+        });
+
+        // a second drag preempting the first calls cancel() internally; here
+        // we call it directly. It must still notify drag-end consumers.
+        controller.cancel();
+
+        expect(onDragEndCallback).toHaveBeenCalledTimes(1);
+        expect(onDragEndCallback).toHaveBeenLastCalledWith(
+            expect.objectContaining({ clientX: 5, clientY: 5 }),
+            false
+        );
+        expect(onDragEndEvent).toHaveBeenCalledTimes(1);
+        expect(controller.active).toBeUndefined();
+
+        dispose.dispose();
+    });
+
     test('events with a different pointerId are ignored mid-drag', () => {
         const controller = PointerDragController.getInstance();
 

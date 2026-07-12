@@ -178,6 +178,66 @@ describe('paneviewComponent', () => {
         paneview.dispose();
     });
 
+    test('re-expanding a collapsed pane restores its prior size, not the container width', () => {
+        const disposables = new CompositeDisposable();
+
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        // a wide-ish, tall container: the cross-axis (width) is 300 while there
+        // is plenty of main-axis (height) room
+        paneview.layout(300, 900);
+
+        const panel1 = paneview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'Panel 1',
+            isExpanded: true,
+        });
+        const panel2 = paneview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Panel 2',
+            isExpanded: true,
+        });
+        paneview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            title: 'Panel 3',
+            isExpanded: true,
+        });
+
+        let panel2Dimensions: PanelDimensionChangeEvent | undefined;
+        disposables.addDisposables(
+            panel2.api.onDidDimensionsChange((event) => {
+                panel2Dimensions = event;
+            })
+        );
+
+        // give panel2 a specific expanded height
+        panel2.api.setSize({ size: 150 });
+        expect(panel2Dimensions?.height).toBe(150);
+
+        // collapse then re-expand it
+        panel2.api.setExpanded(false);
+        panel2.api.setExpanded(true);
+
+        // it must return to its cached ~150 height, not jump to the 300px
+        // cross-axis container width (which would squeeze its siblings)
+        expect(panel2Dimensions?.height).toBe(150);
+
+        disposables.dispose();
+        paneview.dispose();
+    });
+
     test('serialization', () => {
         const paneview = new PaneviewComponent(container, {
             createComponent: (options) => {
