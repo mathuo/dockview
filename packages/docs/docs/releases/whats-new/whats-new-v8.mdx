@@ -30,8 +30,10 @@ The new [`pinnedTabs`](/docs/core/panels/pinnedTabs) option lets a panel be
 pinned to the front of the tab strip, keeping it in place while other tabs come
 and go. Pinned tabs stay ahead of unpinned ones, are excluded from the overflow
 dropdown, and can render compact (hiding the close button, Chrome-style) or on a
-separate row. Pinning round-trips through serialization and can be toggled from
-the built-in tab context menu via the new `'pin'` menu item.
+separate row. Pin and unpin by dragging tabs into or out of that separate row, from
+the keyboard with `Ctrl+Shift+Enter`, or from the built-in tab context menu via the
+new `'pin'` item; in inline mode pinned tabs can stay stuck to the left edge as the
+strip scrolls. Pinning round-trips through serialization.
 
 ### Multi-row (wrapping) tabs & overflow
 
@@ -39,7 +41,11 @@ The new [`overflow`](/docs/core/panels/tabOverflow) option controls what happens
 when there are more tabs than fit on one row. The default single-row strip with
 a chevron dropdown is unchanged; setting `overflow.mode: 'wrap'` instead wraps
 the tabs onto multiple rows and grows the header to fit, with full cross-row
-drag-and-drop reordering. See [Multi-row tabs](/docs/core/panels/multiRowTabs).
+drag-and-drop reordering. Cap the growth with `overflow.maxRows` and the surplus rows
+spill back into the dropdown, or upgrade the dropdown itself into a searchable,
+most-recently-used tab switcher with `overflow.search` and `overflow.mru`. See
+[Multi-row tabs](/docs/core/panels/multiRowTabs) and
+[Advanced overflow](/docs/core/panels/advancedOverflow).
 
 ### Drop guide compass
 

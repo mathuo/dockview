@@ -1,7 +1,7 @@
 ---
 title: Multi-row tabs
 description: The multi-row (wrapping) tabs mode, where a group's tab strip wraps onto additional rows so every tab stays visible at once.
-sidebar_position: 9
+sidebar_position: 10
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -84,13 +84,22 @@ used instead; no error, no regression.
 
 ### `maxRows`
 
-`overflow.maxRows` is reserved to cap how many rows the header may grow to, spilling
-any surplus tabs back into the dropdown.
+`overflow.maxRows` caps how many rows the header may grow to. The strip wraps up to
+`maxRows` rows; any tab that would land on a row beyond the cap spills into the
+chevron overflow dropdown instead, so wrapping and the dropdown compose rather than
+conflict. Left unset, wrapping is unbounded and the header grows to fit every tab.
 
-:::warning
-`maxRows` is not yet implemented. Wrapping is currently unbounded regardless of the
-value, and setting it has no effect today.
-:::
+```tsx
+const api = createDockview(element, {
+    overflow: { mode: 'wrap', maxRows: 2 },
+});
+
+// raise or lower the cap at runtime and the strip reflows
+api.updateOptions({ overflow: { mode: 'wrap', maxRows: 3 } });
+```
+
+`maxRows` is provided by the same `MultiRowTabsModule` as `mode: 'wrap'`, so it is
+only honoured in wrap mode; it has no effect on the single-row dropdown.
 
 ### Reordering across rows
 
@@ -106,21 +115,18 @@ out of the header to detach or float it works exactly as before.
 - `overflow.mode` is read when the layout is created and re-applied if you change it
   via `updateOptions`. A runtime change of header direction is not re-evaluated.
 
-## Advanced overflow (experimental)
+## Advanced overflow
 
-The `overflow` block also carries `search`, `mru`, and `thumbnails` fields intended to
-enrich the dropdown into a searchable, most-recently-used, preview-capable tab
-switcher.
-
-:::warning
-These fields are reserved for a not-yet-shipped advanced overflow module and currently
-have **no effect**. They are documented here only as forward-looking API surface;
-setting them today does nothing. Rely on `mode` and (once implemented) `maxRows`.
-:::
+The `overflow` block also carries `search`, `mru`, and `thumbnails` fields that turn
+the dropdown into a searchable, most-recently-used tab switcher. `search` and `mru`
+ship in the `AdvancedOverflowModule`; `thumbnails` is still reserved and has no effect
+yet. These compose with wrap mode: tabs that spill past `maxRows` land in the same
+enhanced dropdown. See [Advanced overflow](/docs/core/panels/advancedOverflow).
 
 ## See also
 
 - [Tab overflow](/docs/core/panels/tabOverflow): the default single-row dropdown this mode replaces.
+- [Advanced overflow](/docs/core/panels/advancedOverflow): search and most-recently-used ordering for the dropdown.
 - [Pinned tabs](/docs/core/panels/pinnedTabs): another way to keep important tabs visible.
 - [Tab header position](/docs/core/panels/headerPosition): wrapping applies to horizontal headers only.
 ```
