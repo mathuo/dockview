@@ -12375,14 +12375,14 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
         dockview.addPanel({ id: 'panel1', component: 'default' });
         dockview.addPanel({ id: 'panel2', component: 'default' });
 
-        expect(dockview.panels.length).toBe(2);
+        expect(dockview.panels).toHaveLength(2);
 
         // an object with no `grid` is malformed; fromJSON must reject it
         // *before* clearing the live layout
         expect(() => dockview.fromJSON({} as any)).toThrow();
 
         // the pre-existing layout must survive the failed load
-        expect(dockview.panels.length).toBe(2);
+        expect(dockview.panels).toHaveLength(2);
         expect(dockview.getGroupPanel('panel1')).toBeTruthy();
         expect(dockview.getGroupPanel('panel2')).toBeTruthy();
 
