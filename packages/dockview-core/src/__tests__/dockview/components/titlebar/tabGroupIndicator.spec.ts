@@ -285,6 +285,202 @@ describe('WrapTabGroupIndicator', () => {
     });
 });
 
+describe('WrapTabGroupIndicator continuation markers', () => {
+    const CONTINUATION = '.dv-tab-group-chip-continuation';
+
+    // Build a tab whose rect sits on a given row (top) and column offset (left).
+    const makeTab = (top: number, left = 0) => {
+        const el = document.createElement('div');
+        el.getBoundingClientRect = () =>
+            ({
+                top,
+                bottom: top + 26,
+                left,
+                right: left + 50,
+                width: 50,
+                height: 26,
+            }) as DOMRect;
+        return { value: { element: el } };
+    };
+
+    function setup(
+        tabMap: Map<string, any>,
+        tg: TabGroup,
+        wrap = true
+    ): {
+        indicator: WrapTabGroupIndicator;
+        tabsList: HTMLElement;
+    } {
+        const tabsList = document.createElement('div');
+        if (wrap) {
+            tabsList.classList.add('dv-tabs-container--wrap');
+        }
+        const ctx = createContext({
+            tabsList,
+            getTabGroups: () => [tg],
+            getTabMap: () => tabMap as any,
+            getActivePanelId: () => undefined,
+            getHeaderPosition: () => 'top',
+        });
+        const indicator = new WrapTabGroupIndicator(ctx);
+        indicator.syncUnderlineElements(new Set([tg.id]));
+        return { indicator, tabsList };
+    }
+
+    test('a group spanning two rows draws one continuation marker', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(30, 0)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        // First row is the chip's row (no marker); one marker on row 2.
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+
+        indicator.dispose();
+    });
+
+    test('a group spanning three rows draws two continuation markers', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+            ['c', makeTab(60)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'red' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+        tg.addPanel('c');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(2);
+
+        indicator.dispose();
+    });
+
+    test('a single-row group draws no continuation markers', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(0, 50)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'green' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+
+        indicator.dispose();
+    });
+
+    test('marker sits at the leading edge of its row in the group colour', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(30, 12)], // row 2 run begins at left 12
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        const marker = tabsList.querySelector(CONTINUATION) as HTMLElement;
+        expect(marker.style.left).toBe('12px');
+        // vertical centre of the 26px-tall row (30..56) minus half the 8px pip
+        expect(marker.style.top).toBe(`${(30 + 56) / 2 - 4}px`);
+        expect(marker.style.backgroundColor).toBeTruthy();
+
+        indicator.dispose();
+    });
+
+    test('markers shrink when the group stops spanning multiple rows', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+
+        // Both tabs now on the same row → marker pool shrinks to zero.
+        tabMap.set('b', makeTab(0, 50));
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+
+        indicator.dispose();
+    });
+
+    test('markers are removed when wrap mode is turned off', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+
+        tabsList.classList.remove('dv-tabs-container--wrap');
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+
+        indicator.dispose();
+    });
+
+    test('markers are removed when the group dissolves', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+
+        // Group no longer active → its underline and markers are cleaned up.
+        indicator.syncUnderlineElements(new Set());
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+
+        indicator.dispose();
+    });
+
+    test('dispose removes all continuation markers', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(1);
+
+        indicator.dispose();
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+    });
+});
+
 describe('indicator type identity', () => {
     test('NoneTabGroupIndicator and WrapTabGroupIndicator are distinct types', () => {
         const ctx = createContext();

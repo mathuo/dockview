@@ -11,6 +11,17 @@ import {
     TabGroupColorPalette,
 } from '../../tabGroupAccent';
 
+/**
+ * Class for the small accent pip drawn at the leading edge of each wrapped
+ * row a tab group spans beyond its first. Echoes the group chip so a
+ * multi-row group reads as one group on every row it occupies.
+ */
+export const TAB_GROUP_CHIP_CONTINUATION_CLASS =
+    'dv-tab-group-chip-continuation';
+
+/** Diameter (px) of a continuation pip; mirrors the CSS size. */
+const CONTINUATION_PIP_SIZE = 8;
+
 export interface TabGroupIndicatorContext {
     readonly tabsList: HTMLElement;
     getTabGroups(): readonly ITabGroup[];
@@ -37,6 +48,12 @@ export interface ITabGroupIndicator {
  */
 abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
     protected readonly _underlines = new Map<string, HTMLElement>();
+    /**
+     * Per-group pool of continuation-marker pips (one per wrapped row the
+     * group spans beyond its first). Absolutely positioned so they sit
+     * outside the flex-wrap flow, exactly like the underline element.
+     */
+    private readonly _continuationMarkers = new Map<string, HTMLElement[]>();
     private _rafId: number | null = null;
 
     get underlines(): ReadonlyMap<string, HTMLElement> {
@@ -86,11 +103,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             }
         }
 
-        // Remove underlines for dissolved groups
+        // Remove underlines (and any continuation markers) for dissolved groups
         for (const [groupId, el] of this._underlines) {
             if (!activeGroupIds.has(groupId)) {
                 el.remove();
                 this._underlines.delete(groupId);
+                this._clearContinuationMarkers(groupId);
             }
         }
     }
@@ -109,6 +127,57 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             el.remove();
         }
         this._underlines.clear();
+        this._clearContinuationMarkers();
+    }
+
+    /**
+     * Grow/shrink a group's continuation-marker pool to `count` pips,
+     * creating/removing DOM nodes as needed, and return the pool.
+     */
+    private _syncContinuationMarkers(
+        groupId: string,
+        count: number
+    ): HTMLElement[] {
+        let pool = this._continuationMarkers.get(groupId);
+        if (!pool) {
+            pool = [];
+            this._continuationMarkers.set(groupId, pool);
+        }
+        while (pool.length < count) {
+            const marker = document.createElement('div');
+            marker.className = TAB_GROUP_CHIP_CONTINUATION_CLASS;
+            this._ctx.tabsList.appendChild(marker);
+            pool.push(marker);
+        }
+        while (pool.length > count) {
+            const marker = pool.pop();
+            marker?.remove();
+        }
+        return pool;
+    }
+
+    /**
+     * Remove continuation markers for a single group, or (when `groupId`
+     * is omitted) for every group. Used when a group dissolves, stops
+     * wrapping, or the indicator is disposed.
+     */
+    private _clearContinuationMarkers(groupId?: string): void {
+        if (groupId === undefined) {
+            for (const [, pool] of this._continuationMarkers) {
+                for (const marker of pool) {
+                    marker.remove();
+                }
+            }
+            this._continuationMarkers.clear();
+            return;
+        }
+        const pool = this._continuationMarkers.get(groupId);
+        if (pool) {
+            for (const marker of pool) {
+                marker.remove();
+            }
+            this._continuationMarkers.delete(groupId);
+        }
     }
 
     /**
@@ -136,6 +205,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         const wrapped =
             !isVertical &&
             this._ctx.tabsList.classList.contains(OVERFLOW_WRAP_TABS_CLASS);
+        if (!wrapped) {
+            // Continuation markers only exist while wrapping; a runtime
+            // wrap→no-wrap toggle (or a switch to vertical) must not leave
+            // orphaned pips behind.
+            this._clearContinuationMarkers();
+        }
         const containerCrossSize = isVertical
             ? containerRect.width
             : containerRect.height;
@@ -312,6 +387,7 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         );
         if (color === undefined) {
             underline.style.display = 'none';
+            this._clearContinuationMarkers(tg.id);
             return;
         }
 
@@ -345,8 +421,11 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
 
         if (rows.length === 0) {
             underline.style.display = 'none';
+            this._clearContinuationMarkers(tg.id);
             return;
         }
+
+        this._positionContinuationMarkers(tg.id, rows, color);
 
         const overline = this._ctx.getHeaderPosition() === 'bottom';
         const minTop = Math.min(...rows.map((r) => r.top));
@@ -379,6 +458,44 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             d += `M ${row.left},${y} L ${row.right},${y} `;
         }
         path.setAttribute('d', d.trim());
+    }
+
+    /**
+     * Draw a small accent pip at the leading edge of every wrapped row a
+     * group spans beyond its first. The group's real chip already marks the
+     * first row; these lightweight markers echo it on the continuation rows
+     * so a group that wraps onto rows 2–3 reads as one group on each row
+     * instead of losing its colour after the first.
+     *
+     * `rows` are the group's row-runs (container-relative geometry) as
+     * bucketed by {@link _positionWrappedUnderline}; the top-most row is the
+     * chip's row and gets no marker.
+     */
+    private _positionContinuationMarkers(
+        groupId: string,
+        rows: readonly {
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+        }[],
+        color: string
+    ): void {
+        // Ascending by row so the visual first row (the chip's row) is index 0.
+        const sorted = [...rows].sort((a, b) => a.top - b.top);
+        const continuationRows = sorted.slice(1);
+        const markers = this._syncContinuationMarkers(
+            groupId,
+            continuationRows.length
+        );
+
+        continuationRows.forEach((row, i) => {
+            const marker = markers[i];
+            marker.style.backgroundColor = color;
+            marker.style.left = `${row.left}px`;
+            const center = (row.top + row.bottom) / 2;
+            marker.style.top = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+        });
     }
 
     /**

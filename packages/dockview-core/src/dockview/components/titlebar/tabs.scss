@@ -488,6 +488,20 @@
     z-index: 10;
 }
 
+// Continuation marker for multi-row (wrapped) tab groups: a small accent pip
+// drawn at the leading edge of each wrapped row a group spans beyond its
+// first, echoing the group chip so the group reads as one on every row.
+// Positioned by JS (absolute → outside the flex-wrap flow, like the underline).
+.dv-tab-group-chip-continuation {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    opacity: var(--dv-tab-group-line-opacity);
+    pointer-events: none;
+    z-index: 10;
+}
+
 // Header-bottom: overline instead of underline
 .dv-groupview-header-bottom .dv-tab-group-underline {
     bottom: auto;
