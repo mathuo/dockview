@@ -236,6 +236,85 @@ describe('defaultTab', () => {
         expect(element.querySelector('.dv-tab-pin')).toBeNull();
     });
 
+    test('that a middle-click closes the tab', async () => {
+        const api = fromPartial<DockviewPanelApi>({
+            close: jest.fn(),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
+            onDidChangePinned: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+        const params = {};
+
+        render(
+            <DockviewDefaultTab
+                tabLocation="header"
+                api={api}
+                containerApi={containerApi}
+                params={params}
+            />
+        );
+
+        const element = await screen.getByTestId('dockview-dv-default-tab');
+
+        // jsdom has no PointerEvent and testing-library's fireEvent.pointer*
+        // drops `button`, so dispatch MouseEvents (which carry `button`) with
+        // the pointer event type names React listens to.
+        fireEvent(
+            element,
+            new MouseEvent('pointerdown', { button: 1, bubbles: true })
+        );
+        fireEvent(
+            element,
+            new MouseEvent('pointerup', { button: 1, bubbles: true })
+        );
+
+        expect(api.close).toHaveBeenCalledTimes(1);
+    });
+
+    test('that a middle-click aborted by leaving the tab does not close it', async () => {
+        const api = fromPartial<DockviewPanelApi>({
+            close: jest.fn(),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
+            onDidChangePinned: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+        const params = {};
+
+        render(
+            <DockviewDefaultTab
+                tabLocation="header"
+                api={api}
+                containerApi={containerApi}
+                params={params}
+            />
+        );
+
+        const element = await screen.getByTestId('dockview-dv-default-tab');
+
+        // press the middle button, then drag the pointer off the tab (which
+        // should cancel the pending close) before releasing. React derives
+        // onPointerLeave from the native pointerout event.
+        fireEvent(
+            element,
+            new MouseEvent('pointerdown', { button: 1, bubbles: true })
+        );
+        fireEvent.pointerOut(element);
+        fireEvent(
+            element,
+            new MouseEvent('pointerup', { button: 1, bubbles: true })
+        );
+
+        expect(api.close).toHaveBeenCalledTimes(0);
+    });
+
     test('has close button when hideClose=false', async () => {
         const api = fromPartial<DockviewPanelApi>({
             onDidTitleChange: jest

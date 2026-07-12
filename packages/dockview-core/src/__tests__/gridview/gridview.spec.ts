@@ -66,6 +66,24 @@ describe('gridview', () => {
         expect(container.childNodes).toHaveLength(0);
     });
 
+    test('maximumWidth and maximumHeight return their respective axis', () => {
+        const gridview = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view = new MockGridview();
+        view.maximumWidth = 500;
+        view.maximumHeight = Number.MAX_VALUE;
+
+        gridview.addView(view, Sizing.Distribute, [0]);
+
+        expect(gridview.maximumWidth).toBe(500);
+        expect(gridview.maximumHeight).toBe(Number.MAX_VALUE);
+    });
+
     test('insertOrthogonalSplitviewAtRoot #1', () => {
         const gridview = new Gridview(
             false,

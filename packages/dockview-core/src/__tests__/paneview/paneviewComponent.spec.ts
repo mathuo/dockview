@@ -562,6 +562,27 @@ describe('paneviewComponent', () => {
         expect(paneview.disableResizing).toBeTruthy();
     });
 
+    test('that disableAutoResizing can be toggled via updateOptions', () => {
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        expect(paneview.disableResizing).toBeFalsy();
+
+        paneview.updateOptions({ disableAutoResizing: true });
+        expect(paneview.disableResizing).toBeTruthy();
+
+        paneview.updateOptions({ disableAutoResizing: false });
+        expect(paneview.disableResizing).toBeFalsy();
+    });
+
     test('that setVisible toggles visiblity', () => {
         const paneview = new PaneviewComponent(container, {
             createComponent: (options) => {

@@ -375,7 +375,7 @@ export class Gridview implements IDisposable {
     }
 
     get maximumWidth(): number {
-        return this.root.maximumHeight;
+        return this.root.maximumWidth;
     }
 
     get maximumHeight(): number {

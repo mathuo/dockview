@@ -145,7 +145,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
 
-            const frameworkTabComponents = props.tabComponents ?? {};
+            const frameworkTabComponents = { ...props.tabComponents };
 
             if (props.defaultTabComponent) {
                 frameworkTabComponents[DEFAULT_REACT_TAB] =
@@ -346,7 +346,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
 
-            const frameworkTabComponents = props.tabComponents ?? {};
+            const frameworkTabComponents = { ...props.tabComponents };
 
             if (props.defaultTabComponent) {
                 frameworkTabComponents[DEFAULT_REACT_TAB] =

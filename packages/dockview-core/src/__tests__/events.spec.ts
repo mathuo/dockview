@@ -44,6 +44,24 @@ describe('events', () => {
             expect(value).toBeUndefined();
         });
 
+        it('should still notify remaining listeners when one unsubscribes during dispatch', () => {
+            const emitter = new Emitter<number>();
+
+            let bReceived: number | undefined = undefined;
+
+            const a = emitter.event(() => {
+                // a self-disposing (fire-once) listener registered before b
+                a.dispose();
+            });
+            emitter.event((x) => {
+                bReceived = x;
+            });
+
+            emitter.fire(42);
+
+            expect(bReceived).toBe(42);
+        });
+
         it('should replay last value in replay mode', () => {
             const emitter = new Emitter<number>({ replay: true });
             let value: number | undefined = undefined;

@@ -97,7 +97,11 @@ export const DockviewDefaultTab: React.FunctionComponent<
 
     const _onPointerUp = React.useCallback(
         (event: React.PointerEvent<HTMLDivElement>) => {
-            if (isMiddleMouseButton && event.button === 1 && !hideClose) {
+            if (
+                isMiddleMouseButton.current &&
+                event.button === 1 &&
+                !hideClose
+            ) {
                 isMiddleMouseButton.current = false;
                 onClose(event);
             }

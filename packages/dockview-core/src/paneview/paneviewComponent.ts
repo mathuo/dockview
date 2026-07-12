@@ -251,7 +251,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._classNames.setClassNames(options.className ?? '');
         }
 
-        if ('disableResizing' in options) {
+        if ('disableAutoResizing' in options) {
             this.disableResizing = options.disableAutoResizing ?? false;
         }
 
