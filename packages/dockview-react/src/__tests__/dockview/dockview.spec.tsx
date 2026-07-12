@@ -45,6 +45,29 @@ describe('gridview react', () => {
         expect(api).toBeTruthy();
     });
 
+    test('that passing defaultTabComponent does not mutate the caller-owned tabComponents object', () => {
+        const tabComponents: Record<string, React.FunctionComponent<any>> = {
+            myTab: () => <div />,
+        };
+
+        const defaultTabComponent = () => <div />;
+
+        const onReady = () => {
+            // noop
+        };
+
+        render(
+            <DockviewReact
+                components={components}
+                tabComponents={tabComponents}
+                defaultTabComponent={defaultTabComponent}
+                onReady={onReady}
+            />
+        );
+
+        expect(Object.keys(tabComponents)).toEqual(['myTab']);
+    });
+
     test('is sized to container', () => {
         const el = document.createElement('div');
 

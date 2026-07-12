@@ -112,6 +112,17 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 -   Prettier for code formatting
 -   Linting targets source files in packages/\*/src/\*\* (excludes tests, docs, node_modules)
 -   Current rules focus on TypeScript best practices while allowing some flexibility
+-   **SonarCloud must introduce no new issues.** Every PR runs a SonarCloud
+    analysis (the `sonar` check). A PR is not ready to merge while it reports
+    any new issues, even if the Quality Gate still passes — treat "New issues:
+    0" as the bar, not just a green gate. Before pushing, self-review the diff
+    for the smells Sonar flags (redundant `?? {}` / `|| {}` in a spread,
+    unused code, needless casts, cognitive-complexity spikes) and fix them in
+    the same PR. If Sonar reports a new issue, fix it (or, if genuinely a false
+    positive, mark it Won't Fix / Accepted in SonarCloud with a justification)
+    before merging. Fetch the exact findings from
+    `https://sonarcloud.io/api/issues/search?componentKeys=mathuo_dockview&pullRequest=<PR>&issueStatuses=OPEN,CONFIRMED&resolved=false`
+    rather than trusting the summary comment, which can lag a commit behind.
 
 ## Development Notes
 
@@ -190,13 +201,24 @@ the in-session gaps.
 1.  **Starting work** — set the issue to **In Progress** (Linear `save_issue`
     with `state: "In Progress"`) before making changes. Skip if it's already
     In Progress / Done.
-2.  **Opening a PR** — include a Linear magic word for every issue the PR
-    resolves in the PR **description**, one per issue: `Fixes <ID>` /
-    `Closes <ID>` (e.g. `Fixes ABC-123`). This is what makes Linear auto-link
-    the PR and auto-complete the issue on merge, regardless of the branch name
-    (agent branches are assigned as `claude/...`, which Linear does not
-    auto-link). Put the magic words in the body even when the title already
-    mentions the identifier.
+2.  **Opening a PR — link the issue(s).** How to link depends on how many
+    issues the PR resolves:
+    -   **Exactly one issue** — put the identifier in the **branch name** and
+        the **PR title** (e.g. branch `matthew/dv-52-maximum-width`, title
+        `fix(DV-52): maximumWidth axis swap`). Prefer the branch name Linear
+        generates for the issue ("Copy git branch name") so linking is
+        automatic on push. If the branch name can't carry the identifier — most
+        often an agent branch assigned as `claude/...`, which Linear does not
+        auto-link — fall back to a `Fixes <ID>` magic word in the description.
+    -   **More than one issue** — a branch name/title can only carry one
+        identifier, so instead add a Linear magic word for **every** issue in
+        the PR **description**, one per line: `Fixes <ID>` / `Closes <ID>`
+        (e.g. `Fixes ABC-123`).
+
+    Magic words (`Fixes` / `Closes` / `Resolves`) are what auto-complete the
+    issue on merge; a bare identifier in the title/branch links the PR but
+    relies on the integration's PR-merged→Done status mapping to close it. When
+    in doubt, include the magic word.
 3.  **On merge** — when a watched PR merges (the merge webhook arrives during a
     session), set each resolved issue to **Done** (Linear `save_issue` with
     `state: "Done"`) as a backup in case the native integration's status

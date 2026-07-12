@@ -170,7 +170,10 @@ export class Emitter<T> implements IDisposable {
         if (this.options?.replay) {
             this._last = e;
         }
-        for (const listener of this._listeners) {
+        // iterate over a snapshot so that a listener disposing its own (or a
+        // sibling's) subscription during dispatch doesn't cause the live array
+        // to shift underneath the loop and skip the following listener
+        for (const listener of this._listeners.slice()) {
             listener.callback(e);
         }
     }
