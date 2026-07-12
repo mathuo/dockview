@@ -328,6 +328,154 @@ test.describe('multi-row tabs (wrap mode)', () => {
     // Arrow Up/Down move the roving focus between wrapped rows (core keeps
     // Left/Right within a row). Real geometry: the target is the tab in the
     // adjacent row whose horizontal centre is nearest the focused tab's.
+    // --- DV-14: vertical (edge-group) headers wrap into COLUMNS ---
+    // Real-browser only: depends on `writing-mode: vertical-rl` + `flex-wrap`
+    // producing columns and the header growing in width — neither of which jsdom
+    // lays out. The group's header is flipped to `left` after load.
+    const setupVertical = async (page, query = 'overflow=wrap', count = 24) => {
+        await page.goto(`/e2e/fixtures/index.html?${query}`);
+        await page.waitForFunction(() => (window as any).__ready === true);
+        // Add the tabs first (this creates the group), then flip the header to a
+        // vertical position — which also drives the runtime direction-change
+        // signal that re-applies wrap on the column axis (DV-14 / P1).
+        await page.evaluate(
+            (n) => (window as any).__dv.setupWrapTabs(n),
+            count
+        );
+        await page.evaluate(() =>
+            (window as any).__dv.setHeaderPosition('left')
+        );
+    };
+
+    const columnCount = (page) =>
+        page.evaluate(() => {
+            const lefts = new Set<number>();
+            document
+                .querySelectorAll<HTMLElement>('.dv-tabs-container .dv-tab')
+                .forEach((t) => lefts.add(t.offsetLeft));
+            return lefts.size;
+        });
+
+    test('vertical header: tabs wrap into multiple columns and the header grows in width', async ({
+        page,
+    }) => {
+        await setupVertical(page);
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        await expect(tabsList).toHaveClass(/dv-tabs-container-vertical/);
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap/);
+
+        // the tabs occupy more than one column (more than one distinct offsetLeft)
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        // the header grew past a single column (default column width var)
+        const m = await page.evaluate(() => {
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const colW = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            return { colW, headerW: header.offsetWidth };
+        });
+        expect(m.colW).toBeGreaterThan(0);
+        expect(m.headerW).toBeGreaterThan(m.colW);
+    });
+
+    test('vertical header: maxRows caps the header width and spills the surplus into the dropdown', async ({
+        page,
+    }) => {
+        await setupVertical(page, 'overflow=wrap&maxRows=2');
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap-capped/);
+
+        const m = await page.evaluate(() => {
+            const list = document.querySelector(
+                '.dv-tabs-container'
+            ) as HTMLElement;
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const colW = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            return {
+                colW,
+                headerW: header.offsetWidth,
+                clientW: list.clientWidth,
+                scrollW: list.scrollWidth,
+            };
+        });
+
+        // The header grew past a single column but is capped at two.
+        expect(m.headerW).toBeGreaterThan(m.colW);
+        expect(m.headerW).toBeLessThanOrEqual(m.colW * 2 + 1);
+        // The strip clips the surplus columns (natural content is wider than the
+        // capped client box).
+        expect(m.scrollW).toBeGreaterThan(m.clientW);
+        // The surplus tabs appear in the overflow dropdown chevron.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
+    });
+
+    test('vertical header: a tab drags across columns to reorder', async ({
+        page,
+    }) => {
+        await setupVertical(page);
+
+        const tabOrder = () =>
+            page.evaluate(() =>
+                Array.from(
+                    document.querySelectorAll('.dv-tabs-container .dv-tab')
+                ).map((t) => (t as HTMLElement).innerText.trim())
+            );
+
+        const before = await tabOrder();
+        expect(before.length).toBe(24);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        // drag the last tab (a later column) onto the first tab (first column)
+        const s = (await page
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-23' })
+            .boundingBox())!;
+        const t = (await page
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-0' })
+            .boundingBox())!;
+
+        await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2 + 6);
+        // move onto the top half of the first tab (insert before it)
+        await page.mouse.move(t.x + t.width / 2, t.y + 3, { steps: 20 });
+        await page.mouse.up();
+
+        const after = await tabOrder();
+        expect(after[0]).toContain('wrap-tab-long-title-23');
+        expect([...after].sort()).toEqual([...before].sort());
+        expect(after).not.toEqual(before);
+    });
+
+    test('vertical header: no wrap class without the opt-in', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(24));
+        await page.evaluate(() =>
+            (window as any).__dv.setHeaderPosition('left')
+        );
+
+        const list = page.locator('.dv-tabs-container').first();
+        await expect(list).toHaveClass(/dv-tabs-container-vertical/);
+        await expect(list).not.toHaveClass(/dv-tabs-container--wrap/);
+    });
+
     test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
         await setup(page);
 

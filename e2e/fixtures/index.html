@@ -222,6 +222,12 @@
                     // `maxRows`) so the multi-row cap reflow can be exercised.
                     setOverflow: (overflow) =>
                         dockview.updateOptions({ overflow }),
+                    // Move the active/first group's header — drives vertical
+                    // (edge-style) headers for the multi-row column-wrap tests.
+                    setHeaderPosition: (position) => {
+                        const g = dockview.activeGroup || dockview.groups[0];
+                        if (g) g.api.setHeaderPosition(position);
+                    },
                     closePanel: (id) => panels[id] && panels[id].api.close(),
                     // Add a panel, optionally splitting a new group off in a
                     // direction (records an 'add' mutation for layout history).

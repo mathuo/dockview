@@ -12249,3 +12249,107 @@ describe('dockviewComponent', () => {
         expect(overflowTab.element.textContent).not.toContain('original');
     });
 });
+
+describe('group header direction change signal (DV-14 unblocker)', () => {
+    function createDockview(): DockviewComponent {
+        const dv = new DockviewComponent(document.createElement('div'), {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+        dv.layout(1000, 1000);
+        dv.addPanel({ id: 'panel1', component: 'default' });
+        return dv;
+    }
+
+    test('fires on a horizontal→vertical flip (top→left)', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left');
+
+        expect(events).toEqual([{ direction: 'vertical', position: 'left' }]);
+
+        dv.dispose();
+    });
+
+    test('fires on a vertical→horizontal flip (left→top)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('top');
+
+        expect(events).toEqual([{ direction: 'horizontal', position: 'top' }]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a same-axis move (top→bottom)', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('bottom');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a same-axis vertical move (left→right)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('right');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a redundant set (left→left)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('fires once per flip across a top→left→top cycle', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left'); // horizontal→vertical
+        dv.groups[0].api.setHeaderPosition('right'); // vertical→vertical (no fire)
+        dv.groups[0].api.setHeaderPosition('top'); // vertical→horizontal
+
+        expect(events).toEqual([
+            { direction: 'vertical', position: 'left' },
+            { direction: 'horizontal', position: 'top' },
+        ]);
+
+        dv.dispose();
+    });
+});

@@ -82,4 +82,14 @@
         height: auto;
         width: var(--dv-tabs-and-actions-container-height);
     }
+
+    // Vertical header + multi-column (wrapping) tabs: the header grows in WIDTH
+    // (one step per column) instead of the fixed single-column thickness. The
+    // shared bits (min-size, flex-start alignment of the header chrome) come
+    // from the generic `:has(.dv-tabs-container--wrap)` rule above; this only
+    // switches the growth axis from height to width for the vertical case.
+    &.dv-groupview-header-vertical:has(.dv-tabs-container--wrap) {
+        width: auto;
+        min-width: var(--dv-tabs-and-actions-container-height);
+    }
 }

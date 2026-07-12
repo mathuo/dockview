@@ -39,6 +39,19 @@ export interface TabAnimationState {
  * needs to reach back into the owning `Tabs` instance is funnelled through
  * this interface so the boundary stays explicit.
  */
+/** A wrapped drop candidate: a tab's list index and its live bounding rect. */
+interface WrappedTabEntry {
+    index: number;
+    rect: DOMRect;
+}
+
+/** A run of wrapped tabs on one line (row or column), with its cross-axis span. */
+interface WrappedLine {
+    start: number;
+    end: number;
+    items: WrappedTabEntry[];
+}
+
 export interface ITabReorderHost {
     /** Live tab list (the `_tabs` array of the owning `Tabs`). */
     readonly tabItems: IValueDisposable<Tab>[];
@@ -719,19 +732,73 @@ export class TabReorderController extends CompositeDisposable {
 
     /**
      * The insertion slot (index into the full tab list) for a pointer at
-     * `(clientX, clientY)` over a wrapped strip: pick the row whose vertical
-     * span contains `clientY` (clamped to first/last), then the slot within that
-     * row by x-midpoint. Excludes the drag source so its own position doesn't
-     * bias the result; the drop path adjusts for the source offset.
+     * `(clientX, clientY)` over a wrapped strip. Two axes:
+     *  - horizontal header (rows): pick the row whose vertical span contains
+     *    `clientY`, then the slot within it by x-midpoint;
+     *  - vertical header (columns): pick the column whose horizontal span
+     *    contains `clientX`, then the slot within it by y-midpoint.
+     * The pointer's cross-axis coordinate selects the line (nearest line if it
+     * falls in an inter-line gap); its main-axis coordinate selects the slot.
+     * Excludes the drag source so its own position doesn't bias the result; the
+     * drop path adjusts for the source offset.
      */
     private computeWrappedInsertionIndex(
         clientX: number,
         clientY: number
     ): number {
+        const isVertical = this._direction === 'vertical';
+
+        const entries = this._wrappedDragEntries();
+        if (entries.length === 0) {
+            return this._tabs.length;
+        }
+
+        // Cross-axis pointer coordinate + per-tab accessors, swapped by axis:
+        // rows bucket by `top`/`bottom` (cross = y), columns by `left`/`right`
+        // (cross = x). `crossPointer` selects the line; `mainPointer` the slot.
+        const crossPointer = isVertical ? clientX : clientY;
+        const mainPointer = isVertical ? clientY : clientX;
+        const crossStart = (r: DOMRect): number =>
+            isVertical ? r.left : r.top;
+        const crossEnd = (r: DOMRect): number =>
+            isVertical ? r.right : r.bottom;
+        const mainStart = (r: DOMRect): number => (isVertical ? r.top : r.left);
+        const mainSize = (r: DOMRect): number =>
+            isVertical ? r.height : r.width;
+
+        const lines = this._bucketWrappedLines(entries, crossStart, crossEnd);
+
+        // Pick the line whose cross span contains the pointer; if the pointer is
+        // in an inter-line gap (or before/after all lines), pick the nearest
+        // line — NOT a blanket clamp to the last line.
+        const line =
+            lines.find(
+                (l) => crossPointer >= l.start && crossPointer <= l.end
+            ) ?? this._nearestWrappedLine(lines, crossPointer);
+
+        // Within the line, insert before the first tab whose main-axis midpoint
+        // is past the pointer; past all of them → after the line's last tab.
+        const items = [...line.items].sort(
+            (a, b) => mainStart(a.rect) - mainStart(b.rect)
+        );
+        for (const item of items) {
+            const midpoint = mainStart(item.rect) + mainSize(item.rect) / 2;
+            if (mainPointer < midpoint) {
+                return item.index;
+            }
+        }
+        return items[items.length - 1].index + 1;
+    }
+
+    /**
+     * The wrapped drop candidates: each non-source tab's list index + live
+     * rect. The drag source (and any grouped tabs moving with it) are excluded
+     * so their own positions don't bias the hit-test.
+     */
+    private _wrappedDragEntries(): WrappedTabEntry[] {
         const sourceId = this._animState?.sourceTabId;
         const sourceGroupIds = this._animState?.sourceGroupPanelIds;
-
-        const entries: { index: number; rect: DOMRect }[] = [];
+        const entries: WrappedTabEntry[] = [];
         for (let i = 0; i < this._tabs.length; i++) {
             const tab = this._tabs[i].value;
             if (tab.panel.id === sourceId) {
@@ -745,52 +812,50 @@ export class TabReorderController extends CompositeDisposable {
                 rect: tab.element.getBoundingClientRect(),
             });
         }
-        if (entries.length === 0) {
-            return this._tabs.length;
-        }
+        return entries;
+    }
 
-        // Bucket into rows by top edge (2px tolerance for sub-pixel rounding).
-        const rows: { top: number; bottom: number; items: typeof entries }[] =
-            [];
+    /**
+     * Bucket entries into lines by cross-axis start (2px tolerance for sub-pixel
+     * rounding), sorted along the cross axis.
+     */
+    private _bucketWrappedLines(
+        entries: WrappedTabEntry[],
+        crossStart: (r: DOMRect) => number,
+        crossEnd: (r: DOMRect) => number
+    ): WrappedLine[] {
+        const lines: WrappedLine[] = [];
         for (const entry of entries) {
-            const row = rows.find((r) => Math.abs(r.top - entry.rect.top) <= 2);
-            if (row) {
-                row.items.push(entry);
-                row.bottom = Math.max(row.bottom, entry.rect.bottom);
+            const s = crossStart(entry.rect);
+            const line = lines.find((l) => Math.abs(l.start - s) <= 2);
+            if (line) {
+                line.items.push(entry);
+                line.end = Math.max(line.end, crossEnd(entry.rect));
             } else {
-                rows.push({
-                    top: entry.rect.top,
-                    bottom: entry.rect.bottom,
+                lines.push({
+                    start: s,
+                    end: crossEnd(entry.rect),
                     items: [entry],
                 });
             }
         }
-        rows.sort((a, b) => a.top - b.top);
+        lines.sort((a, b) => a.start - b.start);
+        return lines;
+    }
 
-        // Pick the row whose vertical span contains clientY; if the pointer is
-        // in an inter-row gap (or above/below all rows), pick the nearest row by
-        // vertical distance — NOT a blanket clamp to the last row, which would
-        // misroute a between-rows hover to the bottom row.
-        let row = rows.find((r) => clientY >= r.top && clientY <= r.bottom);
-        if (!row) {
-            const distance = (r: (typeof rows)[number]) =>
-                clientY < r.top ? r.top - clientY : clientY - r.bottom;
-            row = rows.reduce(
-                (nearest, r) => (distance(r) < distance(nearest) ? r : nearest),
-                rows[0]
-            );
-        }
-
-        // Within the row, insert before the first tab whose horizontal midpoint
-        // is past the pointer; past all of them → after the row's last tab.
-        const items = row.items.sort((a, b) => a.rect.left - b.rect.left);
-        for (const item of items) {
-            const midpoint = item.rect.left + item.rect.width / 2;
-            if (clientX < midpoint) {
-                return item.index;
-            }
-        }
-        return items[items.length - 1].index + 1;
+    /** The line nearest `crossPointer` by cross-axis distance (gap fallback). */
+    private _nearestWrappedLine(
+        lines: WrappedLine[],
+        crossPointer: number
+    ): WrappedLine {
+        const distance = (l: WrappedLine): number =>
+            crossPointer < l.start
+                ? l.start - crossPointer
+                : crossPointer - l.end;
+        return lines.reduce(
+            (nearest, l) => (distance(l) < distance(nearest) ? l : nearest),
+            lines[0]
+        );
     }
 
     private updateWrapDropIndicator(index: number): void {
