@@ -719,10 +719,15 @@ export class TabReorderController extends CompositeDisposable {
 
     /**
      * The insertion slot (index into the full tab list) for a pointer at
-     * `(clientX, clientY)` over a wrapped strip: pick the row whose vertical
-     * span contains `clientY` (clamped to first/last), then the slot within that
-     * row by x-midpoint. Excludes the drag source so its own position doesn't
-     * bias the result; the drop path adjusts for the source offset.
+     * `(clientX, clientY)` over a wrapped strip. Two axes:
+     *  - horizontal header (rows): pick the row whose vertical span contains
+     *    `clientY`, then the slot within it by x-midpoint;
+     *  - vertical header (columns): pick the column whose horizontal span
+     *    contains `clientX`, then the slot within it by y-midpoint.
+     * The pointer's cross-axis coordinate selects the line (nearest line if it
+     * falls in an inter-line gap); its main-axis coordinate selects the slot.
+     * Excludes the drag source so its own position doesn't bias the result; the
+     * drop path adjusts for the source offset.
      */
     private computeWrappedInsertionIndex(
         clientX: number,
@@ -730,6 +735,7 @@ export class TabReorderController extends CompositeDisposable {
     ): number {
         const sourceId = this._animState?.sourceTabId;
         const sourceGroupIds = this._animState?.sourceGroupPanelIds;
+        const isVertical = this._direction === 'vertical';
 
         const entries: { index: number; rect: DOMRect }[] = [];
         for (let i = 0; i < this._tabs.length; i++) {
@@ -749,44 +755,68 @@ export class TabReorderController extends CompositeDisposable {
             return this._tabs.length;
         }
 
-        // Bucket into rows by top edge (2px tolerance for sub-pixel rounding).
-        const rows: { top: number; bottom: number; items: typeof entries }[] =
-            [];
+        // Cross-axis pointer coordinate + per-tab accessors, swapped by axis:
+        // rows bucket by `top`/`bottom` (cross = y), columns by `left`/`right`
+        // (cross = x). `crossPointer` selects the line; `mainPointer` the slot.
+        const crossPointer = isVertical ? clientX : clientY;
+        const mainPointer = isVertical ? clientY : clientX;
+        const crossStart = (r: DOMRect): number =>
+            isVertical ? r.left : r.top;
+        const crossEnd = (r: DOMRect): number =>
+            isVertical ? r.right : r.bottom;
+        const mainStart = (r: DOMRect): number => (isVertical ? r.top : r.left);
+        const mainSize = (r: DOMRect): number =>
+            isVertical ? r.height : r.width;
+
+        // Bucket into lines by cross-axis start (2px tolerance for sub-pixel
+        // rounding).
+        const lines: {
+            start: number;
+            end: number;
+            items: typeof entries;
+        }[] = [];
         for (const entry of entries) {
-            const row = rows.find((r) => Math.abs(r.top - entry.rect.top) <= 2);
-            if (row) {
-                row.items.push(entry);
-                row.bottom = Math.max(row.bottom, entry.rect.bottom);
+            const s = crossStart(entry.rect);
+            const line = lines.find((l) => Math.abs(l.start - s) <= 2);
+            if (line) {
+                line.items.push(entry);
+                line.end = Math.max(line.end, crossEnd(entry.rect));
             } else {
-                rows.push({
-                    top: entry.rect.top,
-                    bottom: entry.rect.bottom,
+                lines.push({
+                    start: s,
+                    end: crossEnd(entry.rect),
                     items: [entry],
                 });
             }
         }
-        rows.sort((a, b) => a.top - b.top);
+        lines.sort((a, b) => a.start - b.start);
 
-        // Pick the row whose vertical span contains clientY; if the pointer is
-        // in an inter-row gap (or above/below all rows), pick the nearest row by
-        // vertical distance — NOT a blanket clamp to the last row, which would
-        // misroute a between-rows hover to the bottom row.
-        let row = rows.find((r) => clientY >= r.top && clientY <= r.bottom);
-        if (!row) {
-            const distance = (r: (typeof rows)[number]) =>
-                clientY < r.top ? r.top - clientY : clientY - r.bottom;
-            row = rows.reduce(
-                (nearest, r) => (distance(r) < distance(nearest) ? r : nearest),
-                rows[0]
+        // Pick the line whose cross span contains the pointer; if the pointer is
+        // in an inter-line gap (or before/after all lines), pick the nearest
+        // line by cross distance — NOT a blanket clamp to the last line, which
+        // would misroute a between-lines hover to the final line.
+        let line = lines.find(
+            (l) => crossPointer >= l.start && crossPointer <= l.end
+        );
+        if (!line) {
+            const distance = (l: (typeof lines)[number]) =>
+                crossPointer < l.start
+                    ? l.start - crossPointer
+                    : crossPointer - l.end;
+            line = lines.reduce(
+                (nearest, l) => (distance(l) < distance(nearest) ? l : nearest),
+                lines[0]
             );
         }
 
-        // Within the row, insert before the first tab whose horizontal midpoint
-        // is past the pointer; past all of them → after the row's last tab.
-        const items = row.items.sort((a, b) => a.rect.left - b.rect.left);
+        // Within the line, insert before the first tab whose main-axis midpoint
+        // is past the pointer; past all of them → after the line's last tab.
+        const items = line.items.sort(
+            (a, b) => mainStart(a.rect) - mainStart(b.rect)
+        );
         for (const item of items) {
-            const midpoint = item.rect.left + item.rect.width / 2;
-            if (clientX < midpoint) {
+            const midpoint = mainStart(item.rect) + mainSize(item.rect) / 2;
+            if (mainPointer < midpoint) {
                 return item.index;
             }
         }

@@ -66,6 +66,67 @@
         }
     }
 
+    /**
+     * Multi-column (wrapping) tabs for a VERTICAL (edge-group) header — the
+     * mirror of the horizontal rule above with the axes swapped. The main axis
+     * is vertical (bounded by the header height, so overflowing tabs wrap) and
+     * the cross axis is horizontal (grows into additional columns). The header
+     * grows in width via the `:has()` rule in tabsContainer.scss.
+     *
+     * NOTE: column flow direction under `writing-mode: vertical-rl` differs
+     * between left and right header positions; this needs visual verification
+     * in a real browser (jsdom lays out neither writing-mode nor flex-wrap).
+     */
+    &.dv-tabs-container--wrap.dv-tabs-container-vertical {
+        flex-wrap: wrap;
+        width: auto;
+        height: 100%;
+        max-height: 100%;
+        overflow: visible;
+        // Pack wrapped columns from the start edge so a partial last column
+        // doesn't spread.
+        align-content: flex-start;
+
+        // Give each wrapped tab the base column width so every column matches
+        // the single-column header thickness and the header grows in whole-
+        // column increments (mirror of the per-row height rule above).
+        .dv-tab {
+            width: var(--dv-tabs-and-actions-container-height);
+        }
+
+        // `overflow.maxRows` cap, reused as a max-column cap for vertical: clip
+        // the strip to that many columns so the header stops growing, while the
+        // surplus columns (still laid out, hence measurable by the controller)
+        // route into the overflow dropdown.
+        &.dv-tabs-container--wrap-capped {
+            max-width: calc(
+                var(--dv-tabs-and-actions-container-height) *
+                    var(--dv-max-tab-rows)
+            );
+            overflow: hidden;
+        }
+
+        // Discrete drop indicator for 2-D cross-column reorder: a bar on the
+        // leading/trailing (top/bottom) edge of the target tab.
+        .dv-tab--reorder-before::after,
+        .dv-tab--reorder-after::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+        .dv-tab--reorder-before::after {
+            top: 0;
+        }
+        .dv-tab--reorder-after::after {
+            bottom: 0;
+        }
+    }
+
     /* GPU optimizations for smooth scrolling */
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);

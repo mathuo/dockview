@@ -39,6 +39,20 @@ function stampRows(list: HTMLElement, tops: number[]): void {
 }
 
 /**
+ * Vertical analogue of {@link stampRows}: stamp synthetic column offsets onto
+ * the tabs (in DOM order) so the controller's `offsetLeft`-bucketed column
+ * count / surplus can be exercised for a vertical header without real layout.
+ */
+function stampCols(list: HTMLElement, lefts: number[]): void {
+    list.querySelectorAll<HTMLElement>('.dv-tab').forEach((el, i) => {
+        Object.defineProperty(el, 'offsetLeft', {
+            configurable: true,
+            value: lefts[i] ?? 0,
+        });
+    });
+}
+
+/**
  * Multi-row (wrapping) tabs — Phase 2 (wrap render mode). The module toggles the
  * `.dv-tabs-container--wrap` class on a group's tab list and relayouts on
  * row-count change. The actual wrapping geometry (rows, header growth, content
@@ -98,7 +112,7 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.dispose();
     });
 
-    test('wrap is a no-op on a vertical header (v1)', () => {
+    test('wrap applies to a vertical header (columns, DV-14)', () => {
         container = document.createElement('div');
         document.body.appendChild(container);
         const dockview = new DockviewComponent(container, {
@@ -116,9 +130,48 @@ describe('multi-row tabs (wrap mode)', () => {
                 'dv-tabs-container-vertical'
             )
         ).toBe(true);
+        // DV-14: vertical headers now wrap into columns, so the wrap class is
+        // applied (the CSS produces columns; the controller measures by
+        // `offsetLeft`).
         expect(
             panel.group.model.tabsListElement.classList.contains(WRAP_CLASS)
-        ).toBe(false);
+        ).toBe(true);
+
+        dockview.dispose();
+    });
+
+    test('wrap follows a runtime header-direction flip (horizontal↔vertical)', () => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            overflow: { mode: 'wrap' },
+        });
+        dockview.layout(1000, 1000);
+
+        const panel = dockview.addPanel({ id: 'a', component: 'default' });
+        const list = panel.group.model.tabsListElement;
+
+        // Starts horizontal → wrapped.
+        expect(list.classList.contains(WRAP_CLASS)).toBe(true);
+        expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
+            false
+        );
+
+        // Flip to vertical: the wrap class stays (now columns); the vertical
+        // class is applied by core before the direction signal re-applies wrap.
+        panel.group.api.setHeaderPosition('left');
+        expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
+            true
+        );
+        expect(list.classList.contains(WRAP_CLASS)).toBe(true);
+
+        // Flip back to horizontal: still wrapped (rows again).
+        panel.group.api.setHeaderPosition('top');
+        expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
+            false
+        );
+        expect(list.classList.contains(WRAP_CLASS)).toBe(true);
 
         dockview.dispose();
     });
@@ -262,6 +315,45 @@ describe('multi-row tabs (wrap mode)', () => {
         const forced = spy.mock.calls.at(-1)![1];
         expect(forced('p4')).toBe(false);
         expect(forced('p5')).toBe(false);
+
+        dockview.dispose();
+    });
+
+    test('vertical header: surplus columns beyond maxRows route to the dropdown (DV-14)', () => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            overflow: { mode: 'wrap', maxRows: 2 },
+            defaultHeaderPosition: 'left', // vertical header → columns
+        });
+        dockview.layout(1000, 1000);
+
+        const ids = ['p0', 'p1', 'p2', 'p3', 'p4', 'p5'];
+        const first = dockview.addPanel({ id: ids[0], component: 'default' });
+        for (const id of ids.slice(1)) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
+            true
+        );
+
+        // 3 columns of two tabs each, laid out right-to-left (`vertical-rl`): the
+        // DOM-first column is the right-most (largest offsetLeft). maxRows=2 →
+        // the third (left-most, offsetLeft 0) column p4/p5 is surplus. Bucketing
+        // by DOM-fill order (not raw offset) is what makes this correct.
+        stampCols(list, [88, 88, 44, 44, 0, 0]);
+
+        const spy = jest.spyOn(dockview, 'setForcedOverflow');
+        dockview.updateOptions({ overflow: { mode: 'wrap', maxRows: 2 } });
+
+        expect(spy).toHaveBeenCalled();
+        const forced = spy.mock.calls.at(-1)![1];
+        expect(forced('p4')).toBe(true);
+        expect(forced('p5')).toBe(true);
+        expect(forced('p0')).toBe(false);
+        expect(forced('p2')).toBe(false);
 
         dockview.dispose();
     });
@@ -463,16 +555,39 @@ describe('multi-row tabs: cross-row keyboard navigation', () => {
         dockview.dispose();
     });
 
-    test('is inert on a vertical header (wrap gate stays closed)', () => {
+    test('cross-row Arrow keys stay inert on a vertical header (DV-14 columns)', () => {
         const dockview = make({ mode: 'wrap' }, 'left');
-        dockview.addPanel({ id: 'p1', component: 'default' });
+        for (const id of ['p1', 'p2', 'p3', 'p4']) {
+            dockview.addPanel({ id, component: 'default' });
+        }
         const list = dockview.activeGroup!.model.tabsListElement;
 
         expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
             true
         );
-        // wrap (and therefore the cross-row listener) never activates vertically
-        expect(list.classList.contains(WRAP_CLASS)).toBe(false);
+        // DV-14: wrap IS active on a vertical header now (columns). The cross-row
+        // Arrow Up/Down handler is horizontal-only, though — it re-checks the
+        // vertical guard and no-ops — so roving focus does not jump between
+        // columns via Up/Down here.
+        expect(list.classList.contains(WRAP_CLASS)).toBe(true);
+
+        const tabs = Array.from(list.querySelectorAll<HTMLElement>('.dv-tab'));
+        // two columns of two, mocked: col1 left 0 (p1,p2), col2 left 50 (p3,p4)
+        setGeometry(tabs[0], 0, 0, 50);
+        setGeometry(tabs[1], 30, 0, 50);
+        setGeometry(tabs[2], 0, 50, 50);
+        setGeometry(tabs[3], 30, 50, 50);
+
+        tabs[0].focus();
+        fireEvent.keyDown(tabs[0], { key: 'ArrowDown' });
+
+        // On a vertical strip Up/Down is core's main-axis navigation, so it
+        // steps to the next tab in the same column (p1 → p2). The module's
+        // cross-row handler yields (guard) rather than hijacking into a
+        // cross-column jump (which would land on p3/p4).
+        expect(document.activeElement).toBe(tabs[1]);
+        expect(document.activeElement).not.toBe(tabs[2]);
+        expect(document.activeElement).not.toBe(tabs[3]);
 
         dockview.dispose();
     });

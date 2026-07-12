@@ -199,12 +199,13 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         const containerRect = this._ctx.tabsList.getBoundingClientRect();
         const tabGroups = this._ctx.getTabGroups();
         const isVertical = this._ctx.getDirection() === 'vertical';
-        // Multi-row wrap (`MultiRowTabsModule`): a group's tabs can span rows,
-        // which the single horizontal-bar model below can't represent. Draw a
-        // per-row segment instead. Horizontal headers only (wrap is horizontal).
-        const wrapped =
-            !isVertical &&
-            this._ctx.tabsList.classList.contains(OVERFLOW_WRAP_TABS_CLASS);
+        // Multi-line wrap (`MultiRowTabsModule`): a group's tabs can span
+        // multiple rows (horizontal header) or columns (vertical header), which
+        // the single-bar model below can't represent. Draw a per-line segment
+        // instead — rows bucketed by top, columns bucketed by left.
+        const wrapped = this._ctx.tabsList.classList.contains(
+            OVERFLOW_WRAP_TABS_CLASS
+        );
         if (!wrapped) {
             // Continuation markers only exist while wrapping; a runtime
             // wrap→no-wrap toggle (or a switch to vertical) must not leave
@@ -236,7 +237,8 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                     underline,
                     tg,
                     containerRect,
-                    tabMap
+                    tabMap,
+                    isVertical
                 );
                 continue;
             }
@@ -368,17 +370,21 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
     }
 
     /**
-     * Position a group's underline across a multi-row (wrapped) tab strip. The
-     * single horizontal-bar model can't span rows, so the element is sized to
-     * cover the group's row span and an SVG draws one straight segment under
-     * each row's run of the group's tabs. (The active-tab wrap-around bump is
-     * omitted in wrap for now — the per-row lines still convey membership.)
+     * Position a group's underline across a multi-line (wrapped) tab strip. The
+     * single-bar model can't span lines, so the element is sized to cover the
+     * group's line span and an SVG draws one straight segment per line-run of
+     * the group's tabs — a horizontal segment per row (horizontal header) or a
+     * vertical segment per column (vertical header). Tabs are bucketed into
+     * runs by their cross-axis offset: `top` for rows, `left` for columns.
+     * (The active-tab wrap-around bump is omitted in wrap — the per-line lines
+     * still convey membership.)
      */
     private _positionWrappedUnderline(
         underline: HTMLElement,
         tg: ITabGroup,
         containerRect: DOMRect,
-        tabMap: Map<string, IValueDisposable<Tab>>
+        tabMap: Map<string, IValueDisposable<Tab>>,
+        isVertical: boolean
     ): void {
         const t = 2; // line thickness
         const color = resolveTabGroupAccent(
@@ -391,9 +397,15 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             return;
         }
 
-        // Bucket the group's tabs into rows by top edge (2px tolerance).
-        type Row = { top: number; bottom: number; left: number; right: number };
-        const rows: Row[] = [];
+        // Bucket the group's tabs into line-runs by their cross-axis offset
+        // (rows by `top`, columns by `left`), with a 2px sub-pixel tolerance.
+        type Run = { top: number; bottom: number; left: number; right: number };
+        const runs: Run[] = [];
+        // The run holding the group's first tab is the chip's line; it gets no
+        // continuation marker. Tracked by reference so it is correct regardless
+        // of axis or header side (a `vertical-rl` first column is right-most,
+        // not left-most).
+        let firstRun: Run | undefined;
         for (const pid of tg.panelIds) {
             const te = tabMap.get(pid);
             if (!te) {
@@ -404,44 +416,61 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                 continue; // hidden / collapsed
             }
             const top = r.top - containerRect.top;
-            const row = rows.find((x) => Math.abs(x.top - top) <= 2);
-            if (row) {
-                row.left = Math.min(row.left, r.left - containerRect.left);
-                row.right = Math.max(row.right, r.right - containerRect.left);
-                row.bottom = Math.max(row.bottom, r.bottom - containerRect.top);
+            const bottom = r.bottom - containerRect.top;
+            const left = r.left - containerRect.left;
+            const right = r.right - containerRect.left;
+            const key = isVertical ? left : top;
+            let run = runs.find(
+                (x) => Math.abs((isVertical ? x.left : x.top) - key) <= 2
+            );
+            if (run) {
+                run.top = Math.min(run.top, top);
+                run.bottom = Math.max(run.bottom, bottom);
+                run.left = Math.min(run.left, left);
+                run.right = Math.max(run.right, right);
             } else {
-                rows.push({
-                    top,
-                    bottom: r.bottom - containerRect.top,
-                    left: r.left - containerRect.left,
-                    right: r.right - containerRect.left,
-                });
+                run = { top, bottom, left, right };
+                runs.push(run);
             }
+            firstRun ??= run;
         }
 
-        if (rows.length === 0) {
+        if (runs.length === 0) {
             underline.style.display = 'none';
             this._clearContinuationMarkers(tg.id);
             return;
         }
 
-        this._positionContinuationMarkers(tg.id, rows, color);
+        this._positionContinuationMarkers(
+            tg.id,
+            runs,
+            firstRun,
+            color,
+            isVertical
+        );
 
-        const overline = this._ctx.getHeaderPosition() === 'bottom';
-        const minTop = Math.min(...rows.map((r) => r.top));
-        const maxBottom = Math.max(...rows.map((r) => r.bottom));
-        const width = containerRect.width;
-        const height = Math.max(0, maxBottom - minTop);
+        const minLeft = Math.min(...runs.map((r) => r.left));
+        const maxRight = Math.max(...runs.map((r) => r.right));
+        const minTop = Math.min(...runs.map((r) => r.top));
+        const maxBottom = Math.max(...runs.map((r) => r.bottom));
 
-        // Cover the group's row span; the SVG inside draws the per-row lines.
-        underline.style.left = '0px';
-        underline.style.top = `${minTop}px`;
+        // Element covers the group's bounding box: the SVG inside draws the
+        // per-line segments. Cross-axis origin is offset (top for rows, left
+        // for columns); the main axis fills the container.
+        const width = isVertical
+            ? Math.max(0, maxRight - minLeft)
+            : containerRect.width;
+        const height = isVertical
+            ? containerRect.height
+            : Math.max(0, maxBottom - minTop);
+        underline.style.left = isVertical ? `${minLeft}px` : '0px';
+        underline.style.top = isVertical ? '0px' : `${minTop}px`;
         underline.style.bottom = 'auto';
         underline.style.width = `${width}px`;
         underline.style.height = `${height}px`;
         // The `none` indicator paints the underline element itself; clear any
         // background left over from a non-wrap render so it doesn't show as a
-        // block behind the per-row SVG segments after a runtime wrap toggle.
+        // block behind the per-line SVG segments after a runtime wrap toggle.
         underline.style.backgroundColor = '';
 
         const { svg, path } = this.ensureSvgPath(underline);
@@ -450,51 +479,82 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         path.setAttribute('stroke', color);
         path.setAttribute('stroke-width', String(t));
 
+        // `inverted` puts the line on the header-facing edge for the flipped
+        // positions: the top of each row for a bottom header, the right of each
+        // column for a right header.
+        const headerPosition = this._ctx.getHeaderPosition();
+        const inverted = isVertical
+            ? headerPosition === 'right'
+            : headerPosition === 'bottom';
+
         let d = '';
-        for (const row of rows) {
-            const y = overline
-                ? row.top - minTop + t / 2
-                : row.bottom - minTop - t / 2;
-            d += `M ${row.left},${y} L ${row.right},${y} `;
+        for (const run of runs) {
+            if (isVertical) {
+                // Vertical segment down the column's leading edge; svg-x is
+                // container-x minus the element's `minLeft` origin.
+                const x = inverted
+                    ? run.right - minLeft - t / 2
+                    : run.left - minLeft + t / 2;
+                d += `M ${x},${run.top} L ${x},${run.bottom} `;
+            } else {
+                // Horizontal segment along the row's edge; svg-y is container-y
+                // minus the element's `minTop` origin.
+                const y = inverted
+                    ? run.top - minTop + t / 2
+                    : run.bottom - minTop - t / 2;
+                d += `M ${run.left},${y} L ${run.right},${y} `;
+            }
         }
         path.setAttribute('d', d.trim());
     }
 
     /**
-     * Draw a small accent pip at the leading edge of every wrapped row a
+     * Draw a small accent pip at the leading edge of every wrapped line-run a
      * group spans beyond its first. The group's real chip already marks the
-     * first row; these lightweight markers echo it on the continuation rows
-     * so a group that wraps onto rows 2–3 reads as one group on each row
+     * first run; these lightweight markers echo it on the continuation runs so
+     * a group that wraps onto rows/columns 2–3 reads as one group on each line
      * instead of losing its colour after the first.
      *
-     * `rows` are the group's row-runs (container-relative geometry) as
-     * bucketed by {@link _positionWrappedUnderline}; the top-most row is the
-     * chip's row and gets no marker.
+     * `runs` are the group's line-runs (container-relative geometry) as
+     * bucketed by {@link _positionWrappedUnderline}; `firstRun` is the run that
+     * holds the chip and is skipped. The pip sits at each continuation run's
+     * main-axis start (top of a column, left of a row), centred on the cross
+     * axis.
      */
     private _positionContinuationMarkers(
         groupId: string,
-        rows: readonly {
+        runs: readonly {
             top: number;
             bottom: number;
             left: number;
             right: number;
         }[],
-        color: string
+        firstRun:
+            | { top: number; bottom: number; left: number; right: number }
+            | undefined,
+        color: string,
+        isVertical: boolean
     ): void {
-        // Ascending by row so the visual first row (the chip's row) is index 0.
-        const sorted = [...rows].sort((a, b) => a.top - b.top);
-        const continuationRows = sorted.slice(1);
+        const continuationRuns = runs.filter((run) => run !== firstRun);
         const markers = this._syncContinuationMarkers(
             groupId,
-            continuationRows.length
+            continuationRuns.length
         );
 
-        continuationRows.forEach((row, i) => {
+        continuationRuns.forEach((run, i) => {
             const marker = markers[i];
             marker.style.backgroundColor = color;
-            marker.style.left = `${row.left}px`;
-            const center = (row.top + row.bottom) / 2;
-            marker.style.top = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+            if (isVertical) {
+                // Column: pip at the top, centred horizontally on the column.
+                const center = (run.left + run.right) / 2;
+                marker.style.left = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+                marker.style.top = `${run.top}px`;
+            } else {
+                // Row: pip at the left, centred vertically on the row.
+                const center = (run.top + run.bottom) / 2;
+                marker.style.left = `${run.left}px`;
+                marker.style.top = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+            }
         });
     }
 

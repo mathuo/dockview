@@ -481,6 +481,161 @@ describe('WrapTabGroupIndicator continuation markers', () => {
     });
 });
 
+describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
+    const CONTINUATION = '.dv-tab-group-chip-continuation';
+
+    // Build a tab whose rect sits in a given column (left) at a given position
+    // down the column (top).
+    const makeTab = (left: number, top: number) => {
+        const el = document.createElement('div');
+        el.getBoundingClientRect = () =>
+            ({
+                top,
+                bottom: top + 26,
+                left,
+                right: left + 50,
+                width: 50,
+                height: 26,
+            }) as DOMRect;
+        return { value: { element: el } };
+    };
+
+    function setup(
+        tabMap: Map<string, any>,
+        tg: TabGroup,
+        headerPosition: 'left' | 'right' = 'left'
+    ): { indicator: WrapTabGroupIndicator; tabsList: HTMLElement } {
+        const tabsList = document.createElement('div');
+        tabsList.classList.add('dv-tabs-container--wrap');
+        const ctx = createContext({
+            tabsList,
+            getTabGroups: () => [tg],
+            getTabMap: () => tabMap as any,
+            getActivePanelId: () => undefined,
+            getDirection: () => 'vertical',
+            getHeaderPosition: () => headerPosition,
+        });
+        const indicator = new WrapTabGroupIndicator(ctx);
+        indicator.syncUnderlineElements(new Set([tg.id]));
+        return { indicator, tabsList };
+    }
+
+    test('a group spanning two columns draws one vertical segment per column', () => {
+        // column 1 at left 0 (tabs a,b); column 2 at left 40 (tabs c,d)
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(0, 30)],
+            ['c', makeTab(40, 0)],
+            ['d', makeTab(40, 30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        ['a', 'b', 'c', 'd'].forEach((id) => tg.addPanel(id));
+
+        const { indicator } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        const path = indicator.getUnderline('tg-1')!.querySelector('path')!;
+        const d = path.getAttribute('d') ?? '';
+        // two columns → two `M` (move) commands
+        const moves = d.match(/M [\d.]+,[\d.]+/g) ?? [];
+        expect(moves.length).toBe(2);
+        // each segment is vertical: the two points of a segment share their x
+        const segments = d.trim().split(/M /).filter(Boolean);
+        for (const seg of segments) {
+            const coords = seg.match(/([\d.]+),([\d.]+)/g)!;
+            const xs = coords.map((c) => c.split(',')[0]);
+            expect(xs[0]).toBe(xs[1]); // constant x → vertical line
+        }
+
+        indicator.dispose();
+    });
+
+    test('a single-column group draws no continuation markers', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(0, 30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'green' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        expect(tabsList.querySelectorAll(CONTINUATION).length).toBe(0);
+
+        indicator.dispose();
+    });
+
+    test('a group spanning two columns draws one continuation marker at the second column top', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(0, 30)],
+            ['c', makeTab(40, 0)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        ['a', 'b', 'c'].forEach((id) => tg.addPanel(id));
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        const markers = tabsList.querySelectorAll<HTMLElement>(CONTINUATION);
+        expect(markers.length).toBe(1);
+        const marker = markers[0];
+        // pip at the column top, centred horizontally on the 40..90 column
+        expect(marker.style.top).toBe('0px');
+        expect(marker.style.left).toBe(`${(40 + 90) / 2 - 4}px`);
+
+        indicator.dispose();
+    });
+
+    test('the continuation marker skips the column holding the first tab (vertical-rl safe)', () => {
+        // First panel 'a' is in the RIGHT-most column (left 40); the left column
+        // (left 0) is the continuation one. Bucketing by reference — not by
+        // min-left — must mark the left column, not the first.
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(40, 0)],
+            ['b', makeTab(40, 30)],
+            ['c', makeTab(0, 0)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        ['a', 'b', 'c'].forEach((id) => tg.addPanel(id));
+
+        const { indicator, tabsList } = setup(tabMap, tg);
+        (indicator as any)._positionUnderlinesSync();
+
+        const markers = tabsList.querySelectorAll<HTMLElement>(CONTINUATION);
+        expect(markers.length).toBe(1);
+        // the marker is over the left column (centre of 0..50 → 25 − 4)
+        expect(markers[0].style.left).toBe(`${(0 + 50) / 2 - 4}px`);
+
+        indicator.dispose();
+    });
+
+    test('right header draws the segment on the column trailing edge', () => {
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0, 0)],
+            ['b', makeTab(0, 30)],
+        ]);
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const { indicator } = setup(tabMap, tg, 'right');
+        (indicator as any)._positionUnderlinesSync();
+
+        const d =
+            indicator
+                .getUnderline('tg-1')!
+                .querySelector('path')!
+                .getAttribute('d') ?? '';
+        // right header → x at the column's right edge (right 50 − minLeft 0 − t/2)
+        expect(d.startsWith('M 49,')).toBe(true);
+
+        indicator.dispose();
+    });
+});
+
 describe('indicator type identity', () => {
     test('NoneTabGroupIndicator and WrapTabGroupIndicator are distinct types', () => {
         const ctx = createContext();
