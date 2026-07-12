@@ -153,6 +153,27 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 -   Code comments describe the current state of the code, not its history. Don't reference the fix, PR, or what changed unless that context is critical to understanding the code as it stands.
 -   Keep comments brief and concise.
 
+### Writing Style
+
+Code comments, commit messages, and PR descriptions should read as though a
+person wrote them, not a language model.
+
+-   Do not use em dashes (`—`) in comments or commit messages. Rewrite the
+    sentence with a comma, colon, semicolon, parentheses, or a full stop,
+    whichever fits. This is the single most common AI tell; avoid it everywhere,
+    including inline comments and JSDoc blocks.
+-   Drop filler and marketing words. Avoid "comprehensive", "powerful",
+    "robust", "seamlessly", "out of the box", "leverage", "delve into",
+    "first-class", "it's worth noting". State the concrete thing instead.
+-   Prefer short, direct sentences. Cut words that carry no meaning; don't hedge
+    or pad.
+-   Write what the code does and why, not a narration of your reasoning. A
+    comment is not a chat message.
+
+For documentation prose under `packages/docs`, see that package's `AGENTS.md`
+"Writing Style" section, which extends these rules with docs-specific guidance
+(British spelling, frontmatter `description` fields, numeric en dashes).
+
 ## Release Management
 
 ### Creating Release Notes
