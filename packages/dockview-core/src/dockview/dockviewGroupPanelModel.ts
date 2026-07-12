@@ -179,6 +179,9 @@ export interface IHeader {
     /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
      *  changed). */
     refreshOverflow(): void;
+    /** Enable/disable sticky-on-scroll for pinned tabs (PinnedTabs inline mode):
+     *  pinned tabs freeze to the left edge as the strip scrolls. No-op default. */
+    setPinnedSticky(enabled: boolean): void;
     /** Register a resolver that clamps/redirects a header drop index (used by
      *  the PinnedTabs module to enforce the pin boundary). Identity default. */
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void;

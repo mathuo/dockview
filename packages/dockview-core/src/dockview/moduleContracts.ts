@@ -664,6 +664,9 @@ export interface IAdvancedOverflowRenderContext {
     /** Build the group-header element for an overflow tab-group id, or
      *  `undefined` when it is not an overflow group. */
     buildGroupHeader(tabGroupId: string): HTMLElement | undefined;
+    /** Build the "Pinned" section header shown above the pinned overflow rows
+     *  (see {@link AdvancedOverflowRenderParams.pinnedOverflowTabs}). */
+    buildPinnedHeader(): HTMLElement;
     /** The overflow tab-group id a panel belongs to, or `undefined`. Used to
      *  interleave group headers against the filtered set (same rule as free). */
     overflowGroupIdForPanel(panelId: string): string | undefined;
@@ -682,6 +685,11 @@ export interface AdvancedOverflowRenderParams {
     readonly overflowTabs: string[];
     /** Overflow tab-group ids. */
     readonly overflowTabGroups: string[];
+    /** Pinned panel ids whose tabs have clipped out of the strip — rendered in
+     *  a dedicated "Pinned" section at the top of the dropdown, above the search
+     *  box and MRU list. Empty unless the PinnedTabs module is active and the
+     *  pinned block itself overflows. */
+    readonly pinnedOverflowTabs: string[];
     /** Core row/header builders + popover control (see the context type). */
     readonly context: IAdvancedOverflowRenderContext;
 }

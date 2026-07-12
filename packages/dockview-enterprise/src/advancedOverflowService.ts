@@ -71,6 +71,10 @@ export class OverflowListView extends CompositeDisposable {
 
     /** Candidate panel ids (pre-filter, pre-order) — the search scope's set. */
     private readonly _baseIds: string[];
+    /** Pinned tabs that clipped out of the strip — rendered in a "Pinned"
+     *  section above the main list, and excluded from it to avoid a duplicate
+     *  row when the search scope is the whole group. */
+    private readonly _pinnedIds: string[];
     private readonly _titleOf = new Map<string, string>();
 
     /** The rendered rows in display order (group headers excluded). */
@@ -96,10 +100,17 @@ export class OverflowListView extends CompositeDisposable {
             this._titleOf.set(panel.id, panel.title ?? panel.id);
         }
 
-        this._baseIds =
+        this._pinnedIds = [...params.pinnedOverflowTabs];
+        const pinnedSet = new Set(this._pinnedIds);
+
+        this._baseIds = (
             this._search.enabled && this._search.scope === 'group'
                 ? params.group.panels.map((p) => p.id)
-                : [...params.overflowTabs];
+                : [...params.overflowTabs]
+        )
+            // The pinned section renders these separately at the top; keep them
+            // out of the main list so a `group`-scoped search shows no dup.
+            .filter((id) => !pinnedSet.has(id));
 
         this._body = document.createElement('div');
         this._body.style.overflow = 'auto';
@@ -214,6 +225,24 @@ export class OverflowListView extends CompositeDisposable {
         return result;
     }
 
+    /** Build a row for `id`, wire its listbox-option attributes, append it to
+     *  the list, and register it for keyboard navigation. */
+    private _appendRow(id: string): void {
+        const row = this.params.context.buildRow(id);
+        if (!row) {
+            return;
+        }
+        const index = this._rows.length;
+        row.element.setAttribute('role', 'option');
+        row.element.id = `dv-tabs-overflow-option-${index}`;
+        this._list.appendChild(row.element);
+        this._rows.push({
+            id,
+            element: row.element,
+            activate: row.activate,
+        });
+    }
+
     private _renderList(query: string): void {
         const { context } = this.params;
 
@@ -221,6 +250,25 @@ export class OverflowListView extends CompositeDisposable {
             this._list.removeChild(this._list.firstChild);
         }
         this._rows = [];
+
+        // Pinned tabs that clipped out of the strip render first, under a
+        // dedicated "Pinned" header, filtered by the same query. They keep
+        // their pinned (strip) order rather than joining the MRU sort. Append
+        // the rows first, then add the header only if at least one survived
+        // (a panel can close between the overflow event and this render) — no
+        // orphan header.
+        const pinnedMatches = this._pinnedIds.filter((id) =>
+            matchesQuery(this._titleOf.get(id) ?? id, query)
+        );
+        for (const id of pinnedMatches) {
+            this._appendRow(id);
+        }
+        if (this._rows.length > 0) {
+            this._list.insertBefore(
+                context.buildPinnedHeader(),
+                this._rows[0].element
+            );
+        }
 
         const filtered = this._orderedIds().filter((id) =>
             matchesQuery(this._titleOf.get(id) ?? id, query)
@@ -237,19 +285,7 @@ export class OverflowListView extends CompositeDisposable {
                 }
             }
 
-            const row = context.buildRow(id);
-            if (!row) {
-                continue;
-            }
-            const index = this._rows.length;
-            row.element.setAttribute('role', 'option');
-            row.element.id = `dv-tabs-overflow-option-${index}`;
-            this._list.appendChild(row.element);
-            this._rows.push({
-                id,
-                element: row.element,
-                activate: row.activate,
-            });
+            this._appendRow(id);
         }
 
         this._setActiveIndex(this._rows.length > 0 ? 0 : -1);

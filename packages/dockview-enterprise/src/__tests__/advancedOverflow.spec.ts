@@ -50,6 +50,13 @@ function makeFakeContext(activateSpy?: (id: string) => void) {
             };
         },
         buildGroupHeader: () => undefined,
+        buildPinnedHeader: () => {
+            const el = document.createElement('div');
+            el.className =
+                'dv-tabs-overflow-group-header dv-tabs-overflow-pinned-header';
+            el.textContent = 'Pinned';
+            return el;
+        },
         overflowGroupIdForPanel: () => undefined,
         open: (body: HTMLElement) => {
             opened.body = body;
@@ -66,7 +73,12 @@ function makeFakeContext(activateSpy?: (id: string) => void) {
     return { context, opened, closed, focused };
 }
 
-function makeParams(panels: FakePanel[], overflowTabs: string[], context: any) {
+function makeParams(
+    panels: FakePanel[],
+    overflowTabs: string[],
+    context: any,
+    pinnedOverflowTabs: string[] = []
+) {
     return {
         group: {
             id: 'g',
@@ -74,6 +86,7 @@ function makeParams(panels: FakePanel[], overflowTabs: string[], context: any) {
         } as any,
         overflowTabs,
         overflowTabGroups: [] as string[],
+        pinnedOverflowTabs,
         context,
     };
 }
@@ -166,6 +179,119 @@ describe('OverflowListView — search scope', () => {
         ).toBeNull();
         expect(optionRows(opened.body)).toEqual(['b']);
         view.dispose();
+    });
+});
+
+describe('OverflowListView — pinned overflow section', () => {
+    afterEach(() => {
+        document.body
+            .querySelectorAll('.dv-tabs-overflow-container')
+            .forEach((el) => el.remove());
+    });
+
+    test('clipped pinned tabs render first, under a "Pinned" header', () => {
+        const { context, opened } = makeFakeContext();
+        const panels = [
+            { id: 'a', title: 'alpha' },
+            { id: 'b', title: 'beta' },
+            { id: 'c', title: 'gamma' },
+        ];
+        const view = new OverflowListView(
+            // 'c' clipped normally; 'a' + 'b' are clipped pinned tabs.
+            makeParams(panels, ['c'], context, ['a', 'b']),
+            { search: { scope: 'overflow' } },
+            new MruTracker(),
+            false
+        );
+        view.open();
+
+        const header = opened.body!.querySelector(
+            '.dv-tabs-overflow-pinned-header'
+        );
+        expect(header).toBeTruthy();
+        expect(header!.textContent).toContain('Pinned');
+        // Pinned rows first (strip order), then the regular overflow row.
+        expect(optionRows(opened.body)).toEqual(['a', 'b', 'c']);
+        view.dispose();
+    });
+
+    test('no orphan "Pinned" header when the pinned rows fail to build', () => {
+        const { context, opened } = makeFakeContext();
+        // Every row fails to build (e.g. its panel closed just before render).
+        context.buildRow = () => undefined as any;
+        const view = new OverflowListView(
+            makeParams([{ id: 'a', title: 'alpha' }], [], context, ['a']),
+            { search: { scope: 'overflow' } },
+            new MruTracker(),
+            false
+        );
+        view.open();
+
+        expect(
+            opened.body!.querySelector('.dv-tabs-overflow-pinned-header')
+        ).toBeNull();
+        expect(optionRows(opened.body)).toEqual([]);
+        view.dispose();
+    });
+
+    test('group-scoped search does not duplicate a pinned tab in the main list', () => {
+        const { context, opened } = makeFakeContext();
+        const panels = [
+            { id: 'a', title: 'alpha' },
+            { id: 'b', title: 'beta' },
+            { id: 'c', title: 'gamma' },
+        ];
+        const view = new OverflowListView(
+            // scope 'group' would otherwise make every panel matchable, but the
+            // pinned ones must appear only once (in the pinned section).
+            makeParams(panels, ['c'], context, ['a']),
+            { search: true },
+            new MruTracker(),
+            false
+        );
+        view.open();
+
+        // 'a' appears exactly once, ahead of the group set.
+        expect(optionRows(opened.body)).toEqual(['a', 'b', 'c']);
+        expect(optionRows(opened.body).filter((id) => id === 'a')).toEqual([
+            'a',
+        ]);
+        view.dispose();
+    });
+
+    test('search filters the pinned section; the header hides when nothing matches', () => {
+        jest.useFakeTimers();
+        try {
+            const { context, opened } = makeFakeContext();
+            const panels = [
+                { id: 'a', title: 'alpha' },
+                { id: 'b', title: 'beta' },
+                { id: 'c', title: 'gamma' },
+            ];
+            const view = new OverflowListView(
+                makeParams(panels, ['c'], context, ['a', 'b']),
+                { search: { scope: 'overflow' } },
+                new MruTracker(),
+                false
+            );
+            view.open();
+
+            const input = opened.body!.querySelector<HTMLInputElement>(
+                '.dv-tabs-overflow-search'
+            )!;
+            input.value = 'gamma';
+            input.dispatchEvent(new Event('input'));
+            jest.advanceTimersByTime(80);
+
+            // Only the non-pinned 'gamma' survives; the Pinned header is gone.
+            expect(optionRows(opened.body)).toEqual(['c']);
+            expect(
+                opened.body!.querySelector('.dv-tabs-overflow-pinned-header')
+            ).toBeNull();
+            view.dispose();
+        } finally {
+            jest.useRealTimers();
+        }
     });
 });
 

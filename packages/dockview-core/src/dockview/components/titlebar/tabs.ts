@@ -65,6 +65,18 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
      * (no DOM reads) — it runs inside the overflow filter.
      */
     private _forcedOverflow: (panelId: string) => boolean = () => false;
+    /**
+     * When true, pinned (overflow-excluded) tabs stick to the left edge as the
+     * strip scrolls horizontally (Chrome-style frozen columns) — wired by the
+     * PinnedTabs module in inline mode. Each pinned tab is given a cumulative
+     * `--dv-pinned-sticky-left` offset. Defaults to off so behaviour is
+     * unchanged when the module is absent.
+     */
+    private _pinnedSticky = false;
+    /** Whether any tab currently carries the sticky styling — lets
+     *  {@link _applyPinnedSticky} bail early when there is nothing to do (the
+     *  common case for components that never enable the feature). */
+    private _hasPinnedStickyStyling = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _voidContainerListeners: IDisposable | null = null;
 
@@ -124,6 +136,13 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _onOverflowTabsChange = new Emitter<{
         tabs: string[];
         tabGroups: string[];
+        /**
+         * Overflow-excluded (pinned) tabs that have themselves clipped out of
+         * the strip. Rendered in a dedicated "Pinned" section at the top of the
+         * dropdown so an overflowing pinned block stays reachable. Empty unless
+         * the {@link _overflowExclude} predicate is wired (PinnedTabs module).
+         */
+        pinnedTabs: string[];
         reset: boolean;
     }>();
     readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
@@ -155,6 +174,86 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         if (this._showTabsOverflowControl) {
             this.toggleDropdown({ reset: false });
         }
+        // The pinned set may have changed alongside overflow (pin/unpin), so
+        // recompute the sticky offsets too.
+        this._applyPinnedSticky();
+    }
+
+    /**
+     * Enable/disable sticky-on-scroll for pinned tabs (inline mode) — wired by
+     * the PinnedTabs module. When on, pinned (overflow-excluded) tabs are frozen
+     * to the left edge as the strip scrolls, each at the cumulative width of the
+     * pinned tabs before it; when off, the sticky styling is cleared. The
+     * offsets are scroll-invariant, so they are recomputed only on resize,
+     * horizontal scroll (a cheap self-heal after a reorder), and pinned-set
+     * changes — not continuously.
+     */
+    setPinnedSticky(enabled: boolean): void {
+        if (this._pinnedSticky === enabled) {
+            return;
+        }
+        this._pinnedSticky = enabled;
+        this._applyPinnedSticky();
+    }
+
+    /**
+     * Freeze the pinned (overflow-excluded) tabs to the left edge: give each the
+     * `dv-tab--pinned-sticky` class and a `--dv-pinned-sticky-left` offset so the
+     * CSS `position: sticky` rule holds it in place as the strip scrolls. Clears
+     * the styling from any tab that is no longer pinned, and from all tabs when
+     * the feature is off.
+     */
+    private _applyPinnedSticky(): void {
+        const pinned = this._pinnedSticky
+            ? this._tabs.filter((tab) =>
+                  this._overflowExclude(tab.value.panel.id)
+              )
+            : [];
+
+        // Nothing pinned and nothing was ever styled — bail before touching the
+        // DOM. Keeps the common (feature-off) refreshOverflow path free.
+        if (pinned.length === 0 && !this._hasPinnedStickyStyling) {
+            return;
+        }
+
+        const pinnedSet = new Set(pinned.map((tab) => tab.value.element));
+
+        // Clear stale styling from tabs that are no longer sticky-pinned.
+        for (const tab of this._tabs) {
+            const el = tab.value.element;
+            if (
+                !pinnedSet.has(el) &&
+                el.classList.contains('dv-tab--pinned-sticky')
+            ) {
+                el.classList.remove('dv-tab--pinned-sticky');
+                el.style.removeProperty('--dv-pinned-sticky-left');
+            }
+        }
+
+        if (pinned.length === 0) {
+            this._hasPinnedStickyStyling = false;
+            return;
+        }
+
+        // Read every natural position before writing, to avoid interleaving
+        // layout reads and writes. `offsetLeft` (relative to the positioned
+        // `.dv-tabs-container`) is each tab's in-flow left *including* the
+        // preceding tabs' margins, so the frozen block keeps the theme's tab
+        // spacing — a bare width sum would collapse the gaps in spaced themes.
+        const lefts = pinned.map((tab) => tab.value.element.offsetLeft);
+        pinned.forEach((tab, index) => {
+            const el = tab.value.element;
+            el.classList.add('dv-tab--pinned-sticky');
+            const value = `${lefts[index]}px`;
+            // Skip a redundant write — re-setting the same value still
+            // invalidates style and forces a reflow on every scroll tick.
+            if (
+                el.style.getPropertyValue('--dv-pinned-sticky-left') !== value
+            ) {
+                el.style.setProperty('--dv-pinned-sticky-left', value);
+            }
+        });
+        this._hasPinnedStickyStyling = true;
     }
 
     get showTabsOverflowControl(): boolean {
@@ -176,12 +275,17 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 observer.onDidChange((event) => {
                     const hasOverflow = event.hasScrollX || event.hasScrollY;
                     this.toggleDropdown({ reset: !hasOverflow });
+                    // A resize can change tab widths, so refresh sticky offsets.
+                    this._applyPinnedSticky();
                     if (this._tabGroupManager.groupUnderlines.size > 0) {
                         this._tabGroupManager.positionUnderlines();
                     }
                 }),
                 addDisposableListener(this._tabsList, 'scroll', () => {
                     this.toggleDropdown({ reset: false });
+                    // Cheap self-heal: re-assert sticky offsets on scroll (the
+                    // only time they are visible) so any prior reorder settles.
+                    this._applyPinnedSticky();
                     if (this._tabGroupManager.groupUnderlines.size > 0) {
                         this._tabGroupManager.positionUnderlines();
                     }
@@ -1073,6 +1177,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             this._onOverflowTabsChange.fire({
                 tabs: [],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: true,
             });
             return;
@@ -1090,6 +1195,27 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                             )))
             )
             .map((x) => x.value.panel.id);
+
+        // Pinned (overflow-excluded) tabs are normally kept out of the dropdown
+        // entirely. The exception is when the pinned block *itself* overflows:
+        // a pinned tab that is laid out (has width) yet clipped is unreachable
+        // in the strip, so it is surfaced in a "Pinned" section at the top of
+        // the dropdown. A zero-width tab is not clipped-but-hidden — it is a
+        // pinned tab whose main-strip copy is display:none (separate-row mode,
+        // where the row already provides access), so it is skipped.
+        const pinnedTabs = options.reset
+            ? []
+            : this._tabs
+                  .filter(
+                      (tab) =>
+                          this._overflowExclude(tab.value.panel.id) &&
+                          tab.value.element.getBoundingClientRect().width > 0 &&
+                          !isChildEntirelyVisibleWithinParent(
+                              tab.value.element,
+                              this._tabsList
+                          )
+                  )
+                  .map((x) => x.value.panel.id);
 
         // Detect tab groups whose chip is clipped or whose tabs are all
         // in the overflow set (e.g. collapsed groups scrolled out of view).
@@ -1131,7 +1257,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             }
         }
 
-        this._onOverflowTabsChange.fire({ tabs, tabGroups, reset: false });
+        this._onOverflowTabsChange.fire({
+            tabs,
+            tabGroups,
+            pinnedTabs,
+            reset: false,
+        });
     }
 
     updateDragAndDropState(): void {
