@@ -178,3 +178,29 @@ Please reference docs @ [dockview.dev](https://dockview.dev).
 
 ## Breaking changes
 ```
+
+## Linear issue workflow
+
+When the work maps to a Linear issue (the user names an issue identifier such as
+`ABC-123`, or the task/branch references one), keep the issue's state in sync via
+the Linear MCP tools. Linear's native GitHub integration is the source of truth
+for status transitions; these steps make Claude's updates align with it and cover
+the in-session gaps.
+
+1.  **Starting work** — set the issue to **In Progress** (Linear `save_issue`
+    with `state: "In Progress"`) before making changes. Skip if it's already
+    In Progress / Done.
+2.  **Opening a PR** — include a Linear magic word for every issue the PR
+    resolves in the PR **description**, one per issue: `Fixes <ID>` /
+    `Closes <ID>` (e.g. `Fixes ABC-123`). This is what makes Linear auto-link
+    the PR and auto-complete the issue on merge, regardless of the branch name
+    (agent branches are assigned as `claude/...`, which Linear does not
+    auto-link). Put the magic words in the body even when the title already
+    mentions the identifier.
+3.  **On merge** — when a watched PR merges (the merge webhook arrives during a
+    session), set each resolved issue to **Done** (Linear `save_issue` with
+    `state: "Done"`) as a backup in case the native integration's status
+    mapping isn't configured. Idempotent — skip if already Done.
+
+Do not change Linear state for issues the user hasn't asked you to work on, and
+don't reopen or duplicate issues.
