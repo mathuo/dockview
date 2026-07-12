@@ -56,6 +56,12 @@ export class CompositeDisposable {
 export class MutableDisposable implements IDisposable {
     private _disposable = Disposable.NONE;
 
+    get value(): IDisposable | undefined {
+        return this._disposable === Disposable.NONE
+            ? undefined
+            : this._disposable;
+    }
+
     set value(disposable: IDisposable) {
         if (this._disposable) {
             this._disposable.dispose();

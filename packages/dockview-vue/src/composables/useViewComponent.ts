@@ -63,6 +63,19 @@ export function useViewComponent<
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**
+     * Capture the component instance synchronously during `setup`. Watcher
+     * callbacks run via Vue's scheduler flush, where `getCurrentInstance()`
+     * returns null, so re-calling it there would throw and silently abort the
+     * update. Cache it once here and reuse it everywhere below.
+     */
+    const vueInstance = getCurrentInstance();
+    if (!vueInstance) {
+        throw new Error(
+            `${config.componentName}: getCurrentInstance() returned null`
+        );
+    }
+
+    /**
      * Components are teleported into the view's DOM (rendered by
      * `<DockviewPortals>` in the host template) so panels stay in the Vue
      * component tree. See {@link VueRendererRegistry}.
@@ -86,20 +99,13 @@ export function useViewComponent<
         () => (props as any).components,
         () => {
             if (instance.value) {
-                const inst = getCurrentInstance();
-                if (!inst) {
-                    throw new Error(
-                        `${config.componentName}: getCurrentInstance() returned null`
-                    );
-                }
-
                 instance.value.updateOptions({
                     createComponent: (options: {
                         id: string;
                         name?: string;
                     }) => {
                         const component = findComponent(
-                            inst,
+                            vueInstance,
                             options.name!,
                             (props as any).components
                         );
@@ -107,7 +113,7 @@ export function useViewComponent<
                             options.id,
                             options.name,
                             component! as any,
-                            inst,
+                            vueInstance,
                             registry
                         );
                     },
@@ -121,18 +127,10 @@ export function useViewComponent<
             throw new Error(`${config.componentName}: element is not mounted`);
         }
 
-        const inst = getCurrentInstance();
-
-        if (!inst) {
-            throw new Error(
-                `${config.componentName}: getCurrentInstance() returned null`
-            );
-        }
-
         const frameworkOptions = {
             createComponent(options: { id: string; name?: string }) {
                 const component = findComponent(
-                    inst,
+                    vueInstance,
                     options.name!,
                     (props as any).components
                 );
@@ -140,7 +138,7 @@ export function useViewComponent<
                     options.id,
                     options.name,
                     component! as any,
-                    inst,
+                    vueInstance,
                     registry
                 );
             },
