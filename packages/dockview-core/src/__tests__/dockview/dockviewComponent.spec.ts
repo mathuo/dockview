@@ -12352,4 +12352,77 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
 
         dv.dispose();
     });
+
+    test('fromJSON with malformed input does not destroy the existing layout', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        expect(dockview.panels.length).toBe(2);
+
+        // an object with no `grid` is malformed; fromJSON must reject it
+        // *before* clearing the live layout
+        expect(() => dockview.fromJSON({} as any)).toThrow();
+
+        // the pre-existing layout must survive the failed load
+        expect(dockview.panels.length).toBe(2);
+        expect(dockview.getGroupPanel('panel1')).toBeTruthy();
+        expect(dockview.getGroupPanel('panel2')).toBeTruthy();
+
+        dockview.dispose();
+    });
+
+    test('fromJSON degrades gracefully when a group references a missing panel id', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const serialized = dockview.toJSON();
+
+        // corrupt the state: the group still references 'panel2' in its views
+        // but its panel state is absent from the panels map
+        delete (serialized.panels as any)['panel2'];
+
+        // must not throw on the missing panel; the valid panel still loads
+        expect(() => dockview.fromJSON(serialized)).not.toThrow();
+
+        expect(dockview.getGroupPanel('panel1')).toBeTruthy();
+        expect(dockview.getGroupPanel('panel2')).toBeFalsy();
+
+        dockview.dispose();
+    });
 });

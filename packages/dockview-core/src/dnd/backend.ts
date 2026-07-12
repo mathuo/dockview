@@ -141,6 +141,7 @@ class Html5DragSource extends CompositeDisposable implements IDragSource {
                     addGhostImage(event.dataTransfer, ghost.element, {
                         x: ghost.offsetX ?? 0,
                         y: ghost.offsetY ?? 0,
+                        ownerDocument: this.el.ownerDocument ?? undefined,
                     });
                     if (ghost.dispose) {
                         // addGhostImage removes the element from the DOM on

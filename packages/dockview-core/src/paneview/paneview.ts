@@ -168,6 +168,12 @@ export class Paneview extends CompositeDisposable implements IDisposable {
 
         const view = this.removePane(from, { skipDispose: true });
 
+        // `skipDispose` keeps the pane alive but also leaves its old
+        // expansion-state listener attached; dispose that listener here since
+        // the addPane below installs a fresh one, otherwise every move orphans
+        // a live subscription and duplicates the layout-change events.
+        view.disposable.dispose();
+
         this.skipAnimation = true;
         try {
             this.addPane(view.pane, view.pane.size, to, false);

@@ -247,4 +247,46 @@ describe('GridviewVue components prop resolves without registration', () => {
             api.addPanel({ id: 'bad', component: 'NotRegistered' })
         ).toThrow("Failed to find Vue Component 'NotRegistered'");
     });
+
+    test('changing the components prop at runtime refreshes the map without throwing', async () => {
+        const errors: unknown[] = [];
+
+        wrapper = mount(GridviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Cell: MockGridComponent },
+            },
+            attachTo: document.body,
+            global: {
+                config: {
+                    // the components watcher previously re-called
+                    // getCurrentInstance() during the scheduler flush (returns
+                    // null) and threw; Vue routes that to the app error handler
+                    errorHandler: (err: unknown) => errors.push(err),
+                },
+            },
+        });
+        await flushPromises();
+
+        const Extra = defineComponent({
+            name: 'ExtraComponent',
+            props: ['params', 'api', 'containerApi'],
+            template: '<div class="mock-extra">Extra</div>',
+        });
+
+        // swap in a brand-new components object (new reference) at runtime
+        await wrapper.setProps({
+            components: { Cell: MockGridComponent, Extra },
+        });
+        await flushPromises();
+
+        expect(errors).toEqual([]);
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'extra-1', component: 'Extra' })
+        ).not.toThrow();
+        expect(api.getPanel('extra-1')).toBeDefined();
+    });
 });

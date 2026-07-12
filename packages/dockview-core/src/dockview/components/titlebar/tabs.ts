@@ -291,6 +291,11 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                     }
                 })
             );
+        } else {
+            // Disabling the control at runtime must tear down the observer and
+            // scroll listener, otherwise they keep firing toggleDropdown (which
+            // bypasses the refreshOverflow flag guard) and leak until disposal.
+            this._observerDisposable.value = Disposable.NONE;
         }
     }
 

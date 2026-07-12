@@ -3353,6 +3353,25 @@ export class DockviewComponent
         // issue #1304.
         this._popoutWindowService?.cancelPendingRestorations();
 
+        // Validate the input shape *before* mutating the live layout. Both the
+        // reuseExistingPanels setup below and clear() destroy the current
+        // layout, so any validation that runs after them (and outside the
+        // restoration try/catch) would leave the component empty on malformed
+        // input instead of failing safely.
+        if (typeof data !== 'object' || data === null) {
+            throw new Error(
+                'dockview: serialized layout must be a non-null object'
+            );
+        }
+
+        if (
+            !data.grid ||
+            data.grid.root?.type !== 'branch' ||
+            !Array.isArray(data.grid.root.data)
+        ) {
+            throw new Error('dockview: root must be of type branch');
+        }
+
         const existingPanels = new Map<string, IDockviewPanel>();
 
         let tempGroup: DockviewGroupPanel | undefined;
@@ -3395,17 +3414,7 @@ export class DockviewComponent
 
         this.clear();
 
-        if (typeof data !== 'object' || data === null) {
-            throw new Error(
-                'dockview: serialized layout must be a non-null object'
-            );
-        }
-
         const { grid, panels, activeGroup } = data;
-
-        if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
-            throw new Error('dockview: root must be of type branch');
-        }
 
         try {
             // take note of the existing dimensions
@@ -3447,6 +3456,17 @@ export class DockviewComponent
                      * due to a corruption of input data.
                      */
 
+                    /**
+                     * Skip a view whose panel state is missing from the panels
+                     * map rather than passing `undefined` to the deserializer
+                     * (which would dereference `panelData.id` and throw,
+                     * aborting the whole layout restore). Mirrors the guard on
+                     * the edge-group deserialization path.
+                     */
+                    if (!panels[child]) {
+                        continue;
+                    }
+
                     const existingPanel = existingPanels.get(child);
 
                     if (tempGroup && existingPanel) {
@@ -3465,9 +3485,10 @@ export class DockviewComponent
                     }
                 }
 
-                for (let i = 0; i < views.length; i++) {
-                    const panel = createdPanels[i];
-
+                // Iterate the panels that were actually created (a view whose
+                // panel state was missing is skipped above), keeping this loop
+                // aligned with `createdPanels` rather than the raw `views`.
+                for (const panel of createdPanels) {
                     const isActive =
                         typeof activeView === 'string' &&
                         activeView === panel.id;

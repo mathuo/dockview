@@ -815,4 +815,20 @@ describe('tabs', () => {
             expect(tabsList.classList.contains('dv-vertical')).toBeFalsy();
         });
     });
+
+    describe('showTabsOverflowControl', () => {
+        test('disabling at runtime disposes the overflow observer', () => {
+            const { tabs } = createTabsForDropTest();
+
+            // constructed with the control off
+            expect((tabs as any)._observerDisposable.value).toBeUndefined();
+
+            tabs.showTabsOverflowControl = true;
+            expect((tabs as any)._observerDisposable.value).toBeDefined();
+
+            // turning it back off must tear down the observer/scroll listener
+            tabs.showTabsOverflowControl = false;
+            expect((tabs as any)._observerDisposable.value).toBeUndefined();
+        });
+    });
 });
