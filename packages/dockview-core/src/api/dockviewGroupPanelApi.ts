@@ -7,7 +7,10 @@ import {
     DockviewGroupLocation,
     DockviewGroupPanelLocked,
 } from '../dockview/dockviewGroupPanelModel';
-import { DockviewHeaderPosition } from '../dockview/options';
+import {
+    DockviewHeaderDirection,
+    DockviewHeaderPosition,
+} from '../dockview/options';
 import { Emitter, Event } from '../events';
 import {
     GridviewPanelApi,
@@ -36,6 +39,13 @@ export interface DockviewGroupPanelPeekChangeEvent {
     readonly isPeeking: boolean;
 }
 
+export interface DockviewGroupPanelHeaderDirectionChangeEvent {
+    /** The header's new axis: `'horizontal'` (top/bottom) or `'vertical'` (left/right). */
+    readonly direction: DockviewHeaderDirection;
+    /** The header position that produced the new direction. */
+    readonly position: DockviewHeaderPosition;
+}
+
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     /**
@@ -57,6 +67,13 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * fires for non-edge groups or without the auto-hide module.
      */
     readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent>;
+    /**
+     * Fires when this group's header flips orientation between horizontal
+     * (top/bottom) and vertical (left/right) — e.g. when `headerPosition`
+     * moves from `top` to `left`. Does not fire for position changes that
+     * keep the same axis (top↔bottom, left↔right) or for the initial set.
+     */
+    readonly onDidHeaderDirectionChange: Event<DockviewGroupPanelHeaderDirectionChangeEvent>;
     readonly location: DockviewGroupLocation;
     /**
      * Whether this group is locked against drop interactions.
@@ -130,6 +147,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent> =
         this._onDidPeekChange.event;
 
+    readonly _onDidHeaderDirectionChange =
+        new Emitter<DockviewGroupPanelHeaderDirectionChangeEvent>();
+    readonly onDidHeaderDirectionChange: Event<DockviewGroupPanelHeaderDirectionChangeEvent> =
+        this._onDidHeaderDirectionChange.event;
+
     get location(): DockviewGroupLocation {
         if (!this._group) {
             throw new Error(NOT_INITIALIZED_MESSAGE);
@@ -182,6 +204,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             this._onDidActivePanelChange,
             this._onDidCollapsedChange,
             this._onDidPeekChange,
+            this._onDidHeaderDirectionChange,
             this._onDidVisibilityChange.event((event) => {
                 // When becoming visible, apply any pending size change
                 if (event.isVisible && this._pendingSize) {

@@ -265,6 +265,7 @@ export class DockviewGroupPanelModel
     private _isGroupActive = false;
     private _locked: DockviewGroupPanelLocked = false;
     private _headerPosition: DockviewHeaderPosition | undefined;
+    private _headerDirection: DockviewHeaderDirection | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -474,8 +475,10 @@ export class DockviewGroupPanelModel
         );
         addClasses(this.container, `dv-groupview-header-${value}`);
 
-        const direction =
+        const direction: DockviewHeaderDirection =
             value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
+        const previousDirection = this._headerDirection;
+        this._headerDirection = direction;
         this.tabsContainer.direction = direction;
         this.header.direction = direction;
 
@@ -487,6 +490,20 @@ export class DockviewGroupPanelModel
         }
 
         this.updateHeaderActions();
+
+        // Signal a genuine horizontal↔vertical flip so features that lay out
+        // per-axis (e.g. multi-row tab wrapping) can react. Fired after the
+        // side effects above, and only on a real axis change — not on the
+        // initial set, nor on a same-axis move (top↔bottom, left↔right).
+        if (
+            previousDirection !== undefined &&
+            previousDirection !== direction
+        ) {
+            this.groupPanel?.api._onDidHeaderDirectionChange.fire({
+                direction,
+                position: value,
+            });
+        }
     }
 
     get location(): DockviewGroupLocation {
