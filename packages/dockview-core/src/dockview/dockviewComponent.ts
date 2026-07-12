@@ -1323,19 +1323,33 @@ export class DockviewComponent
         const theme = getDockviewTheme(this.gridview.element);
         const element = this.element;
 
+        // Always returns absolute *screen* coordinates. A caller-supplied /
+        // restored `position` is already in screen space — it originates from
+        // PopoutWindow.dimensions() (screenX/screenY). A fresh popout is
+        // positioned from the source element's viewport-relative rect, so it
+        // is offset here by the opener window's own screen position. Doing the
+        // normalisation in one place keeps the window construction below
+        // coordinate-space agnostic; previously the opener offset was added
+        // unconditionally at construction, double-offsetting a restored popout
+        // whenever the opener sat on a non-primary monitor (screenX/Y != 0).
         function getBox(): Box {
             if (options?.position) {
                 return options.position;
             }
 
-            if (itemToPopout instanceof DockviewGroupPanel) {
-                return itemToPopout.element.getBoundingClientRect();
-            }
+            const sourceElement =
+                itemToPopout instanceof DockviewGroupPanel
+                    ? itemToPopout.element
+                    : (itemToPopout.group?.element ?? element);
 
-            if (itemToPopout.group) {
-                return itemToPopout.group.element.getBoundingClientRect();
-            }
-            return element.getBoundingClientRect();
+            const rect = sourceElement.getBoundingClientRect();
+
+            return {
+                left: window.screenX + rect.left,
+                top: window.screenY + rect.top,
+                width: rect.width,
+                height: rect.height,
+            };
         }
 
         const box: Box = getBox();
@@ -1354,8 +1368,8 @@ export class DockviewComponent
             theme ?? '',
             {
                 url: resolvedPopoutUrl ?? '/popout.html',
-                left: window.screenX + box.left,
-                top: window.screenY + box.top,
+                left: box.left,
+                top: box.top,
                 width: box.width,
                 height: box.height,
                 onDidOpen: options?.onDidOpen,
@@ -1639,7 +1653,7 @@ export class DockviewComponent
                     _onDidWindowPositionChange.event(() => {
                         this._onDidPopoutGroupPositionChange.fire({
                             screenX: _window.window!.screenX,
-                            screenY: _window.window!.screenX,
+                            screenY: _window.window!.screenY,
                             group,
                         });
                     }),
