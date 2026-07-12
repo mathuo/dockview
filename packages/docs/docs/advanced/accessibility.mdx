@@ -20,7 +20,10 @@ widget, and groups and floating windows carry landmark roles, so assistive
 technology can describe the layout:
 
 - The tab strip is a `role="tablist"` (with `aria-orientation`), each tab a
-  `role="tab"` carrying `aria-selected` and `aria-controls`.
+  `role="tab"` carrying `aria-selected` and `aria-controls`. Each tab has an explicit
+  accessible name set from its panel title (falling back to the panel id), kept in
+  sync with `setTitle`, so a screen reader reads the title cleanly rather than
+  absorbing the close button's label.
 - Panel content is a `role="tabpanel"` labelled by its tab (`aria-labelledby`).
 - Each group is a `role="region"` labelled by its active panel's title.
 - A floating group is a non-modal `role="dialog"` named from its active panel,

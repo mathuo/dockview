@@ -107,6 +107,12 @@ readers:
 From the target phase, `Ctrl+Shift+F` floats the panel into a new floating group
 instead of docking it.
 
+While a move is armed, Dockview shows a visible on-screen hint mirroring the
+screen-reader narration, so sighted keyboard users can see how to proceed rather than
+relying on the announcement alone. It is an `aria-hidden` element (to avoid a double
+announcement) with the class `.dv-keyboard-docking-hint`, styleable through your theme,
+and is removed when the move commits or is cancelled.
+
 | Action                                   | Default        | Binding key |
 | ---------------------------------------- | -------------- | ----------- |
 | Arm keyboard docking of the active panel | `Ctrl+M`       | `dock`      |
@@ -114,6 +120,18 @@ instead of docking it.
 
 These bindings live on the same `keyboardNavigation.keymap` object, so they can
 be rebound the same way as the navigation keys above.
+
+## Pinning the active tab
+
+When [pinned tabs](/docs/core/panels/pinnedTabs) are enabled, `Ctrl+Shift+Enter` pins
+or unpins the active panel's tab.
+
+| Action                     | Default            | Binding key |
+| -------------------------- | ------------------ | ----------- |
+| Pin / unpin the active tab | `Ctrl+Shift+Enter` | `togglePin` |
+
+The binding is inert unless `pinnedTabs.enabled` is `true`. It lives on the same
+`keyboardNavigation.keymap` object, so it can be rebound like the others.
 
 :::info
 Keyboard docking works inside popout windows too. Arm and complete a move from

@@ -1,0 +1,114 @@
+---
+title: Advanced overflow
+description: Turn the tab overflow dropdown into a searchable, most-recently-used tab switcher with full keyboard navigation.
+sidebar_position: 9
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+The default [overflow dropdown](/docs/core/panels/tabOverflow) is a flat list of the
+tabs that no longer fit. The Advanced Overflow module upgrades that same dropdown, in
+place, into a command-palette style tab switcher: a search box that filters the
+group's tabs, most-recently-used ordering, and full keyboard navigation. The chevron
+trigger and the count badge are unchanged; only the popover body changes. When the
+module is absent the plain list renders exactly as before, so these fields are safe to
+leave set.
+
+All three capabilities live on the shared [`overflow`](/docs/core/panels/tabOverflow)
+option.
+
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="DockviewComponentOptions" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="DockviewAngularOptions" methods={['overflow']} />
+</FrameworkSpecific>
+
+<DocRef declaration="DockviewOverflowOptions" />
+
+## Search
+
+Set `overflow.search` to add a filter input at the top of the dropdown. Typing filters
+the listed tabs by title as you type.
+
+```tsx
+const api = createDockview(element, {
+    overflow: { search: true },
+});
+```
+
+Pass an object to tune the input:
+
+- **`scope`**: `'group'` (the default) searches every tab in the group, so the
+  dropdown becomes a switcher for the whole group, not just the clipped tabs.
+  `'overflow'` restricts the filter to the tabs that are actually hidden behind the
+  chevron.
+- **`placeholder`**: the input's placeholder text. Defaults to `"Search tabs"`.
+
+```tsx
+const api = createDockview(element, {
+    overflow: {
+        search: { scope: 'overflow', placeholder: 'Filter hidden tabs' },
+    },
+});
+```
+
+## Most-recently-used ordering
+
+Set `overflow.mru` to order the dropdown by most-recently-activated instead of the
+tabs' position in the strip, so the tab you last looked at sits at the top. Recency is
+tracked per group and survives a group closing; moving a panel between groups re-homes
+its recency.
+
+```tsx
+const api = createDockview(element, {
+    overflow: { search: true, mru: true },
+});
+```
+
+## Keyboard navigation
+
+The popover is a `role="listbox"` with a roving focus:
+
+- **Arrow keys** move between rows; **Home** / **End** jump to the first / last row.
+- **Enter** activates the focused tab and closes the popover.
+- **Esc** closes the popover and returns focus to the chevron button.
+- **Tab** is trapped inside the popover while it is open.
+
+With `search` enabled the input takes focus when the popover opens, so you can type to
+filter and then arrow into the results without touching the mouse.
+
+## Pinned tabs in the dropdown
+
+When [pinned tabs](/docs/core/panels/pinnedTabs) are enabled and the pinned block
+itself overflows the strip, the clipped pinned tabs appear in a dedicated **Pinned**
+section at the top of the dropdown, above the search and most-recently-used list, and
+are counted in the chevron badge. This matches the plain dropdown, which shows the same
+section when the advanced module is absent.
+
+## Thumbnails
+
+`overflow.thumbnails` is reserved for per-row content previews in the dropdown.
+
+:::warning
+`thumbnails` is not yet implemented. Setting it has no effect today; `search` and
+`mru` are the shipping capabilities of this module.
+:::
+
+## See also
+
+- [Tab overflow](/docs/core/panels/tabOverflow): the default dropdown this module upgrades.
+- [Multi-row tabs](/docs/core/panels/multiRowTabs): wrap tabs onto extra rows instead of collapsing them.
+- [Pinned tabs](/docs/core/panels/pinnedTabs): the source of the dropdown's "Pinned" section.
