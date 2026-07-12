@@ -654,7 +654,16 @@ export class TabsContainer
                     if (tg?.collapsed) {
                         tg.expand();
                     }
-                    tab?.element.scrollIntoView();
+                    // `block: 'nearest'` keeps this from scrolling ancestor
+                    // scroll containers (incl. the page) vertically — a bare
+                    // scrollIntoView() defaults to `block: 'start'`, which
+                    // yanks the whole dockview up when it sits low in a
+                    // scrollable page. We only want to reveal the tab
+                    // horizontally within the tab strip.
+                    tab?.element.scrollIntoView({
+                        block: 'nearest',
+                        inline: 'nearest',
+                    });
                     this.accessor.withOrigin('user', () =>
                         panel.api.setActive()
                     );
