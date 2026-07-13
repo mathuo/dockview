@@ -476,6 +476,142 @@ test.describe('multi-row tabs (wrap mode)', () => {
         await expect(list).not.toHaveClass(/dv-tabs-container--wrap/);
     });
 
+    // Header `right` is the mirror of `left`: columns wrap the same way but the
+    // strip hugs the right edge and the content sits to its left. The existing
+    // vertical coverage only drives `left`, so this guards the mirrored axis.
+    const setupVerticalRight = async (page, count = 24) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(
+            (n) => (window as any).__dv.setupWrapTabs(n),
+            count
+        );
+        await page.evaluate(() =>
+            (window as any).__dv.setHeaderPosition('right')
+        );
+    };
+
+    test('vertical header (right): tabs wrap into columns, header hugs the right edge, content sits left', async ({
+        page,
+    }) => {
+        await setupVerticalRight(page);
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        await expect(tabsList).toHaveClass(/dv-tabs-container-vertical/);
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap/);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        const groupBox = (await page
+            .locator('.dv-groupview')
+            .first()
+            .boundingBox())!;
+        const headerBox = (await page
+            .locator('.dv-tabs-and-actions-container')
+            .first()
+            .boundingBox())!;
+        const contentBox = (await page
+            .locator('.dv-content-container')
+            .first()
+            .boundingBox())!;
+
+        // Multi-column header pinned to the group's right edge ...
+        expect(headerBox.width).toBeGreaterThan(0);
+        expect(Math.round(headerBox.x + headerBox.width)).toBeCloseTo(
+            Math.round(groupBox.x + groupBox.width),
+            0
+        );
+        // ... with the content filling the remaining width to its left.
+        expect(Math.round(contentBox.x)).toBeCloseTo(Math.round(groupBox.x), 0);
+        expect(contentBox.width).toBeCloseTo(
+            groupBox.width - headerBox.width,
+            0
+        );
+    });
+
+    test('vertical header: content shrinks to the area beside the multi-column header', async ({
+        page,
+    }) => {
+        // The vertical analogue of the horizontal "content shrinks below the
+        // multi-row header" case: the active panel must be laid out against the
+        // width left over beside the grown header, not the header-inclusive
+        // group box.
+        await setupVertical(page);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        const groupBox = (await page
+            .locator('.dv-groupview')
+            .first()
+            .boundingBox())!;
+        const headerBox = (await page
+            .locator('.dv-tabs-and-actions-container')
+            .first()
+            .boundingBox())!;
+        const contentBox = (await page
+            .locator('.dv-content-container')
+            .first()
+            .boundingBox())!;
+
+        // The header grew wider than a single column.
+        const colW = await page.evaluate(() =>
+            parseFloat(
+                getComputedStyle(
+                    document.querySelector(
+                        '.dv-tabs-and-actions-container'
+                    ) as HTMLElement
+                ).getPropertyValue('--dv-tabs-and-actions-container-height')
+            )
+        );
+        expect(headerBox.width).toBeGreaterThan(colW);
+
+        // The active panel was sized to the shrunk content area (group width
+        // minus the multi-column header), not the full group width.
+        const reported = await page.evaluate(() =>
+            (window as any).__dv.panelDimensions('wrap-tab-23')
+        );
+        expect(reported).toBeTruthy();
+        expect(reported.width).toBeCloseTo(contentBox.width, 0);
+        expect(reported.width).toBeCloseTo(
+            groupBox.width - headerBox.width,
+            0
+        );
+    });
+
+    test('vertical header: wrapped columns are not clipped by the strip', async ({
+        page,
+    }) => {
+        // "Renders well" invariant for lots of tabs: with an uncapped wrap the
+        // strip must widen to hold every column so no tab box escapes it (the
+        // failure mode is columns overflowing a fixed-width strip and vanishing).
+        await setupVertical(page, 'overflow=wrap', 40);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        const m = await page.evaluate(() => {
+            const list = document.querySelector(
+                '.dv-tabs-container'
+            ) as HTMLElement;
+            const box = list.getBoundingClientRect();
+            const tabs = Array.from(
+                list.querySelectorAll<HTMLElement>('.dv-tab')
+            );
+            const clipped = tabs.filter((t) => {
+                const r = t.getBoundingClientRect();
+                return r.left < box.left - 1 || r.right > box.right + 1;
+            });
+            return {
+                tabCount: tabs.length,
+                clipped: clipped.length,
+                scrollWidth: list.scrollWidth,
+                clientWidth: list.clientWidth,
+            };
+        });
+
+        expect(m.tabCount).toBe(40);
+        // No column overflows the strip's own width ...
+        expect(m.scrollWidth).toBeLessThanOrEqual(m.clientWidth + 1);
+        // ... so every tab stays visible inside it.
+        expect(m.clipped).toBe(0);
+    });
+
     test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
         await setup(page);
 
