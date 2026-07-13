@@ -277,6 +277,19 @@
                     popoutCount: () => dockview.getPopouts().length,
                     closeActivePopout: () =>
                         dockview.getPopouts()[0].group.api.close(),
+                    // Dock the popout window's anchor group back next to a
+                    // grid group — promotes a remaining popout member to anchor
+                    // while the window stays open (drives DV-47).
+                    dockPopoutAnchorNextTo: (targetId) => {
+                        const popoutGroup = dockview.getPopouts()[0].group;
+                        dockview.moveGroupOrPanel({
+                            from: { groupId: popoutGroup.id },
+                            to: {
+                                group: panels[targetId].api.group,
+                                position: 'right',
+                            },
+                        });
+                    },
                     undo: () => dockview.undo(),
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,

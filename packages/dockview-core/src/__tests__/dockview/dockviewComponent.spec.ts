@@ -6246,6 +6246,108 @@ describe('dockviewComponent', () => {
                 dockview.dispose();
             });
 
+            test('DV-43: a non-anchor group in a multi-group popout resolves the popout window popup service, not the main one', async () => {
+                window.open = () => setupMockWindow();
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                // drag panel2's group into the popout → 2-group popout, anchor
+                // is panel1's group
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const mainPopupService = (dockview as any).popupService;
+                const anchorService = dockview.getPopupServiceForGroup(
+                    panel1.group
+                );
+                const memberService = dockview.getPopupServiceForGroup(
+                    panel2.group
+                );
+
+                // the anchor resolves to the popout window's own popup service
+                expect(anchorService).not.toBe(mainPopupService);
+                // and the non-anchor member shares that same service rather than
+                // falling back to the main window's (the DV-43 bug)
+                expect(memberService).toBe(anchorService);
+                expect(memberService).not.toBe(mainPopupService);
+
+                dockview.dispose();
+            });
+
+            test('DV-47: promoting a new anchor re-keys per-window popup-service resolution to the survivor', async () => {
+                const mockWindow = setupMockWindow();
+                window.open = () => mockWindow;
+
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const mainPopupService = (dockview as any).popupService;
+                const popoutService = dockview.getPopupServiceForGroup(
+                    panel1.group
+                );
+                expect(popoutService).not.toBe(mainPopupService);
+
+                // move the ORIGINAL anchor back to the grid → panel2 is promoted
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel1.group.id },
+                    to: { group: panel3.group, position: 'right' },
+                });
+                expect(panel1.api.location.type).toBe('grid');
+                expect(panel2.api.location.type).toBe('popout');
+
+                // the departed group no longer resolves to the popout service —
+                // it uses the main window again
+                expect(dockview.getPopupServiceForGroup(panel1.group)).toBe(
+                    mainPopupService
+                );
+                // the promoted anchor still resolves to the SAME popout service
+                expect(dockview.getPopupServiceForGroup(panel2.group)).toBe(
+                    popoutService
+                );
+
+                // the entry's anchor was reassigned to the survivor
+                const entry = (
+                    dockview as any
+                )._popoutWindowService.findByGroup(panel2.group);
+                expect(entry.popoutGroup).toBe(panel2.group);
+
+                dockview.dispose();
+            });
+
             test('closing a multi-group popout whose anchor came from a floating group docks all members to the grid (no split)', async () => {
                 const mockWindow = setupMockWindow();
                 window.open = () => mockWindow;
