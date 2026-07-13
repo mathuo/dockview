@@ -21,7 +21,10 @@ type DockPhase = 'target' | 'edge';
 
 interface MoveState {
     readonly source: IDockviewPanel;
-    readonly groups: DockviewGroupPanel[];
+    // Re-resolved against the live grid on each render/commit rather than held
+    // as a fixed snapshot, so a group removed mid-move can't leave this
+    // pointing at a disposed group.
+    groups: DockviewGroupPanel[];
     groupIndex: number;
     phase: DockPhase;
     position: Position;
@@ -279,9 +282,40 @@ export class KeyboardDockingService
         }
     }
 
+    /**
+     * Re-resolve the targeted group against the *live* grid. A group can be
+     * removed between arm-time and now (auto-close timer, programmatic
+     * `removeGroup`, collaborative edit); re-reading `host.groups` and clamping
+     * the index keeps the move pointing at a real, undisposed group instead of
+     * a stale snapshot entry. Returns `undefined` when no groups remain.
+     */
+    private _resolveTargetGroup(): DockviewGroupPanel | undefined {
+        const move = this._move!;
+        move.groups = this.host.groups;
+        if (move.groups.length === 0) {
+            return undefined;
+        }
+        move.groupIndex = Math.min(
+            Math.max(move.groupIndex, 0),
+            move.groups.length - 1
+        );
+        return move.groups[move.groupIndex];
+    }
+
+    private _abortMove(): void {
+        this._exit();
+        this.host.announce(this._messages.moveCancelled());
+        this._restoreFocus();
+    }
+
     private _render(): void {
         const move = this._move!;
-        const group = move.groups[move.groupIndex];
+        const group = this._resolveTargetGroup();
+        if (!group) {
+            // every candidate group was removed mid-move — bail out cleanly
+            this._abortMove();
+            return;
+        }
         this._clearPreview();
         this._preview = this.host.showDropPreview(group, move.position);
 
@@ -305,7 +339,11 @@ export class KeyboardDockingService
 
     private _commit(): void {
         const move = this._move!;
-        const group = move.groups[move.groupIndex];
+        const group = this._resolveTargetGroup();
+        if (!group) {
+            this._abortMove();
+            return;
+        }
         const position = move.position;
         const source = move.source;
         const name = group.activePanel?.title ?? group.id;
@@ -347,7 +385,12 @@ export class KeyboardDockingService
     }
 
     private _clearPreview(): void {
-        this._preview?.dispose();
+        try {
+            this._preview?.dispose();
+        } catch {
+            // the previewed group may already have been disposed (removed
+            // mid-move), which can throw from its drop-target teardown
+        }
         this._preview = undefined;
     }
 
