@@ -41,8 +41,7 @@
     "scripts": {
         "build:bundle": "rollup -c",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-        "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-        "build": "npm run build:cjs && npm run build:esm",
+        "build": "npm run build:cjs",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
         "test": "jest --selectProjects dockview-enterprise",
