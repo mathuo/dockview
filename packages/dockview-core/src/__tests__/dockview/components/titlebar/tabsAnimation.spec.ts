@@ -7,6 +7,17 @@ import { ITabRenderer } from '../../../../dockview/types';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import * as dataTransfer from '../../../../dnd/dataTransfer';
+
+// SWC compiles ESM named exports as getter-only, so `jest.spyOn` cannot
+// redefine them. Mock the module instead: `getPanelData` defaults to the real
+// implementation (re-armed in `beforeEach`) and individual tests override it
+// via `.mockReturnValue(...)`.
+const actualDataTransfer =
+    jest.requireActual<typeof dataTransfer>('../../../../dnd/dataTransfer');
+jest.mock('../../../../dnd/dataTransfer', () => ({
+    ...jest.requireActual('../../../../dnd/dataTransfer'),
+    getPanelData: jest.fn(),
+}));
 import { TabAnimation } from '../../../../dockview/options';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
 import { TabGroup } from '../../../../dockview/tabGroup';
@@ -105,6 +116,9 @@ describe('tabs - animation', () => {
     let rAFCallbacks: FrameRequestCallback[];
 
     beforeEach(() => {
+        const getPanelData = dataTransfer.getPanelData as jest.Mock;
+        getPanelData.mockReset();
+        getPanelData.mockImplementation(actualDataTransfer.getPanelData);
         rAFCallbacks = [];
         jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
             rAFCallbacks.push(cb);
@@ -1004,9 +1018,7 @@ describe('tabs - animation', () => {
             mockTabRect(elements[1], { left: 80, width: 80 });
 
             // Mock getPanelData to return an external group's panel
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1023,7 +1035,6 @@ describe('tabs - animation', () => {
             expect(state.sourceIndex).toBe(-1);
             expect(state.tabPositions.size).toBe(2);
 
-            spy.mockRestore();
         });
 
         test('external dragover does not initialize state when tabAnimation is default', () => {
@@ -1031,9 +1042,7 @@ describe('tabs - animation', () => {
             const panel = createMockPanel('panel-a');
             tabs.openPanel(panel, 0);
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1046,7 +1055,6 @@ describe('tabs - animation', () => {
 
             expect(getAnimState(tabs)).toBeNull();
 
-            spy.mockRestore();
         });
 
         test('external dragover uses average tab width for gap', () => {
@@ -1087,9 +1095,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1108,7 +1114,6 @@ describe('tabs - animation', () => {
             // External drag: state should be fully cleared (not just insertionIndex)
             expect(getAnimState(tabs)).toBeNull();
 
-            spy.mockRestore();
         });
 
         test('dragleave clears dropTargetContainer overlay for external drags', () => {
@@ -1126,9 +1131,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1149,7 +1152,6 @@ describe('tabs - animation', () => {
             expect(clearMock).toHaveBeenCalledTimes(1);
             expect(getAnimState(tabs)).toBeNull();
 
-            spy.mockRestore();
         });
 
         test('intra-group dragover clears dropTargetContainer overlay (panel→tab)', () => {
@@ -1204,9 +1206,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1223,7 +1223,6 @@ describe('tabs - animation', () => {
             // Must NOT clear — cross-group animation depends on the overlay persisting
             expect(clearMock).not.toHaveBeenCalled();
 
-            spy.mockRestore();
         });
 
         test('same-group dragover does not trigger external detection', () => {
@@ -1232,9 +1231,7 @@ describe('tabs - animation', () => {
             tabs.openPanel(panelA, 0);
 
             // Mock getPanelData to return same group
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'test-group',
@@ -1248,7 +1245,6 @@ describe('tabs - animation', () => {
             // Should NOT initialize _animState (same group)
             expect(getAnimState(tabs)).toBeNull();
 
-            spy.mockRestore();
         });
 
         test('cross-group FLIP animates newly inserted tab with slide-in', () => {
@@ -1930,9 +1926,7 @@ describe('tabs - animation', () => {
             };
 
             // Mock getPanelData to return a DIFFERENT tab group from another group
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1953,7 +1947,6 @@ describe('tabs - animation', () => {
             // sourceIndex should be -1 (external)
             expect(state.sourceIndex).toBe(-1);
 
-            spy.mockRestore();
         });
 
         test('dragover keeps _animState when same tab group is being dragged', () => {
@@ -1975,9 +1968,7 @@ describe('tabs - animation', () => {
             (tabs as any)._animState = originalState;
 
             // Same tab group id — not stale
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -1996,7 +1987,6 @@ describe('tabs - animation', () => {
             // the key check is the state wasn't thrown away and re-created
             // (sourceTabGroupId should still be 'tg-1')
 
-            spy.mockRestore();
         });
 
         test('dragover on tab list is handled for chip drags in default animation mode', () => {
@@ -2011,9 +2001,7 @@ describe('tabs - animation', () => {
             (accessor as any).getPanel = jest.fn().mockReturnValue(undefined);
 
             // Chip drag (has tabGroupId) should NOT be skipped in default mode
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -2028,7 +2016,6 @@ describe('tabs - animation', () => {
             // Should initialize _animState for the chip drag even in default mode
             expect(getAnimState(tabs)).not.toBeNull();
 
-            spy.mockRestore();
         });
 
         test('dragover on tab list is skipped for regular tab drags in default animation mode', () => {
@@ -2037,9 +2024,7 @@ describe('tabs - animation', () => {
             tabs.openPanel(panelA, 0);
 
             // Regular tab drag (no tabGroupId) — should be skipped in default mode
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
                     new dataTransfer.PanelTransfer(
                         'test-accessor',
                         'other-group',
@@ -2053,7 +2038,6 @@ describe('tabs - animation', () => {
             // Should NOT initialize _animState (default mode, non-chip drag)
             expect(getAnimState(tabs)).toBeNull();
 
-            spy.mockRestore();
         });
     });
 

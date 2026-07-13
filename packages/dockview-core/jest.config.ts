@@ -24,10 +24,13 @@ const config: JestConfigWithTsJest = {
     testEnvironment: 'jsdom',
     transform: {
         '^.+\\.tsx?$': [
-            'ts-jest',
+            '@swc/jest',
             {
-                tsconfig: '<rootDir>/tsconfig.test.json',
-                useESM: false,
+                jsc: {
+                    parser: { syntax: 'typescript', tsx: true },
+                    transform: { react: { runtime: 'automatic' } },
+                    target: 'es2021',
+                },
             },
         ],
     },
