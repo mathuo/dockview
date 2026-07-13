@@ -15,6 +15,9 @@ function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
 
 const VERTICAL_TABS_CLASS = 'dv-tabs-container-vertical';
 const TAB_CLASS = 'dv-tab';
+const HEADER_CLASS = 'dv-tabs-and-actions-container';
+/** The per-line thickness var (row height / column width) core sizes tabs by. */
+const LINE_SIZE_VARIABLE = '--dv-tabs-and-actions-container-height';
 
 /**
  * The wrapped-row neighbour of `current` one row up or down, or `undefined` when
@@ -373,7 +376,45 @@ class WrapController extends CompositeDisposable {
 
         if (effectiveRows !== this._rowCount) {
             this._rowCount = effectiveRows;
+            // Pin the header cross-size before relaying out so content sizing
+            // (which subtracts the header's rendered size) sees the right value.
+            this.sizeVerticalHeader(list, effectiveRows);
             this.host.relayoutGroup(this.group);
+        }
+    }
+
+    /**
+     * Pin a vertical (edge-group) header's WIDTH to the wrapped column count.
+     *
+     * A horizontal header grows its height to fit wrapped rows purely in CSS:
+     * the strip's width is definite, so flex-wrap intrinsic sizing accounts for
+     * the rows. A vertical header can't — the strip wraps on its (percentage)
+     * height, which is indefinite during intrinsic-width resolution, so the
+     * header's `auto` width is computed for a single column and stays clamped
+     * when a resize reflows the tabs into more columns. The surplus columns then
+     * overflow the header and render over the panel content.
+     *
+     * Setting the width explicitly to `columns x lineThickness` makes the header
+     * contain its columns; core's content sizing (group width minus the header's
+     * now-correct width) follows. Capped wrap passes the capped column count, so
+     * the header stops growing at the cap exactly as the CSS max-width does. A
+     * horizontal header clears the property (its height stays CSS-driven), which
+     * also undoes any width left over from a runtime orientation flip.
+     */
+    private sizeVerticalHeader(list: HTMLElement, columns: number): void {
+        const header = list.closest<HTMLElement>(`.${HEADER_CLASS}`);
+        if (!header) {
+            return;
+        }
+        if (!this._vertical) {
+            header.style.removeProperty('width');
+            return;
+        }
+        const lineSize = parseFloat(
+            getComputedStyle(header).getPropertyValue(LINE_SIZE_VARIABLE)
+        );
+        if (Number.isFinite(lineSize) && lineSize > 0) {
+            header.style.width = `${columns * lineSize}px`;
         }
     }
 
@@ -398,6 +439,11 @@ class WrapController extends CompositeDisposable {
         if (list) {
             list.classList.remove(WRAP_CLASS, CAPPED_CLASS);
             list.style.removeProperty(MAX_ROWS_VAR);
+            // Drop the explicit width pinned on the vertical header (if any) so
+            // the header returns to its CSS-driven single-line size.
+            list.closest<HTMLElement>(`.${HEADER_CLASS}`)?.style.removeProperty(
+                'width'
+            );
         }
     }
 }

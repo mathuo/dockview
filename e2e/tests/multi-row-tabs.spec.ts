@@ -612,62 +612,86 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(m.clipped).toBe(0);
     });
 
-    // KNOWN BUG — vertical wrap header does not re-grow its cross-size on a
-    // container resize. The header's width is sized to the column count present
-    // when wrap was applied; when the container later resizes and the tabs
-    // reflow into MORE columns, the header width stays stale, so the surplus
-    // columns spill out of the header container and render over the panel
-    // content. (Initial render is fine — the header grows correctly then; only
-    // a subsequent resize desyncs it.)
-    //
-    // Captured as `fixme` so it doesn't fail CI. Remove `.fixme` once the header
-    // cross-size tracks the reflowed column count on resize.
-    test.fixme(
-        'vertical header: columns reflowed by a resize stay inside the header',
-        async ({ page }) => {
-            // Initial layout: 24 tabs under a left header wrap into a handful of
-            // columns and the header grows to fit them.
-            await setupVertical(page);
-            await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
-
-            const before = await page.evaluate(() => {
-                const header = document.querySelector(
-                    '.dv-tabs-and-actions-container'
-                ) as HTMLElement;
-                const tabs = Array.from(
-                    document.querySelectorAll<HTMLElement>('.dv-tab')
-                );
-                const cols = new Set(tabs.map((t) => t.offsetLeft)).size;
-                const hb = header.getBoundingClientRect();
-                const escaped = tabs.filter(
+    // Regression: a vertical wrap header must re-grow its cross-size (width)
+    // when a container resize reflows the tabs into more columns. Its `auto`
+    // width can't account for the wrap (the strip wraps on its indefinite
+    // percentage height), so without the module pinning the width the surplus
+    // columns overflow the header and render over the panel content. The
+    // `MultiRowTabsService` sizes the header to `columns x lineThickness` on the
+    // reflow to keep every column inside it.
+    const headerMetrics = (page) =>
+        page.evaluate(() => {
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const content = document.querySelector(
+                '.dv-content-container'
+            ) as HTMLElement;
+            const hb = header.getBoundingClientRect();
+            const tabs = Array.from(
+                document.querySelectorAll<HTMLElement>('.dv-tab')
+            );
+            return {
+                cols: new Set(tabs.map((t) => t.offsetLeft)).size,
+                headerWidth: Math.round(hb.width),
+                contentLeft: Math.round(
+                    content.getBoundingClientRect().left
+                ),
+                escaped: tabs.filter(
                     (t) => t.getBoundingClientRect().right > hb.right + 1
-                ).length;
-                return { cols, escaped };
-            });
-            expect(before.escaped).toBe(0);
+                ).length,
+            };
+        });
 
-            // Shrink the viewport so the (shorter) group reflows the tabs into
-            // more columns than the header was originally sized for.
-            await page.setViewportSize({ width: 900, height: 700 });
-            await expect
-                .poll(() => columnCount(page))
-                .toBeGreaterThan(before.cols);
+    test('vertical header: columns reflowed by a resize stay inside the header', async ({
+        page,
+    }) => {
+        // Initial layout: 24 tabs under a left header wrap into a handful of
+        // columns and the header grows to fit them — nothing overflows.
+        await setupVertical(page);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+        const before = await headerMetrics(page);
+        expect(before.escaped).toBe(0);
 
-            // The reflowed columns must remain inside the header container — no
-            // tab may spill past the header's edge over the content.
-            const escaped = await page.evaluate(() => {
-                const header = document.querySelector(
-                    '.dv-tabs-and-actions-container'
-                ) as HTMLElement;
-                const hb = header.getBoundingClientRect();
-                return Array.from(
-                    document.querySelectorAll<HTMLElement>('.dv-tab')
-                ).filter((t) => t.getBoundingClientRect().right > hb.right + 1)
-                    .length;
-            });
-            expect(escaped).toBe(0);
-        }
-    );
+        // Shrink the viewport so the (shorter) group reflows the tabs into more
+        // columns than the header was originally sized for.
+        await page.setViewportSize({ width: 900, height: 700 });
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(before.cols);
+
+        const after = await headerMetrics(page);
+        // The header re-grew to hold the extra columns ...
+        expect(after.headerWidth).toBeGreaterThan(before.headerWidth);
+        // ... every column stays inside it (nothing spills over the content) ...
+        expect(after.escaped).toBe(0);
+        // ... and the content starts exactly at the widened header's edge.
+        expect(after.contentLeft).toBeCloseTo(after.headerWidth, 0);
+    });
+
+    test('vertical header: the header shrinks back when a resize removes columns', async ({
+        page,
+    }) => {
+        // Grow the header (more columns) then enlarge the viewport again: the
+        // header must release the reclaimed width, not stay stuck wide.
+        await setupVertical(page);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+        const initial = await headerMetrics(page);
+
+        // Shrink → strictly more columns, a wider header.
+        await page.setViewportSize({ width: 900, height: 700 });
+        await expect
+            .poll(() => columnCount(page))
+            .toBeGreaterThan(initial.cols);
+        const narrow = await headerMetrics(page);
+        expect(narrow.headerWidth).toBeGreaterThan(initial.headerWidth);
+
+        // Enlarge again → the columns (and the header width) must come back down.
+        await page.setViewportSize({ width: 1280, height: 720 });
+        await expect.poll(() => columnCount(page)).toBeLessThan(narrow.cols);
+
+        const wide = await headerMetrics(page);
+        expect(wide.headerWidth).toBeLessThan(narrow.headerWidth);
+        expect(wide.escaped).toBe(0);
+    });
 
     test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
         await setup(page);
