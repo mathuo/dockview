@@ -286,7 +286,7 @@ test.describe('pinned tabs', () => {
         expect(compact.width).toBeLessThan(normal.width);
     });
 
-    test('overflow: a pinned tab is excluded from the overflow dropdown', async ({
+    test('overflow: a clipped pinned tab surfaces under the Pinned header, not the general list', async ({
         page,
     }) => {
         await page.setViewportSize({ width: 250, height: 500 });
@@ -308,8 +308,20 @@ test.describe('pinned tabs', () => {
 
         // Unpinned tabs overflow into the dropdown…
         await expect(overflow.locator('.dv-tab')).not.toHaveCount(0);
-        // …but the pinned panel is never listed there.
-        await expect(overflow).not.toContainText('panel-7');
+
+        // …and the clipped pinned tab stays reachable, surfaced under a
+        // dedicated "Pinned" header (DV-11) rather than dumped into the general
+        // list. It is excluded from the unpinned rows and never duplicated: it
+        // appears exactly once, as the row directly beneath the Pinned header.
+        const pinnedHeader = overflow.locator('.dv-tabs-overflow-pinned-header');
+        await expect(pinnedHeader).toBeVisible();
+        await expect(pinnedHeader).toContainText('Pinned');
+        await expect(
+            overflow.locator('.dv-tabs-overflow-pinned-header + .dv-tab')
+        ).toContainText('panel-7');
+        await expect(
+            overflow.getByText('panel-7', { exact: true })
+        ).toHaveCount(1);
     });
 
     test('a pinned tab sorts ahead of unpinned tabs', async ({ page }) => {

@@ -17,11 +17,16 @@ main document, so a popout there is not a genuine second window.)
 
 ## Running
 
-The fixture loads the UMD bundles from `dist/`, so build them first:
+The fixtures load the UMD bundles from `dist/`, so build them first. The
+`index.html` fixture pulls in `dockview` (which bundles `dockview-core`) and
+`dockview-enterprise`; the `vue.html` fixture additionally pulls in the
+`dockview-vue` UMD bundle (produced by its `build:js`/vite target, not
+`build:bundle`):
 
 ```bash
-yarn nx run-many -t build:bundle -p dockview-core dockview-enterprise
-yarn playwright install chromium   # first time only
+yarn nx run-many -t build:bundle -p dockview-core dockview dockview-enterprise
+yarn nx run dockview-vue:build:js   # the dockview-vue.umd.js the vue fixture loads
+yarn playwright install chromium    # first time only
 yarn test:e2e
 ```
 
