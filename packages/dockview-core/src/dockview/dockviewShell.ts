@@ -442,6 +442,14 @@ class MiddleColumnView implements IView, IDisposable {
         return 0;
     }
 
+    getViewCachedVisibleSize(position: 'top' | 'bottom'): number | undefined {
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
+        if (index !== undefined) {
+            return this._splitview.getViewCachedVisibleSize(index);
+        }
+        return undefined;
+    }
+
     resizeView(position: 'top' | 'bottom', size: number): void {
         const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
@@ -893,42 +901,82 @@ export class ShellManager implements IDisposable {
             collapsedSize: view.configuredCollapsedSize,
         });
 
+        // Record the size to restore the group to. An expanded-but-hidden
+        // group reports getViewSize 0, so fall back to its cached visible size
+        // (then lastExpandedSize) — otherwise re-showing snaps to minimumSize.
+        const expandedSize = (
+            view: EdgeGroupView,
+            isVisible: boolean,
+            liveSize: number,
+            cachedVisibleSize: number | undefined
+        ): number => {
+            if (view.isCollapsed) {
+                return view.lastExpandedSize;
+            }
+            if (!isVisible) {
+                return cachedVisibleSize ?? view.lastExpandedSize;
+            }
+            return liveSize;
+        };
+
         if (this._leftView && this._leftIndex !== undefined) {
+            const visible = this._outerSplitview.isViewVisible(this._leftIndex);
             edgeGroups.left = {
-                size: this._leftView.isCollapsed
-                    ? this._leftView.lastExpandedSize
-                    : this._outerSplitview.getViewSize(this._leftIndex),
-                visible: this._outerSplitview.isViewVisible(this._leftIndex),
+                size: expandedSize(
+                    this._leftView,
+                    visible,
+                    this._outerSplitview.getViewSize(this._leftIndex),
+                    this._outerSplitview.getViewCachedVisibleSize(
+                        this._leftIndex
+                    )
+                ),
+                visible,
                 collapsed: this._leftView.isCollapsed || undefined,
                 ...constraints(this._leftView),
             };
         }
         if (this._rightView && this._rightIndex !== undefined) {
+            const visible = this._outerSplitview.isViewVisible(
+                this._rightIndex
+            );
             edgeGroups.right = {
-                size: this._rightView.isCollapsed
-                    ? this._rightView.lastExpandedSize
-                    : this._outerSplitview.getViewSize(this._rightIndex),
-                visible: this._outerSplitview.isViewVisible(this._rightIndex),
+                size: expandedSize(
+                    this._rightView,
+                    visible,
+                    this._outerSplitview.getViewSize(this._rightIndex),
+                    this._outerSplitview.getViewCachedVisibleSize(
+                        this._rightIndex
+                    )
+                ),
+                visible,
                 collapsed: this._rightView.isCollapsed || undefined,
                 ...constraints(this._rightView),
             };
         }
         if (this._topView) {
+            const visible = this._middleColumn.isViewVisible('top');
             edgeGroups.top = {
-                size: this._topView.isCollapsed
-                    ? this._topView.lastExpandedSize
-                    : this._middleColumn.getViewSize('top'),
-                visible: this._middleColumn.isViewVisible('top'),
+                size: expandedSize(
+                    this._topView,
+                    visible,
+                    this._middleColumn.getViewSize('top'),
+                    this._middleColumn.getViewCachedVisibleSize('top')
+                ),
+                visible,
                 collapsed: this._topView.isCollapsed || undefined,
                 ...constraints(this._topView),
             };
         }
         if (this._bottomView) {
+            const visible = this._middleColumn.isViewVisible('bottom');
             edgeGroups.bottom = {
-                size: this._bottomView.isCollapsed
-                    ? this._bottomView.lastExpandedSize
-                    : this._middleColumn.getViewSize('bottom'),
-                visible: this._middleColumn.isViewVisible('bottom'),
+                size: expandedSize(
+                    this._bottomView,
+                    visible,
+                    this._middleColumn.getViewSize('bottom'),
+                    this._middleColumn.getViewCachedVisibleSize('bottom')
+                ),
+                visible,
                 collapsed: this._bottomView.isCollapsed || undefined,
                 ...constraints(this._bottomView),
             };

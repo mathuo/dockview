@@ -142,6 +142,10 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return this.splitview.getViewSize(index);
     }
 
+    getViewCachedVisibleSize(index: number): number | undefined {
+        return this.splitview.getViewCachedVisibleSize(index);
+    }
+
     public getPanes(): PaneviewPanel[] {
         return this.splitview.getViews();
     }

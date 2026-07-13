@@ -11441,6 +11441,46 @@ describe('dockviewComponent', () => {
             fresh.dispose();
         });
 
+        test('an expanded-but-hidden edge group serializes its cached size, not 0', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dv.layout(1000, 800);
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                initialSize: 250,
+                minimumSize: 100,
+            });
+            dv.addPanel({
+                id: 'right-p1',
+                component: 'default',
+                position: { referenceGroup: 'right-group' },
+            });
+            dv.getEdgeGroup('right')!.expand();
+
+            // hide the expanded edge group — getViewSize now reports 0
+            dv.setEdgeGroupVisible('right', false);
+
+            const json = dv.toJSON();
+            expect(json.edgeGroups!.right!.visible).toBe(false);
+            // the fix: serialize the cached visible size rather than 0, so
+            // re-showing restores the prior width instead of snapping to min
+            expect(json.edgeGroups!.right!.size).toBeGreaterThan(100);
+
+            dv.dispose();
+        });
+
         test('toJSON includes edgeGroups field for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);

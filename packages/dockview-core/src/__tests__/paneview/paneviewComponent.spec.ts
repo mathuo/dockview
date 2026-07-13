@@ -238,6 +238,53 @@ describe('paneviewComponent', () => {
         paneview.dispose();
     });
 
+    test('a hidden pane round-trips hidden at its cached size, not size 0', () => {
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        paneview.layout(300, 600);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'Panel 1',
+            isExpanded: true,
+        });
+        const panel2 = paneview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Panel 2',
+            isExpanded: true,
+        });
+
+        // hide panel2 — getViewSize now reports 0, but its real size is cached
+        paneview.setVisible(panel2, false);
+
+        const json = paneview.toJSON();
+        const v2 = json.views.find((v) => v.data.id === 'panel2')!;
+        expect(v2.visible).toBe(false);
+        expect(v2.size).toBeGreaterThan(0);
+
+        // round-trip: the pane must reload hidden at its cached size
+        paneview.fromJSON(json);
+        paneview.layout(300, 600);
+
+        const json2 = paneview.toJSON();
+        const v2b = json2.views.find((v) => v.data.id === 'panel2')!;
+        expect(v2b.visible).toBe(false);
+        expect(v2b.size).toBeGreaterThan(0);
+
+        paneview.dispose();
+    });
+
     test('serialization', () => {
         const paneview = new PaneviewComponent(container, {
             createComponent: (options) => {
