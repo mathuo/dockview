@@ -22,6 +22,8 @@
         "docs": "typedoc && node scripts/docs.mjs",
         "lint": "nx run-many -t lint",
         "lint:fix": "nx run-many -t lint:fix",
+        "lint:oxlint": "oxlint",
+        "lint:oxlint:fix": "oxlint --fix",
         "format": "nx run-many -t format",
         "format:check": "nx run-many -t format:check",
         "test": "nx run-many -t test",

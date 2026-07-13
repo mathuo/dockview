@@ -1,0 +1,14 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "ignorePatterns": [
+        "**/dist/**",
+        "**/.build/**",
+        "**/.rollup.cache/**",
+        "**/coverage/**",
+        "**/node_modules/**",
+        "packages/docs/**"
+    ],
+    "rules": {
+        "no-unused-vars": "warn"
+    }
+}
