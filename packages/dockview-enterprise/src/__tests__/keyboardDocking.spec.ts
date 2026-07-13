@@ -158,6 +158,60 @@ describe('accessibility: keyboard docking', () => {
         expect(container.querySelector('.dv-drop-target')).toBeNull();
     });
 
+    test('a group removed mid-move re-resolves the target against the live grid', () => {
+        make(true);
+        // three side-by-side groups; pC is active → the move starts on pC's group
+        dockview.addPanel({ id: 'pA', component: 'default', title: 'A' });
+        dockview.addPanel({
+            id: 'pB',
+            component: 'default',
+            title: 'B',
+            position: { direction: 'right' },
+        });
+        dockview.addPanel({
+            id: 'pC',
+            component: 'default',
+            title: 'C',
+            position: { direction: 'right' },
+        });
+        expect(dockview.groups).toHaveLength(3);
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        // step the target off the source's own group onto a neighbour
+        fireEvent.keyDown(dockview.element, { key: 'ArrowLeft' });
+
+        const previewed = dockview.groups.find(
+            (g) => !!g.element.querySelector('.dv-drop-target')
+        )!;
+        expect(previewed).toBeDefined();
+        expect(previewed).not.toBe(dockview.getGroupPanel('pC')!.group);
+
+        // remove the previewed target out from under the armed move
+        dockview.removeGroup(previewed);
+        expect(dockview.groups).toHaveLength(2);
+
+        // A phase change (Enter) re-renders the *same* target index. Against a
+        // stale snapshot that index is now the removed, disposed group: the
+        // preview would be drawn on a detached element no longer in the layout
+        // (and in a real DOM the disposed drop-target teardown throws out of the
+        // keydown handler, stranding the move). The fix re-resolves against the
+        // live grid, so the preview lands on a group that is still present.
+        expect(() => {
+            fireEvent.keyDown(dockview.element, { key: 'Enter' });
+        }).not.toThrow();
+
+        const previewedAfter = dockview.groups.find(
+            (g) => !!g.element.querySelector('.dv-drop-target')
+        );
+        expect(previewedAfter).toBeDefined();
+
+        // the move stays coherent: committing docks into that live group and
+        // tears down cleanly (attribute cleared, no dangling overlay).
+        fireEvent.keyDown(dockview.element, { key: 'Enter' });
+        expect(dockview.element.hasAttribute('data-dv-kbd-moving')).toBeFalsy();
+        expect(container.querySelector('.dv-drop-target')).toBeNull();
+    });
+
     test('Ctrl+Shift+F floats the moving panel from the target phase', () => {
         make(true);
         dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
