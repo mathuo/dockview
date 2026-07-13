@@ -84,6 +84,50 @@ describe('gridview', () => {
         expect(gridview.maximumHeight).toBe(Number.MAX_VALUE);
     });
 
+    test('a nested branch with all children hidden round-trips hidden, not visible at size 0', () => {
+        const gridview = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        gridview.addView(new MockGridview(), Sizing.Distribute, [0]);
+        gridview.addView(new MockGridview(), Sizing.Distribute, [1]);
+        // split the [1] leaf into a nested branch of two leaves
+        gridview.addView(new MockGridview(), Sizing.Distribute, [1, 0]);
+
+        // hide both children of the nested branch → the branch auto-hides
+        gridview.setViewVisible([1, 0], false);
+        gridview.setViewVisible([1, 1], false);
+
+        const serialized = gridview.serialize();
+        const branch = (serialized.root as any).data[1];
+        expect(branch.type).toBe('branch');
+        // the fix: branch carries its visibility + cached size (was undefined)
+        expect(branch.visible).toBe(false);
+        expect(branch.size).toBeGreaterThan(0);
+
+        // round-trip into a fresh gridview; the branch must load hidden, so
+        // re-serializing preserves visible:false (rather than a visible size-0
+        // branch that no longer round-trips)
+        const restored = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        restored.layout(1000, 1000);
+        restored.deserialize(serialized, {
+            fromJSON: () => new MockGridview(),
+        });
+
+        const reserialized = restored.serialize();
+        const restoredBranch = (reserialized.root as any).data[1];
+        expect(restoredBranch.type).toBe('branch');
+        expect(restoredBranch.visible).toBe(false);
+        expect(restoredBranch.size).toBeGreaterThan(0);
+    });
+
     test('insertOrthogonalSplitviewAtRoot #1', () => {
         const gridview = new Gridview(
             false,

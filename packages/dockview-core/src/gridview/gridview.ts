@@ -228,6 +228,7 @@ export interface GridLeafNode<T extends IGridView> {
 export interface GridBranchNode<T extends IGridView> {
     readonly children: GridNode<T>[];
     readonly box: { width: number; height: number };
+    readonly cachedVisibleSize: number | undefined;
 }
 
 export type GridNode<T extends IGridView> = GridLeafNode<T> | GridBranchNode<T>;
@@ -265,11 +266,25 @@ const serializeBranchNode = <T extends IGridView>(
         return { type: 'leaf', data: node.view.toJSON(), size };
     }
 
+    const data = node.children.map((c) =>
+        serializeBranchNode(c, orthogonal(orientation))
+    );
+
+    // A branch that is hidden in its parent (all its children collapsed) has a
+    // cached visible size; carry it through symmetrically with leaf nodes so
+    // the branch round-trips hidden instead of loading visible at size 0.
+    if (typeof node.cachedVisibleSize === 'number') {
+        return {
+            type: 'branch',
+            data,
+            size: node.cachedVisibleSize,
+            visible: false,
+        };
+    }
+
     return {
         type: 'branch',
-        data: node.children.map((c) =>
-            serializeBranchNode(c, orthogonal(orientation))
-        ),
+        data,
         size,
     };
 };
@@ -285,6 +300,7 @@ export interface ISerializedBranchNode {
     type: 'branch';
     data: ISerializedNode[];
     size: number;
+    visible?: boolean;
 }
 
 export type ISerializedNode = ISerializedLeafNode | ISerializedBranchNode;
@@ -827,7 +843,7 @@ export class Gridview implements IDisposable {
             );
         }
 
-        return { box, children };
+        return { box, children, cachedVisibleSize };
     }
 
     private progmaticSelect(location: number[], reverse = false): LeafNode {
