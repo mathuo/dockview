@@ -410,7 +410,7 @@ class WrapController extends CompositeDisposable {
             header.style.removeProperty('width');
             return;
         }
-        const lineSize = parseFloat(
+        const lineSize = Number.parseFloat(
             getComputedStyle(header).getPropertyValue(LINE_SIZE_VARIABLE)
         );
         if (Number.isFinite(lineSize) && lineSize > 0) {
