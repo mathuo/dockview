@@ -28,6 +28,18 @@ export interface PopoutGroupEntry {
     dropTargetContainer: DropTargetAnchorContainer;
     getWindow: () => Window;
     popoutUrl?: string;
+    /**
+     * The window-scoped popup service shared by every group in this popout
+     * window (resolved per-member via {@link IPopoutWindowService.findByGroup}
+     * so overflow/context menus render in the correct window regardless of
+     * which group is the anchor).
+     */
+    popupService: PopupService;
+    /**
+     * Promote a new anchor group after the current one leaves the window,
+     * rebinding anchor-relative state (focus routing) to it.
+     */
+    setAnchorGroup: (group: DockviewGroupPanel) => void;
     disposable: { dispose: () => DockviewGroupPanel | undefined };
 }
 
@@ -55,10 +67,6 @@ export interface IPopoutWindowService extends IDisposable {
         overlayRenderContainer: OverlayRenderContainer
     ): IDisposable | undefined;
 
-    getPopupService(groupId: string): PopupService | undefined;
-    setPopupService(groupId: string, service: PopupService): void;
-    deletePopupService(groupId: string): void;
-
     readonly restorationPromise: Promise<void>;
     scheduleRestoration(
         delayMs: number,
@@ -75,7 +83,6 @@ export interface IPopoutWindowService extends IDisposable {
 export class PopoutWindowService implements IPopoutWindowService {
     private readonly _host: IPopoutWindowHost;
     private readonly _entries: PopoutGroupEntry[] = [];
-    private readonly _popupServices = new Map<string, PopupService>();
     private readonly _restorationCleanups = new Set<() => void>();
     private _restorationPromise: Promise<void> = Promise.resolve();
 
@@ -179,18 +186,6 @@ export class PopoutWindowService implements IPopoutWindowService {
         });
         observer.observe(gridview.element);
         return { dispose: () => observer.disconnect() };
-    }
-
-    getPopupService(groupId: string): PopupService | undefined {
-        return this._popupServices.get(groupId);
-    }
-
-    setPopupService(groupId: string, service: PopupService): void {
-        this._popupServices.set(groupId, service);
-    }
-
-    deletePopupService(groupId: string): void {
-        this._popupServices.delete(groupId);
     }
 
     scheduleRestoration(

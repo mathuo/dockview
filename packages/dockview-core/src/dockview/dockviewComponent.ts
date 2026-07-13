@@ -15,7 +15,12 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    Disposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -85,7 +90,7 @@ import {
 } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
-import { IPopoutWindowHost } from './popoutWindowService';
+import { IPopoutWindowHost, PopoutGroupEntry } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
 import {
@@ -1761,8 +1766,12 @@ export class DockviewComponent
      * and dismisses on events from that window.
      */
     getPopupServiceForGroup(group: DockviewGroupPanel): PopupService {
+        // Resolve by window membership (DOM containment), not the anchor id, so
+        // every group in a multi-group popout — anchor or not, original or
+        // promoted after the anchor left — uses that window's popup service
+        // rather than falling back to the main window.
         return (
-            this._popoutWindowService?.getPopupService(group.id) ??
+            this._popoutWindowService?.findByGroup(group)?.popupService ??
             this.popupService
         );
     }
@@ -2036,22 +2045,18 @@ export class DockviewComponent
 
                 group.model.dropTargetContainer = dropTargetContainer;
 
-                // Each popout group needs its own popover service so that
+                // Each popout window needs its own popover service so that
                 // tab context menus, chip menus, and tab overflow menus
                 // render in the popout window (not the main window) and
                 // their pointerdown/keydown listeners fire on the right
-                // window for outside-click and Escape dismissal.
+                // window for outside-click and Escape dismissal. It is stored
+                // on the entry below and resolved per-member via
+                // `findByGroup`, so it is shared by every group in the window.
                 const popoutPopupService = new PopupService(
                     popoutContainer,
                     _window.window!
                 );
-                service.setPopupService(group.id, popoutPopupService);
-                popoutWindowDisposable.addDisposables(
-                    popoutPopupService,
-                    Disposable.from(() => {
-                        service.deletePopupService(group.id);
-                    })
-                );
+                popoutWindowDisposable.addDisposables(popoutPopupService);
 
                 group.model.location = {
                     type: 'popout',
@@ -2100,16 +2105,25 @@ export class DockviewComponent
                     );
                 }
 
-                popoutWindowDisposable.addDisposables(
-                    group.api.onDidActiveChange((event) => {
-                        if (event.isActive) {
+                // Focus routing follows the window's *current* anchor group.
+                // Hold it in a mutable disposable so it can be rebound to a new
+                // anchor when the original is dragged out of a multi-group
+                // popout (see `setAnchorGroup` on the entry below).
+                const focusRoutingDisposable = new MutableDisposable();
+                popoutWindowDisposable.addDisposables(focusRoutingDisposable);
+                const bindFocusRouting = (anchor: DockviewGroupPanel): void => {
+                    focusRoutingDisposable.value = new CompositeDisposable(
+                        anchor.api.onDidActiveChange((event) => {
+                            if (event.isActive) {
+                                _window.window?.focus();
+                            }
+                        }),
+                        anchor.api.onWillFocus(() => {
                             _window.window?.focus();
-                        }
-                    }),
-                    group.api.onWillFocus(() => {
-                        _window.window?.focus();
-                    })
-                );
+                        })
+                    );
+                };
+                bindFocusRouting(group);
 
                 // Holder so the close teardown (extracted below) can publish
                 // the group that was returned to the main grid back to the
@@ -2121,7 +2135,7 @@ export class DockviewComponent
                     referenceGroup &&
                     this.getPanel(referenceGroup.id);
 
-                const value = {
+                const value: PopoutGroupEntry = {
                     window: _window,
                     popoutGroup: group,
                     gridview: popoutGridview,
@@ -2132,6 +2146,13 @@ export class DockviewComponent
                     referenceGroup: isValidReferenceGroup
                         ? referenceGroup.id
                         : undefined,
+                    popupService: popoutPopupService,
+                    setAnchorGroup: (newAnchor: DockviewGroupPanel) => {
+                        value.popoutGroup = newAnchor;
+                        // Size/position events read `value.popoutGroup` live, so
+                        // only the focus subscription needs re-binding here.
+                        bindFocusRouting(newAnchor);
+                    },
                     disposable: {
                         dispose: () => {
                             popoutWindowDisposable.dispose();
@@ -2150,14 +2171,16 @@ export class DockviewComponent
                         this._onDidPopoutGroupSizeChange.fire({
                             width: _window.window!.innerWidth,
                             height: _window.window!.innerHeight,
-                            group,
+                            // the window's current anchor, which may have been
+                            // reassigned after the original anchor left
+                            group: value.popoutGroup,
                         });
                     }),
                     _onDidWindowPositionChange.event(() => {
                         this._onDidPopoutGroupPositionChange.fire({
                             screenX: _window.window!.screenX,
                             screenY: _window.window!.screenY,
-                            group,
+                            group: value.popoutGroup,
                         });
                     }),
                     addDisposableListener(_window.window!, 'resize', () => {
@@ -4304,8 +4327,10 @@ export class DockviewComponent
             }
             popout.gridview.remove(group);
             if (popout.popoutGroup === group) {
-                // The anchor left; promote a remaining member.
-                popout.popoutGroup = members.find((m) => m !== group)!;
+                // The anchor left; promote a remaining member and rebind the
+                // window's anchor-relative state (focus routing) to it. The
+                // popup service resolves per-member so needs no rebinding.
+                popout.setAnchorGroup(members.find((m) => m !== group)!);
             }
             return true;
         }
