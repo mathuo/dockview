@@ -108,6 +108,15 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 
 ### Code Quality
 
+-   **Bug fixes must not change expected behaviour.** A fix corrects the
+    defect and nothing else — it must not alter behaviours that are working as
+    intended, even when a broader "improvement" is tempting and tests still
+    pass. If the only way to fix a bug is to change a long-standing, relied-upon
+    behaviour (e.g. the even size redistribution when a panel/group closes), do
+    **not** silently change the default: stop and raise it with the maintainer,
+    and prefer gating any behavioural change behind an opt-in option. Passing
+    tests are necessary but not sufficient here — the absence of a test
+    asserting the old behaviour is not permission to change it.
 -   ESLint configuration extends recommended TypeScript rules
 -   Prettier for code formatting
 -   Linting targets source files in packages/\*/src/\*\* (excludes tests, docs, node_modules)
