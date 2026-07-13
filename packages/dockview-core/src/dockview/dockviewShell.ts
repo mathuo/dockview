@@ -48,6 +48,11 @@ export interface SerializedEdgeGroup {
     autoHide?: boolean;
     /** Per-group "tear down to zero footprint when emptied" flag. */
     autoReveal?: boolean;
+    /** User-configured geometry constraints (as passed to `addEdgeGroup`), so
+     *  they survive the auto-create fromJSON path. Absent = use the defaults. */
+    minimumSize?: number;
+    maximumSize?: number;
+    collapsedSize?: number;
 }
 
 export interface SerializedEdgeGroups {
@@ -142,6 +147,22 @@ export class EdgeGroupView implements IView {
 
     get collapsedSize(): number {
         return this._effectiveBaseCollapsed + this._gapAdd;
+    }
+
+    /** The user-configured (pre-gap) geometry constraints, for serialization.
+     *  These are the raw values passed to `addEdgeGroup` — unlike the effective
+     *  `minimumSize`/`maximumSize`/`collapsedSize` getters, which fold in the
+     *  theme gap and collapse-locking. */
+    get configuredMinimumSize(): number | undefined {
+        return this._baseMinimumSize;
+    }
+
+    get configuredMaximumSize(): number {
+        return this._expandedMaximumSize;
+    }
+
+    get configuredCollapsedSize(): number {
+        return this._baseCollapsedSize;
     }
 
     constructor(
@@ -856,6 +877,22 @@ export class ShellManager implements IDisposable {
     toJSON(): SerializedEdgeGroups {
         const edgeGroups: SerializedEdgeGroups = {};
 
+        // Persist the user-configured constraints so the auto-create fromJSON
+        // path restores them. Omit unconfigured/Infinity values (Infinity isn't
+        // JSON-representable) so they fall back to defaults on restore.
+        const constraints = (
+            view: EdgeGroupView
+        ): Pick<
+            SerializedEdgeGroup,
+            'minimumSize' | 'maximumSize' | 'collapsedSize'
+        > => ({
+            minimumSize: view.configuredMinimumSize,
+            maximumSize: Number.isFinite(view.configuredMaximumSize)
+                ? view.configuredMaximumSize
+                : undefined,
+            collapsedSize: view.configuredCollapsedSize,
+        });
+
         if (this._leftView && this._leftIndex !== undefined) {
             edgeGroups.left = {
                 size: this._leftView.isCollapsed
@@ -863,6 +900,7 @@ export class ShellManager implements IDisposable {
                     : this._outerSplitview.getViewSize(this._leftIndex),
                 visible: this._outerSplitview.isViewVisible(this._leftIndex),
                 collapsed: this._leftView.isCollapsed || undefined,
+                ...constraints(this._leftView),
             };
         }
         if (this._rightView && this._rightIndex !== undefined) {
@@ -872,6 +910,7 @@ export class ShellManager implements IDisposable {
                     : this._outerSplitview.getViewSize(this._rightIndex),
                 visible: this._outerSplitview.isViewVisible(this._rightIndex),
                 collapsed: this._rightView.isCollapsed || undefined,
+                ...constraints(this._rightView),
             };
         }
         if (this._topView) {
@@ -881,6 +920,7 @@ export class ShellManager implements IDisposable {
                     : this._middleColumn.getViewSize('top'),
                 visible: this._middleColumn.isViewVisible('top'),
                 collapsed: this._topView.isCollapsed || undefined,
+                ...constraints(this._topView),
             };
         }
         if (this._bottomView) {
@@ -890,6 +930,7 @@ export class ShellManager implements IDisposable {
                     : this._middleColumn.getViewSize('bottom'),
                 visible: this._middleColumn.isViewVisible('bottom'),
                 collapsed: this._bottomView.isCollapsed || undefined,
+                ...constraints(this._bottomView),
             };
         }
 

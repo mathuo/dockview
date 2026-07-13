@@ -3671,6 +3671,12 @@ export class DockviewComponent
                     id,
                     autoReveal: fixedData.autoReveal,
                     autoHide: fixedData.autoHide,
+                    // Restore the per-group geometry constraints; without these
+                    // the auto-created group reverts to defaults (maximumSize
+                    // Infinity, minimumSize collapsedSize+50).
+                    minimumSize: fixedData.minimumSize,
+                    maximumSize: fixedData.maximumSize,
+                    collapsedSize: fixedData.collapsedSize,
                 });
             }
         }

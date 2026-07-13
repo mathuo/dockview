@@ -820,41 +820,52 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
 
     setActivePanel(panel: IDockviewPanel): void {
         const isVertical = this._direction === 'vertical';
-        let running = 0;
 
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
 
             if (isActivePanel) {
-                const element = tab.value.element;
-                const parentElement = element.parentElement!;
-
-                if (isVertical) {
-                    if (
-                        running < parentElement.scrollTop ||
-                        running + element.clientHeight >
-                            parentElement.scrollTop + parentElement.clientHeight
-                    ) {
-                        parentElement.scrollTop = running;
-                    }
-                } else if (
-                    running < parentElement.scrollLeft ||
-                    running + element.clientWidth >
-                        parentElement.scrollLeft + parentElement.clientWidth
-                ) {
-                    parentElement.scrollLeft = running;
-                }
+                this._scrollTabIntoView(tab.value.element, isVertical);
             }
-
-            running += isVertical
-                ? tab.value.element.clientHeight
-                : tab.value.element.clientWidth;
         }
 
         // Reposition underlines so the wrap-around follows the new active tab
         if (this._tabGroupManager.groupUnderlines.size > 0) {
             this._tabGroupManager.positionUnderlines();
+        }
+    }
+
+    /**
+     * Scroll the active tab into view within its scroll container. Uses the
+     * element's own offset (relative to the container) rather than accumulating
+     * tab client sizes, which omits tab margins and any in-flow group chips
+     * between tabs and so undershoots the active tab's real position.
+     */
+    private _scrollTabIntoView(
+        element: HTMLElement,
+        isVertical: boolean
+    ): void {
+        const parentElement = element.parentElement;
+        if (!parentElement) {
+            return;
+        }
+
+        const start = isVertical ? element.offsetTop : element.offsetLeft;
+        const size = isVertical ? element.offsetHeight : element.offsetWidth;
+        const scrollStart = isVertical
+            ? parentElement.scrollTop
+            : parentElement.scrollLeft;
+        const clientSize = isVertical
+            ? parentElement.clientHeight
+            : parentElement.clientWidth;
+
+        if (start < scrollStart || start + size > scrollStart + clientSize) {
+            if (isVertical) {
+                parentElement.scrollTop = start;
+            } else {
+                parentElement.scrollLeft = start;
+            }
         }
     }
 
