@@ -891,7 +891,6 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         }
 
         const handle = requestAnimationFrame(() => {
-            this._pointerActivation.value = undefined;
             // The panel's tab may have been removed within the deferred frame;
             // only activate a panel this strip still owns.
             if (this._tabMap.has(panel.id)) {
