@@ -358,6 +358,130 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.dispose();
     });
 
+    /**
+     * Vertical (edge-group) wrap headers can't size their width from CSS alone —
+     * the strip wraps on its indefinite percentage height, so flex intrinsic
+     * sizing resolves the header `auto` width for a single column and the surplus
+     * columns overflow. The controller compensates by pinning the header width to
+     * `columns x lineThickness`. The wrapping geometry itself is e2e-only, so here
+     * the column offsets + the line-thickness var are stamped and only the pin
+     * arithmetic / clearing is asserted.
+     */
+    const makeVertical = (
+        overflow: DockviewComponent['options']['overflow']
+    ): DockviewComponent => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            overflow,
+            defaultHeaderPosition: 'left',
+        });
+        dockview.layout(1000, 1000);
+        return dockview;
+    };
+
+    const headerOf = (list: HTMLElement): HTMLElement =>
+        list.closest('.dv-tabs-and-actions-container') as HTMLElement;
+
+    test('vertical header: the header width is pinned to the wrapped column count', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const ids = ['p0', 'p1', 'p2', 'p3', 'p4', 'p5'];
+        const first = dockview.addPanel({ id: ids[0], component: 'default' });
+        for (const id of ids.slice(1)) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        const header = headerOf(list);
+        // The per-column thickness comes from a theme var; stamp it inline.
+        header.style.setProperty(
+            '--dv-tabs-and-actions-container-height',
+            '35px'
+        );
+        // 3 columns of two tabs each (vertical-rl → right-to-left offsets).
+        stampCols(list, [88, 88, 44, 44, 0, 0]);
+
+        // Re-apply to trigger a measure with the stamped geometry in place.
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+
+        // 3 columns x 35px = 105px.
+        expect(header.style.width).toBe('105px');
+
+        dockview.dispose();
+    });
+
+    test('vertical header: maxRows caps the pinned header width', () => {
+        const dockview = makeVertical({ mode: 'wrap', maxRows: 2 });
+        const ids = ['p0', 'p1', 'p2', 'p3', 'p4', 'p5'];
+        const first = dockview.addPanel({ id: ids[0], component: 'default' });
+        for (const id of ids.slice(1)) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        const header = headerOf(list);
+        header.style.setProperty(
+            '--dv-tabs-and-actions-container-height',
+            '35px'
+        );
+        // 3 natural columns, but the cap is 2.
+        stampCols(list, [88, 88, 44, 44, 0, 0]);
+
+        dockview.updateOptions({ overflow: { mode: 'wrap', maxRows: 2 } });
+
+        // Capped at 2 columns x 35px = 70px (matches the CSS max-width cap).
+        expect(header.style.width).toBe('70px');
+
+        dockview.dispose();
+    });
+
+    test('flipping a wrapped vertical header to horizontal clears the pinned width', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const ids = ['p0', 'p1', 'p2', 'p3'];
+        const first = dockview.addPanel({ id: ids[0], component: 'default' });
+        for (const id of ids.slice(1)) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        const header = headerOf(list);
+        header.style.setProperty(
+            '--dv-tabs-and-actions-container-height',
+            '35px'
+        );
+        stampCols(list, [44, 44, 0, 0]);
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+        expect(header.style.width).toBe('70px');
+
+        // Flip to a horizontal header — its height stays CSS-driven, so the
+        // explicit width must be released.
+        first.group.api.setHeaderPosition('top');
+        expect(header.style.width).toBe('');
+
+        dockview.dispose();
+    });
+
+    test('turning wrap off clears the pinned vertical header width', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const first = dockview.addPanel({ id: 'p0', component: 'default' });
+        for (const id of ['p1', 'p2', 'p3']) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        const header = headerOf(list);
+        header.style.setProperty(
+            '--dv-tabs-and-actions-container-height',
+            '35px'
+        );
+        stampCols(list, [44, 44, 0, 0]);
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+        expect(header.style.width).toBe('70px');
+
+        // Tear wrap down — the pinned width must be removed with the wrap classes.
+        dockview.updateOptions({ overflow: { mode: 'dropdown' } });
+        expect(header.style.width).toBe('');
+
+        dockview.dispose();
+    });
+
     test('removing a group disposes its wrap controller without throwing', () => {
         const dockview = make({ mode: 'wrap' });
         const a = dockview.addPanel({ id: 'a', component: 'default' });
