@@ -570,10 +570,7 @@ test.describe('multi-row tabs (wrap mode)', () => {
         );
         expect(reported).toBeTruthy();
         expect(reported.width).toBeCloseTo(contentBox.width, 0);
-        expect(reported.width).toBeCloseTo(
-            groupBox.width - headerBox.width,
-            0
-        );
+        expect(reported.width).toBeCloseTo(groupBox.width - headerBox.width, 0);
     });
 
     test('vertical header: wrapped columns are not clipped by the strip', async ({
@@ -634,9 +631,7 @@ test.describe('multi-row tabs (wrap mode)', () => {
             return {
                 cols: new Set(tabs.map((t) => t.offsetLeft)).size,
                 headerWidth: Math.round(hb.width),
-                contentLeft: Math.round(
-                    content.getBoundingClientRect().left
-                ),
+                contentLeft: Math.round(content.getBoundingClientRect().left),
                 escaped: tabs.filter(
                     (t) => t.getBoundingClientRect().right > hb.right + 1
                 ).length,
@@ -654,17 +649,21 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(before.escaped).toBe(0);
 
         // Shrink the viewport so the (shorter) group reflows the tabs into more
-        // columns than the header was originally sized for.
+        // columns than the header was originally sized for. Retry the whole
+        // assertion until the reflow + header re-pin + relayout settle (the pin
+        // lands a frame after the column count changes).
         await page.setViewportSize({ width: 900, height: 700 });
-        await expect.poll(() => columnCount(page)).toBeGreaterThan(before.cols);
-
-        const after = await headerMetrics(page);
-        // The header re-grew to hold the extra columns ...
-        expect(after.headerWidth).toBeGreaterThan(before.headerWidth);
-        // ... every column stays inside it (nothing spills over the content) ...
-        expect(after.escaped).toBe(0);
-        // ... and the content starts exactly at the widened header's edge.
-        expect(after.contentLeft).toBeCloseTo(after.headerWidth, 0);
+        await expect(async () => {
+            const after = await headerMetrics(page);
+            // More columns than before ...
+            expect(after.cols).toBeGreaterThan(before.cols);
+            // ... the header re-grew to hold them ...
+            expect(after.headerWidth).toBeGreaterThan(before.headerWidth);
+            // ... every column stays inside it (nothing spills over content) ...
+            expect(after.escaped).toBe(0);
+            // ... and the content starts exactly at the widened header's edge.
+            expect(after.contentLeft).toBeCloseTo(after.headerWidth, 0);
+        }).toPass();
     });
 
     test('vertical header: the header shrinks back when a resize removes columns', async ({
@@ -676,21 +675,23 @@ test.describe('multi-row tabs (wrap mode)', () => {
         await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
         const initial = await headerMetrics(page);
 
-        // Shrink → strictly more columns, a wider header.
+        // Shrink → strictly more columns, a wider header (retry until settled).
         await page.setViewportSize({ width: 900, height: 700 });
-        await expect
-            .poll(() => columnCount(page))
-            .toBeGreaterThan(initial.cols);
+        await expect(async () => {
+            const m = await headerMetrics(page);
+            expect(m.cols).toBeGreaterThan(initial.cols);
+            expect(m.headerWidth).toBeGreaterThan(initial.headerWidth);
+        }).toPass();
         const narrow = await headerMetrics(page);
-        expect(narrow.headerWidth).toBeGreaterThan(initial.headerWidth);
 
         // Enlarge again → the columns (and the header width) must come back down.
         await page.setViewportSize({ width: 1280, height: 720 });
-        await expect.poll(() => columnCount(page)).toBeLessThan(narrow.cols);
-
-        const wide = await headerMetrics(page);
-        expect(wide.headerWidth).toBeLessThan(narrow.headerWidth);
-        expect(wide.escaped).toBe(0);
+        await expect(async () => {
+            const wide = await headerMetrics(page);
+            expect(wide.cols).toBeLessThan(narrow.cols);
+            expect(wide.headerWidth).toBeLessThan(narrow.headerWidth);
+            expect(wide.escaped).toBe(0);
+        }).toPass();
     });
 
     test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
