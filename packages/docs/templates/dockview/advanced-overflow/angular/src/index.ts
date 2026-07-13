@@ -32,23 +32,11 @@ export class DefaultPanelComponent {
         <div class="example-layout">
             <div class="example-controls">
                 <button (click)="addPanel()">Add Tab</button>
-                <button (click)="toggleMode()">
-                    {{
-                        mode === 'wrap'
-                            ? 'Switch to dropdown mode'
-                            : 'Switch to wrap mode'
-                    }}
-                </button>
-                <button (click)="toggleVertical()">
-                    {{ vertical ? 'Horizontal header' : 'Vertical header' }}
-                </button>
             </div>
             <div class="example-dock">
                 <dv-dockview
                     [components]="components"
                     [overflow]="overflow"
-                    [pinnedTabs]="pinnedTabs"
-                    [getTabContextMenuItems]="getTabContextMenuItems"
                     className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)"
                 >
@@ -62,33 +50,14 @@ export class AppComponent {
         default: DefaultPanelComponent,
     };
 
-    mode: 'wrap' | 'dropdown' = 'wrap';
-
-    // Wrap tabs onto multiple rows when they no longer fit on one row.
-    overflow: { mode: 'wrap' | 'dropdown' } = { mode: 'wrap' };
-
-    // Enable pinned tabs. This auto-injects Pin/Unpin into the tab
-    // right-click menu.
-    pinnedTabs = { enabled: true };
-
-    // Header orientation. Vertical + wrap lays the tabs out in columns.
-    vertical = false;
-
-    // Two custom right-click items. Pin/Unpin is auto-prepended by
-    // `pinnedTabs`, so it isn't listed here.
-    getTabContextMenuItems = () => [
-        {
-            label:
-                this.mode === 'wrap'
-                    ? 'Switch to dropdown mode'
-                    : 'Switch to wrap mode',
-            action: () => this.toggleMode(),
-        },
-        {
-            label: this.vertical ? 'Horizontal header' : 'Vertical header',
-            action: () => this.toggleVertical(),
-        },
-    ];
+    // Keep overflowing tabs in the chevron dropdown, then enrich that dropdown:
+    // a search box filters the tabs and `mru` orders them most-recently-used
+    // first.
+    overflow = {
+        mode: 'dropdown' as const,
+        search: { placeholder: 'Search tabs…' },
+        mru: true,
+    };
 
     private api?: DockviewApi;
     private counter = 0;
@@ -97,7 +66,7 @@ export class AppComponent {
         this.api = event.api;
         this.counter = 0;
         // Open enough panels in a single group that the tabs no longer fit on
-        // one row.
+        // one row and spill into the dropdown.
         for (let i = 0; i < 12; i++) {
             this.addPanel();
         }
@@ -115,26 +84,6 @@ export class AppComponent {
             title: `Panel ${this.counter}`,
             params: { title: `Panel ${this.counter}` },
         });
-        // Keep any newly created group aligned with the current orientation.
-        this.applyHeaderPosition();
-    }
-
-    toggleMode() {
-        this.mode = this.mode === 'wrap' ? 'dropdown' : 'wrap';
-        this.overflow = { mode: this.mode };
-        // Re-apply the option so flipping the mode takes effect immediately.
-        this.api?.updateOptions({ overflow: this.overflow });
-    }
-
-    toggleVertical() {
-        this.vertical = !this.vertical;
-        this.applyHeaderPosition();
-    }
-
-    private applyHeaderPosition() {
-        this.api?.groups.forEach((group) =>
-            group.api.setHeaderPosition(this.vertical ? 'left' : 'top')
-        );
     }
 }
 

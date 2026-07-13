@@ -108,12 +108,13 @@ the reorder is two-dimensional: you can drag a tab from one row onto another and
 it at any position, with a drop indicator showing where it will land. Dragging a tab
 out of the header to detach or float it works exactly as before.
 
-### Limitations
+### Vertical (column) wrapping
 
-- Wrapping applies to **horizontal** headers only. A group whose header is positioned
-  vertically (for example an edge group) does not wrap in this version.
-- `overflow.mode` is read when the layout is created and re-applied if you change it
-  via `updateOptions`. A runtime change of header direction is not re-evaluated.
+Wrapping applies to vertical headers too. When a group's header sits on the left or
+right (for example an edge group), the tabs wrap into additional **columns** and the
+header grows in width rather than height, and `maxRows` becomes a maximum column cap.
+A change of header direction at runtime is handled automatically, so a group that
+flips between a horizontal and a vertical header re-wraps to match.
 
 ## Advanced overflow
 
@@ -128,5 +129,5 @@ enhanced dropdown. See [Advanced overflow](/docs/core/panels/advancedOverflow).
 - [Tab overflow](/docs/core/panels/tabOverflow): the default single-row dropdown this mode replaces.
 - [Advanced overflow](/docs/core/panels/advancedOverflow): search and most-recently-used ordering for the dropdown.
 - [Pinned tabs](/docs/core/panels/pinnedTabs): another way to keep important tabs visible.
-- [Tab header position](/docs/core/panels/headerPosition): wrapping applies to horizontal headers only.
+- [Tab header position](/docs/core/panels/headerPosition): wrapping applies to horizontal and vertical headers, filling extra rows or columns respectively.
 ```
