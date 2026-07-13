@@ -2,9 +2,6 @@
 title: 'Tab groups'
 description: Visually organise tabs within a group using coloured chips, with a custom colour palette, chip renderers, context menus, and serialization.
 sidebar_position: 12
-enterprise: true
-sidebar_custom_props:
-    enterprise: true
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
@@ -264,6 +261,12 @@ tabGroup.onDidDestroy(() => {});
 
 Right-clicking a tab group chip can show a context menu. This is opt-in; no menu is shown unless
 `getTabGroupChipContextMenuItems` is provided. Return an empty array to suppress the menu for specific chips.
+
+:::info
+The chip context menu is rendered by the enterprise [context menu](/docs/core/panels/contextMenus)
+module. Everything else on this page (chips, colours, custom chip renderers, events, and
+serialization) is part of the free core; only this menu needs the enterprise package.
+:::
 
 <FrameworkSpecific framework="React">
     <DocRef
