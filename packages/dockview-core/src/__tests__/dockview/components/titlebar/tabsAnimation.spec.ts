@@ -2137,5 +2137,56 @@ describe('tabs - animation', () => {
         // source now owns the iframe shield + panelTransfer cleanup via
         // its internal MutableDisposables, fired by the controller's own
         // teardown when the drag ends.
+
+        test('pointer/touch smooth reorder commits on a single-row header', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+
+            const tabAEl = (tabs as any)._tabs[0].value.element as HTMLElement;
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+
+            // start a pointer/touch drag on tab 'a' → initialises _animState
+            (tabs as any)._tabs[0].value._onDragStart.fire(
+                new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                    clientX: 0,
+                    clientY: 0,
+                })
+            );
+            // the drag has settled on insertion index 2 (after 'b')
+            (tabs as any)._animState.currentInsertionIndex = 2;
+
+            // the pointer is released inside the tab strip (single-row, no wrap)
+            jest.spyOn(document, 'elementFromPoint').mockReturnValue(tabsList);
+
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            // end the pointer drag over the strip via the controller
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: tabAEl,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                    clientX: 100,
+                    clientY: 10,
+                })
+            );
+
+            // single-row smooth mode must commit the reorder (previously it had
+            // no pointer commit path, so the tab snapped back and no drop fired)
+            expect(drops).toHaveLength(1);
+            expect(drops[0].index).toBe(1);
+        });
     });
 });

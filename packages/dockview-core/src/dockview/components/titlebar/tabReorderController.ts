@@ -245,18 +245,19 @@ export class TabReorderController extends CompositeDisposable {
         clientY: number;
         pointerEvent: PointerEvent;
     }): void {
-        // Multi-row wrap intra-group reorder — the pointer-backend analog of the
-        // HTML5 tabs-list `drop` commit. In smooth wrap the per-tab pointer drop
-        // target doesn't latch a drop state for the intra-group drag, so its
-        // `onDrop` never fires; commit the reorder from the computed 2-D
-        // insertion index when the drag ends over the strip. This can't
-        // double-commit: `tab.onDrop` nulls `_animState` before this runs (the
-        // backend calls `handleDrop` before `onDragEnd`), so if the per-tab path
-        // *did* fire, `_animState` is already null and this is skipped. (HTML5
-        // wrap drops commit via the tabs-list `drop` listener, which likewise
-        // reads `currentInsertionIndex`.)
+        // Smooth-mode intra-group reorder — the pointer-backend analog of the
+        // HTML5 tabs-list `drop` commit. In smooth mode the per-tab pointer
+        // drop target doesn't latch a drop state for the intra-group drag, so
+        // its `onDrop` never fires; commit the reorder from the computed
+        // insertion index when the drag ends over the strip. This covers both
+        // single-row and multi-row wrap layouts (single-row previously had no
+        // pointer commit path at all, so the tab snapped back on release). It
+        // can't double-commit: `tab.onDrop` nulls `_animState` before this runs
+        // (the backend calls `handleDrop` before `onDragEnd`), so if the per-tab
+        // path *did* fire, `_animState` is already null and this is skipped; in
+        // default (non-smooth) mode `_animState` is never set for an intra-group
+        // drag, so this path is inert there too.
         if (
-            this._wrapMode &&
             e &&
             this._animState &&
             // intra-group single-tab reorder only: `sourceIndex === -1` is a
@@ -269,7 +270,7 @@ export class TabReorderController extends CompositeDisposable {
             this._animState.currentInsertionIndex !== null &&
             this.isPointInsideTabsList(e.clientX, e.clientY)
         ) {
-            this.commitWrapReorder(e.pointerEvent);
+            this.commitPointerReorder(e.pointerEvent);
         }
         this._pointerInsideTabsList = false;
         this.resetDragAnimation();
@@ -281,9 +282,10 @@ export class TabReorderController extends CompositeDisposable {
         return !!el && this._tabsList.contains(el);
     }
 
-    /** Commit a wrap-mode intra-group reorder from the current 2-D insertion
-     *  index (adjusted for the source's own position), then clear drag state. */
-    private commitWrapReorder(event: PointerEvent): void {
+    /** Commit a smooth-mode intra-group reorder from the current insertion
+     *  index (adjusted for the source's own position), then clear drag state.
+     *  Used by the pointer backend for both single-row and wrap layouts. */
+    private commitPointerReorder(event: PointerEvent): void {
         const animState = this._animState;
         if (!animState || animState.currentInsertionIndex === null) {
             return;
