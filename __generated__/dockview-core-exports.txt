@@ -325,14 +325,12 @@ getRegisteredModules
 getRelativeLocation
 indexInParent
 isAnyEdgeGroupEnabled
-isDockviewPackageLoaded
 isEdgeGroupEnabled
 isGridBranchNode
 isGroupOptionsWithGroup
 isGroupOptionsWithPanel
 isPanelOptionsWithGroup
 isPanelOptionsWithPanel
-markDockviewPackageLoaded
 orthogonal
 positionToDirection
 prefersReducedMotion

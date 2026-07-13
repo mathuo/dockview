@@ -32,7 +32,10 @@ export default defineConfig({
             name: 'dockview-vue',
             // the name of the output files when the build is run
             fileName: (format) => `dockview-vue.${format}.js`,
-            formats: ['es', 'umd', 'cjs'],
+            // `es` (module/import) + `umd` (main/require) are the only formats
+            // referenced by package.json exports; a `cjs` build would be dead
+            // output.
+            formats: ['es', 'umd'],
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled

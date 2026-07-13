@@ -32,7 +32,9 @@
     },
     "sideEffects": true,
     "files": [
-        "dist",
+        "dist/package",
+        "dist/cjs/**/*.d.ts",
+        "dist/*.js",
         "README.md",
         "LICENCE.md"
     ],
