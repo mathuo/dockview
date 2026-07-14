@@ -35,7 +35,10 @@ const config: JestConfigWithTsJest = {
         ],
     },
     cacheDirectory: '<rootDir>/node_modules/.cache/jest/dockview-core',
-    maxWorkers: 1, // Core package is large, limit to prevent memory issues
+    // Recycle any worker whose heap balloons, so the large suite can run in
+    // parallel without the OOM that originally forced maxWorkers: 1 under
+    // ts-jest. @swc/jest is far lighter, so parallelism is safe now.
+    workerIdleMemoryLimit: '768MB',
 };
 
 export default config;
