@@ -1,7 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
-    preset: 'ts-jest',
+const config: Config = {
     displayName: { name: 'root', color: 'blue' },
     projects: ['<rootDir>/packages/*/jest.config.ts'],
     collectCoverage: false, // Only collect when explicitly requested
