@@ -1,0 +1,41 @@
+// ─── 404 / Page not found ─────────────────────────────────────────────────────
+
+.nf-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--ifm-navbar-height));
+    padding: 40px 20px 80px;
+}
+
+.nf-code {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ifm-color-primary);
+}
+
+.nf-title {
+    margin: 8px 0 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ifm-heading-color);
+}
+
+.nf-subtitle {
+    max-width: 380px;
+    margin: 12px 0 0;
+    color: var(--ifm-color-content-secondary);
+}
+
+.nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+}

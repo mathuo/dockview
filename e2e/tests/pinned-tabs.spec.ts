@@ -293,9 +293,16 @@ test.describe('pinned tabs', () => {
         await setup(page);
 
         const ids = Array.from({ length: 15 }, (_, i) => `panel-${i}`);
+        // Pin more tabs than fit so the pinned block itself overflows: the
+        // leading pinned tabs stay frozen at the left edge (inline sticky) while
+        // the trailing ones clip out of the strip. A clipped pinned tab is the
+        // only way DV-11's "Pinned" overflow section is reached — a single
+        // pinned tab is held visible by sticky and never clips.
+        const pinned = ids.slice(0, 8);
         await page.evaluate(
-            (ids) => (window as any).__dv.setupPinned(ids, [ids[7]]),
-            ids
+            ({ ids, pinned }) =>
+                (window as any).__dv.setupPinned(ids, pinned),
+            { ids, pinned }
         );
 
         // The strip overflows: the dropdown handle appears.
@@ -309,16 +316,17 @@ test.describe('pinned tabs', () => {
         // Unpinned tabs overflow into the dropdown…
         await expect(overflow.locator('.dv-tab')).not.toHaveCount(0);
 
-        // …and the clipped pinned tab stays reachable, surfaced under a
+        // …and the clipped pinned tabs stay reachable, surfaced under a
         // dedicated "Pinned" header (DV-11) rather than dumped into the general
-        // list. It is excluded from the unpinned rows and never duplicated: it
-        // appears exactly once, as the row directly beneath the Pinned header.
+        // list. The row directly beneath the header is a clipped pinned tab, and
+        // a clipped pinned tab (panel-7, the last of the pinned block) appears
+        // exactly once — excluded from the unpinned rows, never duplicated.
         const pinnedHeader = overflow.locator('.dv-tabs-overflow-pinned-header');
         await expect(pinnedHeader).toBeVisible();
         await expect(pinnedHeader).toContainText('Pinned');
         await expect(
             overflow.locator('.dv-tabs-overflow-pinned-header + .dv-tab')
-        ).toContainText('panel-7');
+        ).toHaveText(/^panel-[0-7]$/);
         await expect(
             overflow.getByText('panel-7', { exact: true })
         ).toHaveCount(1);
@@ -348,6 +356,64 @@ test.describe('pinned tabs', () => {
         await expect
             .poll(() => page.evaluate(() => (window as any).__dv.tabTitles()))
             .toEqual(['c', 'a', 'b']);
+    });
+
+    test('inline sticky: the pinned tab stays frozen at the left edge when the strip scrolls', async ({
+        page,
+    }) => {
+        // Narrow viewport + many tabs so the strip overflows and scrolls
+        // horizontally — the condition the inline sticky offsets exist for.
+        await page.setViewportSize({ width: 360, height: 400 });
+        await setup(page); // inline mode, stickyScroll on by default
+
+        const ids = Array.from({ length: 12 }, (_, i) => `t${i}`);
+        await page.evaluate(
+            (ids) => (window as any).__dv.setupPinned(ids, []),
+            ids
+        );
+        // Pin the first-added tab. It is already leftmost, so it must render at
+        // the strip's left edge and stay frozen there as the strip scrolls.
+        await page.evaluate(() => (window as any).__dv.setPinned('t0', true));
+        await expect(page.locator('.dv-tab--pinned')).toContainText('t0');
+
+        const drift = () =>
+            page.evaluate(() => {
+                const strip = document.querySelector('.dv-tabs-container')!;
+                const pinned = document.querySelector('.dv-tab--pinned')!;
+                const c = strip.getBoundingClientRect();
+                const p = pinned.getBoundingClientRect();
+                return {
+                    fromLeft: Math.round(p.left - c.left),
+                    stickyLeft: (pinned as HTMLElement).style.getPropertyValue(
+                        '--dv-pinned-sticky-left'
+                    ),
+                    scrollWidth: strip.scrollWidth,
+                    clientWidth: strip.clientWidth,
+                };
+            });
+
+        // Precondition: the strip really does overflow (so sticky matters).
+        const rest = await drift();
+        expect(rest.scrollWidth).toBeGreaterThan(rest.clientWidth);
+        // At rest the pinned tab hugs the left edge.
+        expect(rest.fromLeft).toBeLessThan(8);
+
+        // Scroll the strip right and fire the on-scroll self-heal recompute.
+        // Reading the pinned tab's *stuck* offsetLeft and feeding it back into
+        // the sticky offset used to compound it on every recompute, drifting the
+        // pinned tab off the left edge until it rendered over the far-right tabs.
+        for (const x of [80, 160, 240]) {
+            await page.evaluate((x) => {
+                const strip = document.querySelector('.dv-tabs-container')!;
+                strip.scrollLeft = x;
+                strip.dispatchEvent(new Event('scroll'));
+            }, x);
+        }
+
+        // Still frozen at the left edge, offset unchanged — no drift.
+        const after = await drift();
+        expect(after.fromLeft).toBeLessThan(8);
+        expect(after.stickyLeft).toBe('0px');
     });
 
     test('pinned state round-trips through serialization', async ({ page }) => {

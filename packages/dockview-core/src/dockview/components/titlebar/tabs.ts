@@ -216,15 +216,17 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             return;
         }
 
-        const pinnedSet = new Set(pinned.map((tab) => tab.value.element));
-
-        // Clear stale styling from tabs that are no longer sticky-pinned.
+        // Strip every existing sticky styling BEFORE measuring. `offsetLeft` on
+        // a tab that still carries `position: sticky` reports its *stuck*
+        // (frozen/scrolled) position, not its natural in-flow left — so reading
+        // it here and feeding it back into `--dv-pinned-sticky-left` makes the
+        // offset compound on each recompute and the pinned block drifts to the
+        // right edge (it ends up rendering last instead of first). Removing the
+        // class first drops the tabs back to static flow so the reads below are
+        // clean. This also clears stale styling from now-unpinned tabs.
         for (const tab of this._tabs) {
             const el = tab.value.element;
-            if (
-                !pinnedSet.has(el) &&
-                el.classList.contains('dv-tab--pinned-sticky')
-            ) {
+            if (el.classList.contains('dv-tab--pinned-sticky')) {
                 el.classList.remove('dv-tab--pinned-sticky');
                 el.style.removeProperty('--dv-pinned-sticky-left');
             }
@@ -235,23 +237,20 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             return;
         }
 
-        // Read every natural position before writing, to avoid interleaving
-        // layout reads and writes. `offsetLeft` (relative to the positioned
-        // `.dv-tabs-container`) is each tab's in-flow left *including* the
-        // preceding tabs' margins, so the frozen block keeps the theme's tab
-        // spacing — a bare width sum would collapse the gaps in spaced themes.
+        // Read every natural position before writing. The first `offsetLeft`
+        // read flushes the class removals above, so all reads are unstuck.
+        // `offsetLeft` (relative to the positioned `.dv-tabs-container`) is each
+        // tab's in-flow left *including* the preceding tabs' margins, so the
+        // frozen block keeps the theme's tab spacing — a bare width sum would
+        // collapse the gaps in spaced themes.
         const lefts = pinned.map((tab) => tab.value.element.offsetLeft);
         pinned.forEach((tab, index) => {
             const el = tab.value.element;
             el.classList.add('dv-tab--pinned-sticky');
-            const value = `${lefts[index]}px`;
-            // Skip a redundant write — re-setting the same value still
-            // invalidates style and forces a reflow on every scroll tick.
-            if (
-                el.style.getPropertyValue('--dv-pinned-sticky-left') !== value
-            ) {
-                el.style.setProperty('--dv-pinned-sticky-left', value);
-            }
+            el.style.setProperty(
+                '--dv-pinned-sticky-left',
+                `${lefts[index]}px`
+            );
         });
         this._hasPinnedStickyStyling = true;
     }

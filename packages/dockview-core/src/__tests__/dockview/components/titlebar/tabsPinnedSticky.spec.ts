@@ -111,6 +111,35 @@ describe('tabs — sticky pinned tabs', () => {
         tabs.element.remove();
     });
 
+    test('re-applying reads the natural offset, not the stuck one (no right-edge drift)', () => {
+        const tabs = createTabs();
+        tabs.openPanel(createMockPanel('a'));
+        tabs.openPanel(createMockPanel('b'));
+        tabs.setOverflowExclude((id) => id === 'a');
+
+        // Model the browser: while the tab carries `position: sticky` with a
+        // non-zero left it is frozen away from the edge, so `offsetLeft` reports
+        // that stuck x (here 324, the right edge); with the sticky class removed
+        // it reports the natural in-flow x (0, since 'a' is the first tab).
+        const el = tabs.tabs.find((t) => t.panel.id === 'a')!.element;
+        Object.defineProperty(el, 'offsetLeft', {
+            configurable: true,
+            get: () =>
+                el.classList.contains('dv-tab--pinned-sticky') ? 324 : 0,
+        });
+
+        tabs.setPinnedSticky(true);
+        expect(stickyOffset(tabs, 'a')).toBe('0px');
+
+        // A second recompute (resize / scroll self-heal / pinned-set refresh)
+        // must still resolve to the natural 0 — reading the stuck 324 would
+        // compound the offset and push the pinned tab off to the right edge.
+        tabs.setOverflowExclude((id) => id === 'a');
+        expect(stickyOffset(tabs, 'a')).toBe('0px');
+
+        tabs.element.remove();
+    });
+
     test('stays inert while disabled even with excluded tabs', () => {
         const tabs = createTabs();
         tabs.openPanel(createMockPanel('a'));

@@ -10,6 +10,14 @@ See per-package `AGENTS.md` files under `packages/` for package-specific guidanc
 
 ## Development Commands
 
+> **Use Yarn, not npm.** This repo is a **Yarn v1** workspaces monorepo. Install
+> dependencies with `yarn install` (or just `yarn`) and run every script through
+> `yarn <script>`. Do **not** run `npm install`/`npm ci`/`pnpm install` at the
+> repo root — they ignore the workspace protocol and `yarn.lock`, and will
+> corrupt the linked local packages. The `npm install dockview`/`dockview-react`
+> lines elsewhere in this file are end-user consumer instructions for the
+> published packages, not commands for developing in this repo.
+
 ### Build
 
 -   `yarn build` - Build all publishable packages via NX (dockview-core, dockview, dockview-vue, dockview-react, dockview-angular)
