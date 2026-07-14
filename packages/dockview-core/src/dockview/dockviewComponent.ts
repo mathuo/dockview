@@ -185,7 +185,8 @@ export interface DockviewPopoutGroupOptions {
     onWillClose?: (event: { id: string; window: Window }) => void;
 }
 
-interface DockviewPopoutGroupOptionsInternal extends DockviewPopoutGroupOptions {
+interface DockviewPopoutGroupOptionsInternal
+    extends DockviewPopoutGroupOptions {
     referenceGroup?: DockviewGroupPanel;
     overridePopoutGroup?: DockviewGroupPanel;
     /**

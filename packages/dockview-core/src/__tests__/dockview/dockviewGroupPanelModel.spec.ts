@@ -2131,21 +2131,18 @@ describe('dockviewGroupPanelModel', () => {
             ['floating', ['top', 'bottom', 'left', 'right', 'center']],
             ['popout', ['top', 'bottom', 'left', 'right', 'center']],
             ['edge', ['center']],
-        ] as const)(
-            'location=%s applies zones to BOTH dropTarget and pointerDropTarget',
-            (locationType, expectedZones) => {
-                const { dropTarget, pointerDropTarget } =
-                    getContentTargets(groupview);
+        ] as const)('location=%s applies zones to BOTH dropTarget and pointerDropTarget', (locationType, expectedZones) => {
+            const { dropTarget, pointerDropTarget } =
+                getContentTargets(groupview);
 
-                groupview.model.location = { type: locationType } as any;
+            groupview.model.location = { type: locationType } as any;
 
-                expect(dropTarget.setTargetZones).toHaveBeenCalledWith(
-                    expectedZones
-                );
-                expect(pointerDropTarget.setTargetZones).toHaveBeenCalledWith(
-                    expectedZones
-                );
-            }
-        );
+            expect(dropTarget.setTargetZones).toHaveBeenCalledWith(
+                expectedZones
+            );
+            expect(pointerDropTarget.setTargetZones).toHaveBeenCalledWith(
+                expectedZones
+            );
+        });
     });
 });

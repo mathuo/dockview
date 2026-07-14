@@ -79,10 +79,10 @@
         "types:check": "attw --pack . --ignore-rules false-esm internal-resolution-error",
         "test": "vitest run",
         "test:cov": "vitest run --coverage",
-        "lint": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}'",
-        "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}' --fix",
-        "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,vue}'",
-        "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,vue}'"
+        "lint": "biome lint src",
+        "lint:fix": "biome lint --write src",
+        "format": "biome format --write src",
+        "format:check": "biome format src"
     },
     "dependencies": {
         "dockview": "^7.0.2"

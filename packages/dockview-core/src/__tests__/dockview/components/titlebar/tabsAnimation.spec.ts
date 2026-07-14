@@ -60,10 +60,7 @@ function createMockPanel(id: string): IDockviewPanel {
 }
 
 function createTabs(
-    options: {
-        tabAnimation?: TabAnimation;
-        disableDnd?: boolean;
-    } = {}
+    options: { tabAnimation?: TabAnimation; disableDnd?: boolean } = {}
 ): { tabs: Tabs; accessor: DockviewComponent; group: DockviewGroupPanel } {
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor',

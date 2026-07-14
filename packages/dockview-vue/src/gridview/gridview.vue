@@ -12,10 +12,13 @@ import type { IGridviewVueProps, GridviewVueEvents } from './types';
 function extractCoreOptions(props: IGridviewVueProps): GridviewOptions {
     const coreOptions = (
         PROPERTY_KEYS_GRIDVIEW as (keyof GridviewOptions)[]
-    ).reduce((obj, key) => {
-        (obj as any)[key] = props[key];
-        return obj;
-    }, {} as Partial<GridviewOptions>);
+    ).reduce(
+        (obj, key) => {
+            (obj as any)[key] = props[key];
+            return obj;
+        },
+        {} as Partial<GridviewOptions>
+    );
 
     return coreOptions as GridviewOptions;
 }

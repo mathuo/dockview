@@ -218,75 +218,69 @@ describe('tabsContainer', () => {
         ).toHaveLength(1);
     });
 
-    test.each([true, 'no-drop-target' as const])(
-        'that dropping over the empty space does not render a drop target when group is locked=%p (regression #990)',
-        (lockedValue) => {
-            const accessor = fromPartial<DockviewComponent>({
-                withOrigin: (_origin: any, fn: () => any) => fn(),
-                id: 'testcomponentid',
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                options: {},
-                onDidOptionsChange: jest
-                    .fn()
-                    .mockReturnValue({ dispose: jest.fn() }),
-            });
+    test.each([
+        true,
+        'no-drop-target' as const,
+    ])('that dropping over the empty space does not render a drop target when group is locked=%p (regression #990)', (lockedValue) => {
+        const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
+            id: 'testcomponentid',
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+        });
 
-            const groupView = fromPartial<DockviewGroupPanelModel>({
-                canDisplayOverlay: jest.fn(),
-            });
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
 
-            const groupPanel = fromPartial<DockviewGroupPanel>({
-                id: 'testgroupid',
-                model: groupView,
-                panels: [],
-                api: fromPartial<DockviewGroupPanel['api']>({
-                    locked: lockedValue,
-                }),
-            });
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
+            panels: [],
+            api: fromPartial<DockviewGroupPanel['api']>({
+                locked: lockedValue,
+            }),
+        });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+        const cut = new TabsContainer(accessor, groupPanel);
 
-            cut.openPanel(new TestPanel('panel1', jest.fn() as any));
-            cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
 
-            const emptySpace = cut.element
-                .getElementsByClassName('dv-void-container')
-                .item(0) as HTMLElement;
+        const emptySpace = cut.element
+            .getElementsByClassName('dv-void-container')
+            .item(0) as HTMLElement;
 
-            if (!emptySpace!) {
-                fail('element not found');
-            }
-
-            jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
-                () => 100
-            );
-            jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
-                () => 100
-            );
-
-            // simulate an internal same-accessor drag (the buggy path):
-            // the void container previously short-circuited to `return true`
-            // for same-accessor drags regardless of the group's locked state.
-            LocalSelectionTransfer.getInstance().setData(
-                [
-                    new PanelTransfer(
-                        'testcomponentid',
-                        'anothergroupid',
-                        'panel1'
-                    ),
-                ],
-                PanelTransfer.prototype
-            );
-
-            fireEvent.dragEnter(emptySpace!);
-            fireEvent.dragOver(emptySpace!);
-
-            expect(
-                cut.element.getElementsByClassName('dv-drop-target-dropzone')
-            ).toHaveLength(0);
+        if (!emptySpace!) {
+            fail('element not found');
         }
-    );
+
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
+            () => 100
+        );
+
+        // simulate an internal same-accessor drag (the buggy path):
+        // the void container previously short-circuited to `return true`
+        // for same-accessor drags regardless of the group's locked state.
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel1')],
+            PanelTransfer.prototype
+        );
+
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
+
+        expect(
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
+    });
 
     test('that dropping the first tab should render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
