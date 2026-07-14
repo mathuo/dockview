@@ -1,7 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
-    preset: 'ts-jest',
+const config: Config = {
     roots: ['<rootDir>/packages/dockview-react'],
     modulePaths: ['<rootDir>/packages/dockview-react/src'],
     displayName: { name: 'dockview-react', color: 'blue' },
@@ -29,9 +28,13 @@ const config: JestConfigWithTsJest = {
     testEnvironment: 'jsdom',
     transform: {
         '^.+\\.tsx?$': [
-            'ts-jest',
+            '@swc/jest',
             {
-                tsconfig: '<rootDir>/tsconfig.test.json',
+                jsc: {
+                    parser: { syntax: 'typescript', tsx: true },
+                    transform: { react: { runtime: 'automatic' } },
+                    target: 'es2021',
+                },
             },
         ],
     },
