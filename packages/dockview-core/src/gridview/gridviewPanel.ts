@@ -33,9 +33,8 @@ export interface GridviewInitParameters extends PanelInitParameters {
     isVisible?: boolean;
 }
 
-export interface IGridviewPanel<
-    T extends GridviewPanelApi = GridviewPanelApi,
-> extends BasePanelViewExported<T> {
+export interface IGridviewPanel<T extends GridviewPanelApi = GridviewPanelApi>
+    extends BasePanelViewExported<T> {
     readonly minimumWidth: number;
     readonly maximumWidth: number;
     readonly minimumHeight: number;
@@ -45,8 +44,8 @@ export interface IGridviewPanel<
 }
 
 export abstract class GridviewPanel<
-    T extends GridviewPanelApiImpl = GridviewPanelApiImpl,
->
+        T extends GridviewPanelApiImpl = GridviewPanelApiImpl,
+    >
     extends BasePanelView<T>
     implements IGridPanelComponentView, IGridviewPanel
 {

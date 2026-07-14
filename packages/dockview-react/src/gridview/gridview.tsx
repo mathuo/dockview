@@ -16,9 +16,8 @@ export interface GridviewReadyEvent {
     api: GridviewApi;
 }
 
-export interface IGridviewPanelProps<
-    T extends { [index: string]: any } = any,
-> extends PanelParameters<T> {
+export interface IGridviewPanelProps<T extends { [index: string]: any } = any>
+    extends PanelParameters<T> {
     api: GridviewPanelApi;
     containerApi: GridviewApi;
 }
@@ -29,12 +28,15 @@ export interface IGridviewReactProps extends GridviewOptions {
 }
 
 function extractCoreOptions(props: IGridviewReactProps): GridviewOptions {
-    const coreOptions = PROPERTY_KEYS_GRIDVIEW.reduce((obj, key) => {
-        if (key in props) {
-            obj[key] = props[key] as any;
-        }
-        return obj;
-    }, {} as Partial<GridviewComponentOptions>);
+    const coreOptions = PROPERTY_KEYS_GRIDVIEW.reduce(
+        (obj, key) => {
+            if (key in props) {
+                obj[key] = props[key] as any;
+            }
+            return obj;
+        },
+        {} as Partial<GridviewComponentOptions>
+    );
 
     return coreOptions as GridviewOptions;
 }

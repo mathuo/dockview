@@ -31,7 +31,8 @@ export interface PanePanelInitParameter extends PanelInitParameters {
     accessor: PaneviewComponent;
 }
 
-export interface PanePanelComponentInitParameter extends PanePanelInitParameter {
+export interface PanePanelComponentInitParameter
+    extends PanePanelInitParameter {
     api: PaneviewPanelApiImpl;
 }
 
@@ -45,7 +46,8 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
-export interface IPaneviewPanel extends BasePanelViewExported<PaneviewPanelApiImpl> {
+export interface IPaneviewPanel
+    extends BasePanelViewExported<PaneviewPanelApiImpl> {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly minimumBodySize: number;
