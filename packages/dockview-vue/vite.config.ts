@@ -30,8 +30,12 @@ export default defineConfig({
             // src/indext.ts is where we have exported the component(s)
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'dockview-vue',
-            // the name of the output files when the build is run
-            fileName: (format) => `dockview-vue.${format}.js`,
+            // The package is `"type": "module"`, so the ESM output keeps `.js`
+            // (interpreted as ESM) while the UMD/require output gets `.cjs` so
+            // Node resolves it as CommonJS. A plain `.umd.js` would be read as
+            // ESM and fail for `require()` consumers.
+            fileName: (format) =>
+                `dockview-vue.${format}.${format === 'es' ? 'js' : 'cjs'}`,
             // `es` (module/import) + `umd` (main/require) are the only formats
             // referenced by package.json exports; a `cjs` build would be dead
             // output.

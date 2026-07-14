@@ -74,6 +74,7 @@
         "build": "npm run build:cjs && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build && npm run build:bundle",
+        "types:check": "attw --pack . --ignore-rules false-cjs",
         "test": "jest --selectProjects dockview-react",
         "test:cov": "jest --selectProjects dockview-react --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",

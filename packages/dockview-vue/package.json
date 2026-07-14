@@ -35,14 +35,14 @@
         "vue3",
         "composition-api"
     ],
-    "main": "dist/dockview-vue.umd.js",
+    "main": "dist/dockview-vue.umd.cjs",
     "module": "dist/dockview-vue.es.js",
     "types": "dist/types/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/types/index.d.ts",
             "import": "./dist/dockview-vue.es.js",
-            "require": "./dist/dockview-vue.umd.js"
+            "require": "./dist/dockview-vue.umd.cjs"
         },
         "./dist/styles/*": "./dist/styles/*",
         "./package.json": "./package.json"
@@ -75,6 +75,7 @@
         "build": "npm run build:js && npm run build:types && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
+        "types:check": "attw --pack . --ignore-rules false-esm internal-resolution-error",
         "test": "vitest run",
         "test:cov": "vitest run --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}'",
