@@ -43,7 +43,7 @@
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
         "build": "npm run build:cjs",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
-        "rebuild": "npm run clean && npm run build",
+        "rebuild": "npm run clean && npm run build && npm run build:bundle",
         "test": "jest --selectProjects dockview-enterprise",
         "test:cov": "jest --selectProjects dockview-enterprise --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",

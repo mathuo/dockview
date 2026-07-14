@@ -71,7 +71,7 @@
         "build:css": "node scripts/copy-css.js",
         "build": "npm run build:cjs && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
-        "rebuild": "npm run clean && npm run build",
+        "rebuild": "npm run clean && npm run build && npm run build:bundle",
         "test": "jest --selectProjects dockview",
         "test:cov": "jest --selectProjects dockview --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
