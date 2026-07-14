@@ -191,8 +191,6 @@ export {
     registerModules,
     getRegisteredModules,
     clearRegisteredModules,
-    markDockviewPackageLoaded,
-    isDockviewPackageLoaded,
     defineModule,
     DockviewModule,
     ServiceCollection,
