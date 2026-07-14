@@ -6,6 +6,7 @@ import {
     markRaw,
     getCurrentInstance,
     type ComponentInternalInstance,
+    type Ref,
 } from 'vue';
 import type { DockviewIDisposable } from 'dockview';
 import { findComponent, VueRendererRegistry } from '../utils';
@@ -35,6 +36,12 @@ export interface ViewComponentConfig<
     onApiCreated?: (api: TApi) => DockviewIDisposable[];
 }
 
+export interface UseViewComponentReturn<TApi> {
+    el: Ref<HTMLElement | null>;
+    instance: Ref<TApi | null>;
+    registry: VueRendererRegistry;
+}
+
 export function useViewComponent<
     TApi extends {
         dispose(): void;
@@ -57,9 +64,9 @@ export function useViewComponent<
     >,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
-) {
+): UseViewComponentReturn<TApi> {
     const el = ref<HTMLElement | null>(null);
-    const instance = ref<TApi | null>(null);
+    const instance = ref<TApi | null>(null) as Ref<TApi | null>;
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**

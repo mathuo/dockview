@@ -15,7 +15,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview-enterprise"
     },
     "license": "SEE LICENSE IN LICENCE.md",
     "author": "https://github.com/mathuo",
@@ -28,21 +29,24 @@
             "import": "./dist/package/main.esm.mjs",
             "require": "./dist/package/main.cjs.js"
         },
+        "./dist/*": "./dist/*",
         "./package.json": "./package.json"
     },
     "sideEffects": true,
     "files": [
-        "dist",
+        "dist/package",
+        "dist/cjs/**/*.d.ts",
+        "dist/*.js",
         "README.md",
         "LICENCE.md"
     ],
     "scripts": {
         "build:bundle": "rollup -c",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-        "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-        "build": "npm run build:cjs && npm run build:esm",
+        "build": "npm run build:cjs",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
-        "rebuild": "npm run clean && npm run build",
+        "rebuild": "npm run clean && npm run build && npm run build:bundle",
+        "types:check": "attw --pack . --ignore-rules false-cjs",
         "test": "jest --selectProjects dockview-enterprise",
         "test:cov": "jest --selectProjects dockview-enterprise --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",

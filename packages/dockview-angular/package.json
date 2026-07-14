@@ -39,7 +39,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview-angular"
     },
     "license": "MIT",
     "author": "https://github.com/mathuo",
@@ -60,6 +61,7 @@
         "build": "npm run build:angular && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
+        "types:check": "attw --pack . --ignore-rules cjs-resolves-to-esm",
         "test": "jest --selectProjects dockview-angular",
         "test:cov": "jest --selectProjects dockview-angular --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",

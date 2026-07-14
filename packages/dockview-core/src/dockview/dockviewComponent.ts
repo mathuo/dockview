@@ -85,7 +85,6 @@ import {
     assertModule,
     DockviewModule,
     getRegisteredModules,
-    isDockviewPackageLoaded,
     ModuleRegistry,
 } from './modules';
 import { AllModules } from './allModules';
@@ -509,37 +508,6 @@ const NO_EVENT: Event<any> = () => ({
         // noop — nothing ever fires
     },
 });
-
-let _hasWarnedUsingCoreDirectly = false;
-
-/**
- * `dockview-core` is an internal package. The public `dockview` package calls
- * `markDockviewPackageLoaded()` on import; if that marker is absent the consumer
- * is using `dockview-core` directly, so emit a one-time console warning
- * steering them to `dockview`.
- *
- * Suppressed in production builds: it is a development-time nudge and most
- * bundlers inline `process.env.NODE_ENV` so the branch is dropped entirely. The
- * `typeof process` guard keeps this safe in plain browser/UMD contexts where
- * `process` is undefined.
- */
-function warnIfUsingCoreDirectly(): void {
-    if (
-        typeof process !== 'undefined' &&
-        process.env?.NODE_ENV === 'production'
-    ) {
-        return;
-    }
-    if (_hasWarnedUsingCoreDirectly || isDockviewPackageLoaded()) {
-        return;
-    }
-    _hasWarnedUsingCoreDirectly = true;
-    console.warn(
-        'dockview: do not use "dockview-core" directly — it is an internal ' +
-            'package. Use the "dockview" package, the JavaScript version of ' +
-            'dockview, instead. This notice is shown once.'
-    );
-}
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
@@ -1531,10 +1499,6 @@ export class DockviewComponent
                 })
             );
         }
-
-        // Purely a developer warning (no functional effect): nudge anyone using
-        // the internal `dockview-core` package directly towards `dockview`.
-        warnIfUsingCoreDirectly();
 
         this.popupService = new PopupService(this.element);
         this._api = new DockviewApi(this);
