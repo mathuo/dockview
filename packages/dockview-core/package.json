@@ -71,7 +71,7 @@
     "scripts": {
         "build:bundle": "rollup -c",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-        "build:css": "gulp sass",
+        "build:css": "node scripts/build-css.js",
         "build": "npm run build:cjs && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build && npm run build:bundle",
