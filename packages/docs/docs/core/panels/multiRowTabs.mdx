@@ -76,10 +76,10 @@ api.updateOptions({ overflow: { mode: 'wrap' } });
 </FrameworkSpecific>
 
 :::info
-`overflow.mode: 'wrap'` is provided by the multi-row tabs module, which is included
-in the default `dockview` bundle. If you assemble your own set of modules and omit
-it, `mode: 'wrap'` is ignored and the standard single-row strip with the dropdown is
-used instead; no error, no regression.
+`overflow.mode: 'wrap'` is an enterprise feature. With `dockview-enterprise`
+imported it is enabled for every Dockview instance; without it, `mode: 'wrap'` is
+ignored and the standard single-row strip with the dropdown is used instead; no
+error, no regression.
 :::
 
 ### `maxRows`
@@ -98,8 +98,8 @@ const api = createDockview(element, {
 api.updateOptions({ overflow: { mode: 'wrap', maxRows: 3 } });
 ```
 
-`maxRows` is provided by the same `MultiRowTabsModule` as `mode: 'wrap'`, so it is
-only honoured in wrap mode; it has no effect on the single-row dropdown.
+`maxRows` is part of the same enterprise multi-row tabs feature as `mode: 'wrap'`, so
+it is only honoured in wrap mode; it has no effect on the single-row dropdown.
 
 ### Reordering across rows
 
@@ -120,9 +120,9 @@ flips between a horizontal and a vertical header re-wraps to match.
 
 The `overflow` block also carries `search`, `mru`, and `thumbnails` fields that turn
 the dropdown into a searchable, most-recently-used tab switcher. `search` and `mru`
-ship in the `AdvancedOverflowModule`; `thumbnails` is still reserved and has no effect
-yet. These compose with wrap mode: tabs that spill past `maxRows` land in the same
-enhanced dropdown. See [Advanced overflow](/docs/core/panels/advancedOverflow).
+are part of the enterprise advanced overflow feature; `thumbnails` is still reserved
+and has no effect yet. These compose with wrap mode: tabs that spill past `maxRows`
+land in the same enhanced dropdown. See [Advanced overflow](/docs/core/panels/advancedOverflow).
 
 ## See also
 
