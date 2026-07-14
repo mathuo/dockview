@@ -1,7 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
-    preset: 'ts-jest',
+const config: Config = {
     roots: ['<rootDir>/packages/dockview-core'],
     modulePaths: ['<rootDir>/packages/dockview-core/src'],
     displayName: { name: 'dockview-core', color: 'blue' },
@@ -24,15 +23,21 @@ const config: JestConfigWithTsJest = {
     testEnvironment: 'jsdom',
     transform: {
         '^.+\\.tsx?$': [
-            'ts-jest',
+            '@swc/jest',
             {
-                tsconfig: '<rootDir>/tsconfig.test.json',
-                useESM: false,
+                jsc: {
+                    parser: { syntax: 'typescript', tsx: true },
+                    transform: { react: { runtime: 'automatic' } },
+                    target: 'es2021',
+                },
             },
         ],
     },
     cacheDirectory: '<rootDir>/node_modules/.cache/jest/dockview-core',
-    maxWorkers: 1, // Core package is large, limit to prevent memory issues
+    // Recycle any worker whose heap balloons, so the large suite can run in
+    // parallel without the OOM that originally forced maxWorkers: 1 under
+    // ts-jest. @swc/jest is far lighter, so parallelism is safe now.
+    workerIdleMemoryLimit: '768MB',
 };
 
 export default config;

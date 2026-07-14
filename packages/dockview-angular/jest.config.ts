@@ -1,6 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
+const config: Config = {
     preset: 'jest-preset-angular',
     roots: ['<rootDir>/packages/dockview-angular'],
     modulePaths: ['<rootDir>/packages/dockview-angular/src'],
