@@ -16,10 +16,10 @@ Framework-agnostic core layout engine with zero runtime dependencies. All other 
 
 ## Build
 
-- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly`, `tsconfig.json` → `dist/cjs/**/*.d.ts`). The runtime JS ships as the rollup bundles (`build:bundle`), so this pass emits only the `.d.ts`.
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly`, `tsconfig.json` → `dist/cjs/**/*.d.ts`). The runtime JS ships as the rolldown bundles (`build:bundle`), so this pass emits only the `.d.ts`.
 - `build:css` - SCSS to CSS compilation (`node scripts/build-css.js`, using `sass-embedded`)
 - `build` - `build:cjs` + `build:css`
-- `build:bundle` - Rollup bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundles (`rollup -c`)
+- `build:bundle` - rolldown bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundles (`rolldown -c rolldown.config.mjs`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
@@ -32,7 +32,7 @@ Framework-agnostic core layout engine with zero runtime dependencies. All other 
 - `tsconfig.json` - CJS build config
 - `tsconfig.esm.json` - ESM build config
 - `jest.config.ts` - Jest configuration
-- `rollup.config.js` - Rollup bundle configuration
+- `rolldown.config.mjs` - rolldown bundle configuration
 - `scripts/build-css.js` - Compiles + concatenates SCSS to `dist/styles/dockview.css` (`sass-embedded`)
 
 ## Important Notes
