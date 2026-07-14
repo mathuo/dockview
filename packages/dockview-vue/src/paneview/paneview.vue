@@ -12,10 +12,13 @@ import type { IPaneviewVueProps, PaneviewVueEvents } from './types';
 function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
     const coreOptions = (
         PROPERTY_KEYS_PANEVIEW as (keyof PaneviewOptions)[]
-    ).reduce((obj, key) => {
-        (obj as any)[key] = props[key];
-        return obj;
-    }, {} as Partial<PaneviewOptions>);
+    ).reduce(
+        (obj, key) => {
+            (obj as any)[key] = props[key];
+            return obj;
+        },
+        {} as Partial<PaneviewOptions>
+    );
 
     return coreOptions as PaneviewOptions;
 }

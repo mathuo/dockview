@@ -72,10 +72,9 @@ const uniquePortalKeyGenerator = (() => {
 
 export const ReactPartContext = React.createContext<{}>({});
 
-export class ReactPart<
-    P extends object,
-    C extends object = {},
-> implements IFrameworkPart {
+export class ReactPart<P extends object, C extends object = {}>
+    implements IFrameworkPart
+{
     private _initialProps: Parameters = {};
     private componentInstance?: IPanelWrapperRef;
     private ref?: {

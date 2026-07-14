@@ -530,36 +530,36 @@ describe('voidContainer', () => {
             );
         });
 
-        test.each([true, 'no-drop-target' as const])(
-            'does not display a drop overlay when locked=%p, even for same-accessor drags',
-            (lockedValue) => {
-                const { cut, groupView } = setup(lockedValue);
+        test.each([
+            true,
+            'no-drop-target' as const,
+        ])('does not display a drop overlay when locked=%p, even for same-accessor drags', (lockedValue) => {
+            const { cut, groupView } = setup(lockedValue);
 
-                LocalSelectionTransfer.getInstance().setData(
-                    [
-                        new PanelTransfer(
-                            'testcomponentid',
-                            'anothergroupid',
-                            'panel1'
-                        ),
-                    ],
-                    PanelTransfer.prototype
-                );
+            LocalSelectionTransfer.getInstance().setData(
+                [
+                    new PanelTransfer(
+                        'testcomponentid',
+                        'anothergroupid',
+                        'panel1'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
 
-                fireEvent.dragEnter(cut.element);
-                fireEvent.dragOver(cut.element);
+            fireEvent.dragEnter(cut.element);
+            fireEvent.dragOver(cut.element);
 
-                expect(
-                    cut.element.parentElement?.getElementsByClassName(
-                        'dv-drop-target-dropzone'
-                    ).length ?? 0
-                ).toBe(0);
-                // short-circuited before consulting the group model
-                expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
+            expect(
+                cut.element.parentElement?.getElementsByClassName(
+                    'dv-drop-target-dropzone'
+                ).length ?? 0
+            ).toBe(0);
+            // short-circuited before consulting the group model
+            expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
 
-                cut.dispose();
-            }
-        );
+            cut.dispose();
+        });
 
         test('still displays a drop overlay for same-accessor drags when not locked', () => {
             const { cut } = setup(false);

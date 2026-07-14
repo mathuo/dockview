@@ -31,9 +31,8 @@ export interface SerializedGridviewComponent {
     activePanel?: string;
 }
 
-export interface AddGridviewComponentOptions<
-    T extends object = Parameters,
-> extends BaseComponentOptions<T> {
+export interface AddGridviewComponentOptions<T extends object = Parameters>
+    extends BaseComponentOptions<T> {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;

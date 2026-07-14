@@ -17,9 +17,8 @@ export interface PaneviewReadyEvent {
     api: PaneviewApi;
 }
 
-export interface IPaneviewPanelProps<
-    T extends { [index: string]: any } = any,
-> extends PanelParameters<T> {
+export interface IPaneviewPanelProps<T extends { [index: string]: any } = any>
+    extends PanelParameters<T> {
     api: PaneviewPanelApi;
     containerApi: PaneviewApi;
     title: string;
@@ -36,12 +35,15 @@ export interface IPaneviewReactProps extends PaneviewOptions {
 }
 
 function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {
-    const coreOptions = PROPERTY_KEYS_PANEVIEW.reduce((obj, key) => {
-        if (key in props) {
-            obj[key] = props[key] as any;
-        }
-        return obj;
-    }, {} as Partial<PaneviewComponentOptions>);
+    const coreOptions = PROPERTY_KEYS_PANEVIEW.reduce(
+        (obj, key) => {
+            if (key in props) {
+                obj[key] = props[key] as any;
+            }
+            return obj;
+        },
+        {} as Partial<PaneviewComponentOptions>
+    );
 
     return coreOptions as PaneviewOptions;
 }
