@@ -29,6 +29,7 @@
             "import": "./dist/package/main.esm.mjs",
             "require": "./dist/package/main.cjs.js"
         },
+        "./dist/*": "./dist/*",
         "./package.json": "./package.json"
     },
     "sideEffects": true,
