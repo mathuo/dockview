@@ -93,7 +93,8 @@ export interface DockviewGroupChangeEvent {
  * the component-level `DockviewActivePanelChangeEvent` — both report whether the
  * change came from a user gesture or an API call.
  */
-export interface DockviewGroupActivePanelChangeEvent extends DockviewGroupChangeEvent {
+export interface DockviewGroupActivePanelChangeEvent
+    extends DockviewGroupChangeEvent {
     readonly origin: DockviewOrigin;
 }
 

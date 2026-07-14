@@ -12,6 +12,7 @@
         "esModuleInterop": true,
         "downlevelIteration": true,
         "incremental": true,
+        "isolatedModules": true,
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "lib": [

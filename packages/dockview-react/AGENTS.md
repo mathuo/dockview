@@ -25,10 +25,10 @@ bridge, hooks. All documentation, READMEs, and examples point at this package fo
 
 ## Build
 
-- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rollup bundles
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rolldown bundles
 - `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
 - `build` - `build:cjs` + `build:css`
-- `build:bundle` - Rollup bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundle (self-contained for CDN; externalizes `react` and `react-dom`)
+- `build:bundle` - rolldown bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundle (self-contained for CDN; externalizes `react` and `react-dom`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing

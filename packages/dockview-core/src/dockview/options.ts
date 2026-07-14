@@ -30,7 +30,7 @@ import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
 import { CspNonceProvider } from '../dom';
-export { CspNonceProvider };
+export { type CspNonceProvider };
 import { DockviewTabGroupColorEntry } from './tabGroupAccent';
 
 export interface IHeaderActionsRenderer extends IDisposable {

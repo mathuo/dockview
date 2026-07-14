@@ -50,7 +50,6 @@ class LicenseRegistryImpl {
             return;
         }
         this._warned.add(dedupeKey);
-        // eslint-disable-next-line no-console
         console[severity](message);
     }
 

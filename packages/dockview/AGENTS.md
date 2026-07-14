@@ -18,10 +18,10 @@ consumers should install (`npm install dockview`). Framework bindings live in th
 
 ## Build
 
-- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rollup bundles
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rolldown bundles
 - `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
 - `build` - `build:cjs` + `build:css`
-- `build:bundle` - Rollup bundle (UMD bundle is self-contained for CDN; the npm package bundle externalizes `dockview-core`)
+- `build:bundle` - rolldown bundle (UMD bundle is self-contained for CDN; the npm package bundle externalizes `dockview-core`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing

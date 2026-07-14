@@ -21,7 +21,8 @@ import {
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
 
-export interface IDockviewGroupPanel extends IGridviewPanel<DockviewGroupPanelApi> {
+export interface IDockviewGroupPanel
+    extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
     locked: DockviewGroupPanelLocked;
     readonly size: number;

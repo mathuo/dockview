@@ -136,7 +136,6 @@ export function assertModule<T>(
     }
     _warnedMissingModule.add(key);
     const where = context ? ` for ${context}` : '';
-    // eslint-disable-next-line no-console
     console.error(
         `dockview: module "${moduleName}" is not registered${where}.`
     );

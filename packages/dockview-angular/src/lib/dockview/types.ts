@@ -14,7 +14,8 @@ export interface IDockviewAngularPanelProps extends IDockviewPanelProps {
     // Angular-specific panel properties can be added here
 }
 
-export interface IDockviewAngularPanelHeaderProps extends IDockviewPanelHeaderProps {
+export interface IDockviewAngularPanelHeaderProps
+    extends IDockviewPanelHeaderProps {
     // Angular-specific header properties can be added here
 }
 
@@ -22,7 +23,8 @@ export interface IDockviewAngularWatermarkProps extends IWatermarkPanelProps {
     // Angular-specific watermark properties can be added here
 }
 
-export interface IDockviewAngularHeaderActionsProps extends IDockviewHeaderActionsProps {
+export interface IDockviewAngularHeaderActionsProps
+    extends IDockviewHeaderActionsProps {
     // Angular-specific header actions properties can be added here
 }
 

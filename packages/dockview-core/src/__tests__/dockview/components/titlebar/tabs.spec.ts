@@ -725,22 +725,22 @@ describe('tabs', () => {
             return { panel, close };
         }
 
-        test.each(['Delete', 'Backspace'])(
-            'pressing %s on a focused tab closes its panel',
-            (key) => {
-                const { tabs } = createTabsForDropTest();
-                const panels = ['p1', 'p2', 'p3'].map((id) =>
-                    createClosablePanel(id)
-                );
-                panels.forEach(({ panel }) => tabs.openPanel(panel));
+        test.each([
+            'Delete',
+            'Backspace',
+        ])('pressing %s on a focused tab closes its panel', (key) => {
+            const { tabs } = createTabsForDropTest();
+            const panels = ['p1', 'p2', 'p3'].map((id) =>
+                createClosablePanel(id)
+            );
+            panels.forEach(({ panel }) => tabs.openPanel(panel));
 
-                fireEvent.keyDown(getTabElements(tabs)[1], { key });
+            fireEvent.keyDown(getTabElements(tabs)[1], { key });
 
-                expect(panels[1].close).toHaveBeenCalledTimes(1);
-                expect(panels[0].close).not.toHaveBeenCalled();
-                expect(panels[2].close).not.toHaveBeenCalled();
-            }
-        );
+            expect(panels[1].close).toHaveBeenCalledTimes(1);
+            expect(panels[0].close).not.toHaveBeenCalled();
+            expect(panels[2].close).not.toHaveBeenCalled();
+        });
 
         test('ignores the key when focus is not on a tab element', () => {
             const { tabs } = createTabsForDropTest();

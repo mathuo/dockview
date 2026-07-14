@@ -16,9 +16,8 @@ export interface SplitviewReadyEvent {
     api: SplitviewApi;
 }
 
-export interface ISplitviewPanelProps<
-    T extends { [index: string]: any } = any,
-> extends PanelParameters<T> {
+export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
+    extends PanelParameters<T> {
     api: SplitviewPanelApi;
     containerApi: SplitviewApi;
 }
@@ -29,12 +28,15 @@ export interface ISplitviewReactProps extends SplitviewOptions {
 }
 
 function extractCoreOptions(props: ISplitviewReactProps): SplitviewOptions {
-    const coreOptions = PROPERTY_KEYS_SPLITVIEW.reduce((obj, key) => {
-        if (key in props) {
-            obj[key] = props[key] as any;
-        }
-        return obj;
-    }, {} as Partial<SplitviewComponentOptions>);
+    const coreOptions = PROPERTY_KEYS_SPLITVIEW.reduce(
+        (obj, key) => {
+            if (key in props) {
+                obj[key] = props[key] as any;
+            }
+            return obj;
+        },
+        {} as Partial<SplitviewComponentOptions>
+    );
 
     return coreOptions as SplitviewOptions;
 }

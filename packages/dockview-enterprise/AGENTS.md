@@ -48,8 +48,8 @@ calls `registerModules(Modules)` at import (a side effect — hence
 ## Build / Test
 
 - `build` - `tsc` declarations only (`emitDeclarationOnly`; no CSS, styles live
-  in core). The runtime JS ships as the rollup bundles.
-- `build:bundle` - rollup; externalizes `dockview`. Emits the CJS/ESM package
+  in core). The runtime JS ships as the rolldown bundles.
+- `build:bundle` - rolldown; externalizes `dockview`. Emits the CJS/ESM package
   entries (`dist/package`) and UMD bundle, and stamps the build date into
   `releaseDate.ts` (replacing the `__DOCKVIEW_RELEASE_DATE__` token) for
   version-based license expiry.
