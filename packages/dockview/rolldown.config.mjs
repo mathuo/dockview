@@ -34,7 +34,20 @@ function pkg(fmt, min) {
         input: noStylesEntry,
         external: pkgExternal,
         transform: { target },
-        output: { file: join(outDir, 'package', `main.${fmt}${min ? '.min' : ''}.${ext}`), format: fmt, banner, minify: min, esModule: true },
+        output: {
+            file: join(outDir, 'package', `main.${fmt}${min ? '.min' : ''}.${ext}`),
+            format: fmt,
+            banner,
+            minify: min,
+            esModule: true,
+            // `src/index.ts` is a pure `export * from 'dockview-core'` with no
+            // local named exports. rolldown drops the CommonJS `__esModule`
+            // marker in that case, even with `esModule: true`. Loaders that key
+            // CJS->ESM interop off that flag (the docs SystemJS runner, older
+            // bundlers) then expose only `default`, so named imports such as
+            // `createDockview` resolve to undefined. Emit it explicitly for CJS.
+            intro: fmt === 'cjs' ? 'Object.defineProperty(exports, "__esModule", { value: true });' : undefined,
+        },
     };
 }
 export default defineConfig([umd(false), umd(true), pkg('cjs', false), pkg('cjs', true), pkg('esm', false), pkg('esm', true)]);
