@@ -41,7 +41,7 @@
         "LICENCE.md"
     ],
     "scripts": {
-        "build:bundle": "rollup -c",
+        "build:bundle": "rolldown -c rolldown.config.mjs",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
         "build": "npm run build:cjs",
         "clean": "rimraf dist/ .build/ .rollup.cache/",

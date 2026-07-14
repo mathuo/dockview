@@ -70,7 +70,7 @@
         "LICENCE.md"
     ],
     "scripts": {
-        "build:bundle": "rollup -c",
+        "build:bundle": "rolldown -c rolldown.config.mjs",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
         "build:css": "node scripts/copy-css.js",
         "build": "npm run build:cjs && npm run build:css",
