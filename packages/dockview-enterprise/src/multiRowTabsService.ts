@@ -290,12 +290,11 @@ class WrapController extends CompositeDisposable {
         // Clear then read: the first `offsetHeight` flushes the natural layout,
         // so the loop measures content heights rather than the previous pin.
         list.style.removeProperty(VERTICAL_TAB_HEIGHT_VAR);
-        const tabs = list.querySelectorAll<HTMLElement>('.dv-tab');
+        const tabs = Array.from(list.querySelectorAll<HTMLElement>('.dv-tab'));
         let max = 0;
-        for (let i = 0; i < tabs.length; i++) {
-            const height = tabs[i].offsetHeight;
-            if (height > max) {
-                max = height;
+        for (const tab of tabs) {
+            if (tab.offsetHeight > max) {
+                max = tab.offsetHeight;
             }
         }
         if (max > 0) {
