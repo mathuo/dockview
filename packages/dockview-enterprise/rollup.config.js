@@ -103,8 +103,10 @@ function createBundle(format, options) {
 module.exports = [
     createBundle('umd', { isMinified: false }),
     createBundle('umd', { isMinified: true }),
-    // Only the non-minified package bundles are shipped; the closed `exports`
-    // map makes a minified variant unreachable (dead output).
+    // Both plain and minified package bundles are shipped; the minified
+    // variants are published for direct consumption (e.g. CDN / unpkg URLs).
     createBundle('cjs', { isMinified: false }),
+    createBundle('cjs', { isMinified: true }),
     createBundle('esm', { isMinified: false }),
+    createBundle('esm', { isMinified: true }),
 ];

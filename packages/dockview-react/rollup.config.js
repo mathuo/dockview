@@ -131,8 +131,10 @@ module.exports = [
     createBundle('umd', { withStyles: true, isMinified: true }),
     // Package bundles — dist/package/ (no auto-injected CSS; consumers
     // import 'dockview-react/dist/styles/dockview.css' explicitly)
-    // Only the non-minified package bundles are shipped; the closed `exports`
-    // map makes a minified variant unreachable (dead output).
+    // Both plain and minified package bundles are shipped; the minified
+    // variants are published for direct consumption (e.g. CDN / unpkg URLs).
     createBundle('cjs', { withStyles: false, isMinified: false }),
+    createBundle('cjs', { withStyles: false, isMinified: true }),
     createBundle('esm', { withStyles: false, isMinified: false }),
+    createBundle('esm', { withStyles: false, isMinified: true }),
 ];
