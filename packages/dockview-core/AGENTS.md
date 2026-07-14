@@ -16,16 +16,15 @@ Framework-agnostic core layout engine with zero runtime dependencies. All other 
 
 ## Build
 
-- `build:cjs` - TypeScript compilation to CommonJS (`tsc` via `tsconfig.json`)
-- `build:esm` - TypeScript compilation to ESM (`tsc` via `tsconfig.esm.json`)
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly`, `tsconfig.json` → `dist/cjs/**/*.d.ts`). The runtime JS ships as the rollup bundles (`build:bundle`), so this pass emits only the `.d.ts`.
 - `build:css` - SCSS to CSS compilation (`gulp sass`)
-- `build` - All three above in sequence
-- `build:bundle` - Rollup UMD bundle (`rollup -c`)
+- `build` - `build:cjs` + `build:css`
+- `build:bundle` - Rollup bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundles (`rollup -c`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
 
-- `test` - Jest with ts-jest, jsdom environment
+- `test` - Jest with `@swc/jest`, jsdom environment (not type-checked at run time; types are checked in the build + ESLint)
 - Config: `jest.config.ts` (project name: `dockview-core`)
 
 ## Config Files

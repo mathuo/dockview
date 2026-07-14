@@ -55,7 +55,10 @@ function createBundle(format, options) {
         // Emit the `__esModule` marker so interop-sensitive consumers (e.g.
         // SystemJS, legacy AMD loaders) see the named exports.
         esModule: true,
-        sourcemap: isMinified && format === 'umd',
+        // No source maps: the only maps emitted were for the minified UMD
+        // bundles and they are not published (see package.json `files`), which
+        // otherwise leaves a dangling sourceMappingURL in the shipped bundle.
+        sourcemap: false,
         globals: {},
         banner: [
             `/**`,

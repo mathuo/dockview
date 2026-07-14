@@ -18,16 +18,15 @@ consumers should install (`npm install dockview`). Framework bindings live in th
 
 ## Build
 
-- `build:cjs` - TypeScript compilation to CommonJS
-- `build:esm` - TypeScript compilation to ESM
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rollup bundles
 - `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
-- `build` - All three above in sequence
+- `build` - `build:cjs` + `build:css`
 - `build:bundle` - Rollup bundle (UMD bundle is self-contained for CDN; the npm package bundle externalizes `dockview-core`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
 
-- `test` - Jest with ts-jest, jsdom environment (smoke test asserting the core re-export)
+- `test` - Jest with `@swc/jest`, jsdom environment (smoke test asserting the core re-export)
 - Uses `moduleNameMapper` to resolve `dockview-core` from source
 - Config: `jest.config.ts` (project name: `dockview`)
 

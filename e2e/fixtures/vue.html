@@ -47,11 +47,11 @@
                                                           inline `template:` strings
                                                           work with no SFC step)
                2. dockview.js     -> window.dockview      (bundles dockview-core in)
-               3. dockview-vue.umd.js -> window['dockview-vue'] (exposes DockviewVue)
+               3. dockview-vue.umd.cjs -> window['dockview-vue'] (exposes DockviewVue)
              Load order matters: the UMD throws on a missing global otherwise. -->
         <script src="/node_modules/vue/dist/vue.global.js"></script>
         <script src="/packages/dockview/dist/dockview.js"></script>
-        <script src="/packages/dockview-vue/dist/dockview-vue.umd.js"></script>
+        <script src="/packages/dockview-vue/dist/dockview-vue.umd.cjs"></script>
 
         <script>
             (function () {

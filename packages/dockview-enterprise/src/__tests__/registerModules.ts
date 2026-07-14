@@ -1,16 +1,14 @@
-import { markDockviewPackageLoaded, registerModules } from 'dockview-core';
+import { registerModules } from 'dockview-core';
 import { Modules } from '../index';
 import { LicenseManager } from '../licenseRegistry';
 import { fnv1a } from '../licenseValidator';
 
 /**
  * Register this package's modules globally so a default `DockviewComponent`
- * constructed in tests has the full feature set, and mark the public package as
- * loaded so the "don't use dockview-core directly" warning stays quiet. (The
- * index self-registers on import too; both calls are idempotent.)
+ * constructed in tests has the full feature set. (The index self-registers on
+ * import too; the call is idempotent.)
  */
 registerModules(Modules);
-markDockviewPackageLoaded();
 
 /**
  * The bundle now includes `LicenseModule`, which renders a watermark on any

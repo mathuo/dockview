@@ -179,6 +179,14 @@ jobs:
 
             - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
 
+            - name: Validate package type resolution (attw)
+              run: |
+                  for p in dockview-core dockview dockview-react dockview-vue dockview-angular dockview-enterprise; do
+                      echo "::group::attw $p"
+                      (cd "packages/$p" && npm run types:check) || exit 1
+                      echo "::endgroup::"
+                  done
+
     test:
         runs-on: ubuntu-latest
         needs: build

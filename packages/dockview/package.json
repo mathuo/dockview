@@ -37,7 +37,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview"
     },
     "license": "MIT",
     "author": "https://github.com/mathuo",
@@ -51,11 +52,18 @@
             "require": "./dist/package/main.cjs.js"
         },
         "./dist/styles/*": "./dist/styles/*",
+        "./dist/*": "./dist/*",
         "./package.json": "./package.json"
     },
-    "sideEffects": true,
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "files": [
-        "dist",
+        "dist/package",
+        "dist/cjs/**/*.d.ts",
+        "dist/styles",
+        "dist/*.js",
         "README.md",
         "LICENCE.md"
     ],
@@ -63,10 +71,10 @@
         "build:bundle": "rollup -c",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
         "build:css": "node scripts/copy-css.js",
-        "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-        "build": "npm run build:cjs && npm run build:esm && npm run build:css",
+        "build": "npm run build:cjs && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
-        "rebuild": "npm run clean && npm run build",
+        "rebuild": "npm run clean && npm run build && npm run build:bundle",
+        "types:check": "attw --pack . --ignore-rules false-cjs",
         "test": "jest --selectProjects dockview",
         "test:cov": "jest --selectProjects dockview --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
