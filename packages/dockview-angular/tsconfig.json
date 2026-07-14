@@ -18,7 +18,8 @@
         "noPropertyAccessFromIndexSignature": false,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "useDefineForClassFields": false
+        "useDefineForClassFields": false,
+        "isolatedDeclarations": true
     },
     "include": ["src"],
     "exclude": ["src/__tests__", "**/*.spec.ts", "node_modules"]

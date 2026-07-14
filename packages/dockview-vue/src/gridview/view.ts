@@ -9,7 +9,7 @@ export class VueGridviewPanelView extends GridviewPanel {
         component: string,
         private readonly vueComponent: VueComponent<IGridviewVuePanelProps>,
         private readonly parent: ComponentInternalInstance,
-        private readonly registry?: VueRendererRegistry
+        private readonly registry?: VueRendererRegistry | undefined
     ) {
         super(id, component);
     }

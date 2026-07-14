@@ -42,7 +42,7 @@ export class AngularHeaderActionsRenderer implements IHeaderActionsRenderer {
         private readonly component: Type<unknown> | TemplateRef<unknown>,
         private readonly group: DockviewGroupPanel,
         private readonly injector: Injector,
-        private readonly environmentInjector?: EnvironmentInjector
+        private readonly environmentInjector?: EnvironmentInjector | undefined
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dv-angular-part';

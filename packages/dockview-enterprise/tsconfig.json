@@ -3,7 +3,8 @@
     "compilerOptions": {
         "outDir": "dist/cjs",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
-        "rootDir": "src"
+        "rootDir": "src",
+        "isolatedDeclarations": true
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

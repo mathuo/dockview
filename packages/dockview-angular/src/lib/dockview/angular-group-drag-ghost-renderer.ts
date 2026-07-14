@@ -30,7 +30,7 @@ export class AngularGroupDragGhostRenderer implements IGroupDragGhostRenderer {
     constructor(
         private readonly component: Type<any>,
         private readonly injector: Injector,
-        private readonly environmentInjector?: EnvironmentInjector
+        private readonly environmentInjector?: EnvironmentInjector | undefined
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dv-angular-part';

@@ -17,7 +17,7 @@ export class AngularPanePart implements IPanePart {
     constructor(
         private readonly angularComponent: Type<any> | TemplateRef<any>,
         private readonly injector: Injector,
-        private readonly environmentInjector?: EnvironmentInjector
+        private readonly environmentInjector?: EnvironmentInjector | undefined
     ) {
         this.renderer = new AngularRenderer({
             component: this.angularComponent,

@@ -6,7 +6,8 @@
         "target": "es6",
         "outDir": "dist/esm",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
-        "rootDir": "src"
+        "rootDir": "src",
+        "isolatedDeclarations": true
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

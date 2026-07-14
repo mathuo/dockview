@@ -25,14 +25,15 @@ export class AngularFrameworkComponentFactory {
     constructor(
         private components: Record<string, Type<any> | TemplateRef<any>>,
         private readonly injector: Injector,
-        private readonly environmentInjector?: EnvironmentInjector,
-        private tabComponents?: Record<string, Type<any> | TemplateRef<any>>,
-        private watermarkComponent?: Type<any> | TemplateRef<any>,
-        private headerActionsComponents?: Record<
-            string,
-            Type<any> | TemplateRef<any>
-        >,
-        private defaultTabComponent?: Type<any> | TemplateRef<any>
+        private readonly environmentInjector?: EnvironmentInjector | undefined,
+        private tabComponents?:
+            | Record<string, Type<any> | TemplateRef<any>>
+            | undefined,
+        private watermarkComponent?: Type<any> | TemplateRef<any> | undefined,
+        private headerActionsComponents?:
+            | Record<string, Type<any> | TemplateRef<any>>
+            | undefined,
+        private defaultTabComponent?: Type<any> | TemplateRef<any> | undefined
     ) {}
 
     /**

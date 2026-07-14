@@ -66,7 +66,8 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() debug?: boolean;
     @Input() disableAutoResizing?: boolean;
 
-    @Output() ready = new EventEmitter<SplitviewAngularReadyEvent>();
+    @Output() ready: EventEmitter<SplitviewAngularReadyEvent> =
+        new EventEmitter<SplitviewAngularReadyEvent>();
 
     private splitviewApi?: SplitviewApi;
     private readonly lifecycleManager = new AngularLifecycleManager();

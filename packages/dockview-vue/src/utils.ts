@@ -117,12 +117,12 @@ export function mountVueComponent<T extends Record<string, any>>(
     let runningProps = props;
 
     return {
-        update: (newProps: any) => {
+        update: (newProps: any): void => {
             runningProps = { ...props, ...newProps };
             vNode = cloneVNode(vNode, runningProps);
             render(vNode, element);
         },
-        dispose: () => {
+        dispose: (): void => {
             render(null, element);
         },
     };
@@ -160,7 +160,7 @@ let nextMountEntryId = 0;
  * and error boundaries.
  */
 export class VueRendererRegistry {
-    readonly entries = shallowReactive<VueMountEntry[]>([]);
+    readonly entries: VueMountEntry[] = shallowReactive<VueMountEntry[]>([]);
 
     mount(
         component: VueComponent,
@@ -200,7 +200,7 @@ abstract class AbstractVueRenderer {
     constructor(
         protected readonly component: VueComponent,
         protected readonly parent: ComponentInternalInstance,
-        protected readonly registry?: VueRendererRegistry
+        protected readonly registry?: VueRendererRegistry | undefined
     ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
@@ -465,7 +465,7 @@ export class VuePart<T extends Record<string, any> = any> {
         private readonly vueComponent: VueComponent<T>,
         private readonly parent: ComponentInternalInstance,
         private props: T,
-        private readonly registry?: VueRendererRegistry
+        private readonly registry?: VueRendererRegistry | undefined
     ) {}
 
     init(): void {

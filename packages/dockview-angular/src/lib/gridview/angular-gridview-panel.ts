@@ -13,7 +13,7 @@ export class AngularGridviewPanel extends GridviewPanel {
         component: string,
         private readonly angularComponent: Type<any> | TemplateRef<any>,
         private readonly injector: Injector,
-        private readonly environmentInjector?: EnvironmentInjector
+        private readonly environmentInjector?: EnvironmentInjector | undefined
     ) {
         super(id, component);
     }

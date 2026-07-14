@@ -66,7 +66,8 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() debug?: boolean;
     @Input() disableAutoResizing?: boolean;
 
-    @Output() ready = new EventEmitter<GridviewAngularReadyEvent>();
+    @Output() ready: EventEmitter<GridviewAngularReadyEvent> =
+        new EventEmitter<GridviewAngularReadyEvent>();
 
     private gridviewApi?: GridviewApi;
     private readonly lifecycleManager = new AngularLifecycleManager();

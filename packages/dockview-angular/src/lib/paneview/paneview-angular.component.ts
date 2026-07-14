@@ -69,8 +69,10 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() debug?: boolean;
     @Input() disableAutoResizing?: boolean;
 
-    @Output() ready = new EventEmitter<PaneviewAngularReadyEvent>();
-    @Output() drop = new EventEmitter<PaneviewDidDropEvent>();
+    @Output() ready: EventEmitter<PaneviewAngularReadyEvent> =
+        new EventEmitter<PaneviewAngularReadyEvent>();
+    @Output() drop: EventEmitter<PaneviewDidDropEvent> =
+        new EventEmitter<PaneviewDidDropEvent>();
 
     private paneviewApi?: PaneviewApi;
     private readonly lifecycleManager = new AngularLifecycleManager();
