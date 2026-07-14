@@ -15,7 +15,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview-enterprise"
     },
     "license": "SEE LICENSE IN LICENCE.md",
     "author": "https://github.com/mathuo",

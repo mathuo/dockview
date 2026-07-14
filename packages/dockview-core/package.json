@@ -38,7 +38,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview-core"
     },
     "license": "MIT",
     "author": "https://github.com/mathuo",
