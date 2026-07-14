@@ -10,12 +10,12 @@ sidebar_custom_props:
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 The default [overflow dropdown](/docs/core/panels/tabOverflow) is a flat list of the
-tabs that no longer fit. The Advanced Overflow module upgrades that same dropdown, in
-place, into a command-palette style tab switcher: a search box that filters the
-group's tabs, most-recently-used ordering, and full keyboard navigation. The chevron
-trigger and the count badge are unchanged; only the popover body changes. When the
-module is absent the plain list renders exactly as before, so these fields are safe to
-leave set.
+tabs that no longer fit. Advanced overflow, an enterprise feature, upgrades that same
+dropdown, in place, into a command-palette style tab switcher: a search box that
+filters the group's tabs, most-recently-used ordering, and full keyboard navigation.
+The chevron trigger and the count badge are unchanged; only the popover body changes.
+Without `dockview-enterprise` the plain list renders exactly as before, so these
+fields are safe to leave set.
 
 All three capabilities live on the shared [`overflow`](/docs/core/panels/tabOverflow)
 option.
@@ -98,7 +98,7 @@ When [pinned tabs](/docs/core/panels/pinnedTabs) are enabled and the pinned bloc
 itself overflows the strip, the clipped pinned tabs appear in a dedicated **Pinned**
 section at the top of the dropdown, above the search and most-recently-used list, and
 are counted in the chevron badge. This matches the plain dropdown, which shows the same
-section when the advanced module is absent.
+section without `dockview-enterprise`.
 
 ## Thumbnails
 
@@ -106,11 +106,11 @@ section when the advanced module is absent.
 
 :::warning
 `thumbnails` is not yet implemented. Setting it has no effect today; `search` and
-`mru` are the shipping capabilities of this module.
+`mru` are the shipping capabilities of this feature.
 :::
 
 ## See also
 
-- [Tab overflow](/docs/core/panels/tabOverflow): the default dropdown this module upgrades.
+- [Tab overflow](/docs/core/panels/tabOverflow): the default dropdown this feature upgrades.
 - [Multi-row tabs](/docs/core/panels/multiRowTabs): wrap tabs onto extra rows instead of collapsing them.
 - [Pinned tabs](/docs/core/panels/pinnedTabs): the source of the dropdown's "Pinned" section.
