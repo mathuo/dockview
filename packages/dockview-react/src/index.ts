@@ -2,8 +2,8 @@ export * from 'dockview';
 
 export * from './dockview/dockview';
 export * from './dockview/defaultTab';
-export { IDockviewTabGroupChipProps } from './dockview/reactTabGroupChipPart';
-export { IDockviewGroupDragGhostProps } from './dockview/reactGroupDragGhostPart';
+export { type IDockviewTabGroupChipProps } from './dockview/reactTabGroupChipPart';
+export { type IDockviewGroupDragGhostProps } from './dockview/reactGroupDragGhostPart';
 export * from './splitview/splitview';
 export * from './gridview/gridview';
 export * from './paneview/paneview';
