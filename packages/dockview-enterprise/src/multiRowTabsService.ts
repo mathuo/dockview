@@ -5,6 +5,7 @@ import {
     OVERFLOW_WRAP_TABS_CLASS as WRAP_CLASS,
     OVERFLOW_WRAP_TABS_CAPPED_CLASS as CAPPED_CLASS,
     OVERFLOW_MAX_TAB_ROWS_VARIABLE as MAX_ROWS_VAR,
+    OVERFLOW_WRAP_TABS_VERTICAL_TAB_HEIGHT_VARIABLE as VERTICAL_TAB_HEIGHT_VAR,
     defineModule,
 } from 'dockview';
 import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview';
@@ -207,9 +208,15 @@ class WrapController extends CompositeDisposable {
 
         this.addDisposables(
             // A tab added/removed can change the line count without a size
-            // change, so re-measure on panel churn too.
-            this.group.model.onDidAddPanel(() => this.measure()),
-            this.group.model.onDidRemovePanel(() => this.measure()),
+            // change, so re-measure on panel churn too. `remeasure` also refreshes
+            // the vertical uniform-tab-height (a new/removed title can change the
+            // tallest tab) before counting columns.
+            this.group.model.onDidAddPanel(() => this.remeasure()),
+            this.group.model.onDidRemovePanel(() => this.remeasure()),
+            // A title edit changes a vertical tab's natural (rotated) length, so
+            // the tallest-tab height may move — re-measure so the uniform height
+            // still contains every tab. A no-op for horizontal wrap.
+            this.group.model.onDidPanelTitleChange(() => this.remeasure()),
             // A header-direction flip swaps the wrap axis (rows↔columns): the
             // vertical class core toggles is already applied by the time this
             // fires, so a re-apply re-measures on the correct axis.
@@ -246,9 +253,52 @@ class WrapController extends CompositeDisposable {
                 this._observer.observe(list);
                 this.attachRowNav(list);
             }
+            // Pin (or clear, when now horizontal) the uniform tab height before
+            // counting columns so the count reflects the uniform layout.
+            this.refreshVerticalTabHeight(list);
             this.measure();
         } else if (this._wrapped) {
             this.teardown();
+        }
+    }
+
+    /** Refresh the vertical uniform-tab-height, then re-count columns. Used for
+     *  panel churn / title edits (a resize keeps titles, so its RO path skips the
+     *  height refresh and just re-counts). */
+    private remeasure(): void {
+        const list = this.host.getTabsListElement(this.group);
+        if (list) {
+            this.refreshVerticalTabHeight(list);
+        }
+        this.measure();
+    }
+
+    /**
+     * Pin every wrapped tab to a single uniform height so the columns line up
+     * into a clean grid (see {@link VERTICAL_TAB_HEIGHT_VAR}). The height is the
+     * tallest tab's natural (content) height: dropping the current pin first lets
+     * each tab report its content height, so the max is correct even when a pin
+     * was already in place; pinning to that max never clips (every tab fits).
+     * Horizontal wrap clears the property (its rows already share the fixed row
+     * height), which also undoes a pin left over from an orientation flip.
+     */
+    private refreshVerticalTabHeight(list: HTMLElement): void {
+        if (!this._vertical) {
+            list.style.removeProperty(VERTICAL_TAB_HEIGHT_VAR);
+            return;
+        }
+        // Clear then read: the first `offsetHeight` flushes the natural layout,
+        // so the loop measures content heights rather than the previous pin.
+        list.style.removeProperty(VERTICAL_TAB_HEIGHT_VAR);
+        const tabs = Array.from(list.querySelectorAll<HTMLElement>('.dv-tab'));
+        let max = 0;
+        for (const tab of tabs) {
+            if (tab.offsetHeight > max) {
+                max = tab.offsetHeight;
+            }
+        }
+        if (max > 0) {
+            list.style.setProperty(VERTICAL_TAB_HEIGHT_VAR, `${max}px`);
         }
     }
 
@@ -439,6 +489,8 @@ class WrapController extends CompositeDisposable {
         if (list) {
             list.classList.remove(WRAP_CLASS, CAPPED_CLASS);
             list.style.removeProperty(MAX_ROWS_VAR);
+            // Drop the uniform vertical tab height so tabs return to natural size.
+            list.style.removeProperty(VERTICAL_TAB_HEIGHT_VAR);
             // Drop the explicit width pinned on the vertical header (if any) so
             // the header returns to its CSS-driven single-line size.
             list.closest<HTMLElement>(`.${HEADER_CLASS}`)?.style.removeProperty(
