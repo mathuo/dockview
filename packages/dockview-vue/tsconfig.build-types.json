@@ -1,8 +1,7 @@
 // tsconfig.build-types.json
 {
     "compilerOptions": {
-        "skipLibCheck": true,
-        "isolatedDeclarations": true
+        "skipLibCheck": true
     },
     "include": ["src/**/*"],
     "exclude": [

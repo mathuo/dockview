@@ -11,7 +11,7 @@ export class VuePaneviewPanelView implements IPanePart {
     private readonly _element: HTMLElement;
     private part?: VuePart<IPaneviewVuePanelProps>;
 
-    get element(): HTMLElement {
+    get element() {
         return this._element;
     }
 
@@ -19,7 +19,7 @@ export class VuePaneviewPanelView implements IPanePart {
         public readonly id: string,
         private readonly vueComponent: VueComponent<IPaneviewVuePanelProps>,
         private readonly parent: ComponentInternalInstance,
-        private readonly registry?: VueRendererRegistry | undefined
+        private readonly registry?: VueRendererRegistry
     ) {
         this._element = document.createElement('div');
         this._element.style.height = '100%';
@@ -42,19 +42,19 @@ export class VuePaneviewPanelView implements IPanePart {
         this.part.init();
     }
 
-    public toJSON(): { id: string } {
+    public toJSON() {
         return {
             id: this.id,
         };
     }
 
-    public update(params: PanelUpdateEvent): void {
+    public update(params: PanelUpdateEvent) {
         // The update method for paneview doesn't need to pass all props,
         // just the updated params
         (this.part as any)?.update({ params: params.params });
     }
 
-    public dispose(): void {
+    public dispose() {
         this.part?.dispose();
     }
 }

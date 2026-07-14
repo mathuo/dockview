@@ -6,7 +6,6 @@ import {
     markRaw,
     getCurrentInstance,
     type ComponentInternalInstance,
-    type Ref,
 } from 'vue';
 import type { DockviewIDisposable } from 'dockview';
 import { findComponent, VueRendererRegistry } from '../utils';
@@ -27,7 +26,7 @@ export interface ViewComponentConfig<
     ) => TApi;
     createView: (
         id: string,
-        name: string,
+        name: string | undefined,
         component: any,
         instance: ComponentInternalInstance,
         registry: VueRendererRegistry
@@ -58,15 +57,9 @@ export function useViewComponent<
     >,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
-): {
-    el: Ref<HTMLElement | null>;
-    instance: Ref<TApi | null>;
-    registry: VueRendererRegistry;
-} {
+) {
     const el = ref<HTMLElement | null>(null);
-    const instance: Ref<TApi | null> = ref<TApi | null>(
-        null
-    ) as Ref<TApi | null>;
+    const instance = ref<TApi | null>(null);
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**
@@ -118,7 +111,7 @@ export function useViewComponent<
                         );
                         return config.createView(
                             options.id,
-                            options.name!,
+                            options.name,
                             component! as any,
                             vueInstance,
                             registry
@@ -143,7 +136,7 @@ export function useViewComponent<
                 );
                 return config.createView(
                     options.id,
-                    options.name!,
+                    options.name,
                     component! as any,
                     vueInstance,
                     registry

@@ -9,7 +9,7 @@ export class VueSplitviewPanelView extends SplitviewPanel {
         component: string,
         private readonly vueComponent: VueComponent<ISplitviewVuePanelProps>,
         private readonly parent: ComponentInternalInstance,
-        private readonly registry?: VueRendererRegistry | undefined
+        private readonly registry?: VueRendererRegistry
     ) {
         super(id, component);
     }
