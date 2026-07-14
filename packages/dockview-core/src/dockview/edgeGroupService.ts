@@ -1,7 +1,7 @@
 import { IDisposable } from '../lifecycle';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { EdgeGroupPosition } from './dockviewShell';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 /**
  * EdgeGroupService is a pure registry: it tracks which positions are
@@ -148,11 +148,9 @@ export class EdgeGroupService implements IEdgeGroupService {
     }
 }
 
-export const EdgeGroupModule = defineModule<
-    'edgeGroupService',
-    IEdgeGroupServiceHost
->({
-    name: 'EdgeGroup',
-    serviceKey: 'edgeGroupService',
-    create: () => new EdgeGroupService(),
-});
+export const EdgeGroupModule: DockviewModule<IEdgeGroupServiceHost> =
+    defineModule<'edgeGroupService', IEdgeGroupServiceHost>({
+        name: 'EdgeGroup',
+        serviceKey: 'edgeGroupService',
+        create: () => new EdgeGroupService(),
+    });

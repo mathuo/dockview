@@ -6,6 +6,7 @@ import {
     OVERFLOW_WRAP_TABS_CAPPED_CLASS as CAPPED_CLASS,
     OVERFLOW_MAX_TAB_ROWS_VARIABLE as MAX_ROWS_VAR,
     defineModule,
+    DockviewModule,
 } from 'dockview';
 import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview';
 
@@ -502,11 +503,9 @@ export class MultiRowTabsService
     }
 }
 
-export const MultiRowTabsModule = defineModule<
-    'multiRowTabsService',
-    IMultiRowTabsHost
->({
-    name: 'MultiRowTabs',
-    serviceKey: 'multiRowTabsService',
-    create: (host) => new MultiRowTabsService(host),
-});
+export const MultiRowTabsModule: DockviewModule<IMultiRowTabsHost> =
+    defineModule<'multiRowTabsService', IMultiRowTabsHost>({
+        name: 'MultiRowTabs',
+        serviceKey: 'multiRowTabsService',
+        create: (host) => new MultiRowTabsService(host),
+    });

@@ -9,7 +9,7 @@ import {
 } from './dockviewComponent';
 import { DockviewComponentOptions, LiveRegionEvent } from './options';
 import { resolveMessages } from './accessibilityMessages';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 /**
  * The narrow surface the {@link LiveRegionService} needs from the host
@@ -312,7 +312,7 @@ export class LiveRegionService
     }
 }
 
-export const LiveRegionModule = defineModule<
+export const LiveRegionModule: DockviewModule<ILiveRegionHost> = defineModule<
     'liveRegionService',
     ILiveRegionHost
 >({

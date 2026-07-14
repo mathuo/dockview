@@ -6,7 +6,7 @@ import { Position } from 'dockview';
 import { DockviewGroupPanel } from 'dockview';
 import { IDockviewPanel } from 'dockview';
 import { resolveMessages } from 'dockview';
-import { defineModule } from 'dockview';
+import { defineModule, DockviewModule } from 'dockview';
 import { AdvancedDnDModule } from 'dockview';
 import { LiveRegionModule } from 'dockview';
 import { IKeyboardNavigationHost, IKeyboardDockingService } from 'dockview';
@@ -426,12 +426,10 @@ export class KeyboardDockingService
     }
 }
 
-export const KeyboardDockingModule = defineModule<
-    'keyboardDockingService',
-    IKeyboardNavigationHost
->({
-    name: 'KeyboardDocking',
-    serviceKey: 'keyboardDockingService',
-    create: (host) => new KeyboardDockingService(host),
-    dependsOn: [AdvancedDnDModule, LiveRegionModule],
-});
+export const KeyboardDockingModule: DockviewModule<IKeyboardNavigationHost> =
+    defineModule<'keyboardDockingService', IKeyboardNavigationHost>({
+        name: 'KeyboardDocking',
+        serviceKey: 'keyboardDockingService',
+        create: (host) => new KeyboardDockingService(host),
+        dependsOn: [AdvancedDnDModule, LiveRegionModule],
+    });

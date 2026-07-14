@@ -12,7 +12,8 @@ export interface OverflowEvent {
 
 export class OverflowObserver extends CompositeDisposable {
     private readonly _onDidChange = new Emitter<OverflowEvent>();
-    readonly onDidChange = this._onDidChange.event;
+    readonly onDidChange: DockviewEvent<OverflowEvent> =
+        this._onDidChange.event;
 
     private _value: OverflowEvent | null = null;
 
@@ -221,7 +222,7 @@ export function addStyles(
     document: Document,
     styleSheetList: StyleSheetList,
     options: AddStylesOptions = {}
-) {
+): void {
     const styleSheets = Array.from(styleSheetList);
     const { nonce } = options;
     const resolvedNonce = typeof nonce === 'function' ? nonce(document) : nonce;
@@ -343,7 +344,9 @@ function allTagsNamesInclusiveOfShadowDoms(
     return iframes;
 }
 
-export function disableIframePointEvents(rootNode: ParentNode = document) {
+export function disableIframePointEvents(rootNode: ParentNode = document): {
+    release: () => void;
+} {
     const iframes = allTagsNamesInclusiveOfShadowDoms(
         ['IFRAME', 'WEBVIEW'],
         rootNode
@@ -398,7 +401,7 @@ export class Classnames {
 
     constructor(private readonly element: HTMLElement) {}
 
-    setClassNames(classNames: string) {
+    setClassNames(classNames: string): void {
         for (const className of this._classNames) {
             toggleClass(this.element, className, false);
         }
@@ -486,7 +489,10 @@ export function onDidWindowMoveEnd(window: Window): Emitter<void> {
     return emitter;
 }
 
-export function onDidWindowResizeEnd(element: Window, cb: () => void) {
+export function onDidWindowResizeEnd(
+    element: Window,
+    cb: () => void
+): CompositeDisposable {
     let resizeTimeout: any;
 
     const disposable = new CompositeDisposable(
@@ -505,7 +511,7 @@ export function shiftAbsoluteElementIntoView(
     element: HTMLElement,
     root: HTMLElement,
     options: { buffer: number } = { buffer: 10 }
-) {
+): void {
     const buffer = options.buffer;
     const rect = element.getBoundingClientRect();
     const rootRect = root.getBoundingClientRect();

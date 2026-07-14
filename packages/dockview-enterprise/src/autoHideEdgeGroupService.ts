@@ -3,7 +3,7 @@ import { DockviewGroupPanel } from 'dockview';
 import { IDockviewPanel } from 'dockview';
 import { EdgeGroupPosition } from 'dockview';
 import { EdgeGroupPeekOptions } from 'dockview';
-import { defineModule, EdgeGroupModule } from 'dockview';
+import { defineModule, DockviewModule, EdgeGroupModule } from 'dockview';
 import {
     createCloseButton,
     createDismissableLayer,
@@ -728,12 +728,10 @@ export class AutoHideEdgeGroupService
     }
 }
 
-export const AutoHideEdgeGroupModule = defineModule<
-    'autoHideEdgeGroupService',
-    IAutoHideEdgeGroupHost
->({
-    name: 'AutoHideEdgeGroup',
-    serviceKey: 'autoHideEdgeGroupService',
-    dependsOn: [EdgeGroupModule],
-    create: (host) => new AutoHideEdgeGroupService(host),
-});
+export const AutoHideEdgeGroupModule: DockviewModule<IAutoHideEdgeGroupHost> =
+    defineModule<'autoHideEdgeGroupService', IAutoHideEdgeGroupHost>({
+        name: 'AutoHideEdgeGroup',
+        serviceKey: 'autoHideEdgeGroupService',
+        dependsOn: [EdgeGroupModule],
+        create: (host) => new AutoHideEdgeGroupService(host),
+    });

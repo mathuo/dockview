@@ -23,7 +23,8 @@ export class VoidContainer extends CompositeDisposable {
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
-    readonly onDragStart = this._onDragStart.event;
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 

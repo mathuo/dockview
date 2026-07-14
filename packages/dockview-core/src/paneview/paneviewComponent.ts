@@ -81,11 +81,11 @@ export class PaneFramework extends DraggablePaneviewPanel {
         });
     }
 
-    getBodyComponent() {
+    getBodyComponent(): IPanePart {
         return this.options.body;
     }
 
-    getHeaderComponent() {
+    getHeaderComponent(): IPanePart {
         return this.options.header;
     }
 }
@@ -150,10 +150,11 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     readonly onDidDrop: Event<PaneviewDidDropEvent> = this._onDidDrop.event;
 
     private readonly _onDidAddView = new Emitter<PaneviewPanel>();
-    readonly onDidAddView = this._onDidAddView.event;
+    readonly onDidAddView: Event<PaneviewPanel> = this._onDidAddView.event;
 
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
-    readonly onDidRemoveView = this._onDidRemoveView.event;
+    readonly onDidRemoveView: Event<PaneviewPanel> =
+        this._onDidRemoveView.event;
 
     private readonly _onUnhandledDragOver =
         new Emitter<PaneviewDndOverlayEvent>();

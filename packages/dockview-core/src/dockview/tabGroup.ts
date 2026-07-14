@@ -77,7 +77,10 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         panelId: string;
         type: 'add' | 'remove';
     }>();
-    readonly onDidPanelChange = this._onDidPanelChange.event;
+    readonly onDidPanelChange: Event<{
+        panelId: string;
+        type: 'add' | 'remove';
+    }> = this._onDidPanelChange.event;
 
     private readonly _onDidCollapseChange = new Emitter<boolean>();
     readonly onDidCollapseChange: Event<boolean> =

@@ -11,7 +11,7 @@ import {
 import { html5Backend, pointerBackend } from '../dnd/backend';
 import { getPanelData } from '../dnd/dataTransfer';
 import { DockviewComponentOptions, isAnyEdgeGroupEnabled } from './options';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -172,11 +172,9 @@ export class RootDropTargetService implements IRootDropTargetService {
     }
 }
 
-export const RootDropTargetModule = defineModule<
-    'rootDropTargetService',
-    IRootDropTargetHost
->({
-    name: 'RootDropTarget',
-    serviceKey: 'rootDropTargetService',
-    create: (host) => new RootDropTargetService(host),
-});
+export const RootDropTargetModule: DockviewModule<IRootDropTargetHost> =
+    defineModule<'rootDropTargetService', IRootDropTargetHost>({
+        name: 'RootDropTarget',
+        serviceKey: 'rootDropTargetService',
+        create: (host) => new RootDropTargetService(host),
+    });

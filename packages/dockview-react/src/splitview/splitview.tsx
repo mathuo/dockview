@@ -39,7 +39,10 @@ function extractCoreOptions(props: ISplitviewReactProps): SplitviewOptions {
     return coreOptions as SplitviewOptions;
 }
 
-export const SplitviewReact = React.forwardRef(
+export const SplitviewReact: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<ISplitviewReactProps> &
+        React.RefAttributes<HTMLDivElement>
+> = React.forwardRef(
     (props: ISplitviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
         const splitviewRef = React.useRef<SplitviewApi | undefined>(undefined);

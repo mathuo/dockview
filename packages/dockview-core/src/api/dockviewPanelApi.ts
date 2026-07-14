@@ -88,20 +88,26 @@ export class DockviewPanelApiImpl
     private _group: DockviewGroupPanel;
     private readonly _tabComponent: string | undefined;
 
-    readonly _onDidTitleChange = new Emitter<TitleEvent>();
-    readonly onDidTitleChange = this._onDidTitleChange.event;
+    readonly _onDidTitleChange: Emitter<TitleEvent> = new Emitter<TitleEvent>();
+    readonly onDidTitleChange: Event<TitleEvent> = this._onDidTitleChange.event;
 
-    readonly _onDidChangePinned = new Emitter<PinnedChangeEvent>();
-    readonly onDidChangePinned = this._onDidChangePinned.event;
+    readonly _onDidChangePinned: Emitter<PinnedChangeEvent> =
+        new Emitter<PinnedChangeEvent>();
+    readonly onDidChangePinned: Event<PinnedChangeEvent> =
+        this._onDidChangePinned.event;
 
     private readonly _onDidActiveGroupChange = new Emitter<ActiveGroupEvent>();
-    readonly onDidActiveGroupChange = this._onDidActiveGroupChange.event;
+    readonly onDidActiveGroupChange: Event<ActiveGroupEvent> =
+        this._onDidActiveGroupChange.event;
 
     private readonly _onDidGroupChange = new Emitter<GroupChangedEvent>();
-    readonly onDidGroupChange = this._onDidGroupChange.event;
+    readonly onDidGroupChange: Event<GroupChangedEvent> =
+        this._onDidGroupChange.event;
 
-    readonly _onDidRendererChange = new Emitter<RendererChangedEvent>();
-    readonly onDidRendererChange = this._onDidRendererChange.event;
+    readonly _onDidRendererChange: Emitter<RendererChangedEvent> =
+        new Emitter<RendererChangedEvent>();
+    readonly onDidRendererChange: Event<RendererChangedEvent> =
+        this._onDidRendererChange.event;
 
     private readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelLocationChangeEvent>();

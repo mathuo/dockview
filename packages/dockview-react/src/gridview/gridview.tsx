@@ -39,7 +39,10 @@ function extractCoreOptions(props: IGridviewReactProps): GridviewOptions {
     return coreOptions as GridviewOptions;
 }
 
-export const GridviewReact = React.forwardRef(
+export const GridviewReact: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<IGridviewReactProps> &
+        React.RefAttributes<HTMLDivElement>
+> = React.forwardRef(
     (props: IGridviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
         const gridviewRef = React.useRef<GridviewApi | undefined>(undefined);

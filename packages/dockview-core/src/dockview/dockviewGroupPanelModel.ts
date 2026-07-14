@@ -342,35 +342,43 @@ export class DockviewGroupPanelModel
     private readonly _onDidCreateTabGroup = new Emitter<{
         tabGroup: ITabGroup;
     }>();
-    readonly onDidCreateTabGroup = this._onDidCreateTabGroup.event;
+    readonly onDidCreateTabGroup: Event<{ tabGroup: ITabGroup }> =
+        this._onDidCreateTabGroup.event;
 
     private readonly _onDidDestroyTabGroup = new Emitter<{
         tabGroup: ITabGroup;
     }>();
-    readonly onDidDestroyTabGroup = this._onDidDestroyTabGroup.event;
+    readonly onDidDestroyTabGroup: Event<{ tabGroup: ITabGroup }> =
+        this._onDidDestroyTabGroup.event;
 
     private readonly _onDidAddPanelToTabGroup = new Emitter<{
         tabGroup: ITabGroup;
         panelId: string;
     }>();
-    readonly onDidAddPanelToTabGroup = this._onDidAddPanelToTabGroup.event;
+    readonly onDidAddPanelToTabGroup: Event<{
+        tabGroup: ITabGroup;
+        panelId: string;
+    }> = this._onDidAddPanelToTabGroup.event;
 
     private readonly _onDidRemovePanelFromTabGroup = new Emitter<{
         tabGroup: ITabGroup;
         panelId: string;
     }>();
-    readonly onDidRemovePanelFromTabGroup =
-        this._onDidRemovePanelFromTabGroup.event;
+    readonly onDidRemovePanelFromTabGroup: Event<{
+        tabGroup: ITabGroup;
+        panelId: string;
+    }> = this._onDidRemovePanelFromTabGroup.event;
 
     private readonly _onDidTabGroupChange = new Emitter<{
         tabGroup: ITabGroup;
     }>();
-    readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
+    readonly onDidTabGroupChange: Event<{ tabGroup: ITabGroup }> =
+        this._onDidTabGroupChange.event;
 
     private readonly _onDidTabGroupCollapsedChange = new Emitter<{
         tabGroup: ITabGroup;
     }>();
-    readonly onDidTabGroupCollapsedChange =
+    readonly onDidTabGroupCollapsedChange: Event<{ tabGroup: ITabGroup }> =
         this._onDidTabGroupCollapsedChange.event;
 
     private readonly _api: DockviewApi;

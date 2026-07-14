@@ -37,7 +37,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private pointerTarget: IDropTarget | undefined;
 
     private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
-    readonly onDidDrop = this._onDidDrop.event;
+    readonly onDidDrop: Event<PaneviewDidDropEvent> = this._onDidDrop.event;
 
     private readonly _onUnhandledDragOver =
         new Emitter<PaneviewDndOverlayEvent>();

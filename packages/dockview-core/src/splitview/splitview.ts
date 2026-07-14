@@ -114,11 +114,11 @@ export class Splitview {
     private _margin = 0;
 
     private readonly _onDidSashEnd = new Emitter<void>();
-    readonly onDidSashEnd = this._onDidSashEnd.event;
+    readonly onDidSashEnd: Event<void> = this._onDidSashEnd.event;
     private readonly _onDidAddView = new Emitter<IView>();
-    readonly onDidAddView = this._onDidAddView.event;
+    readonly onDidAddView: Event<IView> = this._onDidAddView.event;
     private readonly _onDidRemoveView = new Emitter<IView>();
-    readonly onDidRemoveView = this._onDidRemoveView.event;
+    readonly onDidRemoveView: Event<IView> = this._onDidRemoveView.event;
 
     get contentSize(): number {
         return this._contentSize;

@@ -92,10 +92,10 @@ export class SplitviewComponent
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     private readonly _onDidAddView = new Emitter<IView>();
-    readonly onDidAddView = this._onDidAddView.event;
+    readonly onDidAddView: Event<IView> = this._onDidAddView.event;
 
     private readonly _onDidRemoveView = new Emitter<IView>();
-    readonly onDidRemoveView = this._onDidRemoveView.event;
+    readonly onDidRemoveView: Event<IView> = this._onDidRemoveView.event;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;

@@ -1,5 +1,5 @@
 import { DockviewComponent } from '../../dockviewComponent';
-import { addDisposableListener, Emitter } from '../../../events';
+import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { quasiPreventDefault } from '../../../dom';
@@ -23,7 +23,8 @@ export class FloatingTitleBar extends CompositeDisposable {
     private _group: DockviewGroupPanel;
 
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
-    readonly onDragStart = this._onDragStart.event;
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     get element(): HTMLElement {
         return this._element;

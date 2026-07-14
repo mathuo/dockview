@@ -1,5 +1,5 @@
 import { addStyles, CspNonceProvider } from './dom';
-import { Emitter, addDisposableListener } from './events';
+import { Emitter, addDisposableListener, Event } from './events';
 import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { Box } from './types';
 
@@ -35,10 +35,10 @@ export function assertSameOriginPopoutUrl(url: string): void {
 
 export class PopoutWindow extends CompositeDisposable {
     private readonly _onWillClose = new Emitter<void>();
-    readonly onWillClose = this._onWillClose.event;
+    readonly onWillClose: Event<void> = this._onWillClose.event;
 
     private readonly _onDidClose = new Emitter<void>();
-    readonly onDidClose = this._onDidClose.event;
+    readonly onDidClose: Event<void> = this._onDidClose.event;
 
     private _window: { value: Window; disposable: IDisposable } | null = null;
 

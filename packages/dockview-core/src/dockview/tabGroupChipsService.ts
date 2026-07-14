@@ -1,6 +1,6 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 import { ITabGroupChipsHost, ITabGroupChipsService } from './moduleContracts';
 
 export class TabGroupChipsService implements ITabGroupChipsService {
@@ -38,33 +38,37 @@ export class TabGroupChipsService implements ITabGroupChipsService {
     }
 }
 
-export const TabGroupChipsModule = defineModule<
-    'tabGroupChipsService',
-    ITabGroupChipsHost
->({
-    name: 'TabGroupChips',
-    serviceKey: 'tabGroupChipsService',
-    create: (host) => new TabGroupChipsService(host),
-    init: (host, service) => {
-        // Self-attach to existing and future groups; tear down when groups
-        // are removed. Component doesn't need to know about this wiring.
-        const perGroupDisposables = new Map<DockviewGroupPanel, IDisposable>();
-        return new CompositeDisposable(
-            host.onDidAddGroup((group) => {
-                perGroupDisposables.set(group, service.attachToGroup(group));
-            }),
-            host.onDidRemoveGroup((group) => {
-                perGroupDisposables.get(group)?.dispose();
-                perGroupDisposables.delete(group);
-            }),
-            {
-                dispose: () => {
-                    for (const d of perGroupDisposables.values()) {
-                        d.dispose();
-                    }
-                    perGroupDisposables.clear();
-                },
-            }
-        );
-    },
-});
+export const TabGroupChipsModule: DockviewModule<ITabGroupChipsHost> =
+    defineModule<'tabGroupChipsService', ITabGroupChipsHost>({
+        name: 'TabGroupChips',
+        serviceKey: 'tabGroupChipsService',
+        create: (host) => new TabGroupChipsService(host),
+        init: (host, service) => {
+            // Self-attach to existing and future groups; tear down when groups
+            // are removed. Component doesn't need to know about this wiring.
+            const perGroupDisposables = new Map<
+                DockviewGroupPanel,
+                IDisposable
+            >();
+            return new CompositeDisposable(
+                host.onDidAddGroup((group) => {
+                    perGroupDisposables.set(
+                        group,
+                        service.attachToGroup(group)
+                    );
+                }),
+                host.onDidRemoveGroup((group) => {
+                    perGroupDisposables.get(group)?.dispose();
+                    perGroupDisposables.delete(group);
+                }),
+                {
+                    dispose: () => {
+                        for (const d of perGroupDisposables.values()) {
+                            d.dispose();
+                        }
+                        perGroupDisposables.clear();
+                    },
+                }
+            );
+        },
+    });

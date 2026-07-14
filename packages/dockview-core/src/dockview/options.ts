@@ -745,7 +745,7 @@ export class DockviewUnhandledDragOverEvent
         readonly target: DockviewGroupDropLocation,
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
-        readonly group?: DockviewGroupPanel
+        readonly group?: DockviewGroupPanel | undefined
     ) {
         super();
     }

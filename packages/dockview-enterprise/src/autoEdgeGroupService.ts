@@ -10,7 +10,7 @@ import {
     PositionResolverArgs,
     PositionResolverResult,
 } from 'dockview';
-import { defineModule, EdgeGroupModule } from 'dockview';
+import { defineModule, DockviewModule, EdgeGroupModule } from 'dockview';
 import { IAutoEdgeGroupHost, IAutoEdgeGroupService } from 'dockview';
 
 /**
@@ -282,12 +282,10 @@ export class AutoEdgeGroupService
     }
 }
 
-export const AutoEdgeGroupModule = defineModule<
-    'autoEdgeGroupService',
-    IAutoEdgeGroupHost
->({
-    name: 'AutoEdgeGroup',
-    serviceKey: 'autoEdgeGroupService',
-    dependsOn: [EdgeGroupModule],
-    create: (host) => new AutoEdgeGroupService(host),
-});
+export const AutoEdgeGroupModule: DockviewModule<IAutoEdgeGroupHost> =
+    defineModule<'autoEdgeGroupService', IAutoEdgeGroupHost>({
+        name: 'AutoEdgeGroup',
+        serviceKey: 'autoEdgeGroupService',
+        dependsOn: [EdgeGroupModule],
+        create: (host) => new AutoEdgeGroupService(host),
+    });

@@ -18,15 +18,16 @@ export class PaneviewPanelApiImpl
     extends SplitviewPanelApiImpl
     implements PaneviewPanelApi
 {
-    readonly _onDidExpansionChange = new Emitter<ExpansionEvent>({
-        replay: true,
-    });
+    readonly _onDidExpansionChange: Emitter<ExpansionEvent> =
+        new Emitter<ExpansionEvent>({
+            replay: true,
+        });
     readonly onDidExpansionChange: Event<ExpansionEvent> =
         this._onDidExpansionChange.event;
 
-    readonly _onMouseEnter = new Emitter<MouseEvent>({});
+    readonly _onMouseEnter: Emitter<MouseEvent> = new Emitter<MouseEvent>({});
     readonly onMouseEnter: Event<MouseEvent> = this._onMouseEnter.event;
-    readonly _onMouseLeave = new Emitter<MouseEvent>({});
+    readonly _onMouseLeave: Emitter<MouseEvent> = new Emitter<MouseEvent>({});
     readonly onMouseLeave: Event<MouseEvent> = this._onMouseLeave.event;
 
     private _pane: PaneviewPanel | undefined;

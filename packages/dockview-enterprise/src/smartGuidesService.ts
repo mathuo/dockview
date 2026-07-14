@@ -14,7 +14,7 @@ import {
     SmartGuidesSnapTogetherEvent,
     SnapModifier,
 } from 'dockview';
-import { defineModule, FloatingGroupModule } from 'dockview';
+import { defineModule, DockviewModule, FloatingGroupModule } from 'dockview';
 import { ISmartGuidesHost, ISmartGuidesService } from 'dockview';
 
 /** Fraction of the perpendicular extents that must overlap for an edge to read
@@ -851,7 +851,7 @@ function half(r: Rect, side: 'left' | 'right' | 'top' | 'bottom'): Rect {
     }
 }
 
-export const SmartGuidesModule = defineModule<
+export const SmartGuidesModule: DockviewModule<ISmartGuidesHost> = defineModule<
     'smartGuidesService',
     ISmartGuidesHost
 >({

@@ -582,7 +582,7 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
         this.component.clear();
     }
 
-    updateOptions(options: Partial<GridviewComponentOptions>) {
+    updateOptions(options: Partial<GridviewComponentOptions>): void {
         this.component.updateOptions(options);
     }
 
@@ -1267,7 +1267,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.peekEdgeGroup(position, peek);
     }
 
-    updateOptions(options: Partial<DockviewComponentOptions>) {
+    updateOptions(options: Partial<DockviewComponentOptions>): void {
         this.component.updateOptions(options);
     }
 

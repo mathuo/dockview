@@ -37,7 +37,8 @@ export class GridviewPanelApiImpl
     readonly onDidConstraintsChangeInternal: Event<GridConstraintChangeEvent2> =
         this._onDidConstraintsChangeInternal.event;
 
-    readonly _onDidConstraintsChange = new Emitter<GridConstraintChangeEvent>();
+    readonly _onDidConstraintsChange: Emitter<GridConstraintChangeEvent> =
+        new Emitter<GridConstraintChangeEvent>();
     readonly onDidConstraintsChange: Event<GridConstraintChangeEvent> =
         this._onDidConstraintsChange.event;
 

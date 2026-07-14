@@ -13,7 +13,7 @@
 
 import { DockviewEmitter, DockviewEvent } from 'dockview';
 
-class LicenseRegistryImpl {
+export class LicenseRegistryImpl {
     private _key: string | undefined;
     private readonly _warned = new Set<string>();
     private readonly _onDidChangeKey = new DockviewEmitter<void>();
@@ -62,7 +62,7 @@ class LicenseRegistryImpl {
 }
 
 /** The single per-bundle registry instance. */
-export const LicenseRegistry = new LicenseRegistryImpl();
+export const LicenseRegistry: LicenseRegistryImpl = new LicenseRegistryImpl();
 
 /**
  * Static entry point — the ONLY way to set a key (static-only, no per-instance

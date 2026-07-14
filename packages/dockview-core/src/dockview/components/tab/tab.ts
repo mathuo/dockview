@@ -54,10 +54,11 @@ export class Tab extends CompositeDisposable {
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
-    readonly onDragStart = this._onDragStart.event;
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     private readonly _onDragEnd = new Emitter<DragEvent | PointerEvent>();
-    readonly onDragEnd = this._onDragEnd.event;
+    readonly onDragEnd: Event<DragEvent | PointerEvent> = this._onDragEnd.event;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 

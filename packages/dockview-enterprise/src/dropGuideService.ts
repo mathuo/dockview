@@ -10,7 +10,7 @@ import {
     PositionResolverArgs,
     PositionResolverResult,
 } from 'dockview';
-import { defineModule } from 'dockview';
+import { defineModule, DockviewModule } from 'dockview';
 import { IDropGuideHost, IDropGuideService } from 'dockview';
 import { AdvancedDnDModule } from 'dockview';
 
@@ -510,11 +510,12 @@ export class DropGuideService
     }
 }
 
-export const DropGuideModule = defineModule<'dropGuideService', IDropGuideHost>(
-    {
-        name: 'DropGuide',
-        serviceKey: 'dropGuideService',
-        dependsOn: [AdvancedDnDModule],
-        create: (host) => new DropGuideService(host),
-    }
-);
+export const DropGuideModule: DockviewModule<IDropGuideHost> = defineModule<
+    'dropGuideService',
+    IDropGuideHost
+>({
+    name: 'DropGuide',
+    serviceKey: 'dropGuideService',
+    dependsOn: [AdvancedDnDModule],
+    create: (host) => new DropGuideService(host),
+});

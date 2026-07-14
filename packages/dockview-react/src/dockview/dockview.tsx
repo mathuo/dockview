@@ -106,7 +106,10 @@ function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
     return coreOptions as DockviewOptions;
 }
 
-export const DockviewReact = React.forwardRef(
+export const DockviewReact: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<IDockviewReactProps> &
+        React.RefAttributes<HTMLDivElement>
+> = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
         const dockviewRef = React.useRef<DockviewApi | undefined>(undefined);

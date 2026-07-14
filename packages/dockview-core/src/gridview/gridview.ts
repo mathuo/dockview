@@ -214,7 +214,7 @@ export interface IGridView {
     setVisible?(visible: boolean): void;
 }
 
-export const orthogonal = (orientation: Orientation) =>
+export const orthogonal = (orientation: Orientation): Orientation =>
     orientation === Orientation.HORIZONTAL
         ? Orientation.VERTICAL
         : Orientation.HORIZONTAL;
@@ -350,11 +350,13 @@ export class Gridview implements IDisposable {
         this._onDidChange.event;
 
     private readonly _onDidViewVisibilityChange = new Emitter<void>();
-    readonly onDidViewVisibilityChange = this._onDidViewVisibilityChange.event;
+    readonly onDidViewVisibilityChange: Event<void> =
+        this._onDidViewVisibilityChange.event;
 
     private readonly _onDidMaximizedNodeChange =
         new Emitter<MaximizedViewChanged>();
-    readonly onDidMaximizedNodeChange = this._onDidMaximizedNodeChange.event;
+    readonly onDidMaximizedNodeChange: Event<MaximizedViewChanged> =
+        this._onDidMaximizedNodeChange.event;
 
     public get length(): number {
         return this._root ? this._root.children.length : 0;

@@ -108,14 +108,14 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         );
     }
 
-    setViewVisible(index: number, visible: boolean) {
+    setViewVisible(index: number, visible: boolean): void {
         this.splitview.setViewVisible(index, visible);
     }
 
     public addPane(
         pane: PaneviewPanel,
         size?: number | Sizing,
-        index = this.splitview.length,
+        index: number = this.splitview.length,
         skipLayout = false
     ): void {
         const disposable = pane.onDidChangeExpansionState(() => {

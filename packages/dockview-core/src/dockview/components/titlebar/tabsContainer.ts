@@ -403,7 +403,7 @@ export class TabsContainer
         return this.tabs.getPanelForTab(element);
     }
 
-    setActive(_isGroupActive: boolean) {
+    setActive(_isGroupActive: boolean): void {
         // noop
     }
 

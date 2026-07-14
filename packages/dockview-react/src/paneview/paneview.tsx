@@ -46,7 +46,10 @@ function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {
     return coreOptions as PaneviewOptions;
 }
 
-export const PaneviewReact = React.forwardRef(
+export const PaneviewReact: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<IPaneviewReactProps> &
+        React.RefAttributes<HTMLDivElement>
+> = React.forwardRef(
     (props: IPaneviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
         const paneviewRef = React.useRef<PaneviewApi | undefined>(undefined);

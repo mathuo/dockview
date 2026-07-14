@@ -37,7 +37,7 @@ export class TabGroupChip
         return this._element;
     }
 
-    constructor(private readonly _palette?: TabGroupColorPalette) {
+    constructor(private readonly _palette?: TabGroupColorPalette | undefined) {
         super();
 
         this._element = document.createElement('div');

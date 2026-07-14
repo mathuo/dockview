@@ -12,7 +12,11 @@
  * and all contracts live in this package.
  */
 
-import { defineModule, DockviewIDisposable as IDisposable } from 'dockview';
+import {
+    defineModule,
+    DockviewModule,
+    DockviewIDisposable as IDisposable,
+} from 'dockview';
 import {
     LicenseState,
     isValidLicense,
@@ -200,7 +204,10 @@ export class LicenseService implements ILicenseService {
     }
 }
 
-export const LicenseModule = defineModule<'licenseService', ILicenseHost>({
+export const LicenseModule: DockviewModule<ILicenseHost> = defineModule<
+    'licenseService',
+    ILicenseHost
+>({
     name: 'License',
     serviceKey: 'licenseService',
     // No dependsOn — license must not require any feature module.

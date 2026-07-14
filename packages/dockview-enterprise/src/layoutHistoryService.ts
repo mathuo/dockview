@@ -9,7 +9,7 @@ import {
     DockviewLayoutMutationKind,
     SerializedDockview,
 } from 'dockview';
-import { defineModule } from 'dockview';
+import { defineModule, DockviewModule } from 'dockview';
 import {
     ILayoutHistoryHost,
     ILayoutHistoryService,
@@ -382,11 +382,9 @@ export class LayoutHistoryService
     }
 }
 
-export const LayoutHistoryModule = defineModule<
-    'layoutHistoryService',
-    ILayoutHistoryHost
->({
-    name: 'LayoutHistory',
-    serviceKey: 'layoutHistoryService',
-    create: (host) => new LayoutHistoryService(host),
-});
+export const LayoutHistoryModule: DockviewModule<ILayoutHistoryHost> =
+    defineModule<'layoutHistoryService', ILayoutHistoryHost>({
+        name: 'LayoutHistory',
+        serviceKey: 'layoutHistoryService',
+        create: (host) => new LayoutHistoryService(host),
+    });

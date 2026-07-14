@@ -58,7 +58,10 @@ export interface ITabGroupIndicator {
  * Subclasses implement `applyShape` to control the visual output.
  */
 abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
-    protected readonly _underlines = new Map<string, HTMLElement>();
+    protected readonly _underlines: Map<string, HTMLElement> = new Map<
+        string,
+        HTMLElement
+    >();
     /**
      * Per-group pool of continuation-marker pips (one per wrapped row the
      * group spans beyond its first). Absolutely positioned so they sit

@@ -61,7 +61,8 @@ export abstract class PaneviewPanel
 {
     private readonly _onDidChangeExpansionState: Emitter<boolean> =
         new Emitter<boolean>({ replay: true });
-    onDidChangeExpansionState = this._onDidChangeExpansionState.event;
+    onDidChangeExpansionState: Event<boolean> =
+        this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<{
         size?: number;
         orthogonalSize?: number;

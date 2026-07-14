@@ -9,7 +9,7 @@ import { GroupPanelViewState } from './dockviewGroupPanelModel';
 import { Gridview, ISerializedLeafNode } from '../gridview/gridview';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 export interface PopoutGroupEntry {
     window: PopoutWindow;
@@ -87,7 +87,7 @@ export class PopoutWindowService implements IPopoutWindowService {
     private _restorationPromise: Promise<void> = Promise.resolve();
 
     private readonly _onDidRemove = new Emitter<PopoutGroupEntry>();
-    readonly onDidRemove = this._onDidRemove.event;
+    readonly onDidRemove: Event<PopoutGroupEntry> = this._onDidRemove.event;
 
     constructor(host: IPopoutWindowHost) {
         this._host = host;
@@ -276,11 +276,9 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 }
 
-export const PopoutWindowModule = defineModule<
-    'popoutWindowService',
-    IPopoutWindowHost
->({
-    name: 'PopoutWindow',
-    serviceKey: 'popoutWindowService',
-    create: (host) => new PopoutWindowService(host),
-});
+export const PopoutWindowModule: DockviewModule<IPopoutWindowHost> =
+    defineModule<'popoutWindowService', IPopoutWindowHost>({
+        name: 'PopoutWindow',
+        serviceKey: 'popoutWindowService',
+        create: (host) => new PopoutWindowService(host),
+    });

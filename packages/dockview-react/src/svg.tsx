@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const CloseButton = () => (
+export const CloseButton = (): React.ReactElement => (
     <svg
         height="11"
         width="11"
@@ -13,7 +13,7 @@ export const CloseButton = () => (
     </svg>
 );
 
-export const PinButton = () => (
+export const PinButton = (): React.ReactElement => (
     <svg
         height="11"
         width="11"
@@ -26,7 +26,7 @@ export const PinButton = () => (
     </svg>
 );
 
-export const ExpandMore = () => {
+export const ExpandMore = (): React.ReactElement => {
     return (
         <svg
             width="11"

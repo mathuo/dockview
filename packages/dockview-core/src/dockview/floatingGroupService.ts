@@ -9,7 +9,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewOptions } from './options';
 import { SerializedFloatingGroup } from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 /**
  * Narrow callback surface the FloatingGroupService needs from its host
@@ -221,11 +221,9 @@ export class FloatingGroupService implements IFloatingGroupService {
     }
 }
 
-export const FloatingGroupModule = defineModule<
-    'floatingGroupService',
-    IFloatingGroupHost
->({
-    name: 'FloatingGroup',
-    serviceKey: 'floatingGroupService',
-    create: (host) => new FloatingGroupService(host),
-});
+export const FloatingGroupModule: DockviewModule<IFloatingGroupHost> =
+    defineModule<'floatingGroupService', IFloatingGroupHost>({
+        name: 'FloatingGroup',
+        serviceKey: 'floatingGroupService',
+        create: (host) => new FloatingGroupService(host),
+    });

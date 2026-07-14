@@ -9,6 +9,7 @@ import {
 } from '../gridview/gridview';
 import {
     directionToPosition,
+    DropTargetTargetModel,
     DroptargetOverlayModel,
     Position,
     PositionResolver,
@@ -110,7 +111,10 @@ import {
     IPinnedTabsService,
     IAdvancedOverflowService,
 } from './moduleContracts';
-import { IHeaderActionsHost } from './headerActionsService';
+import {
+    IHeaderActionsHost,
+    IHeaderActionsService,
+} from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -682,7 +686,7 @@ export class DockviewComponent
         this._onDidPanelPinnedChange.event;
 
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
-    readonly onDidMovePanel = this._onDidMovePanel.event;
+    readonly onDidMovePanel: Event<MovePanelEvent> = this._onDidMovePanel.event;
 
     private readonly _onDidCreateTabGroup =
         new Emitter<DockviewTabGroupChangeEvent>();
@@ -744,7 +748,8 @@ export class DockviewComponent
 
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChangeEvent>();
-    readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChangeEvent> =
+        this._onDidMaximizedGroupChange.event;
 
     private readonly _shellManager: ShellManager | undefined;
     private readonly _floatingOverlayHost: HTMLDivElement | undefined;
@@ -759,7 +764,8 @@ export class DockviewComponent
     readonly onDidEdgeGroupAutoHideChange: Event<DockviewGroupPanel> =
         this._onDidEdgeGroupAutoHideChange.event;
 
-    protected readonly _onDidAddGroup = new Emitter<DockviewGroupPanel>();
+    protected readonly _onDidAddGroup: Emitter<DockviewGroupPanel> =
+        new Emitter<DockviewGroupPanel>();
     readonly onDidAddGroup: Event<DockviewGroupPanel> =
         this._onDidAddGroup.event;
 
@@ -1175,7 +1181,7 @@ export class DockviewComponent
         }
     }
 
-    get headerActionsService() {
+    get headerActionsService(): IHeaderActionsService | undefined {
         return this._moduleRegistry.services.headerActionsService;
     }
 
@@ -1220,7 +1226,7 @@ export class DockviewComponent
         return this.gridview.length === 0;
     }
 
-    rootDropTargetOverrideTarget() {
+    rootDropTargetOverrideTarget(): DropTargetTargetModel | undefined {
         return this.rootDropTargetContainer?.model;
     }
 

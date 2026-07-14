@@ -83,7 +83,7 @@ export class EdgeGroupView implements IView {
         this._onDidChange.event;
 
     readonly snap = false;
-    readonly priority = LayoutPriority.Low;
+    readonly priority: LayoutPriority = LayoutPriority.Low;
 
     private _isCollapsed = false;
     private _lastExpandedSize: number;

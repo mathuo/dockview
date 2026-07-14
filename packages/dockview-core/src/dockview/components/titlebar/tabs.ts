@@ -145,7 +145,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         pinnedTabs: string[];
         reset: boolean;
     }>();
-    readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
+    readonly onOverflowTabsChange: Event<{
+        tabs: string[];
+        tabGroups: string[];
+        pinnedTabs: string[];
+        reset: boolean;
+    }> = this._onOverflowTabsChange.event;
 
     /**
      * Register a predicate excluding panels from the overflow dropdown (pinned

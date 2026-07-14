@@ -200,7 +200,7 @@ export class DockviewGroupPanel
         this.model.setActive(isActive);
     }
 
-    layout(width: number, height: number) {
+    layout(width: number, height: number): void {
         super.layout(width, height);
         this.model.layout(width, height);
     }

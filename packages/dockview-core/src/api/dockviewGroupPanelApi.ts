@@ -128,26 +128,27 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
     private _pendingSize: SizeEvent | undefined;
 
-    readonly _onDidLocationChange =
+    readonly _onDidLocationChange: Emitter<DockviewGroupPanelLocationChangeEvent> =
         new Emitter<DockviewGroupPanelLocationChangeEvent>();
     readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent> =
         this._onDidLocationChange.event;
 
-    readonly _onDidActivePanelChange =
+    readonly _onDidActivePanelChange: Emitter<DockviewGroupActivePanelChangeEvent> =
         new Emitter<DockviewGroupActivePanelChangeEvent>();
-    readonly onDidActivePanelChange = this._onDidActivePanelChange.event;
+    readonly onDidActivePanelChange: Event<DockviewGroupActivePanelChangeEvent> =
+        this._onDidActivePanelChange.event;
 
-    readonly _onDidCollapsedChange =
+    readonly _onDidCollapsedChange: Emitter<DockviewGroupPanelCollapsedChangeEvent> =
         new Emitter<DockviewGroupPanelCollapsedChangeEvent>();
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent> =
         this._onDidCollapsedChange.event;
 
-    readonly _onDidPeekChange =
+    readonly _onDidPeekChange: Emitter<DockviewGroupPanelPeekChangeEvent> =
         new Emitter<DockviewGroupPanelPeekChangeEvent>();
     readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent> =
         this._onDidPeekChange.event;
 
-    readonly _onDidHeaderDirectionChange =
+    readonly _onDidHeaderDirectionChange: Emitter<DockviewGroupPanelHeaderDirectionChangeEvent> =
         new Emitter<DockviewGroupPanelHeaderDirectionChangeEvent>();
     readonly onDidHeaderDirectionChange: Event<DockviewGroupPanelHeaderDirectionChangeEvent> =
         this._onDidHeaderDirectionChange.event;

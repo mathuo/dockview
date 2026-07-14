@@ -84,7 +84,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
     implements IBaseGrid<T>
 {
     private readonly _id = nextLayoutId.next();
-    protected readonly _groups = new Map<string, IValueDisposable<T>>();
+    protected readonly _groups: Map<string, IValueDisposable<T>> = new Map<
+        string,
+        IValueDisposable<T>
+    >();
     protected readonly gridview: Gridview;
 
     protected _activeGroup: T | undefined;
@@ -103,12 +106,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidActiveChange: Event<T | undefined> =
         this._onDidActiveChange.event;
 
-    protected readonly _bufferOnDidLayoutChange = new AsapEvent();
+    protected readonly _bufferOnDidLayoutChange: AsapEvent = new AsapEvent();
     readonly onDidLayoutChange: Event<void> =
         this._bufferOnDidLayoutChange.onEvent;
 
     private readonly _onDidViewVisibilityChangeMicroTaskQueue = new AsapEvent();
-    readonly onDidViewVisibilityChangeMicroTaskQueue =
+    readonly onDidViewVisibilityChangeMicroTaskQueue: Event<void> =
         this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
 
     private readonly _classNames: Classnames;
@@ -230,7 +233,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this.gridview.isViewVisible(getGridLocation(panel.element));
     }
 
-    updateOptions(options: Partial<BaseGridOptions>) {
+    updateOptions(options: Partial<BaseGridOptions>): void {
         if (typeof options.proportionalLayout === 'boolean') {
             // this.gridview.proportionalLayout = options.proportionalLayout; // not supported
         }

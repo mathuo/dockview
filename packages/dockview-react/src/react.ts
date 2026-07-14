@@ -70,7 +70,7 @@ const uniquePortalKeyGenerator = (() => {
     return { next: () => `dockview_react_portal_key_${(value++).toString()}` };
 })();
 
-export const ReactPartContext = React.createContext<{}>({});
+export const ReactPartContext: React.Context<{}> = React.createContext<{}>({});
 
 export class ReactPart<
     P extends object,
@@ -89,12 +89,12 @@ export class ReactPart<
         private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
         private readonly parameters: P,
-        private readonly context?: C
+        private readonly context?: C | undefined
     ) {
         this.createPortal();
     }
 
-    public update(props: { [index: string]: any }) {
+    public update(props: { [index: string]: any }): void {
         if (this.disposed) {
             throw new Error('invalid operation: resource is already disposed');
         }
@@ -160,7 +160,7 @@ export class ReactPart<
         };
     }
 
-    public dispose() {
+    public dispose(): void {
         this.ref?.disposable.dispose();
         this.disposed = true;
     }

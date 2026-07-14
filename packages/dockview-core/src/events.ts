@@ -59,7 +59,10 @@ export class AcceptableEvent implements IAcceptableEvent {
 }
 
 class LeakageMonitor {
-    readonly events = new Map<Event<any>, Stacktrace>();
+    readonly events: Map<Event<any>, Stacktrace> = new Map<
+        Event<any>,
+        Stacktrace
+    >();
 
     get size(): number {
         return this.events.size;
@@ -108,7 +111,7 @@ export class Emitter<T> implements IDisposable {
     private readonly _pauseTokens = new Set<object>();
 
     static ENABLE_TRACKING = false;
-    static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
+    static readonly MEMORY_LEAK_WATCHER: LeakageMonitor = new LeakageMonitor();
 
     static setLeakageMonitorEnabled(isEnabled: boolean): void {
         if (isEnabled !== Emitter.ENABLE_TRACKING) {
@@ -121,7 +124,7 @@ export class Emitter<T> implements IDisposable {
         return this._last;
     }
 
-    constructor(private readonly options?: EmitterOptions) {}
+    constructor(private readonly options?: EmitterOptions | undefined) {}
 
     get event(): Event<T> {
         if (!this._event) {

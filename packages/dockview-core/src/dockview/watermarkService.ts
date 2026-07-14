@@ -4,7 +4,7 @@ import { Event } from '../events';
 import { IWatermarkRenderer } from './types';
 import { DockviewApi } from '../api/component.api';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 export interface IWatermarkHost {
     readonly api: DockviewApi;
@@ -75,25 +75,26 @@ export class WatermarkService implements IWatermarkService {
     }
 }
 
-export const WatermarkModule = defineModule<'watermarkService', IWatermarkHost>(
-    {
-        name: 'Watermark',
-        serviceKey: 'watermarkService',
-        create: (host) => new WatermarkService(host),
-        init: (host, service) => {
-            // Initial evaluation reflects the watermark state at construction time.
-            service.update();
-            return new CompositeDisposable(
-                Event.any(
-                    host.onDidAdd,
-                    host.onDidRemove
-                )(() => {
-                    service.update();
-                }),
-                host.onDidViewVisibilityChangeMicroTaskQueue(() => {
-                    service.update();
-                })
-            );
-        },
-    }
-);
+export const WatermarkModule: DockviewModule<IWatermarkHost> = defineModule<
+    'watermarkService',
+    IWatermarkHost
+>({
+    name: 'Watermark',
+    serviceKey: 'watermarkService',
+    create: (host) => new WatermarkService(host),
+    init: (host, service) => {
+        // Initial evaluation reflects the watermark state at construction time.
+        service.update();
+        return new CompositeDisposable(
+            Event.any(
+                host.onDidAdd,
+                host.onDidRemove
+            )(() => {
+                service.update();
+            }),
+            host.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                service.update();
+            })
+        );
+    },
+});

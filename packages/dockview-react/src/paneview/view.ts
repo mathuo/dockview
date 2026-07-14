@@ -11,7 +11,7 @@ export class PanePanelSection implements IPanePart {
     private readonly _element: HTMLElement;
     private part?: ReactPart<IPaneviewPanelProps>;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -39,17 +39,17 @@ export class PanePanelSection implements IPanePart {
         );
     }
 
-    public toJSON() {
+    public toJSON(): { id: string } {
         return {
             id: this.id,
         };
     }
 
-    public update(params: PanelUpdateEvent) {
+    public update(params: PanelUpdateEvent): void {
         this.part?.update(params.params);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.part?.dispose();
     }
 }

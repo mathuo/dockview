@@ -10,7 +10,9 @@ export default defineConfig({
     platform: 'neutral',
     outDir: 'dist/types',
     unbundle: true,
-    plugins: [vueSfcPlugin({ srcDir: 'src', emitLegacyDeclarationAlias: true })],
+    plugins: [
+        vueSfcPlugin({ srcDir: 'src', emitLegacyDeclarationAlias: true }),
+    ],
     dts: { emitDtsOnly: true },
     external: ['vue', 'dockview', 'dockview-core', 'dockview-enterprise'],
     tsconfig: 'tsconfig.build-types.json',

@@ -7,7 +7,7 @@ import { Event } from '../events';
 import { DockviewComponentOptions, IHeaderActionsRenderer } from './options';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewApi } from '../api/component.api';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 
 export interface IHeaderActionsHost {
     readonly api: DockviewApi;
@@ -132,18 +132,16 @@ export class HeaderActionsService implements IHeaderActionsService {
     }
 }
 
-export const HeaderActionsModule = defineModule<
-    'headerActionsService',
-    IHeaderActionsHost
->({
-    name: 'HeaderActions',
-    serviceKey: 'headerActionsService',
-    create: (host) => new HeaderActionsService(host),
-    init: (host, service) => {
-        return new CompositeDisposable(
-            host.onDidRemoveGroup((group) => {
-                service.disposeGroup(group);
-            })
-        );
-    },
-});
+export const HeaderActionsModule: DockviewModule<IHeaderActionsHost> =
+    defineModule<'headerActionsService', IHeaderActionsHost>({
+        name: 'HeaderActions',
+        serviceKey: 'headerActionsService',
+        create: (host) => new HeaderActionsService(host),
+        init: (host, service) => {
+            return new CompositeDisposable(
+                host.onDidRemoveGroup((group) => {
+                    service.disposeGroup(group);
+                })
+            );
+        },
+    });

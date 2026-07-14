@@ -8,7 +8,7 @@ import {
 } from 'dockview';
 import { ITabGroup } from 'dockview';
 import { TabGroupColorPalette } from 'dockview';
-import { defineModule } from 'dockview';
+import { defineModule, DockviewModule } from 'dockview';
 import { IContextMenuHost, IContextMenuService } from 'dockview';
 
 function popoverZIndexFor(target: EventTarget | null): string | undefined {
@@ -433,7 +433,7 @@ export class ContextMenuController implements IContextMenuService {
     }
 }
 
-export const ContextMenuModule = defineModule<
+export const ContextMenuModule: DockviewModule<IContextMenuHost> = defineModule<
     'contextMenuService',
     IContextMenuHost
 >({

@@ -1,7 +1,7 @@
 import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
 import { DockviewGroupPanel } from 'dockview';
 import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview';
-import { defineModule } from 'dockview';
+import { defineModule, DockviewModule } from 'dockview';
 import { IKeyboardNavigationHost, IKeyboardNavigationService } from 'dockview';
 import {
     bindDocumentListeners,
@@ -359,11 +359,9 @@ export class KeyboardNavigationService
     }
 }
 
-export const KeyboardNavigationModule = defineModule<
-    'keyboardNavigationService',
-    IKeyboardNavigationHost
->({
-    name: 'KeyboardNavigation',
-    serviceKey: 'keyboardNavigationService',
-    create: (host) => new KeyboardNavigationService(host),
-});
+export const KeyboardNavigationModule: DockviewModule<IKeyboardNavigationHost> =
+    defineModule<'keyboardNavigationService', IKeyboardNavigationHost>({
+        name: 'KeyboardNavigation',
+        serviceKey: 'keyboardNavigationService',
+        create: (host) => new KeyboardNavigationService(host),
+    });

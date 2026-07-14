@@ -10,7 +10,7 @@ import {
     pointerBackend,
 } from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Emitter } from '../../../events';
+import { Emitter, Event } from '../../../events';
 import {
     CompositeDisposable,
     Disposable,
@@ -68,7 +68,8 @@ export class GroupDragSource extends CompositeDisposable {
         LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
-    readonly onDragStart = this._onDragStart.event;
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     private readonly isFloatingMoveHandle: () => boolean;
 

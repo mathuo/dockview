@@ -27,20 +27,22 @@ export class SplitviewPanelApiImpl
     extends PanelApiImpl
     implements SplitviewPanelApi, IDisposable
 {
-    readonly _onDidConstraintsChangeInternal =
+    readonly _onDidConstraintsChangeInternal: Emitter<PanelConstraintChangeEvent2> =
         new Emitter<PanelConstraintChangeEvent2>();
     readonly onDidConstraintsChangeInternal: Event<PanelConstraintChangeEvent2> =
         this._onDidConstraintsChangeInternal.event;
     //
 
-    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
-        replay: true,
-    });
+    readonly _onDidConstraintsChange: Emitter<PanelConstraintChangeEvent> =
+        new Emitter<PanelConstraintChangeEvent>({
+            replay: true,
+        });
     readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> =
         this._onDidConstraintsChange.event;
     //
 
-    readonly _onDidSizeChange = new Emitter<PanelSizeEvent>();
+    readonly _onDidSizeChange: Emitter<PanelSizeEvent> =
+        new Emitter<PanelSizeEvent>();
     readonly onDidSizeChange: Event<PanelSizeEvent> =
         this._onDidSizeChange.event;
     //
@@ -55,11 +57,11 @@ export class SplitviewPanelApiImpl
         );
     }
 
-    setConstraints(value: PanelConstraintChangeEvent2) {
+    setConstraints(value: PanelConstraintChangeEvent2): void {
         this._onDidConstraintsChangeInternal.fire(value);
     }
 
-    setSize(event: PanelSizeEvent) {
+    setSize(event: PanelSizeEvent): void {
         this._onDidSizeChange.fire(event);
     }
 }

@@ -8,6 +8,7 @@ import {
     IAdvancedOverflowHost,
     IAdvancedOverflowService,
     defineModule,
+    DockviewModule,
 } from 'dockview';
 import { MruTracker } from './mruTracker';
 
@@ -437,40 +438,41 @@ export class AdvancedOverflowService
     }
 }
 
-export const AdvancedOverflowModule = defineModule<
-    'advancedOverflowService',
-    IAdvancedOverflowHost
->({
-    name: 'AdvancedOverflow',
-    serviceKey: 'advancedOverflowService',
-    create: (host) => new AdvancedOverflowService(host),
-    init: (host, service) => {
-        // `service` is the concrete instance created above; the slot types it
-        // as the narrow public interface (which exposes only `renderOverflow`),
-        // so narrow back to reach the MRU lifecycle hooks.
-        const svc = service as AdvancedOverflowService;
-        // Self-attach MRU tracking to existing and future groups; tear down when
-        // groups are removed. Mirrors TabGroupChipsModule's lifecycle.
-        const perGroupDisposables = new Map<DockviewGroupPanel, IDisposable>();
-        return new CompositeDisposable(
-            host.onDidAddGroup((group) => {
-                perGroupDisposables.set(group, svc.attachToGroup(group));
-            }),
-            host.onDidRemoveGroup((group) => {
-                perGroupDisposables.get(group)?.dispose();
-                perGroupDisposables.delete(group);
-            }),
-            host.onDidActivePanelChange((event) =>
-                svc.handleActivePanelChange(event)
-            ),
-            {
-                dispose: () => {
-                    for (const d of perGroupDisposables.values()) {
-                        d.dispose();
-                    }
-                    perGroupDisposables.clear();
-                },
-            }
-        );
-    },
-});
+export const AdvancedOverflowModule: DockviewModule<IAdvancedOverflowHost> =
+    defineModule<'advancedOverflowService', IAdvancedOverflowHost>({
+        name: 'AdvancedOverflow',
+        serviceKey: 'advancedOverflowService',
+        create: (host) => new AdvancedOverflowService(host),
+        init: (host, service) => {
+            // `service` is the concrete instance created above; the slot types it
+            // as the narrow public interface (which exposes only `renderOverflow`),
+            // so narrow back to reach the MRU lifecycle hooks.
+            const svc = service as AdvancedOverflowService;
+            // Self-attach MRU tracking to existing and future groups; tear down when
+            // groups are removed. Mirrors TabGroupChipsModule's lifecycle.
+            const perGroupDisposables = new Map<
+                DockviewGroupPanel,
+                IDisposable
+            >();
+            return new CompositeDisposable(
+                host.onDidAddGroup((group) => {
+                    perGroupDisposables.set(group, svc.attachToGroup(group));
+                }),
+                host.onDidRemoveGroup((group) => {
+                    perGroupDisposables.get(group)?.dispose();
+                    perGroupDisposables.delete(group);
+                }),
+                host.onDidActivePanelChange((event) =>
+                    svc.handleActivePanelChange(event)
+                ),
+                {
+                    dispose: () => {
+                        for (const d of perGroupDisposables.values()) {
+                            d.dispose();
+                        }
+                        perGroupDisposables.clear();
+                    },
+                }
+            );
+        },
+    });

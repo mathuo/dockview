@@ -81,31 +81,38 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
     private readonly panelUpdatesDisposable = new MutableDisposable();
 
-    readonly _onDidDimensionChange = new Emitter<PanelDimensionChangeEvent>();
-    readonly onDidDimensionsChange = this._onDidDimensionChange.event;
+    readonly _onDidDimensionChange: Emitter<PanelDimensionChangeEvent> =
+        new Emitter<PanelDimensionChangeEvent>();
+    readonly onDidDimensionsChange: Event<PanelDimensionChangeEvent> =
+        this._onDidDimensionChange.event;
 
-    readonly _onDidChangeFocus = new Emitter<FocusEvent>();
+    readonly _onDidChangeFocus: Emitter<FocusEvent> = new Emitter<FocusEvent>();
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
     //
-    readonly _onWillFocus = new Emitter<WillFocusEvent>();
+    readonly _onWillFocus: Emitter<WillFocusEvent> =
+        new Emitter<WillFocusEvent>();
     readonly onWillFocus: Event<WillFocusEvent> = this._onWillFocus.event;
     //
-    readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>();
+    readonly _onDidVisibilityChange: Emitter<VisibilityEvent> =
+        new Emitter<VisibilityEvent>();
     readonly onDidVisibilityChange: Event<VisibilityEvent> =
         this._onDidVisibilityChange.event;
 
-    readonly _onWillVisibilityChange = new Emitter<VisibilityEvent>();
+    readonly _onWillVisibilityChange: Emitter<VisibilityEvent> =
+        new Emitter<VisibilityEvent>();
     readonly onWillVisibilityChange: Event<VisibilityEvent> =
         this._onWillVisibilityChange.event;
 
-    readonly _onDidActiveChange = new Emitter<ActiveEvent>();
+    readonly _onDidActiveChange: Emitter<ActiveEvent> =
+        new Emitter<ActiveEvent>();
     readonly onDidActiveChange: Event<ActiveEvent> =
         this._onDidActiveChange.event;
 
-    readonly _onActiveChange = new Emitter<void>();
+    readonly _onActiveChange: Emitter<void> = new Emitter<void>();
     readonly onActiveChange: Event<void> = this._onActiveChange.event;
 
-    readonly _onDidParametersChange = new Emitter<Parameters>();
+    readonly _onDidParametersChange: Emitter<Parameters> =
+        new Emitter<Parameters>();
     readonly onDidParametersChange: Event<Parameters> =
         this._onDidParametersChange.event;
 

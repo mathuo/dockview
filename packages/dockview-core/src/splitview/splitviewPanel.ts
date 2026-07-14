@@ -2,6 +2,7 @@ import { PanelViewInitParameters } from './options';
 import {
     BasePanelView,
     BasePanelViewExported,
+    BasePanelViewState,
 } from '../gridview/basePanelView';
 import { SplitviewPanelApiImpl } from '../api/splitviewPanelApi';
 import { LayoutPriority, Orientation } from './splitview';
@@ -150,7 +151,10 @@ export abstract class SplitviewPanel
         }
     }
 
-    toJSON() {
+    toJSON(): BasePanelViewState & {
+        minimumSize: number | undefined;
+        maximumSize: number | undefined;
+    } {
         const maximum = (value: number) =>
             value === Number.MAX_SAFE_INTEGER ||
             value === Number.POSITIVE_INFINITY

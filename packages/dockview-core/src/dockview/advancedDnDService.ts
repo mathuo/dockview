@@ -11,7 +11,7 @@ import {
     DockviewGroupDropLocation,
     DockviewWillShowOverlayLocationEvent,
 } from './events';
-import { defineModule } from './modules';
+import { defineModule, DockviewModule } from './modules';
 import { IAdvancedDnDHost, IAdvancedDnDService } from './moduleContracts';
 
 /** Cursor offset of the group drag ghost, matched to the long-shipped default. */
@@ -98,7 +98,7 @@ export class AdvancedDnDService implements IAdvancedDnDService {
     }
 }
 
-export const AdvancedDnDModule = defineModule<
+export const AdvancedDnDModule: DockviewModule<IAdvancedDnDHost> = defineModule<
     'advancedDnDService',
     IAdvancedDnDHost
 >({

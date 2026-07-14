@@ -85,7 +85,8 @@ export class GridviewComponent
     readonly onDidRemoveGroup: Event<GridviewPanel> =
         this._onDidRemoveGroup.event;
 
-    protected readonly _onDidAddGroup = new Emitter<GridviewPanel>();
+    protected readonly _onDidAddGroup: Emitter<GridviewPanel> =
+        new Emitter<GridviewPanel>();
     readonly onDidAddGroup: Event<GridviewPanel> = this._onDidAddGroup.event;
 
     private readonly _onDidActiveGroupChange = new Emitter<
