@@ -47,11 +47,13 @@ calls `registerModules(Modules)` at import (a side effect — hence
 
 ## Build / Test
 
-- `build` - tsc CJS + ESM (no CSS; styles live in core)
-- `build:bundle` - rollup; externalizes `dockview`. Also stamps the build date
-  into `releaseDate.ts` (replacing the `__DOCKVIEW_RELEASE_DATE__` token) for
+- `build` - `tsc` declarations only (`emitDeclarationOnly`; no CSS, styles live
+  in core). The runtime JS ships as the rollup bundles.
+- `build:bundle` - rollup; externalizes `dockview`. Emits the CJS/ESM package
+  entries (`dist/package`) and UMD bundle, and stamps the build date into
+  `releaseDate.ts` (replacing the `__DOCKVIEW_RELEASE_DATE__` token) for
   version-based license expiry.
-- `test` - Jest (jsdom). `src/__tests__/registerModules.ts` registers `Modules`
+- `test` - Jest with `@swc/jest` (jsdom). `src/__tests__/registerModules.ts` registers `Modules`
   globally so a default `DockviewComponent` in tests has the full feature set;
   ResizeObserver/PointerEvent jsdom mocks are reused from core. It also seeds a valid license key so `LicenseModule`'s
   watermark does not affect the feature suites.
