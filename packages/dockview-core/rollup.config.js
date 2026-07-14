@@ -105,9 +105,10 @@ module.exports = [
     createBundle('umd', { withStyles: false, isMinified: false }),
     createBundle('umd', { withStyles: false, isMinified: true }),
     // Package bundles — dist/package/ (no auto-injected CSS; consumers
-    // import 'dockview-core/dist/styles/dockview.css' explicitly)
+    // import 'dockview-core/dist/styles/dockview.css' explicitly). Only the
+    // non-minified bundles are shipped: they are the `require`/`import` targets
+    // in package.json, and the closed `exports` map makes any minified variant
+    // unreachable, so emitting one would be dead output.
     createBundle('cjs', { withStyles: false, isMinified: false }),
-    createBundle('cjs', { withStyles: false, isMinified: true }),
     createBundle('esm', { withStyles: false, isMinified: false }),
-    createBundle('esm', { withStyles: false, isMinified: true }),
 ];
