@@ -1,7 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
-    preset: 'ts-jest',
+const config: Config = {
     roots: ['<rootDir>/packages/dockview'],
     modulePaths: ['<rootDir>/packages/dockview/src'],
     displayName: { name: 'dockview', color: 'blue' },

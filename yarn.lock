@@ -13866,7 +13866,7 @@ sass@1.100.0:
   optionalDependencies:
     "@parcel/watcher" "^2.4.1"
 
-sass@^1.81.0, sass@^1.99.0:
+sass@^1.81.0:
   version "1.99.0"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.99.0.tgz#ff9d1594da4886249dfaafabbeea2dea2dc74b26"
   integrity sha512-kgW13M54DUB7IsIRM5LvJkNlpH+WhMpooUcaWGFARkF1Tc82v9mIWkCbCYf+MBvpIUBSeSOTilpZjEPr2VYE6Q==
