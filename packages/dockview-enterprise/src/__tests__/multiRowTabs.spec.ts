@@ -53,6 +53,22 @@ function stampCols(list: HTMLElement, lefts: number[]): void {
 }
 
 /**
+ * Stamp synthetic per-tab `offsetHeight`s (in DOM order) so the controller's
+ * uniform-vertical-tab-height measurement (max natural tab height) can be
+ * exercised without real layout — jsdom reports 0 for every offset.
+ */
+function stampHeights(list: HTMLElement, heights: number[]): void {
+    list.querySelectorAll<HTMLElement>('.dv-tab').forEach((el, i) => {
+        Object.defineProperty(el, 'offsetHeight', {
+            configurable: true,
+            value: heights[i] ?? 0,
+        });
+    });
+}
+
+const VERTICAL_TAB_HEIGHT_VAR = '--dv-wrap-vertical-tab-height';
+
+/**
  * Multi-row (wrapping) tabs — Phase 2 (wrap render mode). The module toggles the
  * `.dv-tabs-container--wrap` class on a group's tab list and relayouts on
  * row-count change. The actual wrapping geometry (rows, header growth, content
@@ -478,6 +494,79 @@ describe('multi-row tabs (wrap mode)', () => {
         // Tear wrap down — the pinned width must be removed with the wrap classes.
         dockview.updateOptions({ overflow: { mode: 'dropdown' } });
         expect(header.style.width).toBe('');
+
+        dockview.dispose();
+    });
+
+    test('vertical header: every wrapped tab is pinned to the tallest tab height', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const ids = ['p0', 'p1', 'p2', 'p3'];
+        const first = dockview.addPanel({ id: ids[0], component: 'default' });
+        for (const id of ids.slice(1)) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = first.group.model.tabsListElement;
+        // Natural tab heights vary with title length; the tallest is 88.
+        stampHeights(list, [80, 88, 74, 80]);
+
+        // Re-apply to trigger a measure with the stamped geometry in place.
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+
+        // The uniform height is the max, so every column holds the same count.
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe(
+            '88px'
+        );
+
+        dockview.dispose();
+    });
+
+    test('a horizontal wrapped header never sets the uniform tab-height var', () => {
+        const dockview = make({ mode: 'wrap' });
+        const first = dockview.addPanel({ id: 'p0', component: 'default' });
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        const list = first.group.model.tabsListElement;
+        stampHeights(list, [35, 35]);
+
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+
+        // Horizontal rows already share the fixed row height — no pin.
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe('');
+
+        dockview.dispose();
+    });
+
+    test('flipping a wrapped vertical header to horizontal clears the uniform tab height', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const first = dockview.addPanel({ id: 'p0', component: 'default' });
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        const list = first.group.model.tabsListElement;
+        stampHeights(list, [80, 88]);
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe(
+            '88px'
+        );
+
+        // Horizontal rows are fixed-height; the vertical pin must be released.
+        first.group.api.setHeaderPosition('top');
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe('');
+
+        dockview.dispose();
+    });
+
+    test('turning wrap off clears the uniform vertical tab height', () => {
+        const dockview = makeVertical({ mode: 'wrap' });
+        const first = dockview.addPanel({ id: 'p0', component: 'default' });
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        const list = first.group.model.tabsListElement;
+        stampHeights(list, [80, 88]);
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe(
+            '88px'
+        );
+
+        // Tearing wrap down removes the pin with the wrap classes.
+        dockview.updateOptions({ overflow: { mode: 'dropdown' } });
+        expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe('');
 
         dockview.dispose();
     });

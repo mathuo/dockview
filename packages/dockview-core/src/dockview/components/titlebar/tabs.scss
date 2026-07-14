@@ -90,8 +90,20 @@
         // Give each wrapped tab the base column width so every column matches
         // the single-column header thickness and the header grows in whole-
         // column increments (mirror of the per-row height rule above).
+        //
+        // Also pin every tab to one uniform height: `--dv-wrap-vertical-tab-height`
+        // is the tallest tab's natural height, measured live by the
+        // `MultiRowTabsModule`. A vertical tab's natural height tracks its
+        // (rotated) title length, so a column fits only a few tabs and a tiny
+        // per-tab height difference flips how many fit, ragged-ing the grid into
+        // a staircase (see the variable's doc in options.ts). One shared height
+        // makes every column hold the same count, so the columns line up — the
+        // mirror of the horizontal rule pinning tabs to the fixed row height.
+        // Falls back to auto (natural per-tab height) when the module hasn't set
+        // the variable, so core-only wrap is unchanged.
         .dv-tab {
             width: var(--dv-tabs-and-actions-container-height);
+            height: var(--dv-wrap-vertical-tab-height, auto);
         }
 
         // `overflow.maxRows` cap, reused as a max-column cap for vertical: clip

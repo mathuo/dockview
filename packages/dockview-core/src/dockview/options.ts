@@ -295,6 +295,21 @@ export const OVERFLOW_WRAP_TABS_CAPPED_CLASS = 'dv-tabs-container--wrap-capped';
 export const OVERFLOW_MAX_TAB_ROWS_VARIABLE = '--dv-max-tab-rows';
 
 /**
+ * The custom property the `MultiRowTabsModule` sets on a WRAPPED VERTICAL
+ * (edge-group) tab list to pin every wrapped tab to a single, uniform height —
+ * the tallest tab's natural height, measured live by the controller. A vertical
+ * tab's natural height tracks its (rotated) title length, so a column only fits
+ * a handful of tabs and tiny per-tab height differences flip how many fit,
+ * ragged-ing the wrapped grid into a staircase. Pinning one height makes every
+ * column hold the same count, so the columns line up as a clean grid (the mirror
+ * of the horizontal wrap, whose tabs share the fixed row height). Shared here so
+ * core (SCSS) and the module agree on the one string. Only meaningful in vertical
+ * wrap; a horizontal strip never sets it and the SCSS falls back to auto height.
+ */
+export const OVERFLOW_WRAP_TABS_VERTICAL_TAB_HEIGHT_VARIABLE =
+    '--dv-wrap-vertical-tab-height';
+
+/**
  * Tab-header overflow behaviour. One shared block across the overflow axis:
  * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
  * Each capability names the module it needs — without that module the field is
