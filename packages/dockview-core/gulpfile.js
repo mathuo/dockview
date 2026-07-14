@@ -1,5 +1,5 @@
 const gulp = require('gulp');
-const gulpSass = require('gulp-sass')(require('sass'));
+const gulpSass = require('gulp-sass')(require('sass-embedded'));
 const concat = require('gulp-concat');
 
 gulp.task('sass', () => {
