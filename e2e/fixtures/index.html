@@ -71,10 +71,22 @@
                           : undefined;
                 // `?smooth=1` turns on the smooth tab reorder animation (needed
                 // to exercise the 2-D cross-row wrap reorder path).
+                // `?theme=<name>` selects an exported theme by its `lib.theme*`
+                // export name (e.g. `abyssSpaced` -> `lib.themeAbyssSpaced`) so
+                // the spaced-theme wrap layout can be exercised; inert (core
+                // default) when absent so other specs are unaffected.
+                const themeParam = params.get('theme');
+                const themeExport =
+                    themeParam &&
+                    lib[
+                        'theme' +
+                            themeParam.charAt(0).toUpperCase() +
+                            themeParam.slice(1)
+                    ];
                 const theme =
                     params.get('smooth') === '1'
                         ? { ...lib.themeAbyss, tabAnimation: 'smooth' }
-                        : undefined;
+                        : themeExport || undefined;
                 // `?pinned=separate-row` exercises the two-row pinned layout;
                 // `?compact=1` opts into icon-only pinned tabs.
                 const pinnedMode =
