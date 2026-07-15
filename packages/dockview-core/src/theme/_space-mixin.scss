@@ -132,13 +132,32 @@
 
     // In writing-mode: vertical-rl (used by vertical tab bars), physical
     // margin-left/right are the cross-axis margins that control the tab
-    // pill's visual "height" (physical width). Match the 0.5rem cross-axis
-    // margin used by horizontal tabs so the pill proportions are consistent
-    // across all four edge-group positions.
+    // pill's visual "height" (physical width). Swap the block/inline parts so
+    // the 0.5rem cross-axis margin matches the one horizontal tabs use, keeping
+    // the pill proportions consistent across all four edge-group positions.
+    // (`--dv-tab-margin-block` is thus the cross-axis margin in BOTH
+    // orientations — top/bottom horizontally, left/right vertically.)
     .dv-tabs-container-vertical {
         .dv-tab {
-            margin: 0.25rem 0.5rem;
+            margin: var(--dv-tab-margin-inline) var(--dv-tab-margin-block);
         }
+    }
+
+    // Multi-column (wrap) tabs on a vertical edge-group header — the cross-axis
+    // mirror of the horizontal wrap rule above. Core pins each wrapped vertical
+    // tab to the full `--dv-tabs-and-actions-container-height` as its WIDTH
+    // (tabs.scss), which (as with the horizontal case) ignores the spaced
+    // theme's cross-axis tab margin: the full-width tab plus its left/right
+    // margins overflows the edge-group strip and the pill loses the inset it
+    // has in single-column mode (flex `align-items: stretch` sizing it to the
+    // strip width minus its margins). Subtract the cross-axis margin so the
+    // pill fits the strip exactly. Only the width (cross axis) is corrected —
+    // the height is core's live-measured `--dv-wrap-vertical-tab-height`.
+    .dv-tabs-container--wrap.dv-tabs-container-vertical .dv-tab {
+        width: calc(
+            var(--dv-tabs-and-actions-container-height) -
+                2 * var(--dv-tab-margin-block)
+        );
     }
 
     .dv-groupview {
