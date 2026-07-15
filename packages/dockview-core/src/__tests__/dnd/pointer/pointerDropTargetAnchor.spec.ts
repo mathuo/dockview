@@ -5,10 +5,10 @@ import { DropTargetTargetModel } from '../../../dnd/droptarget';
 /**
  * Verifies the anchor-container ("override target") rendering path that
  * floating groups, popout groups, and the layout root rely on. The path
- * doesn't append a dropzone to the drop element — instead it renders into
+ * doesn't append a dropzone to the drop element. Instead it renders into
  * an external anchor container's overlay.
  */
-describe('PointerDropTarget — anchor / override target path', () => {
+describe('PointerDropTarget: anchor / override target path', () => {
     afterEach(() => {
         PointerDragController.getInstance().cancel();
     });
@@ -88,7 +88,7 @@ describe('PointerDropTarget — anchor / override target path', () => {
             dropEl.getElementsByClassName('dv-drop-target-dropzone')
         ).toHaveLength(0);
         // The anchor overlay should have been positioned (any non-empty
-        // dimensions are fine — we just want to confirm the anchor path ran).
+        // dimensions are fine; this confirms the anchor path ran).
         expect(overlay.style.width).not.toBe('');
         expect(overlay.style.height).not.toBe('');
         expect(target.state).toBe('right');

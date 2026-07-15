@@ -37,7 +37,7 @@ function createTabs(): Tabs {
     return new Tabs(group, accessor, { showTabsOverflowControl: true });
 }
 
-/** jsdom has no layout — stub a tab's `offsetLeft` (its natural in-flow x, the
+/** jsdom has no layout, so stub a tab's `offsetLeft` (its natural in-flow x, the
  *  value the sticky offset is derived from). */
 function giveOffset(tabs: Tabs, id: string, offsetLeft: number): void {
     const el = tabs.tabs.find((t) => t.panel.id === id)!.element;
@@ -55,7 +55,7 @@ function stickyOffset(tabs: Tabs, id: string): string | undefined {
     return el.style.getPropertyValue('--dv-pinned-sticky-left');
 }
 
-describe('tabs — sticky pinned tabs', () => {
+describe('tabs: sticky pinned tabs', () => {
     test('setPinnedSticky freezes pinned tabs at their natural offsets', () => {
         const tabs = createTabs();
         tabs.openPanel(createMockPanel('a'));
@@ -132,7 +132,7 @@ describe('tabs — sticky pinned tabs', () => {
         expect(stickyOffset(tabs, 'a')).toBe('0px');
 
         // A second recompute (resize / scroll self-heal / pinned-set refresh)
-        // must still resolve to the natural 0 — reading the stuck 324 would
+        // must still resolve to the natural 0; reading the stuck 324 would
         // compound the offset and push the pinned tab off to the right edge.
         tabs.setOverflowExclude((id) => id === 'a');
         expect(stickyOffset(tabs, 'a')).toBe('0px');
@@ -146,7 +146,7 @@ describe('tabs — sticky pinned tabs', () => {
         tabs.setOverflowExclude((id) => id === 'a');
         giveOffset(tabs, 'a', 0);
 
-        // Never enabled — no sticky styling appears.
+        // Never enabled, so no sticky styling appears.
         expect(stickyOffset(tabs, 'a')).toBeUndefined();
         tabs.element.remove();
     });

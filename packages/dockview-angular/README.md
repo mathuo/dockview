@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview-angular</h1>
 
-<p>Angular bindings for dockview — zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
+<p>Angular bindings for dockview, a zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
 
 </div>
 

@@ -245,7 +245,7 @@ export class TabReorderController extends CompositeDisposable {
         clientY: number;
         pointerEvent: PointerEvent;
     }): void {
-        // Smooth-mode intra-group reorder — the pointer-backend analog of the
+        // Smooth-mode intra-group reorder: the pointer-backend analog of the
         // HTML5 tabs-list `drop` commit. In smooth mode the per-tab pointer
         // drop target doesn't latch a drop state for the intra-group drag, so
         // its `onDrop` never fires; commit the reorder from the computed
@@ -263,7 +263,7 @@ export class TabReorderController extends CompositeDisposable {
             // intra-group single-tab reorder only: `sourceIndex === -1` is a
             // cross-group drag (handled by the cross-group machinery), and
             // `sourceTabGroupId` is a group-chip drag (handled by the chip drop
-            // target — which does NOT null `_animState`, so committing here too
+            // target, which does not null `_animState`, so committing here too
             // would double-commit).
             this._animState.sourceIndex !== -1 &&
             !this._animState.sourceTabGroupId &&
@@ -315,7 +315,7 @@ export class TabReorderController extends CompositeDisposable {
      * for a changed drag identity, initializes anim state for incoming
      * cross-group drags, and dispatches to the gap-following math in
      * `handleDragOver`. Returns true when this tabs list has taken
-     * ownership of the drag — HTML5 callers use this to gate
+     * ownership of the drag; HTML5 callers use this to gate
      * `event.preventDefault()`.
      */
     processDragOver(clientX: number, clientY?: number): boolean {
@@ -355,7 +355,7 @@ export class TabReorderController extends CompositeDisposable {
             ) {
                 const avgWidth = this.getAverageTabWidth();
                 if (data.tabGroupId) {
-                    // External group drag — look up the source group to
+                    // External group drag: look up the source group to
                     // size the gap.
                     const sourceGroup = this.accessor.getPanel(data.groupId);
                     const sourceTg = sourceGroup?.model
@@ -405,7 +405,7 @@ export class TabReorderController extends CompositeDisposable {
         }
 
         // For intra-group drag (sourceIndex >= 0) the gap animation is the
-        // sole visual indicator — clear any stale anchor overlay that may
+        // sole visual indicator, so clear any stale anchor overlay that may
         // have been set while the cursor was over the panel content area or
         // another zone. External drags (sourceIndex === -1) leave the
         // overlay to the individual tab Droptargets so cross-group
@@ -431,7 +431,7 @@ export class TabReorderController extends CompositeDisposable {
             return;
         }
         // Moving into the broader drop zone (e.g. void container, left
-        // actions) — keep anim state alive so external listeners can
+        // actions): keep anim state alive so external listeners can
         // continue the gap animation.
         if (related && this._extendedDropZone?.contains(related)) {
             this.resetTabTransforms();
@@ -465,8 +465,8 @@ export class TabReorderController extends CompositeDisposable {
         // Multi-row wrap: the 1-D x-accumulation below assumes a single row.
         // In wrap use a 2-D hit-test (row by y, slot by x within the row) and
         // a discrete drop indicator instead of the gap animation. Group-chip
-        // drags are excluded — they carry group-move semantics ("can't drop
-        // inside another group") the single-tab hit-test doesn't model, and
+        // drags are excluded because they carry group-move semantics ("can't
+        // drop inside another group") the single-tab hit-test doesn't model, and
         // chips don't wrap in v1, so they keep the 1-D path (whose gap animation
         // no-ops in wrap anyway).
         if (this._wrapMode && !this._animState.sourceTabGroupId) {
@@ -520,7 +520,7 @@ export class TabReorderController extends CompositeDisposable {
                 const chipWidth =
                     this._animState.chipPositions.get(groupId) ?? 0;
                 if (accWidth + chipWidth > availableSpace) {
-                    // Chip alone overflows — gap goes before this group
+                    // Chip alone overflows, so the gap goes before this group
                     insertionIndex ??= i;
                     break;
                 }
@@ -621,7 +621,7 @@ export class TabReorderController extends CompositeDisposable {
                     // Snap the insertion index to just before or just
                     // after this group based on cursor position relative
                     // to the group's midpoint. Only applies when the
-                    // insertion would land *inside* the group — for
+                    // insertion would land *inside* the group. For
                     // `isJustBeforeGroup`, the index is already outside
                     // (immediately left of the group) and is a valid
                     // drop position, so leave it untouched (issue #1264).
@@ -636,7 +636,7 @@ export class TabReorderController extends CompositeDisposable {
                 }
 
                 if (isGroupDrag && isJustBeforeGroup) {
-                    // Cursor is just before the group — accept this
+                    // Cursor is just before the group, so accept this
                     // index as-is. Groups can be dropped at the slot
                     // immediately left of another group's first tab.
                     break;
@@ -646,7 +646,7 @@ export class TabReorderController extends CompositeDisposable {
                     // Check whether only the source tab (or source group
                     // tabs) sits between insertionIndex and firstIdx.
                     // If so, the source is being dragged away from that
-                    // slot, so we ARE effectively "just before" the group
+                    // slot, so we are effectively "just before" the group
                     // and should still allow dropping into position 0.
                     let allInBetweenAreSource = true;
                     for (let j = insertionIndex; j < firstIdx; j++) {
@@ -712,14 +712,14 @@ export class TabReorderController extends CompositeDisposable {
     /**
      * Multi-row wrap drag-over: resolve the 2-D insertion slot and show a
      * discrete drop indicator. No gap/FLIP animation (that's 1-D and fights the
-     * flow layout — `applyDragOverTransforms`/`runFlipAnimation` no-op in wrap).
+     * flow layout, so `applyDragOverTransforms`/`runFlipAnimation` no-op in wrap).
      */
     private handleWrappedDragOver(clientX: number, clientY: number): void {
         if (!this._animState) {
             return;
         }
         const index = this.computeWrappedInsertionIndex(clientX, clientY);
-        // targetTabGroupId stays null — wrap reorder is single-tab within the
+        // targetTabGroupId stays null: wrap reorder is single-tab within the
         // group; group-chip drops keep the 1-D path (chips don't wrap in v1).
         if (
             index === this._animState.currentInsertionIndex &&
@@ -772,7 +772,7 @@ export class TabReorderController extends CompositeDisposable {
 
         // Pick the line whose cross span contains the pointer; if the pointer is
         // in an inter-line gap (or before/after all lines), pick the nearest
-        // line — NOT a blanket clamp to the last line.
+        // line, not a blanket clamp to the last line.
         const line =
             lines.find(
                 (l) => crossPointer >= l.start && crossPointer <= l.end
@@ -931,7 +931,7 @@ export class TabReorderController extends CompositeDisposable {
 
     applyDragOverTransforms(skipTransition = false): void {
         // The gap animation is 1-D (single-row margin shifting) and fights the
-        // wrap flow layout — wrap uses a discrete drop indicator instead.
+        // wrap flow layout, so wrap uses a discrete drop indicator instead.
         if (this._wrapMode) {
             return;
         }
@@ -944,7 +944,8 @@ export class TabReorderController extends CompositeDisposable {
         }
 
         // Don't apply transforms until the source tab has been collapsed
-        // in the rAF callback — otherwise the gap + visible source = jump.
+        // in the rAF callback; otherwise the gap and the still-visible source
+        // produce a jump.
         if (this._pendingCollapse) {
             return;
         }
@@ -969,8 +970,8 @@ export class TabReorderController extends CompositeDisposable {
         // the chip so the gap appears before the entire group.
         //
         // Two cases:
-        // 1. targetTabGroupId is null (standalone drop) — always shift chip.
-        // 2. targetTabGroupId is set AND the group is collapsed — shift chip
+        // 1. targetTabGroupId is null (standalone drop): always shift the chip.
+        // 2. targetTabGroupId is set and the group is collapsed: shift the chip
         //    because the collapsed tabs are invisible, so putting the gap on
         //    them has no visual effect.
         let chipToShift: HTMLElement | null = null;
@@ -978,7 +979,7 @@ export class TabReorderController extends CompositeDisposable {
             const tabGroups = this.group.model.getTabGroups();
             for (const tg of tabGroups) {
                 if (tg.id === this._animState.sourceTabGroupId) continue;
-                // Skip the group that the dragged tab belongs to — the
+                // Skip the group that the dragged tab belongs to: the
                 // gap should appear after the chip (where the tab was),
                 // not before it.
                 if (tg.panelIds.includes(this._animState.sourceTabId)) continue;
@@ -1178,7 +1179,7 @@ export class TabReorderController extends CompositeDisposable {
             // Clear any inline gap margin / shifting class applied to
             // destination tabs during dragover. Cross-group moves don't
             // run the FLIP path, and `moveGroupOrPanel` only inserts new
-            // panels — it doesn't recreate existing destination tabs, so
+            // panels; it doesn't recreate existing destination tabs, so
             // their inline `margin-left` would otherwise persist as a
             // visible gap (issue #1243).
             this.resetTabTransforms();
@@ -1228,7 +1229,7 @@ export class TabReorderController extends CompositeDisposable {
         // After a drop, `tab.onDrop` consumes _animState (sets it to null)
         // and immediately calls `runFlipAnimation`, which sets transforms
         // and queues an rAF to trigger the CSS transition. dragend fires
-        // synchronously on the source element BEFORE that rAF runs — if
+        // synchronously on the source element before that rAF runs; if
         // we cleared transforms here we'd clobber the in-flight FLIP, so
         // gate the cleanup on _animState still being set (i.e. drag was
         // cancelled rather than dropped).

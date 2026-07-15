@@ -24,24 +24,24 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
 };
 
 /**
- * Keyboard navigation & focus management — operate the dock without a mouse.
+ * Keyboard navigation & focus management: operate the dock without a mouse.
  * Opt-in via `keyboardNavigation`, with a rebindable {@link DockviewKeybindings}
  * keymap.
  *
- * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
- * - **Focus group** (`F6` / `Shift+F6`) — move focus to the next / previous
+ * - **Switch tab** (`Ctrl+]` / `Ctrl+[`): cycle the focused group's tabs.
+ * - **Focus group** (`F6` / `Shift+F6`): move focus to the next / previous
  *   group in sequence.
- * - **Focus the tab strip** (`Ctrl+Shift+\`) — jump focus from panel content to
+ * - **Focus the tab strip** (`Ctrl+Shift+\`): jump focus from panel content to
  *   the active group's tab strip (the strip's roving-tabindex takes over).
- * - **Toggle pin** (`Ctrl+Shift+Enter`) — pin / unpin the active panel's tab.
+ * - **Toggle pin** (`Ctrl+Shift+Enter`): pin / unpin the active panel's tab.
  *   Inert unless the pinned-tabs feature is enabled.
- * - **Focus restore on close** — when removing a panel/group pulls focus out of
+ * - **Focus restore on close**: when removing a panel/group pulls focus out of
  *   the dock, focus returns to the neighbour the layout just activated instead
  *   of being stranded on `<body>`.
- * - **Floating `Esc`** — `Esc` inside a floating group returns focus to the
+ * - **Floating `Esc`**: `Esc` inside a floating group returns focus to the
  *   control that had it before entering the float (polite: bubble phase,
  *   respects `defaultPrevented`, so panel content keeps `Esc`).
- * - **Floating Tab-containment** — Tab wraps within the floating group so focus
+ * - **Floating Tab-containment**: Tab wraps within the floating group so focus
  *   doesn't leak to the grid behind it.
  *
  * Stands down while an advanced keyboard move is in progress (see
@@ -67,7 +67,7 @@ export class KeyboardNavigationService
 
         // Remember the last control focused anywhere in this dock (outside any
         // float) so Esc inside a floating group can return focus to its
-        // invoking control. Observe-only — never consumes.
+        // invoking control. Observe-only; it never consumes.
         const onFocusIn = (e: Event): void => {
             const t = (e as FocusEvent).target;
             if (
@@ -79,7 +79,7 @@ export class KeyboardNavigationService
             }
         };
 
-        // Esc-from-float restore runs in the BUBBLE phase and respects
+        // Esc-from-float restore runs in the bubble phase and respects
         // defaultPrevented, so panel content that uses Esc keeps priority.
         const onEscape = (e: Event): void =>
             this._onFloatingEscape(e as KeyboardEvent);
@@ -98,7 +98,7 @@ export class KeyboardNavigationService
             // - `remove`: closing the focused panel/group.
             // - `maximize`: maximizing a *different* group hides the focused
             //   one, blurring it to <body>. (Maximizing the focused group keeps
-            //   its DOM in place, so focus stays inside and we no-op — which is
+            //   its DOM in place, so focus stays inside and we no-op, which is
             //   exactly what the was-inside / not-inside guard checks, so we
             //   never steal focus from a mouse user who maximized in place.)
             host.onWillMutateLayout((e) => {
@@ -129,7 +129,7 @@ export class KeyboardNavigationService
     }
 
     /**
-     * The element that actually has focus, across windows — the `activeElement`
+     * The element that actually has focus, across windows: the `activeElement`
      * of whichever document currently holds focus (a popout, else the main
      * document). Each document tracks its own `activeElement` even when blurred,
      * so we must pick the focused one rather than trust the main document.
@@ -142,7 +142,7 @@ export class KeyboardNavigationService
                     return win.document.activeElement;
                 }
             } catch {
-                // A closing / cross-origin window can throw on access — ignore.
+                // A closing / cross-origin window can throw on access, so ignore it.
             }
         }
         return mainDoc.activeElement;
@@ -191,7 +191,7 @@ export class KeyboardNavigationService
         if (!float || !this.host.ownsElement(float)) {
             return false;
         }
-        // Always manage Tab inside a float, never just at the boundary: focus
+        // Always manage Tab inside a float, never only at the boundary: focus
         // often sits on non-tabbable plumbing (the content container, which is
         // tabindex="-1"), and the browser's default Tab from there escapes to
         // the grid behind. Drive the cursor through the float's tabbables
@@ -237,7 +237,7 @@ export class KeyboardNavigationService
             prev.focus();
             return;
         }
-        // Invoking control is gone — fall back to a grid group's content.
+        // Invoking control is gone, so fall back to a grid group's content.
         this.host.groups
             .find((g) => g.api.location.type === 'grid')
             ?.model.focusContent();
@@ -299,7 +299,7 @@ export class KeyboardNavigationService
     }
 
     private _togglePin(): void {
-        // Inert unless the pinned-tabs feature is enabled — the binding is dead
+        // Inert unless the pinned-tabs feature is enabled; the binding is dead
         // weight without it. (`setPinned` is itself gated in core, but guarding
         // here also skips the needless refocus below when nothing can change.)
         if (!this.host.options.pinnedTabs?.enabled) {

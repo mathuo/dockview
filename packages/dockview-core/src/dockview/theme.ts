@@ -59,8 +59,8 @@ export interface DockviewTheme {
     /**
      * Controls tab drag-and-drop reorder animation style.
      *
-     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder —
-     *   tabs slide apart to reveal the insertion gap, then animate to their
+     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder. They
+     *   slide apart to reveal the insertion gap, then animate to their
      *   final positions on drop (Chrome-like behavior).
      * - `"default"`: standard tab reorder behavior without animation.
      *

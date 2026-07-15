@@ -60,7 +60,7 @@
                 defaultExtension: 'js',
             },
             // Point `dockview` at its rollup bundle via an explicit `main`, so
-            // SystemJS doesn't request the bare package directory — a 404
+            // SystemJS doesn't request the bare package directory, which 404s
             // (previously a fatal EISDIR) in the dev server. The bundle requires
             // only `dockview-core`, mapped above.
             dockview: {

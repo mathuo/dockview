@@ -58,7 +58,7 @@ export class HeaderActionsService implements IHeaderActionsService {
 
     refresh(group: DockviewGroupPanel): void {
         // The headerPosition setter on DockviewGroupPanelModel fires inside
-        // the model's constructor — before the parent DockviewGroupPanel has
+        // the model's constructor, before the parent DockviewGroupPanel has
         // assigned its `_model` field, and in tests where the parent panel
         // may be null. Skip; DockviewGroupPanel.initialize() will refresh
         // once construction completes for real groups.

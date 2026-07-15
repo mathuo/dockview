@@ -40,7 +40,7 @@ export const _CodeRunner = (props: { id: string; height?: number }) => {
 
 export const CodeRunner = (props: { id: string; height?: number }) => {
     // Reserve the height on this server-rendered container so the page doesn't
-    // reflow when the client-only iframe mounts — `BrowserOnly` renders nothing
+    // reflow when the client-only iframe mounts. `BrowserOnly` renders nothing
     // until hydration, so without a fixed-height box the content below jumps
     // down once the example appears. The iframe fills this box.
     return (

@@ -14,7 +14,7 @@ import { LongPressDetector } from '../../../dnd/pointer/longPress';
  * Visual chip for a tab group. Owns the DOM element, label, click /
  * context-menu interactions, and exposes a long-press gesture as a
  * second `onContextMenu` source. Drag-and-drop wiring lives in
- * `TabGroupManager` — the manager constructs the drag sources on this
+ * `TabGroupManager`, which constructs the drag sources on this
  * chip's element so it can include tabs-list context (custom group
  * drag image, tab-group transfer payload).
  */

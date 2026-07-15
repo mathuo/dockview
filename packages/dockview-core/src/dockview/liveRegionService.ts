@@ -13,7 +13,7 @@ import { defineModule } from './modules';
 
 /**
  * The narrow surface the {@link LiveRegionService} needs from the host
- * (the `DockviewComponent`) — somewhere to mount the region and the layout
+ * (the `DockviewComponent`): somewhere to mount the region and the layout
  * events to narrate. `onWill/onDidMutateLayout` are used to suppress the
  * bulk-load / clear burst (one transaction, not N panel announcements).
  */
@@ -35,8 +35,8 @@ export interface ILiveRegionHost {
 
 export interface ILiveRegionService extends IDisposable {
     /**
-     * Announce a message to assistive technology via the live region. The
-     * shared sink — the accessibility module writes keyboard-docking
+     * Announce a message to assistive technology via the live region. This
+     * is the shared sink: the accessibility module writes keyboard-docking
      * narration here too, so all announcements use one region.
      */
     announce(message: string, politeness?: 'polite' | 'assertive'): void;
@@ -206,7 +206,7 @@ export class LiveRegionService
     }
 
     /** Route announcements to the live region of the window that currently has
-     *  focus, so a screen-reader user in a popout hears them — falling back to
+     *  focus, so a screen-reader user in a popout hears them, falling back to
      *  the main window. */
     private _focusedRegions(): RegionPair {
         for (const [win, pair] of this._regions) {
@@ -218,7 +218,7 @@ export class LiveRegionService
                     return pair;
                 }
             } catch {
-                // A closing / cross-origin window can throw on access — ignore.
+                // A closing / cross-origin window can throw on access, so ignore.
             }
         }
         return this._regions.get(this._mainWindow)!;

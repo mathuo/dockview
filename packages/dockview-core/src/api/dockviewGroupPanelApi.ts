@@ -69,7 +69,7 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent>;
     /**
      * Fires when this group's header flips orientation between horizontal
-     * (top/bottom) and vertical (left/right) — e.g. when `headerPosition`
+     * (top/bottom) and vertical (left/right), e.g. when `headerPosition`
      * moves from `top` to `left`. Does not fire for position changes that
      * keep the same axis (top↔bottom, left↔right) or for the initial set.
      */

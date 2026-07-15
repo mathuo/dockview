@@ -108,8 +108,8 @@ export class AppComponent implements OnDestroy {
         });
 
         this.disposables.push(
-            // Attach custom metadata when an internal panel/group drag starts —
-            // an external drop zone can then read it via dataTransfer.
+            // Attach custom metadata when an internal panel/group drag starts,
+            // so an external drop zone can read it via dataTransfer.
             api.onWillDragPanel((event) => {
                 if (!(event.nativeEvent instanceof DragEvent)) {
                     return;

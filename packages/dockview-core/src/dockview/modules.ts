@@ -2,7 +2,7 @@
  * Internal module system for dockview.
  *
  * Modules are feature bundles that register services into the dockview
- * component. `registerModules(...)` is the one public entry point — it lets a
+ * component. `registerModules(...)` is the one public entry point: it lets a
  * sibling package contribute modules that `DockviewComponent` picks up at
  * construction. The richer opt-in surface (a per-component `modules` option,
  * framework wrappers) is still reserved for a future version; the module
@@ -62,7 +62,7 @@ export interface DockviewModule<THost = unknown> {
     /**
      * Optional post-construct hook called once after the host is fully
      * constructed and all module services are instantiated. Use this to
-     * subscribe to host events — the returned disposable runs at host
+     * subscribe to host events; the returned disposable runs at host
      * teardown. Components don't need to call into the service from event
      * handlers; the module owns its own reactivity.
      */
@@ -106,7 +106,7 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
 const _warnedMissingModule = new Set<string>();
 
 /**
- * For tests — clears the once-per-key dedup cache used by `assertModule`.
+ * For tests: clears the once-per-key dedup cache used by `assertModule`.
  */
 export function _resetMissingModuleWarnings(): void {
     _warnedMissingModule.clear();
@@ -115,12 +115,12 @@ export function _resetMissingModuleWarnings(): void {
 /**
  * Returns the service if its module is registered, otherwise logs a
  * deduplicated console error and returns `undefined`. Missing modules never
- * throw — they degrade the affected feature to a no-op so consuming
+ * throw; they degrade the affected feature to a no-op so consuming
  * applications don't crash in production.
  *
  * Use at public-API entry points where the caller wants to surface which
  * module is missing. For internal/lifecycle paths, plain `?.` chaining on
- * the service slot is preferred — no log, just a silent no-op.
+ * the service slot is preferred: no log, a silent no-op.
  */
 export function assertModule<T>(
     service: T | undefined,
@@ -223,7 +223,7 @@ export class ModuleRegistry<THost> implements IDisposable {
 const _globalModules: DockviewModule<any>[] = [];
 
 /**
- * Register modules globally. Idempotent per `moduleName` — registering the
+ * Register modules globally. Idempotent per `moduleName`: registering the
  * same module twice is a no-op. Intended to be called once at import time by
  * the package that bundles a given set of modules.
  */
@@ -245,7 +245,7 @@ export function getRegisteredModules(): DockviewModule<any>[] {
 }
 
 /**
- * For tests — clears the global module registry.
+ * For tests: clears the global module registry.
  */
 export function clearRegisteredModules(): void {
     _globalModules.length = 0;

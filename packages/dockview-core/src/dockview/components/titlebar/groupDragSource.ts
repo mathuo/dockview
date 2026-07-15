@@ -31,7 +31,7 @@ export interface GroupDragSourceOptions {
     readonly accessor: DockviewComponent;
     /**
      * The group this handle drags. Pass a function when the handle outlives the
-     * group it represents and can be retargeted — e.g. a floating window's
+     * group it represents and can be retargeted, e.g. a floating window's
      * dedicated title bar, whose anchor group is reassigned when the original
      * anchor leaves a multi-group window. A fixed reference (the tab-bar void
      * container, which lives inside its own group's DOM) is also accepted.
@@ -217,7 +217,7 @@ export class GroupDragSource extends CompositeDisposable {
                     return false;
                 },
                 onDragStart: (event) => {
-                    // Redock just committed — abort any in-flight overlay
+                    // Redock just committed, so abort any in-flight overlay
                     // move so the float stops following the finger while
                     // the ghost takes over.
                     this.getFloatingOverlay()?.cancelPendingDrag();

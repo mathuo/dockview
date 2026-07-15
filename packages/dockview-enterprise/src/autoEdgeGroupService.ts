@@ -19,7 +19,7 @@ import { IAutoEdgeGroupHost, IAutoEdgeGroupService } from 'dockview';
  */
 const OUTER_BAND = 16;
 
-/** Threshold (%) for the inner "split this group" quadrants — matches the core
+/** Threshold (%) for the inner "split this group" quadrants. Matches the core
  *  default activation size, so non-edge drops behave as usual. */
 const QUADRANT_THRESHOLD = 20;
 
@@ -78,17 +78,17 @@ function defaultQuadrant(
 }
 
 /**
- * Drag-revealed, zero-footprint edges — the two-band drag-reveal affordance. A
+ * Drag-revealed, zero-footprint edges: the two-band drag-reveal affordance. A
  * drag toward the layout edge splits into:
  *
  * - an **outer band** (within {@link OUTER_BAND} of the content-area edge) that
- *   docks the panel as a self-hiding, pinnable **edge group** — highlighted
- *   with its own overlay strip, committed via `host.revealEdgeGroupWithData`;
+ *   docks the panel as a self-hiding, pinnable **edge group**, highlighted
+ *   with its own overlay strip and committed via `host.revealEdgeGroupWithData`;
  * - an **inner band** that splits the group under the cursor as usual.
  *
  * Over a **populated** layout the outer band is reached via a
  * {@link PositionResolver} installed on the group content drop targets (the
- * same mechanism the drop-guide compass uses) — so it works without the
+ * same mechanism the drop-guide compass uses), so it works without the
  * compass. Over an empty grid it also handles the root edge target's
  * `kind: 'edge'` overlays directly. It never `preventDefault`s the overlay
  * (that would clear the drop state), only draws its highlight on top and
@@ -140,7 +140,7 @@ export class AutoEdgeGroupService
         return isAnyEdgeGroupEnabled(this.host.options.dockToEdgeGroups);
     }
 
-    /** Edge-band detection only — an `edge` cell in the outer band, else null.
+    /** Edge-band detection only: an `edge` cell in the outer band, else null.
      *  Composed with another resolver (the compass) by the host. */
     resolveEdge(args: PositionResolverArgs): PositionResolverResult | null {
         if (!this._enabled) {
@@ -183,7 +183,7 @@ export class AutoEdgeGroupService
 
     private _onWillShowOverlay(e: DockviewWillShowOverlayLocationEvent): void {
         // Show the edge-group indicator line iff the pointer is in the true
-        // outer band — purely by depth, so it never lights up for a compass
+        // outer band, purely by depth, so it never lights up for a compass
         // outer-ring cell (grid-edge dock, further in) or a normal group split.
         if (!this._enabled || !isEdge(e.position)) {
             this._hide();
@@ -226,8 +226,8 @@ export class AutoEdgeGroupService
         let el = this._highlight;
         if (!el) {
             el = doc.createElement('div');
-            // A thin accent LINE hugging the content-area edge in the direction
-            // the new edge group would appear — styled by `.dv-auto-edge-band`
+            // A thin accent line hugging the content-area edge in the direction
+            // the new edge group would appear. Styled by `.dv-auto-edge-band`
             // in core (theme drag-over colour); the module only sets geometry.
             el.className = 'dv-auto-edge-band';
             this._highlight = el;

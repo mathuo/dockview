@@ -19,8 +19,8 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * Auto-hide ("pinnable") edge groups — VS tool-window model. A collapsed edge
- * group's native tabs are CLICK triggers (no hover): click a tab → peek it as a
+ * Auto-hide ("pinnable") edge groups follow the VS tool-window model. A collapsed
+ * edge group's native tabs are click triggers (no hover): click a tab → peek it as a
  * non-reflowing overlay with a title bar (title + pin + close); click it again /
  * outside / Esc → hide; pin → dock; close → close the panel.
  */

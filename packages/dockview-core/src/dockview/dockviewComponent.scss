@@ -71,8 +71,8 @@
     }
 }
 
-// Visible on-screen hint shown while a keyboard-docking move (Ctrl+M) is armed
-// — mirrors the screen-reader narration so sighted keyboard users get the same
+// Visible on-screen hint shown while a keyboard-docking move (Ctrl+M) is armed.
+// Mirrors the screen-reader narration so sighted keyboard users get the same
 // "arrows / Enter / Escape" guidance. Purely visual (the element is
 // aria-hidden; the LiveRegion speaks the same text). Restyle or hide via this
 // class.

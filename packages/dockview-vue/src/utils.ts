@@ -137,8 +137,8 @@ export interface VueMountDisposable {
  * A single component to be teleported by the host's `<DockviewPortals>`.
  *
  * `props` is a {@link ShallowRef} so reassigning it triggers a re-render
- * without Vue deeply proxying the value — the params object carries raw
- * dockview API instances that must NOT be made reactive.
+ * without Vue deeply proxying the value. The params object carries raw
+ * dockview API instances that must not be made reactive.
  */
 export interface VueMountEntry {
     readonly id: number;

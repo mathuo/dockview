@@ -27,7 +27,7 @@ class TestPanel implements IContentRenderer {
  * absent, the core component must still construct, run the base layout
  * operations (add / split / maximize / serialize / remove) and dispose without
  * throwing. That is the contract that keeps the package boundary a
- * lift-and-move — if removing a module breaks core, the boundary is leaking.
+ * lift-and-move: if removing a module breaks core, the boundary is leaking.
  *
  * Modules are wired through the process-global registry exactly how `dockview`
  * ships them (`registerModules(Modules)`); the component is then constructed
@@ -105,7 +105,7 @@ describe('extracted module removability', () => {
         dockview.dispose();
     };
 
-    test('baseline — all extracted modules present', () => {
+    test('baseline: all extracted modules present', () => {
         expect(() => exercise(null)).not.toThrow();
     });
 

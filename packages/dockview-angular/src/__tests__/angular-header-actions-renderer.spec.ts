@@ -227,7 +227,7 @@ describe('AngularHeaderActionsRenderer', () => {
 
         renderer.dispose();
 
-        // After dispose, firing further events must not throw — disposal
+        // After dispose, firing further events must not throw; disposal
         // should have unsubscribed every handler.
         expect(() => {
             group.model.panels.push({ id: 'late' });

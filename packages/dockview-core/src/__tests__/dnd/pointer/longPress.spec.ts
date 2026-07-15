@@ -54,10 +54,10 @@ describe('LongPressDetector', () => {
         });
 
         fireEvent.pointerDown(element, pointerInit());
-        // Within tolerance — must not cancel.
+        // Within tolerance, so it must not cancel.
         fireEvent.pointerMove(window, pointerInit({ clientX: 5 }));
         jest.advanceTimersByTime(250);
-        // Beyond tolerance — must cancel.
+        // Beyond tolerance, so it must cancel.
         fireEvent.pointerMove(window, pointerInit({ clientX: 20 }));
         jest.advanceTimersByTime(500);
 

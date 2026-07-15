@@ -6,6 +6,6 @@ export * from 'dockview-core';
  * separately-published `dockview-enterprise` package (which depends on and
  * re-exports `dockview`); install that to opt into them.
  *
- * This module has no side effects — it is a pure re-export — so bundlers can
+ * This module has no side effects (it's a pure re-export), so bundlers can
  * fully tree-shake unused exports out of consumer builds.
  */

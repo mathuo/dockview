@@ -27,12 +27,12 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * Pinned tabs (Phase 1 — model + ordering). Pinned tabs render before all
+ * Pinned tabs (Phase 1: model + ordering). Pinned tabs render before all
  * unpinned tabs in their group; pin order is stable (pin appends to the pinned
  * block, unpin returns to the start of the unpinned block). Owned by the
  * PinnedTabs module and dormant unless `pinnedTabs.enabled` is set.
  */
-describe('pinned tabs — ordering math', () => {
+describe('pinned tabs: ordering math', () => {
     const isPinnedIn =
         (pinned: string[]) =>
         (id: string): boolean =>
@@ -78,7 +78,7 @@ describe('pinned tabs — ordering math', () => {
     });
 });
 
-describe('pinned tabs — row reorder index math', () => {
+describe('pinned tabs: row reorder index math', () => {
     // Three tabs, 20px wide, laid out at x = [0, 20, 40] → midpoints [10, 30, 50].
     const midpoints = [10, 30, 50];
 
@@ -113,7 +113,7 @@ describe('pinned tabs — row reorder index math', () => {
     });
 });
 
-describe('pinned tabs — integration', () => {
+describe('pinned tabs: integration', () => {
     let container: HTMLElement;
 
     const make = (
@@ -156,7 +156,7 @@ describe('pinned tabs — integration', () => {
         c.api.setPinned(true);
 
         expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
-        // Default is labelled — not compact.
+        // Default is labelled, not compact.
         expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
             false
         );
@@ -358,7 +358,7 @@ describe('pinned tabs — integration', () => {
         c.api.setPinned(true);
         expect(predicate('c')).toBe(true);
 
-        // A close is not an unpin — the id must still be pruned so it can't
+        // A close is not an unpin; the id must still be pruned so it can't
         // linger in the exclusion set and mis-exclude a future reused id.
         c.api.close();
         expect(predicate('c')).toBe(false);
@@ -436,7 +436,7 @@ describe('pinned tabs — integration', () => {
     });
 });
 
-describe('pinned tabs — reorder guard', () => {
+describe('pinned tabs: reorder guard', () => {
     const makeService = (pinnedTabs: unknown): PinnedTabsService => {
         const stub: any = () => ({ dispose() {} });
         return new PinnedTabsService({
@@ -567,7 +567,7 @@ describe('pinned tabs — reorder guard', () => {
     });
 
     // A drag that originated in the pinned second row always flips (unpins) a
-    // drop past the boundary — the row is the only handle on the tab, so a
+    // drop past the boundary: the row is the only handle on the tab, so a
     // drag-out is a deliberate unpin regardless of the clamp/flip option.
     describe('row-originated drag (unpin-by-drag-out)', () => {
         test('a drag out of the row unpins even in clamp mode', async () => {
@@ -582,7 +582,7 @@ describe('pinned tabs — reorder guard', () => {
             ]);
 
             svc.beginRowDrag('p');
-            // Not clamped back to the boundary — the drop index is honoured…
+            // Not clamped back to the boundary: the drop index is honoured…
             expect(svc.resolveDropIndex(g, 'p', 1)).toBe(1);
             await Promise.resolve();
             // …and the panel unpins.
@@ -602,7 +602,7 @@ describe('pinned tabs — reorder guard', () => {
 
             svc.beginRowDrag('p');
             svc.endRowDrag();
-            // Back to clamp — a pinned tab is pinned-clamped to the boundary.
+            // Back to clamp: a pinned tab is pinned-clamped to the boundary.
             expect(svc.resolveDropIndex(g, 'p', 1)).toBe(0);
             expect(setPinned).not.toHaveBeenCalled();
         });
@@ -625,7 +625,7 @@ describe('pinned tabs — reorder guard', () => {
     });
 });
 
-describe('pinned tabs — serialization', () => {
+describe('pinned tabs: serialization', () => {
     const containers: HTMLElement[] = [];
 
     const make = (
@@ -713,7 +713,7 @@ describe('pinned tabs — serialization', () => {
     });
 });
 
-describe('pinned tabs — separate-row mode', () => {
+describe('pinned tabs: separate-row mode', () => {
     let container: HTMLElement;
 
     const make = (
@@ -972,7 +972,7 @@ describe('pinned tabs — separate-row mode', () => {
         b.api.setPinned(true); // both pinned
         const order = () => a.api.group.model.panels.map((p) => p.id);
 
-        // 'b' is already pinned — dropping its (hidden) main tab is a no-op.
+        // 'b' is already pinned, so dropping its (hidden) main tab is a no-op.
         const moveTo = jest.spyOn(b.api, 'moveTo');
         dragMainTabIntoRow(b, 999);
 
@@ -1007,7 +1007,7 @@ describe('pinned tabs — separate-row mode', () => {
         a.api.setPinned(true);
         expect(rowTabs().map((el) => el.textContent)).toEqual(['a']);
 
-        // A second group, then move the pinned panel into it — no pin-change
+        // A second group, then move the pinned panel into it. No pin-change
         // event fires, only onDidAddPanel on the destination group.
         const z = dockview.addPanel({
             id: 'z',

@@ -60,7 +60,7 @@ export class DockviewFloatingGroupPanel
         this.addDisposables(overlay, {
             // The gridview owns the floating window's DOM subtree (mounted as
             // the overlay's content). Disposing it tears down the splitview;
-            // it does NOT dispose the leaf views (groups) — their lifecycle is
+            // it doesn't dispose the leaf views (groups), whose lifecycle is
             // owned by the component's `_groups` map.
             dispose: () => this.gridview.dispose(),
         });

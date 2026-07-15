@@ -9,15 +9,15 @@
     /**
      * Multi-row (wrapping) tabs: when the tab list wraps onto multiple rows
      * (`.dv-tabs-container--wrap`, toggled by the `MultiRowTabsModule`), the
-     * header grows to fit instead of clipping. Inert otherwise — the single-row
+     * header grows to fit instead of clipping. Inert otherwise: the single-row
      * fixed height above is unchanged.
      */
     &:has(.dv-tabs-container--wrap) {
         height: auto;
         min-height: var(--dv-tabs-and-actions-container-height);
         // Keep the header chrome (prefix / left / right actions, drag void) on
-        // the first row instead of stretching + centering across the full
-        // multi-row height — only the tab list grows downward.
+        // the first row instead of stretching and centering across the full
+        // multi-row height; only the tab list grows downward.
         align-items: flex-start;
 
         > .dv-pre-actions-container,

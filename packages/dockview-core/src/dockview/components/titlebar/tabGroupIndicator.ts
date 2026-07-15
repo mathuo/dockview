@@ -23,8 +23,8 @@ export const TAB_GROUP_CHIP_CONTINUATION_CLASS =
 const CONTINUATION_PIP_SIZE = 8;
 
 /**
- * A maximal run of a group's tabs on one wrapped line — a row (horizontal
- * header) or a column (vertical header) — in container-relative coordinates.
+ * A maximal run of a group's tabs on one wrapped line (a row for a horizontal
+ * header, a column for a vertical header), in container-relative coordinates.
  */
 interface WrappedRun {
     top: number;
@@ -213,7 +213,7 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         // Multi-line wrap (`MultiRowTabsModule`): a group's tabs can span
         // multiple rows (horizontal header) or columns (vertical header), which
         // the single-bar model below can't represent. Draw a per-line segment
-        // instead — rows bucketed by top, columns bucketed by left.
+        // instead: rows bucketed by top, columns bucketed by left.
         const wrapped = this._ctx.tabsList.classList.contains(
             OVERFLOW_WRAP_TABS_CLASS
         );
@@ -384,10 +384,10 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
      * Position a group's underline across a multi-line (wrapped) tab strip. The
      * single-bar model can't span lines, so the element is sized to cover the
      * group's line span and an SVG draws one straight segment per line-run of
-     * the group's tabs — a horizontal segment per row (horizontal header) or a
+     * the group's tabs: a horizontal segment per row (horizontal header) or a
      * vertical segment per column (vertical header). Tabs are bucketed into
      * runs by their cross-axis offset: `top` for rows, `left` for columns.
-     * (The active-tab wrap-around bump is omitted in wrap — the per-line lines
+     * (The active-tab wrap-around bump is omitted in wrap; the per-line lines
      * still convey membership.)
      */
     private _positionWrappedUnderline(
@@ -483,7 +483,7 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
     /**
      * Bucket a group's visible tabs into line-runs by their cross-axis offset
      * (rows by `top`, columns by `left`), with a 2px sub-pixel tolerance.
-     * `firstRun` is the run holding the group's first tab (the chip's line) —
+     * `firstRun` is the run holding the group's first tab (the chip's line),
      * tracked by reference so it is correct regardless of axis or header side (a
      * `vertical-rl` first column is right-most, not left-most).
      */
@@ -817,8 +817,8 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
 }
 
 /**
- * Flat continuous bar indicator — no wrap-around, just a colored line
- * spanning the full tab group width.
+ * Flat continuous bar indicator: a plain colored line spanning the full tab
+ * group width, with no wrap-around.
  */
 export class NoneTabGroupIndicator extends BaseTabGroupIndicator {
     protected applyShape(

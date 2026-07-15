@@ -32,8 +32,8 @@ export interface AddEdgeGroupOptions extends EdgeGroupOptions {
     autoHide?: boolean;
     /**
      * When true, this edge group tears itself down to zero footprint once
-     * emptied (instead of collapsing to a strip) — the behaviour used by
-     * drag-revealed edges.
+     * emptied (instead of collapsing to a strip). This is the behaviour used
+     * by drag-revealed edges.
      */
     autoReveal?: boolean;
 }
@@ -150,7 +150,7 @@ export class EdgeGroupView implements IView {
     }
 
     /** The user-configured (pre-gap) geometry constraints, for serialization.
-     *  These are the raw values passed to `addEdgeGroup` — unlike the effective
+     *  These are the raw values passed to `addEdgeGroup`, unlike the effective
      *  `minimumSize`/`maximumSize`/`collapsedSize` getters, which fold in the
      *  theme gap and collapse-locking. */
     get configuredMinimumSize(): number | undefined {
@@ -384,7 +384,7 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     addBottomView(view: EdgeGroupView, initialSize: number): void {
-        // Append after center (and any existing bottom — shouldn't happen but safe)
+        // Append after center (and any existing bottom; shouldn't happen but safe)
         const newIndex = this._splitview.length;
         this._splitview.addView(view, initialSize, newIndex);
         this._bottomIndex = newIndex;
@@ -863,7 +863,7 @@ export class ShellManager implements IDisposable {
         return this._getView(position)?.isCollapsed ?? false;
     }
 
-    /** The size an edge group expands to (its pre-collapse size) — used to size
+    /** The size an edge group expands to (its pre-collapse size), used to size
      *  the auto-hide peek overlay. */
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number {
         return this._getView(position)?.lastExpandedSize ?? 0;
@@ -903,7 +903,7 @@ export class ShellManager implements IDisposable {
 
         // Record the size to restore the group to. An expanded-but-hidden
         // group reports getViewSize 0, so fall back to its cached visible size
-        // (then lastExpandedSize) — otherwise re-showing snaps to minimumSize.
+        // (then lastExpandedSize); otherwise re-showing snaps to minimumSize.
         const expandedSize = (
             view: EdgeGroupView,
             isVisible: boolean,

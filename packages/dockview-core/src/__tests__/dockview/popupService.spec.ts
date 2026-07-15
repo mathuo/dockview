@@ -86,7 +86,7 @@ describe('PopupService', () => {
         document.body.appendChild(outside);
 
         // PopupService swallows outside-pointerdown for a brief grace window
-        // after opening (touch long-press protection) — advance past it.
+        // after opening (touch long-press protection), so advance past it.
         nowSpy.mockReturnValue(300);
 
         fireEvent.pointerDown(outside);
@@ -119,7 +119,7 @@ describe('PopupService', () => {
         openMenu(service);
         service.close();
 
-        // Open a second menu and close via Escape — only one close should fire
+        // Open a second menu and close via Escape; only one close should fire
         const el2 = openMenu(service);
         fireEvent.keyDown(window, { key: 'Escape' });
 

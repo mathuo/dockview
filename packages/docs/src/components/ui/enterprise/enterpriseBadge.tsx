@@ -17,7 +17,7 @@ export function EnterpriseBadge({
     return (
         <span
             className={className}
-            title="Enterprise feature — part of the dockview-enterprise package"
+            title="Enterprise feature, part of the dockview-enterprise package"
             aria-label="Enterprise feature"
             role="img"
         >

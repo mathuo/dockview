@@ -110,7 +110,7 @@ describe('matchesQuery', () => {
     });
 });
 
-describe('OverflowListView — search scope', () => {
+describe('OverflowListView: search scope', () => {
     afterEach(() => {
         document.body
             .querySelectorAll('.dv-tabs-overflow-container')
@@ -182,7 +182,7 @@ describe('OverflowListView — search scope', () => {
     });
 });
 
-describe('OverflowListView — pinned overflow section', () => {
+describe('OverflowListView: pinned overflow section', () => {
     afterEach(() => {
         document.body
             .querySelectorAll('.dv-tabs-overflow-container')
@@ -295,7 +295,7 @@ describe('OverflowListView — pinned overflow section', () => {
     });
 });
 
-describe('OverflowListView — MRU ordering', () => {
+describe('OverflowListView: MRU ordering', () => {
     afterEach(() => {
         document.body
             .querySelectorAll('.dv-tabs-overflow-container')
@@ -326,7 +326,7 @@ describe('OverflowListView — MRU ordering', () => {
     });
 });
 
-describe('OverflowListView — search filtering + keyboard', () => {
+describe('OverflowListView: search filtering + keyboard', () => {
     beforeEach(() => jest.useFakeTimers());
     afterEach(() => {
         jest.useRealTimers();
@@ -408,7 +408,7 @@ describe('OverflowListView — search filtering + keyboard', () => {
 
 // --- Full-component integration -----------------------------------------------
 
-describe('advanced overflow — full component integration', () => {
+describe('advanced overflow: full component integration', () => {
     let container: HTMLElement;
 
     const make = (overflow: any): DockviewComponent => {
@@ -470,7 +470,7 @@ describe('advanced overflow — full component integration', () => {
             dockview.addPanel({ id, component: 'default', title: id })
         );
 
-        // User activations — the UI wraps tab activation in `withOrigin('user')`
+        // User activations. The UI wraps tab activation in `withOrigin('user')`
         // (a bare `setActive()` is origin 'api' and must not reorder recency).
         dockview.withOrigin('user', () => panels[2].api.setActive()); // c
         dockview.withOrigin('user', () => panels[1].api.setActive()); // b (most recent)

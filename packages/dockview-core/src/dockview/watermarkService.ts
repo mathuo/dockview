@@ -15,7 +15,7 @@ export interface IWatermarkHost {
     // Subscribe to BaseGrid-level add/remove (not the dockview-level
     // onDidAddGroup/onDidRemoveGroup) because BaseGrid fires even when
     // doRemoveGroup is called with skipDispose=true during floating/popout
-    // conversions — that's when a grid group disappears and the watermark
+    // conversions, which is when a grid group disappears and the watermark
     // needs to re-evaluate. The dockview-level events skip these.
     readonly onDidAdd: Event<DockviewGroupPanel>;
     readonly onDidRemove: Event<DockviewGroupPanel>;

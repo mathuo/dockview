@@ -118,7 +118,7 @@ describe('drop guide', () => {
     test('fills the gaps between cells so the overlay does not blink out mid-traverse', () => {
         make(true);
         const r = service.resolver!;
-        // 200x100: the top cell ends at y=27 and the centre starts at y=31 — a
+        // 200x100: the top cell ends at y=27 and the centre starts at y=31, a
         // 4px gap that used to resolve to null (the overlay would disappear). A
         // pointer in the gap now snaps to whichever cell is nearer, so the
         // overlay stays on as the cursor crosses between cells.
@@ -259,7 +259,7 @@ describe('drop guide', () => {
             content.querySelectorAll('.dv-drop-guide-cell-active')
         ).toHaveLength(1);
 
-        over(false, 'center'); // moves to the inner centre — only it is active
+        over(false, 'center'); // moves to the inner centre; only it is active
         const active = content.querySelectorAll('.dv-drop-guide-cell-active');
         expect(active).toHaveLength(1);
         expect(active[0].classList).toContain('dv-drop-guide-cell-center');
@@ -320,7 +320,7 @@ describe('drop guide', () => {
             group,
         } as DockviewWillShowOverlayLocationEvent);
 
-        // 9 cells but inner+outer of a direction share a position — the veto
+        // 9 cells but inner+outer of a direction share a position, so the veto
         // (which can fire onUnhandledDragOver) must run at most once per position.
         expect(gateCalls.length).toBe(new Set(gateCalls).size);
         expect(gateCalls.length).toBeLessThanOrEqual(5);

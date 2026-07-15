@@ -590,9 +590,9 @@ describe('WrapTabGroupIndicator vertical columns (DV-14)', () => {
     });
 
     test('the continuation marker skips the column holding the first tab (vertical-rl safe)', () => {
-        // First panel 'a' is in the RIGHT-most column (left 40); the left column
-        // (left 0) is the continuation one. Bucketing by reference — not by
-        // min-left — must mark the left column, not the first.
+        // First panel 'a' is in the right-most column (left 40); the left column
+        // (left 0) is the continuation one. Bucketing by reference, not by
+        // min-left, must mark the left column, not the first.
         const tabMap = new Map<string, any>([
             ['a', makeTab(40, 0)],
             ['b', makeTab(40, 30)],

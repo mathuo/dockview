@@ -48,32 +48,32 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private _showTabsOverflowControl = false;
     /**
      * Predicate that keeps a panel's tab out of the overflow dropdown
-     * regardless of visibility — wired by the PinnedTabs module so pinned tabs
+     * regardless of visibility. Wired by the PinnedTabs module so pinned tabs
      * never overflow. Defaults to a no-op so behaviour is unchanged when the
-     * module is absent. Must stay a pure lookup (no DOM reads) — it runs inside
-     * the overflow filter, which the `OverflowObserver` re-fires on every
+     * module is absent. Must stay a pure lookup (no DOM reads) because it runs
+     * inside the overflow filter, which the `OverflowObserver` re-fires on every
      * resize.
      */
     private _overflowExclude: (panelId: string) => boolean = () => false;
     /**
-     * Predicate that forces a panel's tab INTO the overflow dropdown regardless
-     * of horizontal fit — the complement of {@link _overflowExclude}. Wired by
+     * Predicate that forces a panel's tab into the overflow dropdown regardless
+     * of horizontal fit, the complement of {@link _overflowExclude}. Wired by
      * the MultiRowTabs module: in wrap mode tabs never clip horizontally (they
      * wrap), so the `OverflowObserver` detects nothing; this routes the surplus
      * rows beyond `overflow.maxRows` into the dropdown. Defaults to a no-op so
      * behaviour is unchanged when the module is absent. Must stay a pure lookup
-     * (no DOM reads) — it runs inside the overflow filter.
+     * (no DOM reads) because it runs inside the overflow filter.
      */
     private _forcedOverflow: (panelId: string) => boolean = () => false;
     /**
      * When true, pinned (overflow-excluded) tabs stick to the left edge as the
-     * strip scrolls horizontally (Chrome-style frozen columns) — wired by the
+     * strip scrolls horizontally (Chrome-style frozen columns), wired by the
      * PinnedTabs module in inline mode. Each pinned tab is given a cumulative
      * `--dv-pinned-sticky-left` offset. Defaults to off so behaviour is
      * unchanged when the module is absent.
      */
     private _pinnedSticky = false;
-    /** Whether any tab currently carries the sticky styling — lets
+    /** Whether any tab currently carries the sticky styling; lets
      *  {@link _applyPinnedSticky} bail early when there is nothing to do (the
      *  common case for components that never enable the feature). */
     private _hasPinnedStickyStyling = false;
@@ -84,8 +84,8 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _reorder: TabReorderController;
 
     // The reorder/animation state lives in the controller; these accessors
-    // bridge the (many) `Tabs` call sites — and the test suite, which reads
-    // `(tabs as any)._animState` / `_pendingCollapse` — onto it.
+    // bridge the (many) `Tabs` call sites (and the test suite, which reads
+    // `(tabs as any)._animState` / `_pendingCollapse`) onto it.
     private get _animState(): TabAnimationState | null {
         return this._reorder.animState;
     }
@@ -159,7 +159,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
 
     /**
      * Register a predicate that forces matching panels into the overflow
-     * dropdown regardless of horizontal fit (the MultiRowTabs surplus set —
+     * dropdown regardless of horizontal fit (the MultiRowTabs surplus set, the
      * rows beyond `overflow.maxRows`). Re-evaluates the dropdown immediately.
      * Passing `() => false` restores default behaviour.
      */
@@ -180,13 +180,13 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     }
 
     /**
-     * Enable/disable sticky-on-scroll for pinned tabs (inline mode) — wired by
+     * Enable/disable sticky-on-scroll for pinned tabs (inline mode), wired by
      * the PinnedTabs module. When on, pinned (overflow-excluded) tabs are frozen
      * to the left edge as the strip scrolls, each at the cumulative width of the
      * pinned tabs before it; when off, the sticky styling is cleared. The
      * offsets are scroll-invariant, so they are recomputed only on resize,
      * horizontal scroll (a cheap self-heal after a reorder), and pinned-set
-     * changes — not continuously.
+     * changes, not continuously.
      */
     setPinnedSticky(enabled: boolean): void {
         if (this._pinnedSticky === enabled) {
@@ -210,15 +210,15 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
               )
             : [];
 
-        // Nothing pinned and nothing was ever styled — bail before touching the
-        // DOM. Keeps the common (feature-off) refreshOverflow path free.
+        // Nothing pinned and nothing was ever styled, so bail before touching
+        // the DOM. Keeps the common (feature-off) refreshOverflow path free.
         if (pinned.length === 0 && !this._hasPinnedStickyStyling) {
             return;
         }
 
-        // Strip every existing sticky styling BEFORE measuring. `offsetLeft` on
+        // Strip every existing sticky styling before measuring. `offsetLeft` on
         // a tab that still carries `position: sticky` reports its *stuck*
-        // (frozen/scrolled) position, not its natural in-flow left — so reading
+        // (frozen/scrolled) position, not its natural in-flow left, so reading
         // it here and feeding it back into `--dv-pinned-sticky-left` makes the
         // offset compound on each recompute and the pinned block drifts to the
         // right edge (it ends up rendering last instead of first). Removing the
@@ -241,7 +241,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         // read flushes the class removals above, so all reads are unstuck.
         // `offsetLeft` (relative to the positioned `.dv-tabs-container`) is each
         // tab's in-flow left *including* the preceding tabs' margins, so the
-        // frozen block keeps the theme's tab spacing — a bare width sum would
+        // frozen block keeps the theme's tab spacing; a bare width sum would
         // collapse the gaps in spaced themes.
         const lefts = pinned.map((tab) => tab.value.element.offsetLeft);
         pinned.forEach((tab, index) => {
@@ -303,7 +303,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     }
 
     /**
-     * The scrollable tab list (`.dv-tabs-container`) holding the tab elements —
+     * The scrollable tab list (`.dv-tabs-container`) holding the tab elements,
      * exposed (read-only) so the multi-row wrap controller can measure the
      * wrapped row count and toggle the wrap class. Not the outer header element.
      */
@@ -453,7 +453,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 onChipDragEnd: () => {
                     // HTML5 chip dragend (incl. cancels). The Html5DragSource
                     // owns the listener on the chip element, so this fires
-                    // even if the chip was detached cross-group — the
+                    // even if the chip was detached cross-group; the
                     // element keeps its listeners until the source is
                     // disposed. resetDragAnimation is a no-op after a
                     // successful drop (anim state already null) thanks to
@@ -501,8 +501,8 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             }),
             // Trackpad / wheel forwarding. The strip scrolls along its own
             // axis (x for horizontal headers, y for vertical), so deltaY
-            // from a plain mouse wheel maps onto the strip's axis too —
-            // this gives the VS Code-style "scroll over tab bar to page
+            // from a plain mouse wheel maps onto the strip's axis too,
+            // giving the VS Code-style "scroll over tab bar to page
             // through tabs" feel. We only consume the event when the strip
             // is actually overflowing in the direction the user wheeled in,
             // so a wheel at the edge of a non-overflowing strip still
@@ -697,7 +697,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         return this._tabs.findIndex((tab) => tab.value.panel.id === id);
     }
 
-    /** DOM id of the tab element for a panel — for the tabpanel's `aria-labelledby`. */
+    /** DOM id of the tab element for a panel, used for the tabpanel's `aria-labelledby`. */
     getTabId(panelId: string): string | undefined {
         return this._tabMap.get(panelId)?.value.element.id;
     }
@@ -721,7 +721,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     }
 
     private _onKeyDown(event: KeyboardEvent): void {
-        // Only handle when a tab element itself is focused — never hijack keys
+        // Only handle when a tab element itself is focused; never hijack keys
         // typed inside a custom tab renderer's own controls (inputs etc.).
         const index = this._tabs.findIndex(
             (tab) => tab.value.element === event.target
@@ -805,7 +805,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         this._tabs[index].value.element.focus();
     }
 
-    /** Move DOM focus to the active tab — the entry point into the tablist. */
+    /** Move DOM focus to the active tab, the entry point into the tablist. */
     focusActiveTab(): void {
         if (this._tabs.length === 0) {
             return;
@@ -910,11 +910,11 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
 
                     // Collapse the source tab after the browser captures the
                     // drag image, then open the gap at the source position in
-                    // the same paint frame — no visual jump.
+                    // the same paint frame, so there's no visual jump.
                     // Both collapse and gap must be instant (no transition).
                     // In wrap mode there is no gap (the 1-D transforms no-op),
                     // and collapsing the source would reflow the wrapped rows
-                    // mid-drag under the 2-D hit-test — so skip the collapse and
+                    // mid-drag under the 2-D hit-test, so skip the collapse and
                     // leave the source in place.
                     this._pendingCollapse = true;
                     requestAnimationFrame(() => {
@@ -1109,7 +1109,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         this.addTab(value, index);
 
         // A new tab may have been inserted between a chip and its
-        // group's first tab — reposition all chips to stay correct.
+        // group's first tab, so reposition all chips to stay correct.
         this._tabGroupManager.positionAllChips();
 
         // If a tab was added during active drag, refresh positions
@@ -1215,7 +1215,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         // entirely. The exception is when the pinned block *itself* overflows:
         // a pinned tab that is laid out (has width) yet clipped is unreachable
         // in the strip, so it is surfaced in a "Pinned" section at the top of
-        // the dropdown. A zero-width tab is not clipped-but-hidden — it is a
+        // the dropdown. A zero-width tab is not clipped-but-hidden; it is a
         // pinned tab whose main-strip copy is display:none (separate-row mode,
         // where the row already provides access), so it is skipped.
         const pinnedTabs = options.reset
@@ -1257,10 +1257,10 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
 
                 // For collapsed groups whose chip is clipped, ensure all
                 // member tabs are included in the overflow list so they appear
-                // in the dropdown. Pinned members are NOT excluded here: a
+                // in the dropdown. Pinned members are not excluded here: a
                 // collapsed group's members aren't rendered as visible tabs, so
-                // the dropdown is their only reachable path — excluding a pinned
-                // one would make it unreachable.
+                // the dropdown is their only reachable path, and excluding a
+                // pinned one would make it unreachable.
                 if (tg.collapsed) {
                     for (const pid of tg.panelIds) {
                         if (!overflowTabSet.has(pid)) {
@@ -1347,7 +1347,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         }
 
         // Collapse group tabs + chip after the browser captures the drag
-        // image, then open the gap at the source position — all instant
+        // image, then open the gap at the source position, all instant
         // (no transitions).
         const groupPanelIds = new Set(tabGroup.panelIds);
         this._pendingCollapse = true;

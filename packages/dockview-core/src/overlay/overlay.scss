@@ -50,7 +50,7 @@
     }
 }
 
-// Drag-reveal edge indicator: a thin accent LINE hugging the content-area edge
+// Drag-reveal edge indicator: a thin accent line hugging the content-area edge
 // in the direction a new edge group would dock. A line (not a fill) so it reads
 // differently from the split overlay; the colour is the theme's drag-over accent
 // so it matches the rest of the drop styling. Geometry (edge + extent) is set
@@ -170,7 +170,7 @@
 
     // The container is the backdrop behind its content. A single floating group
     // hides it entirely, but a nested floating layout exposes the gaps/sashes
-    // between groups — without a fill those gaps would be transparent. Mirror
+    // between groups, and without a fill those gaps would be transparent. Mirror
     // the docked backdrop (the dockview root uses --dv-group-view-background-color).
     background-color: var(--dv-group-view-background-color);
 
@@ -351,7 +351,7 @@
     }
 }
 
-// Smart Guides — alignment lines + dock/merge drop-preview painted in the
+// Smart Guides: alignment lines + dock/merge drop-preview painted in the
 // floating container while a float is dragged. The module positions + sizes
 // these inline; only the theming lives here (override the CSS vars to restyle).
 .dv-smart-guides {

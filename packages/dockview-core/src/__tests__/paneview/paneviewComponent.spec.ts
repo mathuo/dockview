@@ -265,7 +265,7 @@ describe('paneviewComponent', () => {
             isExpanded: true,
         });
 
-        // hide panel2 — getViewSize now reports 0, but its real size is cached
+        // hide panel2: getViewSize now reports 0, but its real size is cached
         paneview.setVisible(panel2, false);
 
         const json = paneview.toJSON();

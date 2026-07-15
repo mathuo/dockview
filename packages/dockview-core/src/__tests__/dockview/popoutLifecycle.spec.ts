@@ -240,7 +240,7 @@ describe('popout screen positioning', () => {
 
     test('a serialized popout round-trips and restores at its saved screen position (no double-offset)', async () => {
         // 1. Serialize a popout whose window reports an absolute screen
-        //    position — as a window dragged onto a secondary monitor would.
+        //    position, as a window dragged onto a secondary monitor would.
         const POPOUT_SCREEN_X = 2200;
         const POPOUT_SCREEN_Y = 300;
         window.open = (() => {
@@ -268,10 +268,10 @@ describe('popout screen positioning', () => {
 
         // 2. Restore into a fresh component whose opener sits on a secondary
         //    monitor. The saved position is already absolute, so restoration
-        //    must NOT add the opener screen offset again (the DV-39 defect:
+        //    must not add the opener screen offset again (the DV-39 defect:
         //    left would become 1600 + 2200 = 3800). This exercises the real
         //    fromJSON -> deserializePopoutWindows -> addPopoutGroup path, not
-        //    just the supplied-position branch.
+        //    only the supplied-position branch.
         setOpenerScreenPosition(1600, 200);
         const features = captureOpenFeatures();
 

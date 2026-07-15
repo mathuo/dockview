@@ -309,7 +309,7 @@ describe('DockviewVue components prop (issue #1301)', () => {
     });
 
     function mountBare(props: Record<string, any> = {}) {
-        // NOTE: no `global.components` here — this is the scenario that used
+        // No `global.components` here; this is the scenario that used
         // to require `app.component(...)` in main.ts.
         return mount(DockviewVue, { props, attachTo: document.body });
     }
@@ -399,7 +399,7 @@ describe('DockviewVue components prop (issue #1301)', () => {
             },
             attachTo: document.body,
             // String form must continue to work with the legacy global
-            // registration path too — that's the contract we promised.
+            // registration path too. That's the contract we promised.
             global: { components: { MockTab } },
         });
         await flushPromises();
@@ -449,7 +449,7 @@ describe('DockviewVue components prop (issue #1301)', () => {
 
         const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
-        // Should not throw on createWatermarkComponent invocation — we proxy
+        // Should not throw on createWatermarkComponent invocation; we proxy
         // any call to verify resolveComponent doesn't reject the object.
         expect(() =>
             (api as any).component.options.createWatermarkComponent?.()
@@ -550,7 +550,7 @@ describe('DockviewVue components prop (issue #1301)', () => {
         await wrapper.setProps({ components: { Panel: NewPanel } });
         await nextTick();
 
-        // The next addPanel should resolve against the updated map — no
+        // The next addPanel should resolve against the updated map, with no
         // rerender of existing panels (we explicitly chose read-at-create).
         expect(() =>
             api.addPanel({ id: 'panel-2', component: 'Panel', title: 'P2' })

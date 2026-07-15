@@ -35,7 +35,7 @@ class PanelContentPartTest implements IContentRenderer {
 }
 
 /**
- * Layer 1 of the accessibility pack — the free WAI-ARIA Tabs baseline that
+ * Layer 1 of the accessibility pack: the free WAI-ARIA Tabs baseline that
  * ships in core. Asserts roles, states and the tab <-> tabpanel relationships.
  */
 describe('accessibility: WAI-ARIA tabs baseline', () => {
@@ -118,7 +118,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const activeTabId2 = selectedBefore[0].id;
         expect(tabpanel.getAttribute('aria-labelledby')).toBe(activeTabId2);
 
-        // activate panel1 — selection + labelling must move with it.
+        // activate panel1; selection + labelling must move with it.
         panel1.api.setActive();
 
         const selectedAfter = realTabs().filter(
@@ -204,7 +204,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const region = container.querySelector('.dv-groupview')!;
         expect(region.getAttribute('aria-label')).toBe('First');
 
-        // An untitled active panel must not leave a stale name behind — the
+        // An untitled active panel must not leave a stale name behind: the
         // attribute is removed rather than set to an empty string.
         panel1.api.setTitle('');
         expect(region.getAttribute('aria-label')).toBeNull();
@@ -238,7 +238,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
 });
 
 /**
- * Layer 2 — the free WAI-ARIA Tabs keyboard pattern within a strip
+ * Layer 2: the free WAI-ARIA Tabs keyboard pattern within a strip
  * (roving tabindex + arrow / Home / End navigation + manual activation).
  */
 describe('accessibility: tab keyboard navigation', () => {
@@ -266,7 +266,7 @@ describe('accessibility: tab keyboard navigation', () => {
     const realTabs = (): HTMLElement[] =>
         Array.from(container.querySelectorAll('.dv-tab')) as HTMLElement[];
 
-    test('roving tabindex — only the active tab is in the tab order', () => {
+    test('roving tabindex: only the active tab is in the tab order', () => {
         dockview.addPanel({ id: 'p1', component: 'default' });
         dockview.addPanel({ id: 'p2', component: 'default' }); // p2 active
 

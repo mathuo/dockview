@@ -47,7 +47,7 @@ export const SB = {
     mono: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
 };
 
-// Shared button styles (grid/panel/group action rows) — the site's secondary /
+// Shared button styles (grid/panel/group action rows): the site's secondary /
 // primary button recipe, so every button reads clearly in light and dark.
 export const sbBtn: CSSProperties = {
     padding: '5px 11px',

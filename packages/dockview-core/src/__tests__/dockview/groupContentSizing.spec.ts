@@ -28,8 +28,8 @@ class TestContentPart implements IContentRenderer {
 }
 
 /**
- * The group lays panels out with the *content-area* dimensions — the group box
- * minus the header along its axis — so panels (and `onDidDimensionsChange`)
+ * The group lays panels out with the *content-area* dimensions: the group box
+ * minus the header along its axis. That way panels (and `onDidDimensionsChange`)
  * receive the real space they occupy, not the header-inclusive group box.
  *
  * jsdom performs no layout, so `offset*` is 0 by default and nothing is

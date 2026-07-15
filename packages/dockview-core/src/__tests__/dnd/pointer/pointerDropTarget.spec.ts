@@ -236,7 +236,7 @@ describe('PointerDropTarget', () => {
         const target = new PointerDropTarget(element, {
             acceptedTargetZones: ['left', 'right', 'center'],
             canDisplayOverlay: () => true,
-            // 10,20 would be 'left' by default — the resolver forces 'right'.
+            // 10,20 would be 'left' by default, but the resolver forces 'right'.
             getPositionResolver: () => ({
                 resolve: () => ({ position: 'right' }),
             }),

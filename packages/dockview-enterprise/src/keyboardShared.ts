@@ -63,7 +63,7 @@ interface MultiWindowHost {
  * Attach `specs` to the main document **and to every popout document**, keeping
  * the set in sync as popouts open and close. A popout window is a separate
  * `document`, so a capture-phase listener on the main document alone never sees
- * keystrokes made inside a popout — each document needs its own listener.
+ * keystrokes made inside a popout, so each document needs its own listener.
  *
  * A popout that shares the main document (the jsdom mock) is skipped, since the
  * main document's listener already covers it and a second would double-fire.

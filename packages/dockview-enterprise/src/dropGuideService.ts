@@ -58,8 +58,8 @@ const UNIT: Record<Position, { dx: number; dy: number }> = {
  * The cross of cells centred in a `width`×`height` target: the inner ring
  * (split/merge this group, restricted to `zones`) plus, when `includeEdges`, an
  * outer ring of directional cells that dock against the whole layout. The
- * resolver hit-tests these rects and the widget paints them — one geometry, so
- * you aim at exactly the cell you see.
+ * resolver hit-tests these rects and the widget paints them from one geometry,
+ * so you aim at exactly the cell you see.
  */
 function compassCells(
     width: number,
@@ -138,7 +138,7 @@ class CompassResolver implements PositionResolver {
             this.edgesEnabled()
         );
 
-        // Exact hit — the fast path.
+        // Exact hit, the fast path.
         for (const cell of cells) {
             if (
                 args.x >= cell.left &&
@@ -150,8 +150,8 @@ class CompassResolver implements PositionResolver {
             }
         }
 
-        // Gap-fill. The cells form a plus/cross — a vertical column (all share
-        // the central cell's x) and a horizontal row (all share its y) —
+        // Gap-fill. The cells form a plus/cross: a vertical column (all share
+        // the central cell's x) and a horizontal row (all share its y),
         // separated by a GAP-wide space. Exact hit-testing returns null in those
         // gaps, so the drop overlay blinks out as the cursor crosses from one
         // cell to its neighbour. Snap a pointer sitting in an on-axis gap to its
@@ -168,14 +168,14 @@ class CompassResolver implements PositionResolver {
         for (const cell of cells) {
             let dist: number;
             if (inColumn && cell.left === cx) {
-                // a vertical neighbour — gap distance along y
+                // a vertical neighbour: gap distance along y
                 dist = Math.max(
                     cell.top - args.y,
                     args.y - (cell.top + cell.size),
                     0
                 );
             } else if (inRow && cell.top === cy) {
-                // a horizontal neighbour — gap distance along x
+                // a horizontal neighbour: gap distance along x
                 dist = Math.max(
                     cell.left - args.x,
                     args.x - (cell.left + cell.size),
@@ -205,7 +205,7 @@ class CompassWidget {
         this._container = container;
         // Pin a stable containing block. The drop target sets `position:
         // relative` on this element only while an inner-cell overlay shows (the
-        // `.dv-drop-target` class), and removes it for edge cells — without this
+        // `.dv-drop-target` class), and removes it for edge cells. Without this,
         // the absolutely-positioned compass re-anchors to a higher ancestor on
         // an outer cell and visibly jumps. Restored on dispose.
         this._priorPosition = container.style.position;
@@ -227,7 +227,7 @@ class CompassWidget {
 
     /**
      * Paint the cells `gate` accepts (so only legal drops show), centred on
-     * `outline` — the frame the drop target measures — and translated into this
+     * `outline` (the frame the drop target measures) and translated into this
      * widget's own box so the cells line up with where a drop resolves even when
      * the two boxes differ (e.g. `dndPanelOverlay: 'group'` measures the whole
      * group, but the widget is mounted in the content container).
@@ -267,9 +267,9 @@ class CompassWidget {
     }
 
     /**
-     * Highlight the cell the cursor is aiming at — the only hover feedback an
-     * outer (edge) cell gets, since the drop target draws no overlay for it.
-     * `edge` disambiguates the inner vs outer cell that share a direction.
+     * Highlight the cell the cursor is aiming at. This is the only hover
+     * feedback an outer (edge) cell gets, since the drop target draws no overlay
+     * for it. `edge` disambiguates the inner vs outer cell that share a direction.
      */
     setActive(position: Position, edge: boolean): void {
         for (const c of this._cells) {
@@ -294,7 +294,7 @@ class CompassWidget {
 }
 
 /**
- * Drop Guide ("compass") — a VS Code-style aim-at-a-cell drop overlay for group
+ * Drop Guide ("compass"): a VS Code-style aim-at-a-cell drop overlay for group
  * docking. While a panel/group is dragged over a group, a cross of cells is
  * painted over it and the dragged item snaps to whichever cell the cursor is
  * over (instead of the cursor-quadrant of the target). Drop resolution + commit
@@ -367,7 +367,7 @@ export class DropGuideService
             return;
         }
         // An edge-group cell (the true outer edge, when auto edge groups compose
-        // with the compass) is owned by the edge-group affordance — bow out so
+        // with the compass) is owned by the edge-group affordance; bow out so
         // the two don't double-render.
         if (e.edgeGroup) {
             this._unmount();
@@ -375,7 +375,7 @@ export class DropGuideService
         }
         this._mount(e.group, e.nativeEvent);
         if (!this._mounted) {
-            return; // no compass mounted (e.g. no content container) — nothing to drive
+            return; // no compass mounted (e.g. no content container), nothing to drive
         }
         // Fires per drag-over frame while over a cell: light up the cell being
         // aimed at, and for an outer cell preview the layout-edge region. A move
@@ -392,8 +392,8 @@ export class DropGuideService
     /**
      * Clear the feedback when the cursor is over no cell (a dead zone between
      * cells, or off the group). `onWillShowOverlay` only fires on a cell, so
-     * without this the highlight + edge preview would linger. Only ever clears —
-     * setting stays with `onWillShowOverlay` — so the two never conflict.
+     * without this the highlight + edge preview would linger. It only ever
+     * clears (setting stays with `onWillShowOverlay`), so the two never conflict.
      */
     private _clearFeedbackIfOffCells(event: DragEvent | PointerEvent): void {
         if (!this._mounted) {
@@ -415,8 +415,8 @@ export class DropGuideService
     }
 
     /**
-     * Preview the whole-layout-edge region an outer cell docks into — the half
-     * the panel will occupy — styled with the same theme variables as a real
+     * Preview the whole-layout-edge region an outer cell docks into (the half
+     * the panel will occupy), styled with the same theme variables as a real
      * drop overlay so it reads identically. Drawn over the layout root (a
      * positioned element), beneath the compass.
      */
@@ -457,12 +457,12 @@ export class DropGuideService
         const widget = new CompassWidget(content);
         const all = new Set(INNER_CELLS);
         const configured = this._configuredZones();
-        // The frame the drop target measures (the whole group or just the
+        // The frame the drop target measures (the whole group or only the
         // content, per `dndPanelOverlay`); fall back to the content container.
         const outline = this.host.getDropOverlayElement(group) ?? content;
         // Cache the veto per direction: the inner and outer cell of a direction
         // share a position, and `canDropOnGroup` can fire `onUnhandledDragOver`
-        // for a cross-component drag — so resolve each position at most once.
+        // for a cross-component drag, so resolve each position at most once.
         const allowed = new Map<Position, boolean>();
         widget.render(
             outline,

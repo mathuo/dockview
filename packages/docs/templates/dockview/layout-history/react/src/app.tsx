@@ -34,7 +34,7 @@ const App = (props: { theme?: string }) => {
 
     const onReady = (event: DockviewReadyEvent) => {
         loadDefaultLayout(event.api);
-        // The seed layout shouldn't be undoable — start with a clean history.
+        // The seed layout shouldn't be undoable, so start with a clean history.
         event.api.clearHistory();
         setApi(event.api);
     };

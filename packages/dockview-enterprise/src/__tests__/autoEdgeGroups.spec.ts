@@ -18,7 +18,7 @@ class TestPanel implements IContentRenderer {
 const flush = (): Promise<void> => new Promise((r) => setTimeout(r));
 
 /**
- * Drag-revealed, zero-footprint edges — the two-band drag-reveal affordance. A drag
+ * Drag-revealed, zero-footprint edges via a two-band drag-reveal affordance. A drag
  * toward a layout edge splits the widened root band into an outer "dock as edge
  * group" band (reveals a self-hiding edge group) and an inner "split the grid"
  * band (falls through to core's grid split).

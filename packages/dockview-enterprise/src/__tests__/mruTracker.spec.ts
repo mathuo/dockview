@@ -83,7 +83,7 @@ describe('MruTracker', () => {
  * The `origin` filter lives in the service (it reads the event payload), so it
  * is exercised through `AdvancedOverflowService.handleActivePanelChange`.
  */
-describe('AdvancedOverflowService — MRU origin filter', () => {
+describe('AdvancedOverflowService: MRU origin filter', () => {
     const makeGroup = (id: string, panelIds: string[]): any => ({
         id,
         panels: panelIds.map((pid) => ({ id: pid })),
@@ -101,11 +101,11 @@ describe('AdvancedOverflowService — MRU origin filter', () => {
         const service = new AdvancedOverflowService({} as any);
         service.attachToGroup(makeGroup('g', ['a', 'b', 'c']));
 
-        // Programmatic (origin 'api') — must NOT reorder.
+        // Programmatic (origin 'api'); must not reorder.
         service.handleActivePanelChange(activation('c', 'g', 'api') as any);
         expect(service.mru.order('g')).toEqual(['a', 'b', 'c']);
 
-        // User gesture — reorders.
+        // User gesture, reorders.
         service.handleActivePanelChange(activation('c', 'g', 'user') as any);
         expect(service.mru.order('g')).toEqual(['c', 'a', 'b']);
 

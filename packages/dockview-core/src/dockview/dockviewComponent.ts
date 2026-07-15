@@ -283,7 +283,7 @@ export interface FloatingGroupOptions {
      */
     dragHandle?: 'titlebar' | 'tabbar';
     /**
-     * Exclude this floating group from Smart Guides — it never snaps and shows
+     * Exclude this floating group from Smart Guides so it never snaps and shows
      * no guides when dragged (e.g. a pinned HUD). See
      * {@link DockviewOptions.smartGuides}.
      */
@@ -493,20 +493,20 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }
 
-/** A never-firing history-change event — the fallback `onDidChangeHistory`
+/** A never-firing history-change event, the fallback `onDidChangeHistory`
  *  returns when the LayoutHistory module is absent, so the api event is always
  *  valid and subscribable. */
 const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
     dispose: () => {
-        // noop — nothing ever fires
+        // noop, nothing ever fires
     },
 });
 
-/** A never-firing event — the fallback the Smart Guides snap events return when
+/** A never-firing event, the fallback the Smart Guides snap events return when
  *  the module is absent, so the api events are always subscribable. */
 const NO_EVENT: Event<any> = () => ({
     dispose: () => {
-        // noop — nothing ever fires
+        // noop, nothing ever fires
     },
 });
 
@@ -612,7 +612,7 @@ export class DockviewComponent
         this._onDidRemovePopoutGroup.event;
 
     private readonly _onDidChangePopouts = new Emitter<void>();
-    /** Fires whenever a popout window opens or closes — i.e. the set of popout
+    /** Fires whenever a popout window opens or closes, i.e. the set of popout
      *  documents changed. Used by accessibility services that mirror per-window
      *  state (e.g. a live region in each popout). */
     readonly onDidChangePopouts: Event<void> = this._onDidChangePopouts.event;
@@ -623,8 +623,8 @@ export class DockviewComponent
 
     private readonly _onDidStartFloatingGroupDrag =
         new Emitter<DockviewGroupPanel>();
-    /** Fires with the dragged group when a floating group move-drag first moves
-     *  — consumed by the Smart Guides service (`ISmartGuidesHost`) to start each
+    /** Fires with the dragged group when a floating group move-drag first moves.
+     *  Consumed by the Smart Guides service (`ISmartGuidesHost`) to start each
      *  drag from a clean slate (a redock long-press aborts with no end event). */
     readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel> =
         this._onDidStartFloatingGroupDrag.event;
@@ -632,7 +632,7 @@ export class DockviewComponent
     private readonly _onDidEndFloatingGroupDrag =
         new Emitter<DockviewGroupPanel>();
     /** Fires with the dragged group when a floating group's move/resize drag
-     *  ends — consumed by the Smart Guides service (`ISmartGuidesHost`) to tear
+     *  ends. Consumed by the Smart Guides service (`ISmartGuidesHost`) to tear
      *  down its per-drag guides. */
     readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel> =
         this._onDidEndFloatingGroupDrag.event;
@@ -804,14 +804,14 @@ export class DockviewComponent
     }
 
     /**
-     * ISmartGuidesHost — the positioning parent floats are placed in, also the
+     * ISmartGuidesHost: the positioning parent floats are placed in, also the
      * coordinate space the Smart Guides overlay draws its alignment lines in.
      */
     getFloatingContainer(): HTMLElement {
         return this._floatingOverlayHost ?? this.gridview.element;
     }
 
-    /** ISmartGuidesHost — the other floats' group identity + container-relative
+    /** ISmartGuidesHost: the other floats' group identity + container-relative
      *  box, for the snap-together detector. */
     getFloatingGroupSnapshots(
         exclude: DockviewGroupPanel
@@ -834,7 +834,7 @@ export class DockviewComponent
             });
     }
 
-    /** ISmartGuidesHost — dock/merge a dragged float into a target group via the
+    /** ISmartGuidesHost: dock/merge a dragged float into a target group via the
      *  existing move primitive (so events + undo cover it). */
     mergeFloatInto(
         dragged: DockviewGroupPanel,
@@ -853,7 +853,7 @@ export class DockviewComponent
         });
     }
 
-    /** ISmartGuidesHost — the main grid's splitter (sash) rectangles, in the
+    /** ISmartGuidesHost: the main grid's splitter (sash) rectangles, in the
      *  floating container's coordinate space, for the optional splitter target. */
     getGridSplitterRects(): Box[] {
         const origin = this.getFloatingContainer().getBoundingClientRect();
@@ -871,7 +871,7 @@ export class DockviewComponent
     }
 
     private get _smartGuidesService() {
-        // Optional like every module service — `?.`-guarded everywhere so the
+        // Optional like every module service; `?.`-guarded everywhere so the
         // module can be removed without crashing the float drag loop.
         return this._moduleRegistry.services.smartGuidesService;
     }
@@ -906,7 +906,7 @@ export class DockviewComponent
      * `transformFloatingGroupDrag` option and the optional Smart Guides module,
      * so an app and the module can both nudge a single drag rather than one
      * clobbering the other. Returns `undefined` only when the app option is
-     * unset AND the module is absent (the removability case) — then no transform
+     * unset and the module is absent (the removability case); then no transform
      * is installed and the sibling-box snapshot is skipped, so the drag loop is
      * truly byte-for-byte unchanged. When the module is present but `smartGuides`
      * is unset it installs a cheap pass-through (the service snaps nothing and
@@ -962,7 +962,7 @@ export class DockviewComponent
     }
 
     private get _watermarkService() {
-        // Tier 1 module — optional. Callers must `?.`-guard so the module
+        // Tier 1 module, optional. Callers must `?.`-guard so the module
         // can be removed from AllModules without crashing the component.
         return this._moduleRegistry.services.watermarkService;
     }
@@ -972,14 +972,14 @@ export class DockviewComponent
     }
 
     private get _rootDropTargetService() {
-        // Optional like every other module service — RootDropTargetModule can be
+        // Optional like every other module service; RootDropTargetModule can be
         // removed from the registered set without crashing the component.
         return this._moduleRegistry.services.rootDropTargetService;
     }
 
     private get _advancedDnDService() {
-        // Optional — callers `?.`-guard so the module can be removed from
-        // AllModules. Absent ⇒ the onWill* hooks simply don't fire (≡ no
+        // Optional; callers `?.`-guard so the module can be removed from
+        // AllModules. When absent the onWill* hooks don't fire (≡ no
         // subscriber), which is invisible to apps not customising DnD.
         return this._moduleRegistry.services.advancedDnDService;
     }
@@ -988,7 +988,7 @@ export class DockviewComponent
         return this._moduleRegistry.services.dropGuideService;
     }
 
-    /** IDropGuideHost — whether a content drop at `position` on `group` is
+    /** IDropGuideHost: whether a content drop at `position` on `group` is
      *  allowed, for compass cell gating (only legal cells are shown). The same
      *  predicate the content drop target uses, so the compass and the real drop
      *  agree. */
@@ -1000,7 +1000,7 @@ export class DockviewComponent
         return group.model.canDisplayContentOverlay(event, position);
     }
 
-    /** IDropGuideHost — the frame the content drop target measures (mirrors the
+    /** IDropGuideHost: the frame the content drop target measures (mirrors the
      *  `getOverlayOutline` rule in `content.ts`): the whole group when
      *  `dndPanelOverlay === 'group'`, else just the content. The compass paints
      *  in this frame so its cells align with where a drop resolves. */
@@ -1016,7 +1016,7 @@ export class DockviewComponent
             : content;
     }
 
-    /** IMultiRowTabsHost — the group's scrollable tab list (`.dv-tabs-container`),
+    /** IMultiRowTabsHost: the group's scrollable tab list (`.dv-tabs-container`),
      *  the element the wrap controller toggles + measures. */
     getTabsListElement(group: DockviewGroupPanel): HTMLElement | undefined {
         return group.model.header.hidden
@@ -1024,13 +1024,13 @@ export class DockviewComponent
             : group.model.tabsListElement;
     }
 
-    /** IMultiRowTabsHost — re-run a group's layout so a wrapped-header height
+    /** IMultiRowTabsHost: re-run a group's layout so a wrapped-header height
      *  change propagates to the content + active panel. */
     relayoutGroup(group: DockviewGroupPanel): void {
         group.relayout();
     }
 
-    /** IMultiRowTabsHost — force the wrap controller's surplus set (rows beyond
+    /** IMultiRowTabsHost: force the wrap controller's surplus set (rows beyond
      *  `overflow.maxRows`) into the group's overflow dropdown. */
     setForcedOverflow(
         group: DockviewGroupPanel,
@@ -1039,14 +1039,14 @@ export class DockviewComponent
         group.model.header.setForcedOverflow(fn);
     }
 
-    /** IDropGuideHost — the layout root (`.dv-dockview`, a positioned element),
+    /** IDropGuideHost: the layout root (`.dv-dockview`, a positioned element),
      *  the surface the outer-cell landing preview is drawn over. */
     getLayoutElement(): HTMLElement {
         return this.gridview.element;
     }
 
     /**
-     * The drop-position resolver installed on the group content drop targets —
+     * The drop-position resolver installed on the group content drop targets:
      * the app's `dropPositionResolver` option if set, else the Drop Guide
      * module's compass resolver (undefined when the compass is disabled). Read
      * live by the content drop targets; undefined ⇒ default cursor-quadrant.
@@ -1057,9 +1057,9 @@ export class DockviewComponent
         }
         const compass = this._dropGuideService?.resolver;
         const autoEdge = this._moduleRegistry.services.autoEdgeGroupService;
-        // With both the compass and auto edge groups on, COMPOSE them: the true
+        // With both the compass and auto edge groups on, compose them: the true
         // outer edge reveals an edge group, everything else (inner split cells,
-        // the compass's grid-edge outer ring) falls through to the compass — so
+        // the compass's grid-edge outer ring) falls through to the compass, so
         // a drop can target either the layout edge or an edge group.
         if (compass && autoEdge) {
             return {
@@ -1111,9 +1111,9 @@ export class DockviewComponent
         ) {
             // `dockToEdgeGroups` baseline (single band): a root-edge drop reveals
             // an edge group instead of splitting the grid. When the two-band
-            // drag-reveal affordance is registered it owns edge-drop routing —
+            // drag-reveal affordance is registered it owns edge-drop routing:
             // it preempts the outer band via `onWillDrop.preventDefault` and lets
-            // the inner band fall through here to the default grid split — so
+            // the inner band fall through here to the default grid split, so
             // this single-band fallback is disabled.
             this.revealEdgeGroupWithData(position, data);
             return;
@@ -1207,7 +1207,7 @@ export class DockviewComponent
         return event.isAccepted;
     }
 
-    // IAdvancedDnDHost — the emitters stay here so the public onWill* event
+    // IAdvancedDnDHost: the emitters stay here so the public onWill* event
     // shape is unchanged; AdvancedDnDService routes the per-group fires
     // through these. Engine guards (e.g. disableDnd) run on the component
     // ahead of the dispatch.
@@ -1230,7 +1230,7 @@ export class DockviewComponent
     /**
      * Resolve the custom group drag ghost (via the AdvancedDnD module), or
      * `undefined` to fall back to the default chip. Returns `undefined` when
-     * the module is absent — the default ghost then renders.
+     * the module is absent, and the default ghost then renders.
      */
     buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined {
         return this._advancedDnDService?.buildGroupDragGhost(group);
@@ -1247,9 +1247,9 @@ export class DockviewComponent
         return this._advancedDnDService?.resolveOverlayModel(location, group);
     }
 
-    // IKeyboardNavigationHost — keyboard docking reaches the AdvancedDnD preview +
+    // IKeyboardNavigationHost: keyboard docking reaches the AdvancedDnD preview +
     // LiveRegion announcer through these so the service stays decoupled.
-    /** Outermost element — the shell (incl. edge groups) once built, else the gridview. */
+    /** Outermost element: the shell (incl. edge groups) once built, else the gridview. */
     get rootElement(): HTMLElement {
         return this._shellManager?.element ?? this.element;
     }
@@ -1277,7 +1277,7 @@ export class DockviewComponent
     /**
      * The next / previous group in gridview (spatial) order, wrapping round.
      * The keyboard accessibility module's focus navigation is built on this
-     * primitive — the only piece that needs the grid internals; the rest of
+     * primitive, the only piece that needs the grid internals; the rest of
      * the navigation logic lives in the KeyboardNavigationService.
      */
     adjacentGroup(
@@ -1379,19 +1379,19 @@ export class DockviewComponent
     }
 
     get contextMenuService(): IContextMenuService | undefined {
-        // Owned by ContextMenuModule — undefined when the module is not
+        // Owned by ContextMenuModule; undefined when the module is not
         // registered, so callers must `?.`-guard.
         return this._moduleRegistry.services.contextMenuService;
     }
 
     get pinnedTabsService(): IPinnedTabsService | undefined {
-        // Owned by PinnedTabsModule — undefined when the module is not
+        // Owned by PinnedTabsModule; undefined when the module is not
         // registered, so callers must `?.`-guard.
         return this._moduleRegistry.services.pinnedTabsService;
     }
 
     get advancedOverflowService(): IAdvancedOverflowService | undefined {
-        // Owned by AdvancedOverflowModule — undefined when the module is not
+        // Owned by AdvancedOverflowModule; undefined when the module is not
         // registered, so callers must `?.`-guard (the free flat overflow list
         // renders in that case).
         return this._moduleRegistry.services.advancedOverflowService;
@@ -1412,7 +1412,7 @@ export class DockviewComponent
         }
 
         if (!this.options.pinnedTabs?.enabled) {
-            // Feature dormant — pinning is opt-in via `pinnedTabs.enabled`.
+            // Feature dormant; pinning is opt-in via `pinnedTabs.enabled`.
             return;
         }
 
@@ -1485,8 +1485,8 @@ export class DockviewComponent
         this._moduleRegistry.initialize(this);
 
         // Surface popout removal symmetrically with `onDidAddPopoutGroup`. The
-        // service is the single point every removal path funnels through — a
-        // genuine window close and an explicit removal alike — and it suppresses
+        // service is the single point every removal path funnels through, both
+        // a genuine window close and an explicit removal, and it suppresses
         // the event during component teardown.
         const popoutWindowService = this._popoutWindowService;
         if (popoutWindowService) {
@@ -1659,7 +1659,7 @@ export class DockviewComponent
             })
         );
 
-        // Root edge-drop wiring lives with its (optional) module — guard it so
+        // Root edge-drop wiring lives with its (optional) module; guard it so
         // the module is independently removable.
         const rootDropTarget = this._rootDropTargetService;
         if (rootDropTarget) {
@@ -1732,8 +1732,8 @@ export class DockviewComponent
      */
     getPopupServiceForGroup(group: DockviewGroupPanel): PopupService {
         // Resolve by window membership (DOM containment), not the anchor id, so
-        // every group in a multi-group popout — anchor or not, original or
-        // promoted after the anchor left — uses that window's popup service
+        // every group in a multi-group popout (anchor or not, original or
+        // promoted after the anchor left) uses that window's popup service
         // rather than falling back to the main window.
         return (
             this._popoutWindowService?.findByGroup(group)?.popupService ??
@@ -1763,7 +1763,7 @@ export class DockviewComponent
         );
     }
 
-    /** The live popout `Window` handles — one per open popout group. The
+    /** The live popout `Window` handles, one per open popout group. The
      *  narrow surface accessibility services need to mirror per-window state. */
     getPopoutWindows(): Window[] {
         return this.getPopouts().map((popout) => popout.window);
@@ -1801,7 +1801,7 @@ export class DockviewComponent
         const element = this.element;
 
         // Always returns absolute *screen* coordinates. A caller-supplied /
-        // restored `position` is already in screen space — it originates from
+        // restored `position` is already in screen space; it originates from
         // PopoutWindow.dimensions() (screenX/screenY). A fresh popout is
         // positioned from the source element's viewport-relative rect, so it
         // is offset here by the opener window's own screen position. Doing the
@@ -2032,8 +2032,8 @@ export class DockviewComponent
                 if (options?.overridePopoutGridview) {
                     // Restored multi-group window. Wire every member (including
                     // the anchor) to this window's containers and popout
-                    // location now that the gridview is attached and laid out —
-                    // re-setting renderContainer forces a re-render at the right
+                    // location now that the gridview is attached and laid out.
+                    // Re-setting renderContainer forces a re-render at the right
                     // time so 'always'-rendered content positions in this
                     // window rather than where it was first created.
                     const members = this.groups.filter((candidate) =>
@@ -2185,7 +2185,7 @@ export class DockviewComponent
     }
 
     /**
-     * The popout window was blocked (e.g. by the browser's popup blocker —
+     * The popout window was blocked (e.g. by the browser's popup blocker,
      * common when restoring popouts on load). Fall back gracefully so the
      * group(s) end up valid and visible in the main grid rather than as
      * orphans that later crash clear()/remove().
@@ -2232,13 +2232,13 @@ export class DockviewComponent
 
         if (group === referenceGroup) {
             // No separate grid group to return to (e.g. restoring a popout
-            // straight from JSON) — dock this group into the main grid.
+            // straight from JSON), so dock this group into the main grid.
             if (!this.gridview.element.contains(group.element)) {
                 this.movingLock(() => this.doAddGroup(group, [0]));
                 group.model.location = { type: 'grid' };
             }
         } else {
-            // A fresh group was created for the popout — return its panels to
+            // A fresh group was created for the popout, so return its panels to
             // the reference group and discard the now-empty popout group so it
             // doesn't linger as an orphan.
             this.movingLock(() =>
@@ -2264,7 +2264,7 @@ export class DockviewComponent
      * Wire a group that has been displaced from a floating / popout window back
      * to the main grid's render & drop-target containers and dock it at the
      * root. The caller is responsible for first detaching it from its old
-     * gridview — the detach strategy differs between the window-teardown path
+     * gridview; the detach strategy differs between the window-teardown path
      * (`doRemoveGroup`) and the blocked-window path (`gridview.remove`).
      */
     private redockGroupToMainGrid(group: DockviewGroupPanel): void {
@@ -2408,7 +2408,7 @@ export class DockviewComponent
         }
 
         // All members have been relocated out; tear down the window's nested
-        // gridview (does not dispose the leaf views — their lifecycle stays
+        // gridview (does not dispose the leaf views, whose lifecycle stays
         // with `_groups`).
         disposePopoutGridview();
     }
@@ -2890,7 +2890,7 @@ export class DockviewComponent
                     return;
                 }
                 if (service.isAutoReveal(group)) {
-                    // Defer the teardown — disposing the group (and its
+                    // Defer the teardown: disposing the group (and its
                     // onDidRemovePanel emitter) from inside that emitter's own
                     // dispatch corrupts the emitter / mutation depth. The
                     // re-check no-ops if a concurrent move re-filled the edge.
@@ -2930,7 +2930,7 @@ export class DockviewComponent
      * Reveal (create-or-fill) the edge group at `position` and move the dragged
      * item described by `data` into it. A newly created edge group is created
      * collapsed and flagged `autoReveal` so it tears down to zero footprint when
-     * later emptied. If an edge group already exists there it is reused — the
+     * later emptied. If an edge group already exists there it is reused: the
      * panel is added to its tabs and its collapsed/toggled state is left as-is
      * (never re-created; `addEdgeGroup` throws on a duplicate position). No-op if
      * the EdgeGroup module is absent.
@@ -2950,7 +2950,7 @@ export class DockviewComponent
         this.mutation('add', () => {
             let group = service.get(position);
             if (!group) {
-                // A newly revealed edge group is created collapsed — the drop
+                // A newly revealed edge group is created collapsed, so the drop
                 // adds a tab to its strip rather than popping the group open.
                 this.addEdgeGroup(position, {
                     id: this.getNextGroupId(),
@@ -2996,7 +2996,7 @@ export class DockviewComponent
         return this._edgeGroupService?.get(position);
     }
 
-    /** Pin (expand) the edge group at a position — auto-hide module feature. */
+    /** Pin (expand) the edge group at a position; auto-hide module feature. */
     pinEdgeGroup(position: EdgeGroupPosition): void {
         this._moduleRegistry.services.autoHideEdgeGroupService?.pin(position);
     }
@@ -3016,15 +3016,15 @@ export class DockviewComponent
         );
     }
 
-    /** The auto-hide peek mounts on the shell — the same element the
-     *  `OverlayRenderContainer` roots on — so `always` content re-anchors in the
+    /** The auto-hide peek mounts on the shell, the same element the
+     *  `OverlayRenderContainer` roots on, so `always` content re-anchors in the
      *  peek's coordinate space. */
     get overlayRoot(): HTMLElement {
         return this.rootElement;
     }
 
     /** Viewport rect of the docked content area (the element the root/group drop
-     *  targets hit-test against) — used by the two-band drag-reveal affordance to
+     *  targets hit-test against), used by the two-band drag-reveal affordance to
      *  classify a pointer's distance from each edge. This is the gridview/center
      *  container, which is inset when edge groups are present, so the outer band
      *  sits at the boundary of the content area (adjacent to any existing edge
@@ -3033,7 +3033,7 @@ export class DockviewComponent
         return this.element.getBoundingClientRect();
     }
 
-    /** The size an edge group expands to (pre-collapse) — sizes the peek. */
+    /** The size an edge group expands to (pre-collapse); sizes the peek. */
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number {
         return this._shellManager?.getEdgeGroupExpandedSize(position) ?? 0;
     }
@@ -3078,7 +3078,7 @@ export class DockviewComponent
             );
         }
 
-        // One transaction — the per-panel removals below nest via the depth
+        // One transaction; the per-panel removals below nest via the depth
         // counter, so consumers see a single edge-group removal.
         this.mutation('remove', () => {
             // Remove panels inside the group first
@@ -3293,7 +3293,7 @@ export class DockviewComponent
                     continue;
                 }
                 // Don't persist a transient empty auto-reveal edge (it's
-                // mid-teardown to zero footprint — the deferred removeEdgeGroup
+                // mid-teardown to zero footprint, and the deferred removeEdgeGroup
                 // microtask hasn't run yet). Restoring it would recreate an edge
                 // that can never tear itself down, since nothing is ever removed
                 // from it to fire onDidRemovePanel.
@@ -3324,7 +3324,7 @@ export class DockviewComponent
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
-        // One 'load' transaction for the whole deserialization — the many
+        // One 'load' transaction for the whole deserialization; the many
         // nested add/remove mutations join it via the depth counter.
         this.mutation('load', () => this._doFromJSON(data, options));
     }
@@ -3336,7 +3336,7 @@ export class DockviewComponent
         // Cancel any popout-restoration timers queued by a previous fromJSON
         // that haven't fired yet. The cancel path also disposes orphan groups
         // registered in _groups synchronously but never parented into a popout
-        // window — otherwise the upcoming clear() would call gridview.remove()
+        // window; otherwise the upcoming clear() would call gridview.remove()
         // on an unparented element and throw "Invalid grid element". See
         // issue #1304.
         this._popoutWindowService?.cancelPendingRestorations();
@@ -3651,7 +3651,7 @@ export class DockviewComponent
                 const id = groupState?.id ?? `${_position}-group`;
                 // Trust the serialized per-group flags. Absent → unset (a
                 // static edge collapses to a strip; auto-hide inherits the
-                // per-edge option). We deliberately do NOT fall back to the
+                // per-edge option). We deliberately don't fall back to the
                 // `dockToEdgeGroups` option here, so a static edge group in a
                 // saved layout is never silently turned into a self-tearing-
                 // down one just because the option is on this session.
@@ -3870,7 +3870,7 @@ export class DockviewComponent
     }
 
     closeAllGroups(): void {
-        // One transaction — the per-panel removals inside nest via the depth
+        // One transaction; the per-panel removals inside nest via the depth
         // counter, so consumers (undo, announcements) see a single mutation.
         this.mutation('remove', () => {
             for (const entry of this._groups.entries()) {
@@ -4266,7 +4266,7 @@ export class DockviewComponent
      *
      * @returns `true` if the group was detached from a multi-member window;
      * `false` if `group` is not in a nested window, or is the window's only
-     * member — in which case the caller is responsible for disposing the whole
+     * member, in which case the caller is responsible for disposing the whole
      * window.
      */
     private detachFromNestedWindow(group: DockviewGroupPanel): boolean {
@@ -4367,7 +4367,7 @@ export class DockviewComponent
             }
 
             if (this.detachFromNestedWindow(group)) {
-                // The floating window hosts other groups and stays alive —
+                // The floating window hosts other groups and stays alive, so
                 // finalize just this group.
                 if (options?.skipDispose) {
                     // Relocation: reset location so the destination root can
@@ -4381,7 +4381,7 @@ export class DockviewComponent
                 return group;
             }
 
-            // Last group leaving — dispose the whole floating window.
+            // Last group leaving, so dispose the whole floating window.
             if (!options?.skipDispose) {
                 this.disposeGroupRecord(group);
             }
@@ -4401,7 +4401,7 @@ export class DockviewComponent
             }
 
             if (this.detachFromNestedWindow(group)) {
-                // The popout window hosts other groups and stays alive —
+                // The popout window hosts other groups and stays alive, so
                 // finalize just this group.
                 if (options?.skipDispose) {
                     // Relocation: reset location so the destination root can
@@ -4415,7 +4415,7 @@ export class DockviewComponent
                 return group;
             }
 
-            // Last group leaving — tear the whole popout window down.
+            // Last group leaving, so tear the whole popout window down.
             if (!options?.skipDispose) {
                 if (!options?.skipPopoutAssociated) {
                     const refGroup = selectedGroup.referenceGroup
@@ -4446,7 +4446,7 @@ export class DockviewComponent
         }
 
         // A `grid`-location group whose element isn't actually in the gridview
-        // is an orphan — e.g. a popout-destined group created during fromJSON
+        // is an orphan, e.g. a popout-destined group created during fromJSON
         // whose window hasn't opened yet, swept up by clear()/a re-entrant
         // fromJSON. `gridview.remove()` would throw "Invalid grid element", so
         // dispose it directly.
@@ -4543,7 +4543,7 @@ export class DockviewComponent
      * Run `func` with the operation origin set to `origin`, restoring the
      * previous value afterwards. Used by the DockviewApi boundary to tag
      * programmatic operations as `'api'`, and by user-gesture handlers to tag
-     * `'user'`. Only the outermost caller sets the origin — a nested call (or a
+     * `'user'`. Only the outermost caller sets the origin; a nested call (or a
      * call made while a mutation is already in flight) keeps whatever the
      * enclosing operation established, so the trigger always wins.
      */
@@ -4670,7 +4670,7 @@ export class DockviewComponent
              */
 
             // The destination group may live in the main grid or in a floating
-            // window's nested gridview — resolve which root we are dropping
+            // window's nested gridview, so resolve which root we are dropping
             // into so locations/orientation are computed against it.
             const destinationGridview =
                 this.getGridviewForGroup(destinationGroup);
@@ -4726,7 +4726,7 @@ export class DockviewComponent
                      * has a single panel
                      *
                      * 1. remove the panel from the group without triggering any events
-                     * 2. remove the popout group — this may cascade-remove the empty
+                     * 2. remove the popout group; this may cascade-remove the empty
                      *    reference group it left behind in the main grid (see
                      *    doRemoveGroup for popout groups), which can shift grid indices
                      * 3. recompute the target location now that the grid is stable
@@ -4783,7 +4783,7 @@ export class DockviewComponent
 
                 if (sourceGroup.api.location.type === 'edge') {
                     /**
-                     * Edge groups are permanent structural elements — never move the
+                     * Edge groups are permanent structural elements; never move the
                      * group itself. Instead extract the panel and create a new grid group,
                      * leaving the edge slot intact (same behaviour as the size >= 2 path).
                      */
@@ -5139,7 +5139,7 @@ export class DockviewComponent
                 // below, which bypasses doAddGroup and so doesn't fire
                 // BaseGrid._onDidAdd. Modules (TabGroupChips, etc.) drive
                 // per-group attachment off _onDidAddGroup, so we fire it
-                // explicitly here — matches the pattern in addFloatingGroup
+                // explicitly here, matching the pattern in addFloatingGroup
                 // and addEdgeGroup.
                 this._onDidAddGroup.fire(source);
                 this.movingLock(() => {
@@ -5205,7 +5205,7 @@ export class DockviewComponent
                             break;
                         }
 
-                        // Last group leaving — tear the window down. Remove from
+                        // Last group leaving, so tear the window down. Remove from
                         // the service first to prevent automatic restoration.
                         this._popoutWindowService?.remove(selectedPopoutGroup);
 
@@ -5388,7 +5388,7 @@ export class DockviewComponent
                 }),
                 view.model.onWillShowOverlay((event) => {
                     if (this.options.disableDnd) {
-                        // Engine policy — stays in core, ahead of any
+                        // Engine policy; stays in core, ahead of any
                         // customisation dispatch.
                         event.preventDefault();
                         return;
@@ -5543,8 +5543,8 @@ export class DockviewComponent
         if (floating) {
             return floating.gridview;
         }
-        // Use findByGroup (anchor-identity OR containment) for symmetry with
-        // the floating branch — it also resolves an anchor whose element is
+        // Use findByGroup (anchor-identity or containment) for symmetry with
+        // the floating branch; it also resolves an anchor whose element is
         // briefly detached from the gridview during a move/restore.
         const popout = this._popoutWindowService?.findByGroup(group);
         if (popout) {

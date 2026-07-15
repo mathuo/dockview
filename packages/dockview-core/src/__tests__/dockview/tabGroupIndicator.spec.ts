@@ -3,7 +3,7 @@ import { mockGetBoundingClientRect } from '../__test_utils__/utils';
 
 /**
  * The Chrome-style wrap indicator must sit on the edge of the tab strip that is
- * adjacent to the content — i.e. it flips with the header position: bottom edge
+ * adjacent to the content, so it flips with the header position: bottom edge
  * for a top header, top edge for a bottom header, left edge for a left header,
  * right edge for a right header. These tests assert the generated SVG path's
  * anchored edge flips with `headerPosition`.

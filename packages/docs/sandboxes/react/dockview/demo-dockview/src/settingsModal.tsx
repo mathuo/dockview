@@ -26,7 +26,7 @@ const Kbd = (props: { children: React.ReactNode }) => (
     </kbd>
 );
 
-// Read-only reference. Mirrors the enabled `keyboardNavigation` bindings —
+// Read-only reference. Mirrors the enabled `keyboardNavigation` bindings:
 // KeyboardNavigation (nav) + KeyboardDocking (move). Keep in sync with
 // DEFAULT_KEYMAP in dockview-enterprise if the defaults change.
 const SHORTCUTS: { label: string; keys: string[] }[] = [
@@ -34,7 +34,7 @@ const SHORTCUTS: { label: string; keys: string[] }[] = [
     { label: 'Focus group by direction', keys: ['Ctrl ⇧ ←↑↓→'] },
     { label: 'Next / previous tab in group', keys: ['Ctrl ]', 'Ctrl ['] },
     { label: 'Focus the tab strip', keys: ['Ctrl ⇧ \\'] },
-    { label: 'Move panel — arm', keys: ['Ctrl M'] },
+    { label: 'Move panel: arm', keys: ['Ctrl M'] },
     { label: '…then pick target / edge', keys: ['←↑↓→'] },
     { label: '…tab into group (centre)', keys: ['Space', 'C'] },
     { label: '…commit / cancel', keys: ['Enter', 'Esc'] },

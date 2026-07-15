@@ -190,7 +190,7 @@ describe('provide/inject reaches teleported panels', () => {
             },
         });
 
-        // The host provides a value; the panel — a teleported descendant —
+        // The host provides a value; the panel (a teleported descendant)
         // must resolve it through the component tree.
         const Host = defineComponent({
             name: 'ProvideHost',

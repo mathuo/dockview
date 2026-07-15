@@ -1,13 +1,13 @@
 /**
  * Module-level license registry + the static `LicenseManager`.
  *
- * `LicenseRegistry` is a single per-bundle instance — call
+ * `LicenseRegistry` is a single per-bundle instance. Call
  * `LicenseManager.setLicenseKey()` once at app boot and every dock sees it. It
  * holds the statically-set key, notifies on change, and owns the once-per-
  * process console de-dup (modelled on core's `_warnedMissingModule`).
  *
- * Static-only by design — there is no per-instance key. Effective key
- * resolution is simply: registry key → missing. See `enterprise-modules/
+ * Static-only by design: there is no per-instance key. The effective key is
+ * the registry key, or missing when none is set. See `enterprise-modules/
  * license.md` §5.
  */
 
@@ -38,7 +38,7 @@ class LicenseRegistryImpl {
 
     /**
      * Log `message` at most once per process for a given `dedupeKey`. N docks on
-     * a page therefore produce ONE warning, not N — the flag lives here (module
+     * a page therefore produce one warning, not N. The flag lives here (module
      * scope), never on the per-component service.
      */
     warnOnce(
@@ -53,7 +53,7 @@ class LicenseRegistryImpl {
         console[severity](message);
     }
 
-    /** Tests only — reset key + de-dup state. */
+    /** Tests only: reset key and de-dup state. */
     _reset(): void {
         this._key = undefined;
         this._warned.clear();
@@ -64,7 +64,7 @@ class LicenseRegistryImpl {
 export const LicenseRegistry = new LicenseRegistryImpl();
 
 /**
- * Static entry point — the ONLY way to set a key (static-only, no per-instance
+ * Static entry point: the only way to set a key (static-only, no per-instance
  * option). Set once at app boot; every `DockviewComponent` created afterwards
  * sees it.
  */

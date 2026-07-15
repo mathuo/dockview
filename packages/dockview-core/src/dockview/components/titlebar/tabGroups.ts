@@ -287,11 +287,11 @@ export class TabGroupManager {
     /**
      * Synchronously dispose the chip drag sources for an in-flight chip
      * drag. Called from `_commitGroupMove` so the transfer payload +
-     * iframe shield are released BEFORE the cross-group move detaches
+     * iframe shield are released before the cross-group move detaches
      * the chip (chip dispose is scheduled on a microtask via
      * `_scheduleTabGroupUpdate`, which is too late for callers that read
-     * `getPanelData()` synchronously after the move). Idempotent — the
-     * subsequent `update()` will also dispose the sources.
+     * `getPanelData()` synchronously after the move). This is idempotent;
+     * the subsequent `update()` will also dispose the sources.
      */
     disposeChipDrag(tabGroupId: string): void {
         const entry = this._chipRenderers.get(tabGroupId);
@@ -414,8 +414,8 @@ export class TabGroupManager {
             isCancelled: () =>
                 !resolveDndCapabilities(this._ctx.accessor.options).html5,
             onDragStart: (event) => {
-                // Type guard via `dataTransfer` — `instanceof DragEvent`
-                // would throw in jsdom which doesn't ship a DragEvent
+                // Type guard via `dataTransfer`; `instanceof DragEvent`
+                // would throw in jsdom, which doesn't ship a DragEvent
                 // constructor.
                 if ('dataTransfer' in event && event.dataTransfer) {
                     this.setGroupDragImage(
@@ -433,7 +433,7 @@ export class TabGroupManager {
 
         // Synchronous panelTransfer cleanup directly on the chip element.
         // `Html5DragSource`'s dragend defers data disposal via `setTimeout(0)`
-        // so drop handlers can read the payload — but a chip drag that
+        // so drop handlers can read the payload, but a chip drag that
         // ends via `moveGroupOrPanel` (no actual drop event) needs the
         // singleton cleared immediately, otherwise a synchronous
         // `getPanelData()` after the move still sees the stale chip
@@ -511,7 +511,7 @@ export class TabGroupManager {
 
         // The chip sits before its group's first tab in the DOM, so it
         // covers the "drop before the group" position. Without a drop
-        // target here, dropping a tab over the chip is a dead zone —
+        // target here, dropping a tab over the chip is a dead zone,
         // particularly visible when the group is first in the tabs list
         // and there's no preceding tab whose right zone covers position 0.
         // The smooth animation path already shifts the chip's margin to

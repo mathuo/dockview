@@ -13,7 +13,7 @@ export interface DroptargetEvent {
     /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     readonly nativeEvent: DragEvent | PointerEvent;
     /**
-     * The resolved cell was marked `edge` by a {@link PositionResolver} — an
+     * The resolved cell was marked `edge` by a {@link PositionResolver}: an
      * "outer" cell that should dock against the whole layout, not this target.
      * The target renders no overlay for it; the consumer routes the commit.
      */
@@ -37,7 +37,7 @@ export class WillShowOverlayEvent
         return !!this.options.edge;
     }
 
-    /** See {@link PositionResolverResult.edgeGroup}. A display hint — a consumer
+    /** See {@link PositionResolverResult.edgeGroup}. A display hint; a consumer
      *  (e.g. the drop-guide compass) can bow out of this cell. */
     get edgeGroup(): boolean {
         return !!this.options.edgeGroup;
@@ -114,7 +114,7 @@ export interface PositionResolverResult {
     readonly edge?: boolean;
     /**
      * Display hint: this cell docks as a dedicated edge group (not a grid-edge
-     * split). Purely advisory — a co-installed resolver's UI (e.g. the drop-guide
+     * split). Purely advisory. A co-installed resolver's UI (e.g. the drop-guide
      * compass) can suppress its own overlay for these cells so they don't
      * double-render with the edge-group affordance.
      */
@@ -124,9 +124,9 @@ export interface PositionResolverResult {
 /**
  * Pluggable replacement for the built-in cursor-quadrant drop resolution.
  * Supplied via {@link DroptargetOptions.positionResolver}, it maps a pointer
- * location within a target to a drop {@link Position} — or `null` for no drop —
+ * location within a target to a drop {@link Position} (or `null` for no drop)
  * instead of the default threshold-band quadrant. Both DnD backends consult the
- * same resolver. Unset ⇒ the default quadrant behaviour, byte-for-byte unchanged.
+ * same resolver. When unset, the default quadrant behaviour applies unchanged.
  */
 export interface PositionResolver {
     resolve(args: PositionResolverArgs): PositionResolverResult | null;
@@ -185,7 +185,7 @@ export interface DroptargetOptions {
      * Supply a {@link PositionResolver} that overrides how a pointer location
      * resolves to a drop {@link Position}. A lazy getter (like
      * {@link getOverrideTarget}) so the source can change at runtime; returning
-     * `undefined` — the default — uses the built-in cursor-quadrant logic.
+     * `undefined` (the default) uses the built-in cursor-quadrant logic.
      */
     getPositionResolver?: () => PositionResolver | undefined;
 }
@@ -328,7 +328,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
 
                 this.markAsUsed(e);
 
-                // An `edge` cell reports its position but renders nothing — the
+                // An `edge` cell reports its position but renders nothing. The
                 // consumer (e.g. the layout-edge dock) owns the preview + commit.
                 if (resolved.edge) {
                     this.removeDropTarget();
@@ -547,7 +547,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
     }
 
     private removeDropTarget(): void {
-        // Always clear state — an `edge` cell sets state with no overlay element.
+        // Always clear state, since an `edge` cell sets state with no overlay element.
         this._state = undefined;
         this._edge = false;
         if (this.targetElement) {

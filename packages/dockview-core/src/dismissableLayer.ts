@@ -3,7 +3,7 @@ import { CompositeDisposable, IDisposable } from './lifecycle';
 
 /** Touch-primary input (coarse pointer, no fine pointer). On these devices a
  *  window resize is usually an on-screen-keyboard pop / orientation change /
- *  address-bar collapse — none of which mean "dismiss". */
+ *  address-bar collapse, none of which mean "dismiss". */
 function isCoarsePrimaryInput(win: Window): boolean {
     if (!win.matchMedia) {
         return false;
@@ -14,7 +14,7 @@ function isCoarsePrimaryInput(win: Window): boolean {
 }
 
 export interface DismissableLayerOptions {
-    /** Window to listen on — pass the popout window for popout-hosted layers.
+    /** Window to listen on. Pass the popout window for popout-hosted layers.
      *  Defaults to the global `window`. */
     readonly window?: Window;
     /** Invoked when any enabled dismiss signal fires. */
@@ -23,8 +23,8 @@ export interface DismissableLayerOptions {
      *  mark interaction (e.g. make a transient layer sticky). */
     readonly onInsidePointerDown?: (event: PointerEvent) => void;
     /** Whether a pointer event is inside the layer. Defaults to a DOM
-     *  `contains` check against {@link DismissableLayerOptions.elements} —
-     *  provide this for geometry-based hit testing (e.g. when the visible
+     *  `contains` check against {@link DismissableLayerOptions.elements}.
+     *  Provide this for geometry-based hit testing (e.g. when the visible
      *  content is a sibling overlay stacked on top of the layer). */
     readonly isInside?: (event: PointerEvent) => boolean;
     /** Elements treated as "inside" by the default contains check. */
@@ -35,7 +35,7 @@ export interface DismissableLayerOptions {
     readonly keys?: readonly string[];
     /** Dismiss on a pointerdown outside the layer (default `true`). */
     readonly outsidePointerDown?: boolean;
-    /** Ignore outside-pointerdowns for this many ms after opening — covers the
+    /** Ignore outside-pointerdowns for this many ms after opening. Covers the
      *  gesture that opened the layer (e.g. a touch long-press) dispatching a
      *  follow-up pointerdown just outside it. */
     readonly pointerDownGraceMs?: number;
@@ -43,17 +43,17 @@ export interface DismissableLayerOptions {
      *  `false`). */
     readonly resize?: boolean;
     /** Dismiss when focus moves to an element *outside* the layer (default
-     *  `false`) — the "slide back on focus loss" behaviour. */
+     *  `false`): the "slide back on focus loss" behaviour. */
     readonly focusOut?: boolean;
     /** Whether a newly-focused element is inside the layer (for
      *  {@link focusOut}). Defaults to a `contains` check against
-     *  {@link elements} — provide this for geometry-based testing when the
+     *  {@link elements}. Provide this for geometry-based testing when the
      *  content is a sibling overlay stacked on top of the layer. */
     readonly isFocusInside?: (focused: Element) => boolean;
     /** Listen in the capture phase (default `false`). Use capture when the
      *  layer must see the event before content handlers stop its propagation. */
     readonly capture?: boolean;
-    /** Clock source for the grace window — defaults to `Date.now`. */
+    /** Clock source for the grace window. Defaults to `Date.now`. */
     readonly now?: () => number;
 }
 
@@ -65,8 +65,8 @@ export interface DismissableLayerOptions {
  * decided by an `isInside` predicate (geometry) or a `contains` check against
  * `elements`. Dispose to detach every listener.
  *
- * It owns only the *signals* — not the surface element, its position, or any
- * hover/keep-open policy — so callers keep their own element lifecycle and
+ * It owns only the *signals*, not the surface element, its position, or any
+ * hover/keep-open policy, so callers keep their own element lifecycle and
  * layer this underneath.
  */
 export function createDismissableLayer(

@@ -763,7 +763,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Fires before each top-level structural layout mutation (add / remove /
      * move / float / popout / maximize / load / clear). Compound operations
      * (e.g. a drag) fire once. Pair with `onDidMutateLayout` to bracket a
-     * change — useful for undo/redo, autosave and dirty-tracking.
+     * change, which is useful for undo/redo, autosave and dirty-tracking.
      */
     get onWillMutateLayout(): Event<DockviewLayoutMutationEvent> {
         return this.component.onWillMutateLayout;
@@ -825,7 +825,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Fires when a popout group is removed — whether the user closed its window
+     * Fires when a popout group is removed, whether the user closed its window
      * or it was docked back programmatically. Symmetric with
      * {@link onDidAddPopoutGroup}; not fired during component disposal.
      */
@@ -900,7 +900,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     /**
      * The nearest grid group in a spatial direction from `group`, comparing
-     * group centre points — e.g. the group visually to the left. Floating and
+     * group centre points, e.g. the group visually to the left. Floating and
      * popout groups are ignored. Returns `undefined` when there is no group in
      * that direction. Pair with `group.api.boundingBox` to build your own
      * spatial navigation.

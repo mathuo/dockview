@@ -63,7 +63,7 @@ const BookRow: React.FC<{
                 ...tnum,
             }}
         >
-            {/* cumulative depth wall — animated via transform:scaleX so it
+            {/* cumulative depth wall, animated via transform:scaleX so it
                 composites on the GPU (no per-frame layout/paint). */}
             <div
                 style={{

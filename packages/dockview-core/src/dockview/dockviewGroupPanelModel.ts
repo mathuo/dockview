@@ -90,7 +90,7 @@ export interface DockviewGroupChangeEvent {
 /**
  * Payload for the group-level `onDidActivePanelChange`. Extends
  * {@link DockviewGroupChangeEvent} with the {@link DockviewOrigin} so it mirrors
- * the component-level `DockviewActivePanelChangeEvent` — both report whether the
+ * the component-level `DockviewActivePanelChangeEvent`. Both report whether the
  * change came from a user gesture or an API call.
  */
 export interface DockviewGroupActivePanelChangeEvent
@@ -393,7 +393,7 @@ export class DockviewGroupPanelModel
         return this.contentContainer.element.id;
     }
 
-    /** The group's content drop target — lets keyboard docking preview a drop here. */
+    /** The group's content drop target; lets keyboard docking preview a drop here. */
     get contentDropTarget(): Droptarget {
         return this.contentContainer.dropTarget;
     }
@@ -438,7 +438,7 @@ export class DockviewGroupPanelModel
         return this.tabsContainer;
     }
 
-    /** The scrollable tab list element (`.dv-tabs-container`) — exposed for the
+    /** The scrollable tab list element (`.dv-tabs-container`), exposed for the
      *  multi-row wrap controller to measure rows / toggle the wrap class. */
     get tabsListElement(): HTMLElement {
         return this.tabsContainer.tabsListElement;
@@ -446,7 +446,7 @@ export class DockviewGroupPanelModel
 
     /** The panel whose tab owns `element` (the tab itself or a descendant of
      *  it), or `undefined` when the target isn't a tab. The robust inverse of a
-     *  tab→panel lookup — no positional/DOM-order assumptions. */
+     *  tab→panel lookup, with no positional/DOM-order assumptions. */
     getPanelForTab(element: Element): IDockviewPanel | undefined {
         return this.tabsContainer.getPanelForTab(element);
     }
@@ -494,7 +494,7 @@ export class DockviewGroupPanelModel
 
         // Signal a genuine horizontal↔vertical flip so features that lay out
         // per-axis (e.g. multi-row tab wrapping) can react. Fired after the
-        // side effects above, and only on a real axis change — not on the
+        // side effects above, and only on a real axis change, not on the
         // initial set, nor on a same-axis move (top↔bottom, left↔right).
         if (
             previousDirection !== undefined &&
@@ -608,7 +608,7 @@ export class DockviewGroupPanelModel
                 const draggedPanelId = dragData?.panelId ?? null;
 
                 // Let an injected resolver (PinnedTabs) clamp/redirect the drop
-                // index — e.g. so an unpinned tab cannot land left of a pinned
+                // index, e.g. so an unpinned tab cannot land left of a pinned
                 // one. Identity by default; only same-panel header drops carry
                 // a panel id to resolve against.
                 const resolvedIndex = draggedPanelId
@@ -658,7 +658,7 @@ export class DockviewGroupPanelModel
                         localIndex
                     );
                 } else if (draggedPanelId && event.targetTabGroupId === null) {
-                    // Dropped outside any group — remove from current group
+                    // Dropped outside any group, so remove it from the current group
                     this.removePanelFromTabGroup(draggedPanelId);
                 }
             }),
@@ -857,7 +857,7 @@ export class DockviewGroupPanelModel
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
         if (existingGroup?.id === tabGroupId) {
-            return; // already in this group — no mutation
+            return; // already in this group, nothing to mutate
         }
 
         this._bracketTabGroupMutation(() => {
@@ -1123,7 +1123,7 @@ export class DockviewGroupPanelModel
             // Dispose the external listeners (onDidChange, onDidCollapseChange)
             // we registered on this group. We cannot dispose synchronously
             // here because this method runs inside the onDidDestroy fire
-            // loop — disposing the CompositeDisposable that holds the
+            // loop, and disposing the CompositeDisposable that holds the
             // onDidDestroy subscription would splice listeners mid-iteration.
             // Schedule cleanup on the next microtask instead.
             const tabGroupDisposable = this._tabGroupDisposables.get(
@@ -1175,7 +1175,7 @@ export class DockviewGroupPanelModel
             }
         }
 
-        // All tabs are in collapsed groups — show watermark
+        // All tabs are in collapsed groups, so show the watermark
         this.contentContainer.closePanel();
         this.doSetActivePanel(undefined);
         this.updateContainer();

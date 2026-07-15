@@ -123,7 +123,7 @@ describe('multi-row tabs seam', () => {
         // jsdom has no layout, so nothing clips → no dropdown by default.
         expect(dropdown()).toBeNull();
 
-        // Force 'b' into overflow (the wrap surplus set) — the dropdown appears
+        // Force 'b' into overflow (the wrap surplus set); the dropdown appears
         // although 'b' is not horizontally clipped.
         cut.setForcedOverflow(a.group, (id) => id === 'b');
         expect(dropdown()).not.toBeNull();

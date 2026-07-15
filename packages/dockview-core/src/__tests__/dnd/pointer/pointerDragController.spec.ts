@@ -124,13 +124,13 @@ describe('PointerDragController', () => {
             getData: () => ({ dispose: jest.fn() }),
         });
 
-        // First move — pointer is over the target.
+        // First move: pointer is over the target.
         spy.mockReturnValue([targetEl]);
         window.dispatchEvent(
             makePointerEvent('pointermove', { clientX: 10, clientY: 10 })
         );
 
-        // Second move — pointer is off-target.
+        // Second move: pointer is off-target.
         spy.mockReturnValue([]);
         window.dispatchEvent(
             makePointerEvent('pointermove', { clientX: 500, clientY: 500 })
@@ -267,7 +267,7 @@ describe('PointerDragController', () => {
             getData: () => ({ dispose: jest.fn() }),
         });
 
-        // Different pointerId — must NOT route through the target.
+        // Different pointerId, so this must not route through the target.
         window.dispatchEvent(
             makePointerEvent('pointermove', {
                 pointerId: 2,
@@ -285,9 +285,9 @@ describe('PointerDragController', () => {
     });
 
     test('hit-testing prefers the inner / more-specific target when nested targets overlap', () => {
-        // Regression: previously `_findTargetUnder` accepted ANY registered
+        // Regression: previously `_findTargetUnder` accepted any registered
         // target whose element contains the cursor element. Because the
-        // layout-root drop target is registered first AND contains every
+        // layout-root drop target is registered first and contains every
         // tab, it always won the race and per-tab targets were unreachable.
         const controller = PointerDragController.getInstance();
 
@@ -316,7 +316,7 @@ describe('PointerDragController', () => {
             makePointerEvent('pointermove', { clientX: 10, clientY: 10 })
         );
 
-        // Inner target should have received the drag-over; root must NOT
+        // Inner target should have received the drag-over; root must not
         // have received it (it'd have eclipsed inner under the old logic).
         expect(innerHandle.handleDragOver).toHaveBeenCalled();
         expect(rootHandle.handleDragOver).not.toHaveBeenCalled();
@@ -332,7 +332,7 @@ describe('PointerDragController', () => {
         test("beginDrag shields iframes in the source's owning document; teardown releases", () => {
             const controller = PointerDragController.getInstance();
 
-            // Build iframes in the main document — these would otherwise
+            // Build iframes in the main document. They would otherwise
             // capture pointermove events once the cursor crosses into them
             // and freeze the drag.
             const iframe = document.createElement('iframe');
@@ -396,7 +396,7 @@ describe('PointerDragController', () => {
 
     describe("listener attachment honours the source's owning window", () => {
         test("pointermove from source's owning window is routed to the controller", () => {
-            // Build an iframe — stand-in for a popout window — so we get a
+            // Build an iframe (stand-in for a popout window) so we get a
             // real `contentWindow` distinct from the main `window`. Verifies
             // that the controller listens on the source's owning window, not
             // on the main `window`.
@@ -428,7 +428,7 @@ describe('PointerDragController', () => {
                 getData: () => ({ dispose: jest.fn() }),
             });
 
-            // Fire the move on the popout window (NOT the main `window`).
+            // Fire the move on the popout window (not the main `window`).
             // If listeners attached to main `window`, this would be a no-op.
             otherWin.dispatchEvent(
                 makePointerEvent('pointermove', { clientX: 10, clientY: 10 })

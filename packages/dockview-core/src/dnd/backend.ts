@@ -16,8 +16,8 @@ import { disableIframePointEvents } from '../dom';
  * mechanism (HTML5 native events, pointer events) behind a uniform set of
  * `createX` methods.
  *
- * The backends are stateless — `html5Backend` and `pointerBackend` below
- * are exported as module-level singletons so they need no construction
+ * The backends are stateless. `html5Backend` and `pointerBackend` below
+ * are exported as module-level singletons, so they need no construction
  * or wiring through the component tree.
  */
 export interface IDragBackend {
@@ -177,10 +177,10 @@ class Html5DragSource extends CompositeDisposable implements IDragSource {
         this._disabled = value;
     }
     setTouchOnly(_: boolean): void {
-        // No-op — HTML5 path can't filter by pointer type.
+        // No-op: the HTML5 path can't filter by pointer type.
     }
     cancelPending(): void {
-        // No-op — HTML5 has no pre-arm phase to cancel.
+        // No-op: HTML5 has no pre-arm phase to cancel.
     }
 }
 

@@ -57,9 +57,9 @@ import {
 } from './themeBuilder';
 import { Sidebar } from './themeBuilderModal';
 
-// Set the docs license key HERE (not only in index.tsx): the docs /demo page
+// Set the docs license key here (not only in index.tsx): the docs /demo page
 // loads this module (app.tsx) directly via ExampleFrame, never index.tsx, so
-// otherwise every dockview instance — including the nested FX Rates dockview —
+// otherwise every dockview instance, including the nested FX Rates dockview,
 // renders the "Unlicensed" watermark. Runs at module load, before any dockview
 // is created; harmless if index.tsx also sets it (standalone/CodeSandbox).
 LicenseManager.setLicenseKey(
@@ -837,7 +837,7 @@ const DockviewDemo = (props: {
 
             if (api) {
                 // Float / popout operate on the whole containing group, so they
-                // stay custom items — the built-in chip shortcuts are scoped to
+                // stay custom items. The built-in chip shortcuts are scoped to
                 // the tab group (`'collapse'` / `'close'`, used above).
                 items.push(
                     'separator',

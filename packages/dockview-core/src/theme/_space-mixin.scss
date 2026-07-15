@@ -15,7 +15,7 @@
     --dv-floating-titlebar-background-color: var(
         --dv-group-view-background-color
     );
-    // Keep the handle seamless with the gap — no divider line below it.
+    // Keep the handle seamless with the gap: no divider line below it.
     --dv-floating-titlebar-border-bottom: none;
 
     box-sizing: border-box;
@@ -69,7 +69,7 @@
 
     // With a dedicated title bar the bar already frames the top of the card and
     // shares the inset/gap color, so the grid's top inset would double up into a
-    // tall empty band above the panels — drop it (keep left/right/bottom).
+    // tall empty band above the panels. Drop it (keep left/right/bottom).
     .dv-resize-container-with-titlebar > .dv-grid-view {
         padding-top: 0;
     }
@@ -77,7 +77,7 @@
     // The drag-handle bar is the top strip of the floating window's frame (same
     // color as the inset gap). Round its top corners so it follows the
     // container's rounded top. The nested groups below are complete,
-    // independently-rounded cards — do NOT flatten their tops (an unscoped
+    // independently-rounded cards, so don't flatten their tops (an unscoped
     // descendant rule here previously stripped the top border/rounding from
     // every nested group, not just a single merged one).
     .dv-resize-container-with-titlebar > .dv-floating-titlebar {

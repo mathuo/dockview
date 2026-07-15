@@ -206,7 +206,7 @@ export const Text = (props: { content: DocsContent[] }) => {
                             </code>
                         );
                     case 'inline-tag':
-                        // e.g. `{@link SomeType}` — render the referenced symbol
+                        // e.g. `{@link SomeType}`: render the referenced symbol
                         // name as inline code.
                         return <code key={i}>{piece.text}</code>;
                     default:

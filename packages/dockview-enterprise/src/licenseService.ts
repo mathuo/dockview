@@ -1,14 +1,14 @@
 /**
- * `LicenseService` — per-`DockviewComponent` license gate (the enterprise module).
+ * `LicenseService`: per-`DockviewComponent` license gate (the enterprise module).
  *
  * The whole package is enterprise, so its mere presence means enterprise is in
- * use: this service validates the key on construction and — unless a valid key
- * is set — renders a small inline-styled corner watermark and logs one console
- * warning. Features are NEVER disabled; the watermark is the enforcement.
+ * use: this service validates the key on construction and, unless a valid key
+ * is set, renders a small inline-styled corner watermark and logs one console
+ * warning. Features are never disabled; the watermark is the enforcement.
  *
- * ZERO core footprint: the `ServiceCollection` slot is declaration-merged onto
+ * Zero core footprint: the `ServiceCollection` slot is declaration-merged onto
  * `dockview` (never declared in `dockview-core`), the watermark anchors to the
- * existing generic `rootElement`, the watermark is styled INLINE (no core SCSS),
+ * existing generic `rootElement`, the watermark is styled inline (no core SCSS),
  * and all contracts live in this package.
  */
 
@@ -21,7 +21,7 @@ import {
 import { LicenseRegistry } from './licenseRegistry';
 import { DOCKVIEW_RELEASE_DATE } from './releaseDate';
 
-// The `ServiceCollection` slot is added HERE, not in core — so core never names
+// The `ServiceCollection` slot is added here, not in core, so core never names
 // `licenseService`. Augmenting `dockview` (which re-exports core's
 // `ServiceCollection`) keeps the package free of any `dockview-core` reference.
 // Compile-time only; the module system stores/reads services by string key at
@@ -32,7 +32,7 @@ declare module 'dockview' {
     }
 }
 
-/** Narrow host surface — satisfied structurally by `DockviewComponent`. */
+/** Narrow host surface, satisfied structurally by `DockviewComponent`. */
 export interface ILicenseHost {
     /** Generic shell-element anchor (DockviewComponent's existing `rootElement`). */
     readonly rootElement: HTMLElement;
@@ -49,7 +49,7 @@ export interface LicenseServiceOptions {
     /**
      * Injectable dockview release date for deterministic tests. Defaults to the
      * baked-in `DOCKVIEW_RELEASE_DATE`. Enforcement is version-based, so this is
-     * the build's publish date, NOT the current wall-clock time.
+     * the build's publish date, not the current wall-clock time.
      */
     releaseDate?: () => Date;
 }
@@ -59,7 +59,7 @@ const INFO_URL = 'https://dockview.dev/enterprise';
 
 // The dockview brand lockup (mark + "dockview" wordmark), monotone. Every shape
 // inherits `fill:currentColor` from the <svg>, so the container's `color` alone
-// drives the grey tint. No <title> — the whole watermark is decorative
+// drives the grey tint. No <title>, since the whole watermark is decorative
 // (aria-hidden). Vectors lifted from the brand kit's `dockview-lockup-mono.svg`.
 const LOCKUP_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730.3 174" width="100%" height="100%" fill="currentColor" aria-hidden="true">' +
@@ -155,7 +155,7 @@ export class LicenseService implements ILicenseService {
             const el = document.createElement('div');
             el.className = 'dv-license-watermark';
             el.setAttribute('aria-hidden', 'true');
-            // Styled INLINE (never core SCSS). pointer-events:none is mandatory —
+            // Styled inline (never core SCSS). pointer-events:none is mandatory:
             // it must never intercept clicks on the user's panels. A discreet,
             // monotone-grey brand lockup at moderate opacity: professional, not loud.
             el.style.cssText = [
@@ -203,7 +203,7 @@ export class LicenseService implements ILicenseService {
 export const LicenseModule = defineModule<'licenseService', ILicenseHost>({
     name: 'License',
     serviceKey: 'licenseService',
-    // No dependsOn — license must not require any feature module.
+    // No dependsOn: license must not require any feature module.
     create: (host) => new LicenseService(host),
     init: (_host, service): IDisposable => {
         service.refresh(); // re-evaluate once fully constructed

@@ -55,7 +55,7 @@ function stampCols(list: HTMLElement, lefts: number[]): void {
 /**
  * Stamp synthetic per-tab `offsetHeight`s (in DOM order) so the controller's
  * uniform-vertical-tab-height measurement (max natural tab height) can be
- * exercised without real layout — jsdom reports 0 for every offset.
+ * exercised without real layout, since jsdom reports 0 for every offset.
  */
 function stampHeights(list: HTMLElement, heights: number[]): void {
     list.querySelectorAll<HTMLElement>('.dv-tab').forEach((el, i) => {
@@ -69,10 +69,10 @@ function stampHeights(list: HTMLElement, heights: number[]): void {
 const VERTICAL_TAB_HEIGHT_VAR = '--dv-wrap-vertical-tab-height';
 
 /**
- * Multi-row (wrapping) tabs — Phase 2 (wrap render mode). The module toggles the
+ * Multi-row (wrapping) tabs, Phase 2 (wrap render mode). The module toggles the
  * `.dv-tabs-container--wrap` class on a group's tab list and relayouts on
  * row-count change. The actual wrapping geometry (rows, header growth, content
- * shrink) is e2e-only — jsdom has no layout — so these tests cover the
+ * shrink) is e2e-only (jsdom has no layout), so these tests cover the
  * deterministic wiring: class application, gating, and cleanup.
  */
 describe('multi-row tabs (wrap mode)', () => {
@@ -106,7 +106,7 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.dispose();
     });
 
-    test('default (no overflow) leaves the strip single-row — no wrap class', () => {
+    test('default (no overflow) leaves the strip single-row: no wrap class', () => {
         const dockview = make();
         const panel = dockview.addPanel({ id: 'a', component: 'default' });
 
@@ -117,7 +117,7 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.dispose();
     });
 
-    test("mode: 'dropdown' leaves the strip single-row — no wrap class", () => {
+    test("mode: 'dropdown' leaves the strip single-row: no wrap class", () => {
         const dockview = make({ mode: 'dropdown' });
         const panel = dockview.addPanel({ id: 'a', component: 'default' });
 
@@ -293,14 +293,14 @@ describe('multi-row tabs (wrap mode)', () => {
         }
         const list = first.group.model.tabsListElement;
 
-        // Two rows only — within the 3-row cap, so no surplus.
+        // Two rows only, within the 3-row cap, so no surplus.
         stampRows(list, [0, 0, 44, 44]);
 
         const spy = jest.spyOn(dockview, 'setForcedOverflow');
         dockview.updateOptions({ overflow: { mode: 'wrap', maxRows: 3 } });
 
         // Either not called (set unchanged from empty) or called with an
-        // all-false predicate — never forcing a real panel out.
+        // all-false predicate, never forcing a real panel out.
         for (const call of spy.mock.calls) {
             const forced = call[1];
             expect(['p0', 'p1', 'p2', 'p3'].some((id) => forced(id))).toBe(
@@ -375,7 +375,7 @@ describe('multi-row tabs (wrap mode)', () => {
     });
 
     /**
-     * Vertical (edge-group) wrap headers can't size their width from CSS alone —
+     * Vertical (edge-group) wrap headers can't size their width from CSS alone:
      * the strip wraps on its indefinite percentage height, so flex intrinsic
      * sizing resolves the header `auto` width for a single column and the surplus
      * columns overflow. The controller compensates by pinning the header width to
@@ -467,7 +467,7 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.updateOptions({ overflow: { mode: 'wrap' } });
         expect(header.style.width).toBe('70px');
 
-        // Flip to a horizontal header — its height stays CSS-driven, so the
+        // Flip to a horizontal header; its height stays CSS-driven, so the
         // explicit width must be released.
         first.group.api.setHeaderPosition('top');
         expect(header.style.width).toBe('');
@@ -491,7 +491,7 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.updateOptions({ overflow: { mode: 'wrap' } });
         expect(header.style.width).toBe('70px');
 
-        // Tear wrap down — the pinned width must be removed with the wrap classes.
+        // Tear wrap down; the pinned width must be removed with the wrap classes.
         dockview.updateOptions({ overflow: { mode: 'dropdown' } });
         expect(header.style.width).toBe('');
 
@@ -529,7 +529,7 @@ describe('multi-row tabs (wrap mode)', () => {
 
         dockview.updateOptions({ overflow: { mode: 'wrap' } });
 
-        // Horizontal rows already share the fixed row height — no pin.
+        // Horizontal rows already share the fixed row height, so no pin.
         expect(list.style.getPropertyValue(VERTICAL_TAB_HEIGHT_VAR)).toBe('');
 
         dockview.dispose();
@@ -589,7 +589,7 @@ describe('multi-row tabs (wrap mode)', () => {
     });
 });
 
-/** Mock a tab's layout geometry — jsdom reports 0 for every offset. */
+/** Mock a tab's layout geometry; jsdom reports 0 for every offset. */
 function setGeometry(
     el: HTMLElement,
     top: number,
@@ -669,7 +669,7 @@ describe('findVerticalNeighbour', () => {
 });
 
 /**
- * Cross-row keyboard navigation — Arrow Up/Down move the roving focus between
+ * Cross-row keyboard navigation: Arrow Up/Down move the roving focus between
  * wrapped rows. Only active while the strip is wrapping a horizontal header;
  * jsdom has no layout, so tab geometry is mocked (real wrapping is e2e).
  */
@@ -750,7 +750,7 @@ describe('multi-row tabs: cross-row keyboard navigation', () => {
     });
 
     test('is inert when the strip is not wrapping (no cross-row jump)', () => {
-        const dockview = make(); // dropdown overflow — no wrap class, no listener
+        const dockview = make(); // dropdown overflow, no wrap class, no listener
         const tabs = sixTabsTwoRows(dockview);
         expect(
             dockview.activeGroup!.model.tabsListElement.classList.contains(
@@ -762,7 +762,7 @@ describe('multi-row tabs: cross-row keyboard navigation', () => {
         fireEvent.keyDown(tabs[1], { key: 'ArrowDown' });
 
         // core owns Left/Right for a horizontal strip and ignores Up/Down, so
-        // focus stays put — our cross-row handler never ran.
+        // focus stays put; our cross-row handler never ran.
         expect(document.activeElement).toBe(tabs[1]);
 
         dockview.dispose();
@@ -778,9 +778,9 @@ describe('multi-row tabs: cross-row keyboard navigation', () => {
         expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
             true
         );
-        // DV-14: wrap IS active on a vertical header now (columns). The cross-row
-        // Arrow Up/Down handler is horizontal-only, though — it re-checks the
-        // vertical guard and no-ops — so roving focus does not jump between
+        // DV-14: wrap is active on a vertical header now (columns). The cross-row
+        // Arrow Up/Down handler is horizontal-only, though: it re-checks the
+        // vertical guard and no-ops, so roving focus does not jump between
         // columns via Up/Down here.
         expect(list.classList.contains(WRAP_CLASS)).toBe(true);
 
@@ -809,7 +809,7 @@ describe('multi-row tabs: cross-row keyboard navigation', () => {
         const dockview = make({ mode: 'wrap' });
         const tabs = sixTabsTwoRows(dockview);
 
-        // turn wrap off — the capture listener must be removed
+        // turn wrap off; the capture listener must be removed
         dockview.updateOptions({ overflow: { mode: 'dropdown' } });
 
         tabs[1].focus();

@@ -214,7 +214,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 // `forceVisible` / `clip` are sticky per-panel state owned by
                 // the peek (set via `repositionPanelOverlay`). Read them at paint
                 // time so an unrelated `resize()` (visibility / layout) can't
-                // clobber a force-shown, clipped peek panel back to hidden — a
+                // clobber a force-shown, clipped peek panel back to hidden. A
                 // peeked panel's `isVisible` is false (its group is collapsed),
                 // so without the sticky force it would render nothing.
                 const forceVisible = entry.forceVisible ?? false;

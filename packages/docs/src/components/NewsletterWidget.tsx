@@ -54,7 +54,7 @@ export default function NewsletterWidget() {
         try {
             localStorage.setItem(DISMISS_KEY, 'true');
         } catch {
-            /* storage unavailable — dismissal just won't persist */
+            /* storage unavailable, so the dismissal won't persist */
         }
     };
 

@@ -191,7 +191,7 @@ describe('PaneviewVue components prop resolves without registration', () => {
     });
 
     test('addPanel resolves component from props.components alone', async () => {
-        // No `global.components` and no `app.component()` — the user's
+        // No `global.components` and no `app.component()`: the user's
         // `<script setup>` scenario.
         wrapper = mount(PaneviewVue, {
             props: { components: { MyPane: MockPaneComponent } },

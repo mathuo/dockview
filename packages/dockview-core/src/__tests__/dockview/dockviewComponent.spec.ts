@@ -1153,7 +1153,7 @@ describe('dockviewComponent', () => {
         sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
 
         // Create a second group to be the destination by moving panel1 out
-        // and then moving it back — use moveGroupOrPanel to ensure a
+        // and then moving it back, using moveGroupOrPanel to ensure a
         // separate group exists
         dockview.moveGroupOrPanel({
             from: { groupId: sourceGroup.id, panelId: 'panel3' },
@@ -1672,7 +1672,7 @@ describe('dockviewComponent', () => {
         fireEvent.dragStart(chip);
         expect(getPanelData()?.tabGroupId).toBe(monitoring.id);
 
-        // The drop resolves via moveGroupOrPanel — the same path the
+        // The drop resolves via moveGroupOrPanel, the same path the
         // real drag flow ends up calling. This detaches the chip from
         // the DOM (source tab group becomes empty).
         dockview.moveGroupOrPanel({
@@ -1687,7 +1687,7 @@ describe('dockviewComponent', () => {
         // Without the fix, panelTransfer keeps the chip-drag payload
         // (with tabGroupId) and any subsequent dragover/canDisplayOverlay
         // call that reads it before the next dragstart's setData runs
-        // would see stale data — including a stale tabGroupId pointing
+        // would see stale data, including a stale tabGroupId pointing
         // at a tab group that has just been recreated under a new id.
         expect(getPanelData()).toBeUndefined();
 
@@ -5258,8 +5258,8 @@ describe('dockviewComponent', () => {
             dockview.overlayRenderContainer.element
         );
 
-        // Host must NOT live inside `.dv-dockview` — that element has
-        // `contain: layout` which forms a stacking context that would trap
+        // Host must not live inside `.dv-dockview`, which has
+        // `contain: layout` and forms a stacking context that would trap
         // floating z-indexes below shell-level render overlays.
         expect(dockview.element.contains(overlay)).toBe(false);
     });
@@ -6329,12 +6329,12 @@ describe('dockviewComponent', () => {
                 expect(panel1.api.location.type).toBe('grid');
                 expect(panel2.api.location.type).toBe('popout');
 
-                // the departed group no longer resolves to the popout service —
-                // it uses the main window again
+                // the departed group no longer resolves to the popout
+                // service; it uses the main window again
                 expect(dockview.getPopupServiceForGroup(panel1.group)).toBe(
                     mainPopupService
                 );
-                // the promoted anchor still resolves to the SAME popout service
+                // the promoted anchor still resolves to the same popout service
                 expect(dockview.getPopupServiceForGroup(panel2.group)).toBe(
                     popoutService
                 );
@@ -6364,7 +6364,7 @@ describe('dockviewComponent', () => {
                     component: 'default',
                     floating: true,
                 });
-                // panel3 must be placed explicitly in the grid — a position-less
+                // panel3 must be placed explicitly in the grid; a position-less
                 // add would land in the active (floating) group.
                 const panel3 = dockview.addPanel({
                     id: 'panel_3',
@@ -6445,7 +6445,7 @@ describe('dockviewComponent', () => {
                 const dockview = make();
                 dockview.layout(1000, 500);
 
-                // A frozen layout in the shape dockview emitted BEFORE nested
+                // A frozen layout in the shape dockview emitted before nested
                 // multi-group windows existed: floating/popout groups use the
                 // legacy `data` field and no `grid`. Hand-authored (not produced
                 // by the current serializer) so it guards old -> new read
@@ -7829,7 +7829,7 @@ describe('dockviewComponent', () => {
                     },
                 });
 
-                // Dispose BEFORE the popout-restoration timer has had a chance
+                // Dispose before the popout-restoration timer has had a chance
                 // to fire. This simulates the React StrictMode mount -> dispose
                 // -> remount sequence that triggers issue #851.
                 expect(openSpy).not.toHaveBeenCalled();
@@ -7838,7 +7838,7 @@ describe('dockviewComponent', () => {
                 // Advance any timers and microtasks. With the fix in place the
                 // queued popout restoration is cancelled in dispose() and the
                 // guard inside the timeout body short-circuits any survivors,
-                // so window.open MUST NOT be called.
+                // so window.open must not be called.
                 jest.runAllTimers();
                 await Promise.resolve();
                 jest.runAllTimers();
@@ -8172,7 +8172,7 @@ describe('dockviewComponent', () => {
             await dockview.addPopoutGroup(panel2);
             expect(panel2.api.location.type).toBe('popout');
 
-            // Drop the panel back onto the right edge of panel_3's group —
+            // Drop the panel back onto the right edge of panel_3's group,
             // a neighbor following the original slot. Pre-fix this placed the
             // new group after panel_4 instead of between panel_3 and panel_4.
             panel2.api.moveTo({
@@ -8240,7 +8240,7 @@ describe('dockviewComponent', () => {
             await dockview.addPopoutGroup(panel2);
             expect(panel2.api.location.type).toBe('popout');
 
-            // Drop on the far right edge — pre-fix this threw "Invalid index"
+            // Drop on the far right edge. Pre-fix this threw "Invalid index"
             // because the stale target index pointed past the end of the grid
             // after the empty reference group was cascade-removed.
             expect(() =>
@@ -8599,12 +8599,12 @@ describe('dockviewComponent', () => {
 
             expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
 
-            // addPopoutGroup creates a new group for the popout window —
+            // addPopoutGroup creates a new group for the popout window, so
             // panel1's group reference now points at it
             const popoutGroup = panel1.api.group;
             expect(popoutGroup).not.toBe(dockedGroup);
 
-            // The popout group has a dedicated popupService — required so
+            // The popout group has a dedicated popupService, required so
             // its context menus render in the popout window, not the main one
             const popoutService = dockview.getPopupServiceForGroup(popoutGroup);
             expect(popoutService).not.toBe(dockview.popupService);
@@ -8912,7 +8912,7 @@ describe('dockviewComponent', () => {
             jest.advanceTimersByTime(500);
             await dockview.popoutRestorationPromise;
 
-            // blocked popout content is not lost — it falls back into the grid
+            // blocked popout content is not lost; it falls back into the grid
             expect(dockview.panels.map((p) => p.id).sort()).toEqual([
                 'p1',
                 'p2',
@@ -9062,7 +9062,7 @@ describe('dockviewComponent', () => {
                     dockview.fromJSON(emptyLayout as any);
                 }).not.toThrow();
 
-                // Drain any timers — none should still be in flight, but if
+                // Drain any timers. None should still be in flight, but if
                 // any survive they must not call window.open or throw.
                 jest.runAllTimers();
                 await dockview.popoutRestorationPromise;
@@ -9072,7 +9072,7 @@ describe('dockviewComponent', () => {
                 expect(dockview.groups).toHaveLength(0);
                 expect(dockview.panels).toHaveLength(0);
 
-                // The component should still be usable — loading a fresh
+                // The component should still be usable: loading a fresh
                 // layout after the sequence must succeed.
                 expect(() => {
                     dockview.fromJSON(popoutLayout as any);
@@ -9324,7 +9324,7 @@ describe('dockviewComponent', () => {
             jest.runAllTimers();
             expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
-            // remove an empty edge group — fires only _onDidRemoveGroup (no
+            // remove an empty edge group: fires only _onDidRemoveGroup (no
             // panel events). Without _onDidRemoveGroup in the composition
             // this would not fire.
             dockview.removeEdgeGroup('left');
@@ -10803,7 +10803,7 @@ describe('dockviewComponent', () => {
 
             // The fix schedules updateAllPositions on the next animation
             // frame via debouncedUpdateAllPositions(). Without the
-            // _onDidMovePanel listener this assertion fails — the overlay
+            // _onDidMovePanel listener this assertion fails; the overlay
             // would only reposition on the next external resize.
             await new Promise((resolve) => requestAnimationFrame(resolve));
             expect(updateSpy).toHaveBeenCalled();
@@ -11181,7 +11181,7 @@ describe('dockviewComponent', () => {
             const state = dockview.toJSON();
             dockview.fromJSON(state);
 
-            // After restore, the active panel should NOT be in the collapsed group
+            // After restore, the active panel should not be in the collapsed group
             const restoredGroup = dockview.api.panels[0].group;
             const activeId = restoredGroup.activePanel?.id;
 
@@ -11232,7 +11232,7 @@ describe('dockviewComponent', () => {
             const state = dockview.toJSON();
             dockview.fromJSON(state);
 
-            // All panels are in collapsed groups — no active panel,
+            // All panels are in collapsed groups, so no active panel and the
             // watermark should be shown
             const restoredGroup = dockview.api.panels[0].group;
             const restored = dockview.api.getTabGroups({
@@ -11516,7 +11516,7 @@ describe('dockviewComponent', () => {
             const state = dv.toJSON();
             dv.dispose();
 
-            // a fresh component that has NOT called addEdgeGroup — fromJSON must
+            // a fresh component that has not called addEdgeGroup; fromJSON must
             // auto-create the edge group with the serialized constraints
             const c2 = document.createElement('div');
             const fresh = new DockviewComponent(c2, {
@@ -11571,7 +11571,7 @@ describe('dockviewComponent', () => {
             });
             dv.getEdgeGroup('right')!.expand();
 
-            // hide the expanded edge group — getViewSize now reports 0
+            // hide the expanded edge group; getViewSize now reports 0
             dv.setEdgeGroupVisible('right', false);
 
             const json = dv.toJSON();
@@ -11905,7 +11905,7 @@ describe('dockviewComponent', () => {
 
             expect(edgeGroupApi.location.type).toBe('edge');
 
-            // attempt to float the edge group — should be a no-op
+            // attempt to float the edge group; should be a no-op
             dv.addFloatingGroup(edgeGroup);
 
             // group should still be an edge group, not floating
@@ -11924,7 +11924,7 @@ describe('dockviewComponent', () => {
 
             expect(edgeGroupApi.location.type).toBe('edge');
 
-            // attempt to popout the edge group — should return false
+            // attempt to popout the edge group; should return false
             const result = await dv.addPopoutGroup(edgeGroup);
 
             expect(result).toBe(false);
@@ -12345,8 +12345,8 @@ describe('dockviewComponent', () => {
                     groupId: panel.group.id,
                     panelId: 'p1',
                 });
-                // empty it, then serialize SYNCHRONOUSLY (before the deferred
-                // teardown runs) — the transient empty auto-reveal edge must not
+                // empty it, then serialize synchronously (before the deferred
+                // teardown runs). The transient empty auto-reveal edge must not
                 // be persisted, or it would restore as an edge that never tears
                 // itself down.
                 dv.getEdgeGroupPanel('left')!.panels[0].api.close();
@@ -12364,7 +12364,7 @@ describe('dockviewComponent', () => {
                             options.name
                         );
                     },
-                    // internal seam — register a subset (see moduleRemovability.spec)
+                    // internal seam: register a subset (see moduleRemovability.spec)
                     modules: AllModules.filter((m) => m !== EdgeGroupModule),
                 } as never);
                 dv.layout(1000, 1000);
@@ -12458,7 +12458,7 @@ describe('dockviewComponent', () => {
     });
 
     test('issue #914: api.setTitle reflected by createTabRenderer output', () => {
-        // Regression test for #914 — the header overflow dropdown lazily
+        // Regression test for #914: the header overflow dropdown lazily
         // builds a fresh tab renderer via panel.view.createTabRenderer(...)
         // each time it opens. Prior to the fix that renderer was initialised
         // with a snapshot of the panel's init params, so a title updated via

@@ -75,7 +75,7 @@ export class ContentContainer
 
         // Resolve the override anchor dynamically: a group can be relocated
         // between roots (grid / floating / popout) after construction, and the
-        // popout anchor in particular lives in another window — a value
+        // popout anchor in particular lives in another window, so a value
         // captured here would mount overlays in the wrong window.
         const getOverrideTarget = () => group.dropTargetContainer?.model;
 
@@ -86,7 +86,7 @@ export class ContentContainer
 
         // `dropTarget` stays the concrete `Droptarget` (not via the backend
         // factory) because overlayRenderContainer forwards HTML5 drag events
-        // through `dropTarget.dnd` — that field is not part of `IDropTarget`.
+        // through `dropTarget.dnd`, and that field is not part of `IDropTarget`.
         this.dropTarget = new Droptarget(this.element, {
             getOverlayOutline: () => {
                 return accessor.options.theme?.dndPanelOverlay === 'group'

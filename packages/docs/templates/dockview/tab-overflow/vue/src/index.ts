@@ -9,7 +9,7 @@ import {
     IDockviewPanelProps,
 } from 'dockview-vue';
 
-// dockview.dev docs license key — replace with your own key in production.
+// dockview.dev docs license key. Replace with your own key in production.
 LicenseManager.setLicenseKey(
     '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
 );
@@ -46,7 +46,7 @@ const App = defineComponent({
         return {
             api: undefined as DockviewApi | undefined,
             // Bound to `:overflow` below, so flipping it re-applies the option
-            // through the Vue wrapper — no manual `updateOptions` call needed.
+            // through the Vue wrapper without a manual `updateOptions` call.
             mode: 'wrap' as 'wrap' | 'dropdown',
             // A vertical header plus wrap mode makes the tabs wrap into columns.
             vertical: false,

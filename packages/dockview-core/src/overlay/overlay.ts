@@ -333,7 +333,7 @@ export class Overlay extends CompositeDisposable {
             let hasMoved = false;
             this._dragCancelled = false;
 
-            // Snapshot once per drag — siblings don't move while this one drags.
+            // Snapshot once per drag; siblings don't move while this one drags.
             const siblingBoxes = this.options.transformDragPosition
                 ? (this.options.getSiblingBoxes?.() ?? [])
                 : [];
@@ -348,7 +348,7 @@ export class Overlay extends CompositeDisposable {
                 try {
                     captureTarget.setPointerCapture(pointerId);
                 } catch {
-                    // ignore – non-fatal if the browser refuses capture
+                    // ignore: non-fatal if the browser refuses capture
                 }
             }
 
@@ -376,7 +376,7 @@ export class Overlay extends CompositeDisposable {
                             try {
                                 captureTarget.releasePointerCapture(pointerId);
                             } catch {
-                                // ignore – pointer may already be released
+                                // ignore: pointer may already be released
                             }
                         }
                     },
@@ -581,7 +581,7 @@ export class Overlay extends CompositeDisposable {
                     try {
                         resizeHandleElement.setPointerCapture(pointerId);
                     } catch {
-                        // ignore – non-fatal if the browser refuses capture
+                        // ignore: non-fatal if the browser refuses capture
                     }
                 }
 
@@ -782,7 +782,7 @@ export class Overlay extends CompositeDisposable {
                                         pointerId
                                     );
                                 } catch {
-                                    // ignore – pointer may already be released
+                                    // ignore: pointer may already be released
                                 }
                             }
                         },

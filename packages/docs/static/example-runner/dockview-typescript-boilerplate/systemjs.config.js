@@ -57,8 +57,8 @@
             },
             // Examples import from `dockview` directly. Give it an explicit
             // `main` (its rollup bundle) so SystemJS doesn't request the bare
-            // package directory — a 404 (previously a fatal EISDIR) in the dev
-            // server. The bundle requires only `dockview-core`, mapped above.
+            // package directory, which 404s (previously a fatal EISDIR) in the
+            // dev server. The bundle requires only `dockview-core`, mapped above.
             dockview: {
                 main: './dist/package/main.cjs.js',
                 format: 'cjs',

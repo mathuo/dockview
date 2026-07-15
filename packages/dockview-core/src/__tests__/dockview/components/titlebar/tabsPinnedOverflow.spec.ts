@@ -1,5 +1,5 @@
 // Force every tab to be reported as clipped so `toggleDropdown` treats them as
-// overflowing — isolating the pinned-overflow bucket from jsdom's zero-geometry.
+// overflowing, isolating the pinned-overflow bucket from jsdom's zero-geometry.
 jest.mock('../../../../dom', () => {
     const actual = jest.requireActual('../../../../dom');
     return {
@@ -65,7 +65,7 @@ function giveWidth(tabs: Tabs, id: string, width: number): void {
         }) as DOMRect;
 }
 
-describe('tabs — pinned-among-themselves overflow', () => {
+describe('tabs: pinned-among-themselves overflow', () => {
     const lastEvent = (
         tabs: Tabs
     ): { tabs: string[]; pinnedTabs: string[] } => {
