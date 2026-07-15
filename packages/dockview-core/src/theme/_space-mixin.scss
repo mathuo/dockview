@@ -2,7 +2,13 @@
     --dv-spacing-padding: 10px;
     --dv-tab-font-size: 12px;
     --dv-border-radius: 12px;
-    --dv-tab-margin: 0.5rem 0.25rem;
+    // Split into block (top/bottom) and inline (left/right) parts so the
+    // multi-row wrap rule below can subtract the exact vertical margin from
+    // the wrapped-tab height (calc can't read a component out of the
+    // `--dv-tab-margin` shorthand).
+    --dv-tab-margin-block: 0.5rem;
+    --dv-tab-margin-inline: 0.25rem;
+    --dv-tab-margin: var(--dv-tab-margin-block) var(--dv-tab-margin-inline);
     --dv-tabs-and-actions-container-height: 44px;
     --dv-tab-border-radius: 8px;
     --dv-sash-border-radius: 4px;
@@ -103,6 +109,25 @@
             height: var(--dv-tab-close-icon-size);
             width: var(--dv-tab-close-icon-size);
         }
+    }
+
+    // Multi-row (wrap) tabs. Core pins each wrapped tab to the full
+    // `--dv-tabs-and-actions-container-height` (tabs.scss) so every row matches
+    // the single-row header height. That assumes a zero tab margin, which holds
+    // for the default theme but not the spaced themes: here `--dv-tab-margin`
+    // adds a vertical inset that flex-wrap counts toward each row's height, so a
+    // full-height tab plus its margins makes every wrapped row taller than the
+    // header — and the tab fills that whole height instead of keeping the pill
+    // inset it has in single-row mode (where flex `align-items: stretch` sizes
+    // the tab to the header height minus its margins). Subtract the vertical
+    // margin so each wrapped row is exactly one header height and the tab keeps
+    // its pill proportions. Horizontal headers only — the vertical wrap case
+    // sizes tabs from `--dv-wrap-vertical-tab-height` (measured live).
+    .dv-tabs-container--wrap:not(.dv-tabs-container-vertical) .dv-tab {
+        height: calc(
+            var(--dv-tabs-and-actions-container-height) -
+                2 * var(--dv-tab-margin-block)
+        );
     }
 
     // In writing-mode: vertical-rl (used by vertical tab bars), physical
