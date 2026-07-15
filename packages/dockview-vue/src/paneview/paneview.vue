@@ -26,6 +26,11 @@ function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
 const emit = defineEmits<PaneviewVueEvents>();
 const props = defineProps<IPaneviewVueProps>();
 
+// Two root nodes (host element + `<DockviewPortals>`) prevent Vue from
+// auto-inheriting fallthrough attributes, so bind `$attrs` (class, style, ...)
+// onto the host element explicitly below.
+defineOptions({ inheritAttrs: false });
+
 const { el, registry } = useViewComponent(
     {
         componentName: 'paneview-vue',
@@ -44,6 +49,6 @@ const { el, registry } = useViewComponent(
 </script>
 
 <template>
-    <div ref="el" style="height: 100%; width: 100%" />
+    <div ref="el" style="height: 100%; width: 100%" v-bind="$attrs" />
     <DockviewPortals :entries="registry.entries" />
 </template>

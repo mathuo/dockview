@@ -556,4 +556,29 @@ describe('DockviewVue components prop (issue #1301)', () => {
             api.addPanel({ id: 'panel-2', component: 'Panel', title: 'P2' })
         ).not.toThrow();
     });
+
+    test('forwards fallthrough attributes (class/style) onto the host element', async () => {
+        // Regression guard: the component renders two root nodes (the host
+        // element and the `<DockviewPortals>` teleport host), so Vue cannot
+        // auto-inherit fallthrough attributes. Without inheritAttrs:false plus
+        // an explicit v-bind="$attrs" on the host, a consumer's
+        // `<dockview-vue class="dockview-theme-abyss">` lands on nothing,
+        // leaving the dock unstyled and zero-height (fallout from #1369, which
+        // added the second root node).
+        wrapper = mount(DockviewVue, {
+            attrs: { class: 'dockview-theme-test', 'data-example': 'dock' },
+            attachTo: document.body,
+            global: { components: { MockPanel } },
+        });
+        await flushPromises();
+
+        const host = document.querySelector(
+            '.dockview-theme-test'
+        ) as HTMLElement | null;
+        expect(host).not.toBeNull();
+        expect(host!.getAttribute('data-example')).toBe('dock');
+        // the forwarded attributes land on the dockview host itself, not some
+        // detached node: the initialised dock lives inside it
+        expect(host!.querySelector('.dv-dockview')).not.toBeNull();
+    });
 });

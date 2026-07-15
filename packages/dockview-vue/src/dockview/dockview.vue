@@ -49,6 +49,13 @@ const emit = defineEmits<VueEvents>();
 
 const props = defineProps<IDockviewVueProps>();
 
+// The template has two root nodes (the dockview host element and the
+// `<DockviewPortals>` teleport host), so Vue cannot auto-inherit fallthrough
+// attributes. Disable automatic inheritance and bind `$attrs` (class, style,
+// id, ...) explicitly onto the host element below, otherwise a consumer's
+// `<dockview-vue class="dockview-theme-abyss">` would land on nothing.
+defineOptions({ inheritAttrs: false });
+
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);
 const eventDisposables: DockviewIDisposable[] = [];
@@ -396,6 +403,6 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div ref="el" />
+    <div ref="el" v-bind="$attrs" />
     <DockviewPortals :entries="registry.entries" />
 </template>
