@@ -26,6 +26,11 @@ function extractCoreOptions(props: IGridviewVueProps): GridviewOptions {
 const emit = defineEmits<GridviewVueEvents>();
 const props = defineProps<IGridviewVueProps>();
 
+// Two root nodes (host element + `<DockviewPortals>`) prevent Vue from
+// auto-inheriting fallthrough attributes, so bind `$attrs` (class, style, ...)
+// onto the host element explicitly below.
+defineOptions({ inheritAttrs: false });
+
 const { el, registry } = useViewComponent(
     {
         componentName: 'gridview-vue',
@@ -41,6 +46,6 @@ const { el, registry } = useViewComponent(
 </script>
 
 <template>
-    <div ref="el" style="height: 100%; width: 100%" />
+    <div ref="el" style="height: 100%; width: 100%" v-bind="$attrs" />
     <DockviewPortals :entries="registry.entries" />
 </template>
