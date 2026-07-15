@@ -694,6 +694,109 @@ test.describe('multi-row tabs (wrap mode)', () => {
         }).toPass();
     });
 
+    // --- Spaced themes: the wrapped tab must keep its pill inset ---
+    // Spaced themes give tabs a `--dv-tab-margin`. Core pins each wrapped tab to
+    // the full row-height/column-width; without the theme's compensating
+    // subtraction the tab fills that whole size and its margin then pushes the
+    // row band past one header unit (horizontal) / overflows the strip
+    // (vertical) — the pill inset it has in single-row mode is lost. The
+    // invariant is the ROW BAND (tab border-box + its cross-axis margins), not
+    // the tab box alone: it must equal exactly one header unit. The default
+    // theme has a zero tab margin, so only the spaced theme exercises this.
+    test('spaced theme: each wrapped row band equals one header height (pill inset kept)', async ({
+        page,
+    }) => {
+        await page.goto(
+            '/e2e/fixtures/index.html?overflow=wrap&theme=abyssSpaced'
+        );
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(12));
+
+        const m = await page.evaluate(() => {
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const tab = document.querySelector(
+                '.dv-tabs-container .dv-tab'
+            ) as HTMLElement;
+            const rowH = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            const cs = getComputedStyle(tab);
+            const band =
+                tab.offsetHeight +
+                parseFloat(cs.marginTop) +
+                parseFloat(cs.marginBottom);
+            const rows = new Set<number>();
+            document
+                .querySelectorAll<HTMLElement>('.dv-tabs-container .dv-tab')
+                .forEach((t) => rows.add(t.offsetTop));
+            return {
+                rowH,
+                tabH: tab.offsetHeight,
+                marginY:
+                    parseFloat(cs.marginTop) + parseFloat(cs.marginBottom),
+                band,
+                headerH: header.offsetHeight,
+                rowCount: rows.size,
+            };
+        });
+
+        // The theme actually has a vertical tab margin (this is what the bug
+        // hinged on — a zero-margin theme can't regress here).
+        expect(m.marginY).toBeGreaterThan(0);
+        // The tab keeps its pill inset: it is SHORTER than the full row unit ...
+        expect(m.tabH).toBeLessThan(m.rowH);
+        // ... and the row band (tab + margins) is exactly one row unit, so
+        // wrapped rows don't overshoot (the pre-fix band was rowH + marginY).
+        expect(m.band).toBeCloseTo(m.rowH, 0);
+        // Tabs really wrapped, and the header is a whole number of row units.
+        expect(m.rowCount).toBeGreaterThan(1);
+        expect(m.headerH).toBeCloseTo(m.rowCount * m.rowH, 0);
+    });
+
+    test('spaced theme (vertical header): each wrapped column band equals one header width (pill inset kept)', async ({
+        page,
+    }) => {
+        await setupVertical(page, 'overflow=wrap&theme=abyssSpaced', 12);
+        await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
+
+        const m = await page.evaluate(() => {
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const tab = document.querySelector(
+                '.dv-tabs-container .dv-tab'
+            ) as HTMLElement;
+            const colW = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            const cs = getComputedStyle(tab);
+            const band =
+                tab.offsetWidth +
+                parseFloat(cs.marginLeft) +
+                parseFloat(cs.marginRight);
+            return {
+                colW,
+                tabW: tab.offsetWidth,
+                marginX:
+                    parseFloat(cs.marginLeft) + parseFloat(cs.marginRight),
+                band,
+            };
+        });
+
+        expect(m.marginX).toBeGreaterThan(0);
+        // The cross-axis mirror: the vertical tab keeps its pill inset (narrower
+        // than the strip) and its column band fits exactly one header width, so
+        // the strip doesn't overflow (the pre-fix band was colW + marginX).
+        expect(m.tabW).toBeLessThan(m.colW);
+        expect(m.band).toBeCloseTo(m.colW, 0);
+    });
+
     test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
         await setup(page);
 
