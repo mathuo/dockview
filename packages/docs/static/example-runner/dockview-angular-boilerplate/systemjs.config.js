@@ -61,15 +61,19 @@
             app: {
                 defaultExtension: 'ts',
             },
+            // dockview-core is resolved transitively via `dockview`;
+            // dockview-enterprise is imported directly for its named exports
+            // (e.g. `LicenseManager`). Both resolve to the rolldown
+            // `dist/package` bundle, which sets `__esModule` (via rolldown's
+            // `esModule: true`). SystemJS 0.21 only exposes named exports from a
+            // CJS module when that marker is present.
             'dockview-core': {
-                main: './dist/cjs/index.js',
+                main: './dist/package/main.cjs.js',
                 format: 'cjs',
                 defaultExtension: 'js',
             },
-            // `dockview-enterprise`: tsc `dist/cjs` build so SystemJS sees the
-            // named exports (e.g. `LicenseManager`). Examples that use it import it.
             'dockview-enterprise': {
-                main: './dist/cjs/index.js',
+                main: './dist/package/main.cjs.js',
                 format: 'cjs',
                 defaultExtension: 'js',
             },
