@@ -30,6 +30,9 @@ class TestPanel implements IContentRenderer {
  * this package never imports.
  */
 describe('dockToEdgeGroups is enterprise-only', () => {
+    /** `DEFAULT_ROOT_OVERLAY_MODEL.activationSize` in rootDropTargetService. */
+    const DEFAULT_ACTIVATION = 10;
+
     const transfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     let dockview: DockviewComponent;
@@ -74,14 +77,16 @@ describe('dockToEdgeGroups is enterprise-only', () => {
      * anywhere public, and the alternative — simulating dragover at a measured
      * offset — would assert the same thing through far more machinery.
      */
-    function bandActivationSize(dv: DockviewComponent): unknown {
+    function bandActivationSize(dv: DockviewComponent): number | undefined {
         const svc = (dv as never as { _rootDropTargetService: unknown })
             ._rootDropTargetService as {
             _html5Target: {
-                options: { overlayModel?: { activationSize?: unknown } };
+                options: {
+                    overlayModel?: { activationSize?: { value?: number } };
+                };
             };
         };
-        return svc._html5Target.options.overlayModel?.activationSize;
+        return svc._html5Target.options.overlayModel?.activationSize?.value;
     }
 
     function dragPanelToEdge(panelId: string, groupId: string): void {
@@ -120,9 +125,15 @@ describe('dockToEdgeGroups is enterprise-only', () => {
         // group" sub-band. With no affordance nothing consumes it, so widening
         // would only enlarge the plain grid-split trigger — a bigger target for
         // behaviour the default band already gives.
-        expect(bandActivationSize(dockview)).toEqual(
+        //
+        // Pinned to the concrete default rather than compared against a second
+        // free build: two builds agreeing proves nothing if the band ever
+        // resolves to undefined. 32 is the widened value this must never be —
+        // see the enterprise-side edgeDragRevealBand spec for the positive.
+        expect(bandActivationSize(dockview)).toBe(DEFAULT_ACTIVATION);
+        expect(
             bandActivationSize(freeDockview({ dockToEdgeGroups: undefined }))
-        );
+        ).toBe(DEFAULT_ACTIVATION);
     });
 
     test('setting the option reports the missing module', () => {

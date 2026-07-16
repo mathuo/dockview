@@ -29,8 +29,9 @@
  * runtime: core may carry a fallback that hands a paid feature to free builds,
  * and reading that as "the option is free" turns one bug into two. Pick the
  * module that *implements the documented feature*; if core also does it, that's
- * a leak to fix in core, not a reason to drop the rule. `dockToEdgeGroups` is
- * the cautionary case — core's single-band fallback made it look free.
+ * a leak to fix in core, not a reason to drop the rule. `dockToEdgeGroups` was
+ * the cautionary case: core once carried a single-band fallback that made it
+ * look free, and the fix was to remove the fallback, not to weaken this rule.
  */
 
 import { logMissingModule } from './modules';
@@ -132,10 +133,10 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         moduleName: 'AutoEdgeGroup',
         // Dock-to-edge is a paid feature end to end: features.mdx ticks only
         // the Enterprise column and autoEdgeGroups.mdx is `enterprise: true`.
-        // Core carries a single-band fallback (see dockviewComponent's edge-drop
-        // handler, gated on `!autoEdgeGroupService`) that predates that
-        // decision and currently hands the feature to free builds — tracked
-        // separately; this rule reflects the intended boundary, not that leak.
+        // Core implements no part of it — its edge-drop handler always splits
+        // the grid, and the widened activation band is gated on the service —
+        // so without the module the option is inert and this is the only thing
+        // that says so.
         when: (o) => isAnyEdgeGroupEnabled(o.dockToEdgeGroups),
     },
 

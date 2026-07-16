@@ -119,10 +119,13 @@ export class RootDropTargetService implements IRootDropTargetService {
             return host.dispatchUnhandledDragOver(event, position);
         };
 
-        const overlayModel = resolveRootOverlayModel(
-            host.options,
-            host.hasEdgeDragReveal
-        );
+        // `false`, not `host.hasEdgeDragReveal`: this runs during module
+        // initialisation, where the affordance's service may not exist yet, so
+        // the honest answer here is always "no" (see `hasEdgeDragReveal`'s
+        // contract). Reading the host would look like a live gate while being
+        // incapable of returning anything else. The band this resolves is
+        // provisional; the `init` hook below re-resolves it for real.
+        const overlayModel = resolveRootOverlayModel(host.options, false);
 
         this._html5Target = html5Backend.createDropTarget(host.element, {
             className: 'dv-drop-target-edge',
