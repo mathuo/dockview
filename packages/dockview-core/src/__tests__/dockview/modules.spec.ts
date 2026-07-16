@@ -3,6 +3,7 @@ import {
     ModuleRegistry,
     _resetMissingModuleWarnings,
     assertModule,
+    missingModuleMessage,
 } from '../../dockview/modules';
 
 describe('ModuleRegistry', () => {
@@ -135,11 +136,44 @@ describe('assertModule', () => {
         assertModule(undefined, 'PopoutWindow', 'api.addPopoutGroup');
         assertModule(undefined, 'PopoutWindow', 'api.popoutRestorationPromise');
         expect(consoleError).toHaveBeenCalledTimes(2);
-        expect(consoleError.mock.calls[0][0]).toMatch(
-            /for api\.addPopoutGroup/
-        );
+        expect(consoleError.mock.calls[0][0]).toMatch(/`api\.addPopoutGroup`/);
         expect(consoleError.mock.calls[1][0]).toMatch(
-            /for api\.popoutRestorationPromise/
+            /`api\.popoutRestorationPromise`/
         );
+    });
+
+    test('names dockview-enterprise and the fix for an enterprise module', () => {
+        assertModule(undefined, 'SmartGuides', 'smartGuides');
+        const message = consoleError.mock.calls[0][0];
+        expect(message).toMatch(/ships in dockview-enterprise/);
+        expect(message).toMatch(/npm install dockview-enterprise/);
+        expect(message).toMatch(/import 'dockview-enterprise'/);
+    });
+
+    test('does not mention enterprise for a core module', () => {
+        assertModule(undefined, 'PopoutWindow', 'api.addPopoutGroup');
+        expect(consoleError.mock.calls[0][0]).not.toMatch(/enterprise/i);
+    });
+});
+
+describe('missingModuleMessage', () => {
+    test('is the same text assertModule logs, for callers that must throw', () => {
+        const consoleError = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => undefined);
+        _resetMissingModuleWarnings();
+
+        assertModule(undefined, 'EdgeGroup', 'api.addEdgeGroup');
+        expect(consoleError.mock.calls[0][0]).toBe(
+            missingModuleMessage('EdgeGroup', 'api.addEdgeGroup')
+        );
+
+        consoleError.mockRestore();
+    });
+
+    test('names the module and the reason', () => {
+        const message = missingModuleMessage('EdgeGroup', 'api.addEdgeGroup');
+        expect(message).toMatch(/EdgeGroup/);
+        expect(message).toMatch(/`api\.addEdgeGroup`/);
     });
 });

@@ -85,8 +85,10 @@ import {
     assertModule,
     DockviewModule,
     getRegisteredModules,
+    missingModuleMessage,
     ModuleRegistry,
 } from './modules';
+import { validateOptionModules } from './optionsModules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost, PopoutGroupEntry } from './popoutWindowService';
@@ -883,12 +885,20 @@ export class DockviewComponent
 
     /** Toggle Smart Guides snapping at runtime (no-op if the module is absent). */
     setSmartGuidesEnabled(enabled: boolean): void {
-        this._smartGuidesService?.setEnabled(enabled);
+        assertModule(
+            this._smartGuidesService,
+            'SmartGuides',
+            'api.setSmartGuidesEnabled'
+        )?.setEnabled(enabled);
     }
 
     /** Merge a partial Smart Guides option override in at runtime. */
     updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
-        this._smartGuidesService?.updateOptions(options);
+        assertModule(
+            this._smartGuidesService,
+            'SmartGuides',
+            'api.updateSmartGuidesOptions'
+        )?.updateOptions(options);
     }
 
     /** Fires when a dragged float commits an alignment snap on drop. */
@@ -1157,12 +1167,20 @@ export class DockviewComponent
     /** Undo the previous recorded layout mutation (no-op if nothing to undo or
      *  the LayoutHistory module is absent). Requires `layoutHistory.enabled`. */
     undo(): void {
-        this._layoutHistoryService?.undo();
+        assertModule(
+            this._layoutHistoryService,
+            'LayoutHistory',
+            'api.undo'
+        )?.undo();
     }
 
     /** Re-apply the next layout mutation (no-op if nothing to redo). */
     redo(): void {
-        this._layoutHistoryService?.redo();
+        assertModule(
+            this._layoutHistoryService,
+            'LayoutHistory',
+            'api.redo'
+        )?.redo();
     }
 
     get canUndo(): boolean {
@@ -1416,11 +1434,12 @@ export class DockviewComponent
             return;
         }
 
-        const service = assertModule(
-            this.pinnedTabsService,
-            'PinnedTabs',
-            'setPinned'
-        );
+        // Not routed through assertModule: reaching here means
+        // `pinnedTabs.enabled` is set, so the option rule in optionsModules.ts
+        // has already reported the missing module at construction (or at the
+        // updateOptions that enabled it). Warning again here would report the
+        // same module twice for one mistake.
+        const service = this.pinnedTabsService;
         if (!service) {
             return;
         }
@@ -1483,6 +1502,8 @@ export class DockviewComponent
             this._moduleRegistry.register(module);
         }
         this._moduleRegistry.initialize(this);
+
+        this.reportMissingOptionModules(options);
 
         // Surface popout removal symmetrically with `onDidAddPopoutGroup`. The
         // service is the single point every removal path funnels through, both
@@ -2763,6 +2784,11 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
+        // Validate what the caller passed, not the merged result: every key of
+        // DockviewOptions is present (as `undefined`) on `this.options`, so a
+        // presence test there would fire for every rule.
+        this.reportMissingOptionModules(options);
+
         this._floatingGroupService?.updateBounds(options);
 
         this._rootDropTargetService?.setOptions(options);
@@ -2815,6 +2841,19 @@ export class DockviewComponent
         this._layoutFromShell(this.gridview.width, this.gridview.height);
     }
 
+    /**
+     * Report any option the caller set whose module isn't registered. Logs
+     * once per module+reason; never throws, matching the module system's
+     * degrade-to-no-op contract.
+     */
+    private reportMissingOptionModules(
+        options: Partial<DockviewComponentOptions>
+    ): void {
+        validateOptionModules(options, (moduleName) =>
+            this._moduleRegistry.has(moduleName)
+        );
+    }
+
     override layout(
         width: number,
         height: number,
@@ -2864,13 +2903,15 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi {
-        const service = assertModule(
-            this._edgeGroupService,
-            'EdgeGroup',
-            'api.addEdgeGroup'
-        );
+        const service = this._edgeGroupService;
         if (!service) {
-            throw new Error(`dockview: EdgeGroup module is not registered`);
+            // Throws rather than degrading to a no-op like every other module
+            // entry point: the return type is non-optional, so there is no
+            // group to hand back. Not routed through assertModule — that would
+            // log and then throw, reporting the same problem twice.
+            throw new Error(
+                missingModuleMessage('EdgeGroup', 'api.addEdgeGroup')
+            );
         }
         if (service.has(position)) {
             throw new Error(
