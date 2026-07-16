@@ -1109,25 +1109,13 @@ export class DockviewComponent
 
         const data = getPanelData();
 
-        if (
-            data &&
-            position !== 'center' &&
-            isEdgeGroupEnabled(
-                this.options.dockToEdgeGroups,
-                position as EdgeGroupPosition
-            ) &&
-            this._edgeGroupService &&
-            !this._moduleRegistry.services.autoEdgeGroupService
-        ) {
-            // `dockToEdgeGroups` baseline (single band): a root-edge drop reveals
-            // an edge group instead of splitting the grid. When the two-band
-            // drag-reveal affordance is registered it owns edge-drop routing:
-            // it preempts the outer band via `onWillDrop.preventDefault` and lets
-            // the inner band fall through here to the default grid split, so
-            // this single-band fallback is disabled.
-            this.revealEdgeGroupWithData(position, data);
-            return;
-        }
+        // No `dockToEdgeGroups` handling here: docking a dragged panel to an
+        // edge is an AutoEdgeGroup (enterprise) feature, and that module owns
+        // edge-drop routing entirely — it preempts its outer "dock as edge
+        // group" band via `onWillDrop.preventDefault` above and lets the inner
+        // "split the grid" band fall through to the move below. Without the
+        // module the option is inert and a root-edge drop splits the grid, as
+        // it does when the option is unset.
 
         if (data) {
             this.moveGroupOrPanel({

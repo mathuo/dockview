@@ -1,0 +1,100 @@
+import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { AllModules } from '../../dockview/allModules';
+import { IContentRenderer } from '../../dockview/types';
+import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
+import { _resetMissingModuleWarnings } from '../../dockview/modules';
+
+class TestPanel implements IContentRenderer {
+    element = document.createElement('div');
+    init(): void {
+        // noop
+    }
+    layout(): void {
+        // noop
+    }
+    dispose(): void {
+        // noop
+    }
+}
+
+/**
+ * Docking a dragged panel to a layout edge is an AutoEdgeGroup (enterprise)
+ * feature — `features.mdx` ticks only the Enterprise column. Core used to carry
+ * a single-band fallback that performed the dock whenever the module was
+ * absent, which handed the feature to free builds; these tests pin the tier
+ * boundary so it can't come back.
+ *
+ * `AllModules` is core-only, so this file always runs as a free build: the
+ * enterprise modules self-register on import of `dockview-enterprise`, which
+ * this package never imports.
+ */
+describe('dockToEdgeGroups is enterprise-only', () => {
+    const transfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
+
+    let dockview: DockviewComponent;
+    let container: HTMLElement;
+
+    beforeEach(() => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+
+        // The missing-module dedup is page-global and outlives a test, so
+        // without this only the first component built in this file would log.
+        _resetMissingModuleWarnings();
+        jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            dockToEdgeGroups: true,
+            modules: AllModules,
+        } as never);
+        dockview.layout(1000, 800);
+    });
+
+    afterEach(() => {
+        transfer.clearData(PanelTransfer.prototype);
+        dockview.dispose();
+        container.remove();
+        jest.restoreAllMocks();
+    });
+
+    function dragPanelToEdge(panelId: string, groupId: string): void {
+        transfer.setData(
+            [new PanelTransfer(dockview.id, groupId, panelId)],
+            PanelTransfer.prototype
+        );
+        dockview.dockToLayoutEdge(new MouseEvent('drop') as never, 'left');
+    }
+
+    test('a root-edge drop does not create an edge group', () => {
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        dockview.addPanel({ id: 'b', component: 'default' });
+
+        dragPanelToEdge('a', a.group.id);
+
+        // The dock is the paid behaviour: without AutoEdgeGroup the drop must
+        // fall through to the ordinary grid split, leaving no edge group.
+        expect(dockview.getEdgeGroup('left')).toBeUndefined();
+        expect(
+            dockview.groups.filter((g) => g.model.location.type === 'edge')
+        ).toEqual([]);
+    });
+
+    test('the panel is still moved — the drop degrades, it does not vanish', () => {
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        dockview.addPanel({ id: 'b', component: 'default' });
+
+        dragPanelToEdge('a', a.group.id);
+
+        expect(dockview.panels.map((p) => p.id).sort()).toEqual(['a', 'b']);
+    });
+
+    test('setting the option reports the missing module', () => {
+        // The option is inert here, so the diagnostic is the only thing telling
+        // the user why — see optionsModules.ts.
+        const messages = (console.error as jest.Mock).mock.calls.map(
+            (c) => c[0] as string
+        );
+        expect(messages.some((m) => m.includes('AutoEdgeGroup'))).toBe(true);
+    });
+});
