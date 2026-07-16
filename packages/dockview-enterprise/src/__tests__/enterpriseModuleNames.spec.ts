@@ -54,8 +54,14 @@ describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
  * happens, nothing is logged. `keyboardNavigation` shipped exactly that way.
  *
  * Each module declares the options that must name it (`DockviewModule.options`)
- * and this pins the two together: the declaration lives with the module that
- * knows the answer, and core's table is checked against it.
+ * and this pins the declaration to core's table, in both directions.
+ *
+ * Know what this does *not* buy you: coverage is measured against the
+ * declaration, which is itself hand-written. An option added with **neither** a
+ * declaration nor a rule passes both tests and stays just as silent. This
+ * narrows the manual step to one place — next to the module that knows the
+ * answer — rather than eliminating it. Adding an option to a module means adding
+ * it to `options` too, and nothing here will remind you.
  */
 describe('OPTION_MODULE_RULES covers every gated enterprise option', () => {
     const declared = Modules.flatMap((m) =>

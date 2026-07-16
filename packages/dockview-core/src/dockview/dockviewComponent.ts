@@ -1114,8 +1114,9 @@ export class DockviewComponent
         // edge-drop routing entirely — it preempts its outer "dock as edge
         // group" band via `onWillDrop.preventDefault` above and lets the inner
         // "split the grid" band fall through to the move below. Without the
-        // module the option is inert and a root-edge drop splits the grid, as
-        // it does when the option is unset.
+        // module a root-edge drop splits the grid, exactly as when the option
+        // is unset — the option's only other effect, widening the activation
+        // band, is gated on the same service (see rootDropTargetService).
 
         if (data) {
             this.moveGroupOrPanel({
@@ -1189,6 +1190,15 @@ export class DockviewComponent
             this._layoutHistoryService?.onDidChangeHistory ??
             NO_LAYOUT_HISTORY_CHANGES
         );
+    }
+
+    /**
+     * Whether the two-band edge drag-reveal affordance is registered. See
+     * {@link IRootDropTargetHost.hasEdgeDragReveal} — must not be read during
+     * module initialisation, only from `init`/postConstruct onwards.
+     */
+    get hasEdgeDragReveal(): boolean {
+        return !!this._moduleRegistry.services.autoEdgeGroupService;
     }
 
     isGridEmpty(): boolean {
@@ -1406,8 +1416,10 @@ export class DockviewComponent
     /**
      * Pin/unpin a panel's tab. The single gated entry point behind
      * `panel.api.setPinned`. Dormant unless `pinnedTabs.enabled` is set (a
-     * silent no-op), and a warn-once no-op when the PinnedTabs module is not
-     * registered. When active it mutates the panel's pinned flag (which fires
+     * silent no-op), and a silent no-op when the PinnedTabs module is not
+     * registered — reaching past the `enabled` check means the option was set,
+     * so the option rule has already named the missing module. When active it
+     * mutates the panel's pinned flag (which fires
      * `panel.api.onDidChangePinned`) and the component-level
      * `onDidPanelPinnedChange`; the module reacts to enforce pinned-first
      * ordering.
@@ -2964,8 +2976,8 @@ export class DockviewComponent
      * (never re-created; `addEdgeGroup` throws on a duplicate position). No-op if
      * the EdgeGroup module is absent.
      *
-     * This is the primitive behind the dock-to-edge groups; the two-band
-     * drag-reveal affordance and the `dockToEdgeGroups` baseline both route here.
+     * This is the primitive behind the dock-to-edge groups: the two-band
+     * drag-reveal affordance routes its outer-band drops here.
      */
     revealEdgeGroupWithData(
         position: EdgeGroupPosition,

@@ -1,6 +1,7 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { AllModules } from '../../dockview/allModules';
 import { IContentRenderer } from '../../dockview/types';
+import { DockviewComponentOptions } from '../../dockview/options';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { _resetMissingModuleWarnings } from '../../dockview/modules';
 
@@ -32,31 +33,56 @@ describe('dockToEdgeGroups is enterprise-only', () => {
     const transfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     let dockview: DockviewComponent;
-    let container: HTMLElement;
+    const built: DockviewComponent[] = [];
+
+    /** A component with only core modules — i.e. the free package. */
+    function freeDockview(
+        options: Partial<DockviewComponentOptions>
+    ): DockviewComponent {
+        const container = document.createElement('div');
+        document.body.appendChild(container);
+        const dv = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            modules: AllModules,
+            ...options,
+        } as never);
+        dv.layout(1000, 800);
+        built.push(dv);
+        return dv;
+    }
 
     beforeEach(() => {
-        container = document.createElement('div');
-        document.body.appendChild(container);
-
         // The missing-module dedup is page-global and outlives a test, so
         // without this only the first component built in this file would log.
         _resetMissingModuleWarnings();
         jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-        dockview = new DockviewComponent(container, {
-            createComponent: () => new TestPanel(),
-            dockToEdgeGroups: true,
-            modules: AllModules,
-        } as never);
-        dockview.layout(1000, 800);
+        dockview = freeDockview({ dockToEdgeGroups: true });
     });
 
     afterEach(() => {
         transfer.clearData(PanelTransfer.prototype);
-        dockview.dispose();
-        container.remove();
+        for (const dv of built.splice(0)) {
+            dv.dispose();
+        }
         jest.restoreAllMocks();
     });
+
+    /**
+     * The resolved edge activation band, read off the drop target the service
+     * built. Reaches through privates deliberately: the band is not exposed
+     * anywhere public, and the alternative — simulating dragover at a measured
+     * offset — would assert the same thing through far more machinery.
+     */
+    function bandActivationSize(dv: DockviewComponent): unknown {
+        const svc = (dv as never as { _rootDropTargetService: unknown })
+            ._rootDropTargetService as {
+            _html5Target: {
+                options: { overlayModel?: { activationSize?: unknown } };
+            };
+        };
+        return svc._html5Target.options.overlayModel?.activationSize;
+    }
 
     function dragPanelToEdge(panelId: string, groupId: string): void {
         transfer.setData(
@@ -87,6 +113,16 @@ describe('dockToEdgeGroups is enterprise-only', () => {
         dragPanelToEdge('a', a.group.id);
 
         expect(dockview.panels.map((p) => p.id).sort()).toEqual(['a', 'b']);
+    });
+
+    test('the option does not widen the edge activation band', () => {
+        // The widened band exists to fit the affordance's outer "dock as edge
+        // group" sub-band. With no affordance nothing consumes it, so widening
+        // would only enlarge the plain grid-split trigger — a bigger target for
+        // behaviour the default band already gives.
+        expect(bandActivationSize(dockview)).toEqual(
+            bandActivationSize(freeDockview({ dockToEdgeGroups: undefined }))
+        );
     });
 
     test('setting the option reports the missing module', () => {

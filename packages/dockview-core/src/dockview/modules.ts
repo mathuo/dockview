@@ -225,11 +225,26 @@ export function logMissingModule(
  * module is missing. For internal/lifecycle paths, plain `?.` chaining on
  * the service slot is preferred: no log, a silent no-op.
  *
- * Guard commands, not queries. `api.undo()` asked for something to happen, so
- * silence is a bug report waiting to happen; `canUndo` asked a question, and
- * `false` is a truthful answer that shouldn't log. Same for event getters
- * falling back to a never-firing event, and for idempotent cleanup
- * (`clearHistory()` on an absent history has genuinely nothing to do).
+ * Two rules decide whether an entry point guards:
+ *
+ * 1. **Commands, not queries.** `api.undo()` asked for something to happen, so
+ *    silence is a bug report waiting to happen; `canUndo` asked a question, and
+ *    `false` is a truthful answer that shouldn't log. Same for event getters
+ *    falling back to a never-firing event, and for idempotent cleanup
+ *    (`clearHistory()` on an absent history has genuinely nothing to do).
+ *
+ * 2. **Only if the option rule can't already have fired.** A command reachable
+ *    without its gating option — `api.undo()` works on a component that never
+ *    set `layoutHistory` — needs this, because no rule will have run. A command
+ *    that can't be reached until the option is set doesn't: `setPanelPinned`
+ *    returns early unless `pinnedTabs.enabled`, so by the time it could warn,
+ *    the option rule has already named the same module. Guarding it too would
+ *    report one mistake twice.
+ *
+ * Rule 2 tolerates one overlap: setting `layoutHistory.enabled` *and* calling
+ * `api.undo()` without the module reports both, since the reasons differ and
+ * dedup is per module+reason. That's the price of covering the far more likely
+ * case — calling `undo()` having never set the option at all.
  *
  * Interaction handlers are queries in this sense too: a right-click reaching an
  * absent ContextMenu module means the app never asked for one, so it stays

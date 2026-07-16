@@ -68,7 +68,10 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         reason: 'smartGuides',
         moduleName: 'SmartGuides',
         // Present implies enabled; `enabled: false` is an explicit opt-out.
-        when: (o) => o.smartGuides != null && o.smartGuides.enabled !== false,
+        // Truthiness rather than `!= null` so a JS caller passing the untyped
+        // `smartGuides: false` (a reasonable guess at the off switch, and
+        // whatever a binding forwards) isn't billed for disabling it.
+        when: (o) => !!o.smartGuides && o.smartGuides.enabled !== false,
     },
     {
         optionKey: 'layoutHistory',
@@ -162,7 +165,10 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         optionKey: 'dndGuide',
         reason: 'dndGuide',
         moduleName: 'DropGuide',
-        when: (o) => o.dndGuide != null,
+        // Truthiness, not presence: `dndGuide` is `boolean | {...}`, so a
+        // `!= null` test would fire on `dndGuide: false` — billing a user for
+        // turning the compass off.
+        when: (o) => !!o.dndGuide,
     },
     {
         optionKey: 'keyboardNavigation',

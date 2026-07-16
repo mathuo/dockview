@@ -123,7 +123,28 @@ describe('validateOptionModules', () => {
                 layoutHistory: { enabled: false },
                 autoHideEdgeGroups: false,
                 dockToEdgeGroups: { left: false },
+                dndGuide: false,
+                keyboardNavigation: false,
+                overflow: { search: false, mru: false },
             }),
+            nothingRegistered
+        );
+        expect(consoleError).not.toHaveBeenCalled();
+    });
+
+    // Enumerated rather than hand-listed: the hand-listed test above missed
+    // `dndGuide: false`, which fired because its rule tested presence rather
+    // than truthiness. A rule that can't be expressed as a plain `false` is
+    // skipped — every such option here nests its own opt-out, covered above.
+    test.each([
+        ['dndGuide'],
+        ['keyboardNavigation'],
+        ['autoHideEdgeGroups'],
+        ['dockToEdgeGroups'],
+        ['smartGuides'],
+    ])('`%s: false` is an opt-out, never a purchase prompt', (key) => {
+        validateOptionModules(
+            options({ [key]: false } as Partial<DockviewComponentOptions>),
             nothingRegistered
         );
         expect(consoleError).not.toHaveBeenCalled();
