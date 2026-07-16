@@ -116,7 +116,7 @@ const App = defineComponent({
     },
     template: `
         <dockview-vue
-            class="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
+            className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
             @ready="onReady"
             style="width: 100%; height: 100%;">
         </dockview-vue>

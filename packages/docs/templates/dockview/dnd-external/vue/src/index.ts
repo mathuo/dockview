@@ -207,7 +207,8 @@ const App = defineComponent({
                 </template>
             </div>
             <dockview-vue
-                class="example-dock ${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
+                class="example-dock"
+                className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                 :dnd-edges="{ size: { value: 100, type: 'pixels' }, activationSize: { value: 5, type: 'percentage' } }"
                 @ready="onReady"
                 @didDrop="onDidDrop">

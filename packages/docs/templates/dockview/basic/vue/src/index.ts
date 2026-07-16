@@ -79,7 +79,7 @@ const App = defineComponent({
     template: `
       <dockview-vue
         style="width:100%; height:100%"
-        class="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
+        className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
         @ready="onReady"
       >
       </dockview-vue>`,
