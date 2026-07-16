@@ -7,8 +7,9 @@ import {
     OVERFLOW_MAX_TAB_ROWS_VARIABLE as MAX_ROWS_VAR,
     OVERFLOW_WRAP_TABS_VERTICAL_TAB_HEIGHT_VARIABLE as VERTICAL_TAB_HEIGHT_VAR,
     defineModule,
+    IMultiRowTabsHost,
+    IMultiRowTabsService,
 } from 'dockview';
-import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview';
 
 function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
     return typeof overflow === 'object' && overflow?.mode === 'wrap';

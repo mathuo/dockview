@@ -1,8 +1,12 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
-import { DockviewGroupPanel } from 'dockview';
-import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview';
-import { defineModule } from 'dockview';
-import { IKeyboardNavigationHost, IKeyboardNavigationService } from 'dockview';
+import {
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewGroupPanel,
+    DockviewKeybindings,
+    KeyboardNavigationOptions,
+    defineModule,
+    IKeyboardNavigationHost,
+    IKeyboardNavigationService,
+} from 'dockview';
 import {
     bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,
@@ -205,12 +209,12 @@ export class KeyboardNavigationService
         const index =
             active instanceof HTMLElement ? tabbables.indexOf(active) : -1;
         const n = tabbables.length;
-        const next =
-            index === -1
-                ? e.shiftKey
-                    ? n - 1
-                    : 0
-                : (index + (e.shiftKey ? -1 : 1) + n) % n;
+        let next: number;
+        if (index === -1) {
+            next = e.shiftKey ? n - 1 : 0;
+        } else {
+            next = (index + (e.shiftKey ? -1 : 1) + n) % n;
+        }
         tabbables[next].focus();
         return true;
     }

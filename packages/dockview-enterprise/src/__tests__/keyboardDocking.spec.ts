@@ -216,8 +216,8 @@ describe('accessibility: keyboard docking', () => {
         make(true);
         dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
         dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
-        expect(dockview.groups.length).toBe(1); // p1, p2 tabs in one group
-        expect(dockview.floatingGroups.length).toBe(0);
+        expect(dockview.groups).toHaveLength(1); // p1, p2 tabs in one group
+        expect(dockview.floatingGroups).toHaveLength(0);
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).toContain('Moving P2');
@@ -230,7 +230,7 @@ describe('accessibility: keyboard docking', () => {
         });
 
         expect(region().textContent).toBe('P2 floated.');
-        expect(dockview.floatingGroups.length).toBe(1);
+        expect(dockview.floatingGroups).toHaveLength(1);
     });
 
     test('float is rebindable', () => {
@@ -245,11 +245,11 @@ describe('accessibility: keyboard docking', () => {
             ctrlKey: true,
             shiftKey: true,
         });
-        expect(dockview.floatingGroups.length).toBe(0);
+        expect(dockview.floatingGroups).toHaveLength(0);
 
         // the rebound key does
         fireEvent.keyDown(dockview.element, { key: 'f', altKey: true });
-        expect(dockview.floatingGroups.length).toBe(1);
+        expect(dockview.floatingGroups).toHaveLength(1);
     });
 
     test('does nothing when keyboardNavigation is off (default)', () => {

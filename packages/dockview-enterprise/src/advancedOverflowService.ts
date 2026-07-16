@@ -247,7 +247,7 @@ export class OverflowListView extends CompositeDisposable {
         const { context } = this.params;
 
         while (this._list.firstChild) {
-            this._list.removeChild(this._list.firstChild);
+            this._list.firstChild.remove();
         }
         this._rows = [];
 

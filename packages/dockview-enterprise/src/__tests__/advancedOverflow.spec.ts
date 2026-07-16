@@ -459,7 +459,7 @@ describe('advanced overflow: full component integration', () => {
         expect(body).toBeTruthy();
         expect(body!.querySelector('.dv-tabs-overflow-search')).toBeTruthy();
         // scope 'group' (search: true) => every tab is reachable.
-        expect(body!.querySelectorAll('[role="option"]').length).toBe(4);
+        expect(body!.querySelectorAll('[role="option"]')).toHaveLength(4);
 
         dockview.dispose();
     });

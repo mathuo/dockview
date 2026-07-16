@@ -3172,7 +3172,7 @@ export class DockviewComponent
         value: boolean | undefined
     ): void {
         const service = this._edgeGroupService;
-        if (!service || !service.includes(group)) {
+        if (!service?.includes(group)) {
             return;
         }
         service.setAutoHide(group, value);
