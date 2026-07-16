@@ -677,6 +677,61 @@ describe('splitview', () => {
         expect(removeEventListenerSpy).toHaveBeenCalledTimes(4);
     });
 
+    test("dnd: sash drag follows pointer events in the element's own document", () => {
+        // A popout window (api.addPopoutGroup) has its own document, and the
+        // group's element is moved into it. The sash's pointer events are then
+        // dispatched into THAT document — so listeners bound to the global
+        // document never fire and the sash cannot be dragged.
+        const otherDocument = document.implementation.createHTMLDocument();
+        const otherContainer = otherDocument.createElement('div');
+        otherDocument.body.appendChild(otherContainer);
+
+        const splitview = new Splitview(otherContainer, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(400, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+
+        const sashElement = otherContainer
+            .getElementsByClassName('dv-sash')
+            .item(0) as HTMLElement;
+
+        expect(sashElement).toBeTruthy();
+        expect([view1.size, view2.size]).toEqual([200, 200]);
+
+        fireEvent(
+            sashElement,
+            new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
+        );
+
+        // expect a delta move of 70 - 50 = 20, driven from the owning document
+        fireEvent(
+            otherDocument,
+            new MouseEvent('pointermove', { clientX: 70, clientY: 110 })
+        );
+        expect([view1.size, view2.size]).toEqual([220, 180]);
+
+        fireEvent(
+            otherDocument,
+            new MouseEvent('pointerup', { clientX: 70, clientY: 110 })
+        );
+
+        // the drag has ended, so further moves must not resize
+        fireEvent(
+            otherDocument,
+            new MouseEvent('pointermove', { clientX: 100, clientY: 110 })
+        );
+        expect([view1.size, view2.size]).toEqual([220, 180]);
+
+        splitview.dispose();
+    });
+
     test('should restore iframe pointer events on contextmenu during sash drag', () => {
         const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
         const removeEventListenerSpy = jest.spyOn(
