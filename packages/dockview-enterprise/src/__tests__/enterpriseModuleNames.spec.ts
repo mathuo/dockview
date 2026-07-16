@@ -5,6 +5,7 @@
 // excluded from the tsc build (see tsconfig `exclude`), so this path never
 // ships.
 import { ENTERPRISE_MODULE_NAMES } from '../../../dockview-core/src/dockview/modules';
+import { OPTION_MODULE_RULES } from '../../../dockview-core/src/dockview/optionsModules';
 import { Modules } from '../index';
 
 /**
@@ -42,5 +43,59 @@ describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
         // ENTERPRISE_MODULE_NAMES still claims it's paid — users would be told
         // to install a package they don't need.
         expect(stale).toEqual([]);
+    });
+});
+
+/**
+ * The second half of the same problem. `OPTION_MODULE_RULES` in core says which
+ * option needs which module; it is hand-written, and core cannot derive it —
+ * it can't import the modules it might be missing. So an enterprise option can
+ * be added with no rule, and it fails *silently*: the free user sets it, nothing
+ * happens, nothing is logged. `keyboardNavigation` shipped exactly that way.
+ *
+ * Each module declares the options that must name it (`DockviewModule.options`)
+ * and this pins the two together: the declaration lives with the module that
+ * knows the answer, and core's table is checked against it.
+ */
+describe('OPTION_MODULE_RULES covers every gated enterprise option', () => {
+    const declared = Modules.flatMap((m) =>
+        (m.options ?? []).map((optionKey) => ({
+            moduleName: m.moduleName,
+            optionKey,
+        }))
+    );
+
+    const ruled = OPTION_MODULE_RULES.map((r) => ({
+        moduleName: r.moduleName,
+        optionKey: r.optionKey as string,
+    }));
+
+    const key = (p: { moduleName: string; optionKey: string }) =>
+        `${p.optionKey} -> ${p.moduleName}`;
+
+    test('every option a module claims has a rule naming that module', () => {
+        const ruledKeys = new Set(ruled.map(key));
+        const uncovered = declared
+            .filter((d) => !ruledKeys.has(key(d)))
+            .map(key)
+            .sort();
+
+        // If this fails: setting that option on the free package does nothing
+        // and says nothing. Add a rule to optionsModules.ts.
+        expect(uncovered).toEqual([]);
+    });
+
+    test('every rule naming an enterprise module is claimed by it', () => {
+        const declaredKeys = new Set(declared.map(key));
+        const unclaimed = ruled
+            .filter((r) => ENTERPRISE_MODULE_NAMES.has(r.moduleName))
+            .filter((r) => !declaredKeys.has(key(r)))
+            .map(key)
+            .sort();
+
+        // If this fails: core demands a module for an option the module doesn't
+        // own — the `dockToEdgeGroups` class of bug, where the wrong module gets
+        // named (or a free feature gets billed as paid).
+        expect(unclaimed).toEqual([]);
     });
 });

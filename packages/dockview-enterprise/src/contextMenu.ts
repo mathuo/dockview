@@ -439,6 +439,11 @@ export const ContextMenuModule = defineModule<
     IContextMenuHost
 >({
     name: 'ContextMenu',
+    options: [
+        'getTabContextMenuItems',
+        'getTabGroupChipContextMenuItems',
+        'createContextMenuItemComponent',
+    ],
     serviceKey: 'contextMenuService',
     create: (host) => new ContextMenuController(host),
 });

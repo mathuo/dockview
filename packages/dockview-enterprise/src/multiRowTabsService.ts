@@ -560,6 +560,7 @@ export const MultiRowTabsModule = defineModule<
     IMultiRowTabsHost
 >({
     name: 'MultiRowTabs',
+    options: ['overflow'],
     serviceKey: 'multiRowTabsService',
     create: (host) => new MultiRowTabsService(host),
 });

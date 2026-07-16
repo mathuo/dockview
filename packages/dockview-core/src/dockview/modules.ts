@@ -68,6 +68,24 @@ export interface DockviewModule<THost = unknown> {
      */
     init?: (host: THost, services: ServiceCollection) => IDisposable;
     dependsOn?: DockviewModule<any>[];
+    /**
+     * Top-level option keys that must report *this* module when it isn't
+     * registered — the module's half of the contract with core's
+     * `OPTION_MODULE_RULES`, which core cannot derive because it can't import
+     * the modules it might be missing.
+     *
+     * Declared here rather than inferred so a test can hold the two in sync:
+     * see `enterpriseModuleNames.spec.ts`, which fails if an option listed here
+     * has no rule (the user would get silence) or a rule names this module for
+     * an option not listed here.
+     *
+     * List an option only if it should produce a diagnostic naming this module.
+     * Options this module merely *reads* don't belong here: `edgeGroupPeek` only
+     * tunes `autoHideEdgeGroups` and is inert alone, and where one opt-in gates
+     * two modules in the same package (`keyboardNavigation`) only the module the
+     * message should name declares it — one mistake, one message.
+     */
+    options?: string[];
 }
 
 /**
@@ -84,9 +102,12 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
         service: NonNullable<ServiceCollection[K]>
     ) => IDisposable;
     dependsOn?: DockviewModule<any>[];
+    /** See {@link DockviewModule.options}. */
+    options?: string[];
 }): DockviewModule<THost> {
     return {
         moduleName: config.name,
+        options: config.options,
         services: {
             [config.serviceKey]: config.create,
         },

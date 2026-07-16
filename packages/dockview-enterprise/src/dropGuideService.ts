@@ -512,6 +512,7 @@ export class DropGuideService
 export const DropGuideModule = defineModule<'dropGuideService', IDropGuideHost>(
     {
         name: 'DropGuide',
+        options: ['dndGuide'],
         serviceKey: 'dropGuideService',
         dependsOn: [AdvancedDnDModule],
         create: (host) => new DropGuideService(host),

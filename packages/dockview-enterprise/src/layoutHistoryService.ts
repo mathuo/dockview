@@ -383,6 +383,7 @@ export const LayoutHistoryModule = defineModule<
     ILayoutHistoryHost
 >({
     name: 'LayoutHistory',
+    options: ['layoutHistory'],
     serviceKey: 'layoutHistoryService',
     create: (host) => new LayoutHistoryService(host),
 });

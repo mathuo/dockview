@@ -38,6 +38,14 @@ import { DockviewComponentOptions, isAnyEdgeGroupEnabled } from './options';
 
 export interface OptionModuleRule {
     /**
+     * The top-level option this rule gates on. Several rules may share one key
+     * (`overflow` gates both MultiRowTabs and AdvancedOverflow); `reason` carries
+     * the precise path. Kept separate from `reason` so the completeness test in
+     * dockview-enterprise can match rules to the options each module declares
+     * without parsing prose.
+     */
+    optionKey: keyof DockviewComponentOptions;
+    /**
      * How the user expressed intent, quoted verbatim into the message — name
      * the exact option path and value, e.g. `overflow.mode: 'wrap'`.
      */
@@ -56,48 +64,57 @@ export interface OptionModuleRule {
 
 export const OPTION_MODULE_RULES: OptionModuleRule[] = [
     {
+        optionKey: 'smartGuides',
         reason: 'smartGuides',
         moduleName: 'SmartGuides',
         // Present implies enabled; `enabled: false` is an explicit opt-out.
         when: (o) => o.smartGuides != null && o.smartGuides.enabled !== false,
     },
     {
+        optionKey: 'layoutHistory',
         reason: 'layoutHistory.enabled: true',
         moduleName: 'LayoutHistory',
         // Defaults to false: the module is inert until asked for.
         when: (o) => o.layoutHistory?.enabled === true,
     },
     {
+        optionKey: 'pinnedTabs',
         reason: 'pinnedTabs.enabled: true',
         moduleName: 'PinnedTabs',
         when: (o) => o.pinnedTabs?.enabled === true,
     },
     {
+        optionKey: 'overflow',
         reason: "overflow.mode: 'wrap'",
         moduleName: 'MultiRowTabs',
         when: (o) => o.overflow?.mode === 'wrap',
     },
     {
+        optionKey: 'overflow',
         reason: 'overflow.maxRows',
         moduleName: 'MultiRowTabs',
         when: (o) => o.overflow?.maxRows != null,
     },
     {
+        optionKey: 'overflow',
         reason: 'overflow.search',
         moduleName: 'AdvancedOverflow',
         when: (o) => !!o.overflow?.search,
     },
     {
+        optionKey: 'overflow',
         reason: 'overflow.mru',
         moduleName: 'AdvancedOverflow',
         when: (o) => !!o.overflow?.mru,
     },
     {
+        optionKey: 'overflow',
         reason: 'overflow.thumbnails',
         moduleName: 'AdvancedOverflow',
         when: (o) => !!o.overflow?.thumbnails,
     },
     {
+        optionKey: 'autoHideEdgeGroups',
         reason: 'autoHideEdgeGroups',
         moduleName: 'AutoHideEdgeGroup',
         // Without the module a collapsed edge group renders an empty strip and
@@ -107,6 +124,7 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
     },
 
     {
+        optionKey: 'dockToEdgeGroups',
         reason: 'dockToEdgeGroups',
         moduleName: 'AutoEdgeGroup',
         // Dock-to-edge is a paid feature end to end: features.mdx ticks only
@@ -123,24 +141,43 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
     // the module, so it can't justify a message of its own; alongside
     // `autoHideEdgeGroups` the rule above already covers it.
     {
+        optionKey: 'getTabContextMenuItems',
         reason: 'getTabContextMenuItems',
         moduleName: 'ContextMenu',
         when: (o) => o.getTabContextMenuItems != null,
     },
     {
+        optionKey: 'getTabGroupChipContextMenuItems',
         reason: 'getTabGroupChipContextMenuItems',
         moduleName: 'ContextMenu',
         when: (o) => o.getTabGroupChipContextMenuItems != null,
     },
     {
+        optionKey: 'createContextMenuItemComponent',
         reason: 'createContextMenuItemComponent',
         moduleName: 'ContextMenu',
         when: (o) => o.createContextMenuItemComponent != null,
     },
     {
+        optionKey: 'dndGuide',
         reason: 'dndGuide',
         moduleName: 'DropGuide',
         when: (o) => o.dndGuide != null,
+    },
+    {
+        optionKey: 'keyboardNavigation',
+        reason: 'keyboardNavigation',
+        moduleName: 'KeyboardNavigation',
+        // Any truthy value opts in (`true` or an options object) — mirrors
+        // `readKeyboardNavigation` in the enterprise keyboard modules. Baseline
+        // a11y (ARIA, within-strip arrow keys, live region, focus indicators)
+        // is free and needs no option; this opt-in buys layout-level keyboard
+        // operability, which is the paid part.
+        //
+        // The same opt-in also gates KeyboardDocking, but one message is
+        // enough: both ship in dockview-enterprise, so the install fixes both,
+        // and naming each separately would report one mistake twice.
+        when: (o) => !!o.keyboardNavigation,
     },
 ];
 
