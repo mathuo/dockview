@@ -170,6 +170,32 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 -   Code comments describe the current state of the code, not its history. Don't reference the fix, PR, or what changed unless that context is critical to understanding the code as it stands.
 -   Keep comments brief and concise.
 
+### Public Documentation
+
+-   **Refrain from mentioning `dockview-core` in public-facing documentation.** It is
+    an internal module, not a supported install target. This covers the root README,
+    the docs site, blog posts, release notes, and the published package READMEs.
+-   Point consumers at `dockview` or a framework binding (`dockview-react`,
+    `dockview-vue`, `dockview-angular`) instead. Where a dependency graph or build
+    order would otherwise name it, describe the chain from `dockview` onwards.
+-   Only refer to `dockview-core` where its internal nature is itself the point (for
+    example, contributor-facing notes in this file), and say that it is internal when
+    you do.
+-   **The module system is an internal concept — don't mention it in public-facing
+    documentation.** Avoid "modules", "feature modules" and `registerModules` in the
+    surfaces listed above. Describe what the user gets and what they do ("importing
+    the package enables the enterprise features"), not how registration works
+    internally. Angular's `DockviewAngularModule` is an unrelated Angular NgModule
+    and is fine to name.
+-   **Don't enumerate the enterprise features** in READMEs or package docs. The
+    canonical list lives on <https://dockview.dev/enterprise>; link to it instead.
+    An inline list duplicates that page and drifts out of date as the feature set
+    changes.
+-   **Don't document the unlicensed behaviour.** Public docs should not say that
+    dockview keeps working without a valid licence key, or describe the watermark.
+    State that enterprise features are governed by a licence key and link to the
+    enterprise page; don't present the key as optional.
+
 ## Release Management
 
 ### Creating Release Notes
