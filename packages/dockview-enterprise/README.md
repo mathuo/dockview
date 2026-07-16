@@ -1,12 +1,29 @@
-# dockview-enterprise
+<div align="center">
 
-Enterprise feature modules and licensing for [dockview](https://github.com/mathuo/dockview).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/dockview-lockup-dark.svg?raw=true">
+  <img src="https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/dockview-lockup-light.svg?raw=true" alt="Dockview" width="480">
+</picture>
+
+<h1>dockview-enterprise</h1>
+
+<p>Enterprise features and licensing for dockview</p>
+
+[![npm version](https://img.shields.io/npm/v/dockview-enterprise)](https://www.npmjs.com/package/dockview-enterprise)
+[![npm downloads](https://img.shields.io/npm/dm/dockview-enterprise)](https://www.npmjs.com/package/dockview-enterprise)
+[![CI](https://img.shields.io/github/actions/workflow/status/mathuo/dockview/main.yml?branch=master&label=CI)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
+[![Coverage](https://img.shields.io/sonar/coverage/mathuo_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
+[![Quality gate](https://img.shields.io/sonar/quality_gate/mathuo_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
+
+</div>
+
+---
 
 `dockview-enterprise` is a drop-in **superset** of the free `dockview` package:
-it re-exports the entire `dockview` API and adds the enterprise feature modules
-(pinned tabs, smart guides, drop guide, auto-hide edge groups, multi-row tabs,
-context menu, tab-group chips, keyboard docking, layout history) plus the license
-gate. Importing the package self-registers all of them.
+it re-exports the entire `dockview` API and adds the enterprise features plus
+licensing. Importing the package enables all of them.
+
+See [licensing](https://dockview.dev/docs/overview/features) for what's included.
 
 ## Install
 
@@ -22,15 +39,13 @@ It depends on `dockview`; use it **instead of** `dockview` (not alongside). Ever
 ```ts
 import { DockviewComponent, LicenseManager } from 'dockview-enterprise';
 
-// Optional: set your license key. Without a valid key, dockview keeps working
-// but shows a small corner watermark.
+// Set your license key.
 LicenseManager.setLicenseKey('your-license-key');
 ```
 
-Merely importing `dockview-enterprise` registers the enterprise modules and the
-license check, so the feature options (`pinnedTabs`, `smartGuides`, …) become
-available on every `DockviewComponent`. No explicit `registerModules` call is
-needed.
+Merely importing `dockview-enterprise` enables the enterprise features and the
+license check, so their options become available on every `DockviewComponent`.
+No further setup is needed.
 
 Using a framework binding (`dockview-react` / `dockview-vue` /
 `dockview-angular`)? Keep importing your components from the binding and add a
@@ -43,6 +58,8 @@ import 'dockview-enterprise';
 ## License
 
 Enterprise features are governed by a license key set via
-`LicenseManager.setLicenseKey(...)`. Without a valid key, dockview keeps working
-but shows a small corner watermark. See
-<https://dockview.dev/enterprise>.
+`LicenseManager.setLicenseKey(...)`. See
+[licensing](https://dockview.dev/docs/overview/features).
+
+`dockview-enterprise` is proprietary software governed by a commercial licence
+agreement. See [LICENCE.md](./LICENCE.md).
