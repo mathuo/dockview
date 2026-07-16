@@ -89,17 +89,19 @@ export class Scrollbar extends CompositeDisposable {
                     this.calculateScrollbarStyles();
                 };
 
+                const doc = this.element.ownerDocument;
+
                 const onEnd = () => {
                     toggleClass(this.element, 'dv-scrollable-scrolling', false);
 
-                    document.removeEventListener('pointermove', onPointerMove);
-                    document.removeEventListener('pointerup', onEnd);
-                    document.removeEventListener('pointercancel', onEnd);
+                    doc.removeEventListener('pointermove', onPointerMove);
+                    doc.removeEventListener('pointerup', onEnd);
+                    doc.removeEventListener('pointercancel', onEnd);
                 };
 
-                document.addEventListener('pointermove', onPointerMove);
-                document.addEventListener('pointerup', onEnd);
-                document.addEventListener('pointercancel', onEnd);
+                doc.addEventListener('pointermove', onPointerMove);
+                doc.addEventListener('pointerup', onEnd);
+                doc.addEventListener('pointercancel', onEnd);
             }),
             addDisposableListener(this.element, 'scroll', () => {
                 this.calculateScrollbarStyles();
