@@ -25,6 +25,7 @@ import {
     OVERFLOW_WRAP_TABS_CLASS,
 } from '../../options';
 import { Tab } from '../tab/tab';
+import { resolveDndCapabilities } from '../../dndCapabilities';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupManager } from './tabGroups';
@@ -40,6 +41,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
     private readonly _observerDisposable = new MutableDisposable();
+    private readonly _pointerActivation = new MutableDisposable();
     private readonly _scrollbar: Scrollbar | null = null;
 
     private _tabs: IValueDisposable<Tab>[] = [];
@@ -471,6 +473,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
+            this._pointerActivation,
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
@@ -868,6 +871,36 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         }
     }
 
+    /**
+     * Activate a tab in response to a plain (non-shift) left pointerdown.
+     *
+     * With the HTML5 drag backend the tab is natively `draggable`, and a native
+     * drag arms from the same pointerdown+move gesture. Firefox aborts that
+     * pending drag if the pointerdown also moves focus / relayouts the tab strip
+     * synchronously — which `openPanel` does — so a drag started on an inactive
+     * tab never begins (issue #932). Defer the activation past the frame so
+     * `dragstart` arms first; a plain click (no drag) still activates on the
+     * next frame, which is imperceptible. The pointer backend has no native drag
+     * to pre-empt, so it activates synchronously as before.
+     */
+    private _activateOnPointerDown(panel: IDockviewPanel): void {
+        if (!resolveDndCapabilities(this.accessor.options).html5) {
+            this.group.model.openPanel(panel);
+            return;
+        }
+
+        const handle = requestAnimationFrame(() => {
+            // The panel's tab may have been removed within the deferred frame;
+            // only activate a panel this strip still owns.
+            if (this._tabMap.has(panel.id)) {
+                this.group.model.openPanel(panel);
+            }
+        });
+        this._pointerActivation.value = {
+            dispose: () => cancelAnimationFrame(handle),
+        };
+    }
+
     openPanel(panel: IDockviewPanel, index: number = this._tabs.length): void {
         if (this._tabMap.has(panel.id)) {
             return;
@@ -1006,7 +1039,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                     this.group.api.location.type !== 'edge' &&
                     this.group.activePanel !== panel
                 ) {
-                    this.group.model.openPanel(panel);
+                    this._activateOnPointerDown(panel);
                 }
             }),
             tab.onDrop((event) => {
