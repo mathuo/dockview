@@ -119,7 +119,8 @@ const App = defineComponent({
           <button @click="addPanel">Add Panel</button>
         </div>
         <dockview-vue
-          class="example-dock ${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
+          class="example-dock"
+          className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
           :layoutHistory="{ enabled: true, undoableProgrammaticMutations: true }"
           @ready="onReady"
         >
