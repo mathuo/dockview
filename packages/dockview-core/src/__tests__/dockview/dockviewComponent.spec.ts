@@ -319,7 +319,7 @@ describe('dockviewComponent', () => {
             const tabEls = Array.from(
                 group.element.querySelectorAll('.dv-tab')
             ) as HTMLElement[];
-            expect(tabEls.length).toBe(2);
+            expect(tabEls).toHaveLength(2);
 
             // each tab element resolves to a distinct panel
             const r1 = group.model.getPanelForTab(tabEls[0]);

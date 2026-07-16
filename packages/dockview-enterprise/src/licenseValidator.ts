@@ -194,7 +194,7 @@ export function validateLicense(
         return 'missing';
     }
     const parsed = parseLicenseKey(key);
-    if (!parsed || !parsed.validUntil) {
+    if (!parsed?.validUntil) {
         return 'invalid';
     }
     // Compare at UTC-date granularity (keys carry dates, not times): a build

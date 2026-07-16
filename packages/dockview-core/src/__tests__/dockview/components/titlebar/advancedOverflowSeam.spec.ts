@@ -86,7 +86,7 @@ describe('advanced overflow seam: free fallback (no module)', () => {
         // No search input in the free path.
         expect(body!.querySelector('.dv-tabs-overflow-search')).toBeNull();
         // The clipped tabs render as rows.
-        expect(body!.querySelectorAll('.dv-tab').length).toBe(2);
+        expect(body!.querySelectorAll('.dv-tab')).toHaveLength(2);
 
         dockview.dispose();
     });

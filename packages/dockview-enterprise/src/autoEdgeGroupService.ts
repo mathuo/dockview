@@ -1,5 +1,5 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
 import {
+    DockviewCompositeDisposable as CompositeDisposable,
     DockviewWillDropEvent,
     DockviewWillShowOverlayLocationEvent,
     EdgeGroupPosition,
@@ -9,9 +9,11 @@ import {
     PositionResolver,
     PositionResolverArgs,
     PositionResolverResult,
+    defineModule,
+    EdgeGroupModule,
+    IAutoEdgeGroupHost,
+    IAutoEdgeGroupService,
 } from 'dockview';
-import { defineModule, EdgeGroupModule } from 'dockview';
-import { IAutoEdgeGroupHost, IAutoEdgeGroupService } from 'dockview';
 
 /**
  * Distance (px) from the content-area edge within which a drop docks as an

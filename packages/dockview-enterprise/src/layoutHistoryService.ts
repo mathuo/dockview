@@ -2,15 +2,11 @@ import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewEmitter as Emitter,
     DockviewEvent as Event,
-} from 'dockview';
-import {
     DockviewComponentOptions,
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
     SerializedDockview,
-} from 'dockview';
-import { defineModule } from 'dockview';
-import {
+    defineModule,
     ILayoutHistoryHost,
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,

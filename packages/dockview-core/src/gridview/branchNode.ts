@@ -179,10 +179,7 @@ export class BranchNode extends CompositeDisposable implements IView {
                         // Honour an explicit `visible` flag for branch children
                         // too (not just leaves), so a hidden sub-grid restores
                         // hidden with its cached size rather than visible at 0.
-                        visible:
-                            childDescriptor.visible !== undefined
-                                ? childDescriptor.visible
-                                : true,
+                        visible: childDescriptor.visible ?? true,
                     };
                 }),
                 size: this.orthogonalSize,

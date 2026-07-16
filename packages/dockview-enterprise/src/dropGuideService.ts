@@ -1,18 +1,17 @@
 import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewIDisposable as IDisposable,
-} from 'dockview';
-import {
     DockviewGroupPanel,
     DockviewWillShowOverlayLocationEvent,
     Position,
     PositionResolver,
     PositionResolverArgs,
     PositionResolverResult,
+    defineModule,
+    IDropGuideHost,
+    IDropGuideService,
+    AdvancedDnDModule,
 } from 'dockview';
-import { defineModule } from 'dockview';
-import { IDropGuideHost, IDropGuideService } from 'dockview';
-import { AdvancedDnDModule } from 'dockview';
 
 /** Size (px) of each compass cell + the gap between them. */
 const CELL = 38;

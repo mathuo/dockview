@@ -259,8 +259,8 @@ describe('PointerDropTarget', () => {
 
         (target as any)._onDragOver(makeDragEvent(10, 20));
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
         expect(target.state).toBeUndefined();
 
         target.dispose();

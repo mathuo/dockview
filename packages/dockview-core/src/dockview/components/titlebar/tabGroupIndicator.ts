@@ -609,7 +609,7 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         path: SVGPathElement;
     } {
         const existing = underline.firstElementChild as SVGSVGElement | null;
-        if (existing && existing.tagName === 'svg') {
+        if (existing?.tagName === 'svg') {
             return {
                 svg: existing,
                 path: existing.firstElementChild as SVGPathElement,

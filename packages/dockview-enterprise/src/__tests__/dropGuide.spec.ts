@@ -322,7 +322,7 @@ describe('drop guide', () => {
 
         // 9 cells but inner+outer of a direction share a position, so the veto
         // (which can fire onUnhandledDragOver) must run at most once per position.
-        expect(gateCalls.length).toBe(new Set(gateCalls).size);
+        expect(gateCalls).toHaveLength(new Set(gateCalls).size);
         expect(gateCalls.length).toBeLessThanOrEqual(5);
     });
 
