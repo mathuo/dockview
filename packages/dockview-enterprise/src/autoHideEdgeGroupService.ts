@@ -29,18 +29,18 @@ function resolveOptions(o: EdgeGroupPeekOptions | undefined): {
 /**
  * Click-driven auto-hide ("pinnable") peek for a single edge group, modelled on
  * Visual Studio tool windows. The collapsed edge group's native tabs are the
- * triggers — **no hover**:
+ * triggers, with **no hover**:
  *
  * - **Click a tab** → that tab's panel slides out as a non-reflowing overlay
  *   with a **title bar** (active title left; pin + close right). The content
- *   container is reparented out (state preserved) and the grid is NOT reflowed.
+ *   container is reparented out (state preserved) and the grid is not reflowed.
  * - **Click the same tab again**, or **click outside** the strip+peek, or
  *   **Esc** → hide. Clicking empty space inside the tab strip does nothing.
  * - **Pin** → re-dock (expand) the group. **Close** → close the panel.
  *
- * Both render modes slide out: it reparents the content CONTAINER (not the
+ * Both render modes slide out: it reparents the content container (not the
  * panel content). For `onlyWhenVisible` the content rides inside it; for
- * `always` the container is just the position reference the shared render
+ * `always` the container is only the position reference the shared render
  * overlay re-anchors to (`repositionPanelOverlay`, force-visible + clipped to
  * the reveal window). A fixed clip frame makes the panel emerge from the
  * strip's inner edge rather than from the screen edge.
@@ -71,7 +71,7 @@ class EdgeGroupController extends CompositeDisposable {
 
         const strip = this.group.element;
         // Click a collapsed tab → toggle the peek for that tab's panel (open it,
-        // switch to it, or — if it's already the peeked tab — hide it). Natively
+        // switch to it, or hide it if it's already the peeked tab). Natively
         // a collapsed-tab click expands the group; suppress that (the edge-expand
         // handler bails on a default-prevented click) so click peeks instead.
         // Capture phase so it runs before the tab's own bubble-phase handler.
@@ -102,7 +102,7 @@ class EdgeGroupController extends CompositeDisposable {
         this.addDisposables(
             // Collapse change: tear the peek down, then reconcile the docked
             // tool-window chrome (expanded ⇒ title bar + tabs-bottom; collapsed
-            // ⇒ just the strip).
+            // ⇒ only the strip).
             this.group.api.onDidCollapsedChange(() => {
                 this._closePeek();
                 this._updateDocked();
@@ -161,14 +161,14 @@ class EdgeGroupController extends CompositeDisposable {
         return resolveOptions(this.host.options.edgeGroupPeek);
     }
 
-    /** Whether this specific edge group is opted into auto-hide — the per-group
-     *  flag resolved against the global option by the host, so a static and an
-     *  auto-hiding edge group can co-exist. */
+    /** Whether this specific edge group is opted into auto-hide. The per-group
+     *  flag is resolved against the global option by the host, so a static and
+     *  an auto-hiding edge group can co-exist. */
     private _enabled(): boolean {
         return this.host.isEdgeGroupAutoHide(this.group);
     }
 
-    /** Enabled + collapsed — the precondition for peeking. */
+    /** Enabled and collapsed, the precondition for peeking. */
     private _gate(): boolean {
         return this._enabled() && this.group.api.isCollapsed();
     }
@@ -205,7 +205,7 @@ class EdgeGroupController extends CompositeDisposable {
     // --- shared title bar (peek overlay + docked tool window) ---
 
     /** Build the tool-window title bar: panel title (left), pin + close (right).
-     *  Used by both the peek overlay and the docked group chrome — only the
+     *  Used by both the peek overlay and the docked group chrome; only the
      *  mounting/positioning and the pin action differ. */
     private _buildTitleBar(opts: {
         title: string;
@@ -220,7 +220,7 @@ class EdgeGroupController extends CompositeDisposable {
         bar.className = 'dv-edge-peek-header';
         // Layout/cosmetics are owned by `.dv-edge-peek-header` / -title in the
         // stylesheet (overlay.scss). Only the resolved opaque background is
-        // dynamic — the floating peek must never be see-through.
+        // dynamic, because the floating peek must never be see-through.
         if (opts.background) {
             bar.style.backgroundColor = opts.background;
         }
@@ -243,7 +243,7 @@ class EdgeGroupController extends CompositeDisposable {
             btn.setAttribute('aria-label', label);
             // Monotone SVG (inherits `currentColor` via `.dv-svg`), matching the
             // tab close button. Cosmetics (incl. the hover background) are owned
-            // by the stylesheet — inline styles here would beat its `:hover`.
+            // by the stylesheet; inline styles here would beat its `:hover`.
             icon.setAttribute('aria-hidden', 'true');
             btn.appendChild(icon);
             btn.addEventListener('click', onClick);
@@ -263,7 +263,7 @@ class EdgeGroupController extends CompositeDisposable {
 
     /** Reconcile the docked chrome with the collapse state: an expanded
      *  (pinned) edge group renders as a tool window (title bar top + tabs
-     *  bottom); a collapsed one is just the strip. */
+     *  bottom); a collapsed one is only the strip. */
     private _updateDocked(): void {
         const shouldDock = this._enabled() && !this.group.api.isCollapsed();
         if (shouldDock && !this._docked) {
@@ -281,7 +281,7 @@ class EdgeGroupController extends CompositeDisposable {
         const title = this.group.activePanel?.title ?? '';
         const { element, title: titleEl } = this._buildTitleBar({
             title,
-            // The pushpin here UN-pins (auto-hides), the inverse of the peek's.
+            // The pushpin here un-pins (auto-hides), the inverse of the peek's.
             // Generic labels: the title element carries the panel name and
             // updates on switch, so the button names never go stale.
             pinLabel: 'Auto-hide',
@@ -293,7 +293,7 @@ class EdgeGroupController extends CompositeDisposable {
         element.style.flexShrink = '0';
         element.style.height = `${TITLEBAR_HEIGHT}px`;
         // Appended last → under the group's `column-reverse` (header-bottom)
-        // flow it lands at the visual TOP, above the content, with the tab
+        // flow it lands at the visual top, above the content, with the tab
         // strip at the bottom.
         this.group.element.appendChild(element);
         this._docked = { bar: element, title: titleEl };
@@ -334,7 +334,7 @@ class EdgeGroupController extends CompositeDisposable {
         if (this.group.activePanel !== panel) {
             panel.api.setActive();
         }
-        // Reparent the whole content CONTAINER so BOTH renderers work (see class
+        // Reparent the whole content container so both renderers work (see class
         // doc). It un-hides automatically once out of the collapsed subtree.
         const content = this.group.element.querySelector<HTMLElement>(
             '.dv-content-container'
@@ -364,7 +364,7 @@ class EdgeGroupController extends CompositeDisposable {
         }
 
         // --- title bar (separate sibling so it layers above an `always` render
-        //     overlay; it sits in the top band ABOVE the content) ---
+        //     overlay; it sits in the top band above the content) ---
         const { element: header, title: titleEl } = this._buildTitleBar({
             title,
             pinLabel: 'Pin',
@@ -375,8 +375,8 @@ class EdgeGroupController extends CompositeDisposable {
         });
         header.style.position = 'absolute';
         header.style.zIndex = '1001';
-        // The overlay root is pointer-events:none — opt the title bar back in so
-        // its buttons are clickable. It's in the top band, above the content.
+        // The overlay root is pointer-events:none, so opt the title bar back in
+        // so its buttons are clickable. It's in the top band, above the content.
         header.style.pointerEvents = 'auto';
 
         // --- fixed clip frame (content emerges from the strip's inner edge) ---
@@ -428,7 +428,7 @@ class EdgeGroupController extends CompositeDisposable {
     /**
      * Slide the content overlay in from the strip edge via a manual rAF loop, so
      * that each frame re-anchors any `always` content over the moving box. The
-     * title bar is fixed (it doesn't slide) — the content slides in beneath it.
+     * title bar is fixed (it doesn't slide); the content slides in beneath it.
      */
     private _animateIn(overlay: HTMLElement): void {
         const position = this._position;
@@ -468,7 +468,7 @@ class EdgeGroupController extends CompositeDisposable {
 
     /** Anchor the title bar (top band) and the clip frame (content, inset below
      *  the title bar) to the strip's inner edge, sized to the group's expanded
-     *  size — relative to the overlay root. No grid reflow. */
+     *  size, relative to the overlay root. No grid reflow. */
     private _positionOverlay(): void {
         const position = this._position;
         if (!position || !this._peek) {
@@ -537,16 +537,16 @@ class EdgeGroupController extends CompositeDisposable {
     }
 
     /** Is the point within the peek (overlay or title bar) or the strip
-     *  container? In the click model, clicking anywhere in the strip — tab or
-     *  empty space — must NOT dismiss; only an outside click does. */
+     *  container? In the click model, clicking anywhere in the strip (tab or
+     *  empty space) must not dismiss; only an outside click does. */
     private _pointWithinPeek(x: number, y: number): boolean {
         if (!this._peek) {
             return false;
         }
         const within = (r: DOMRect): boolean =>
             x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-        // Use the FIXED clip frame (the reveal window), not the sliding overlay
-        // — during the slide-in the overlay doesn't yet cover the whole reveal,
+        // Use the fixed clip frame (the reveal window), not the sliding overlay:
+        // during the slide-in the overlay doesn't yet cover the whole reveal,
         // so a click on the revealed content would otherwise read as "outside".
         return (
             within(this.group.element.getBoundingClientRect()) ||
@@ -559,7 +559,7 @@ class EdgeGroupController extends CompositeDisposable {
         const doc = this.group.element.ownerDocument;
         // The whole dismissal lifecycle (Esc + outside-pointerdown + resize +
         // focus-out) is the shared layer's job. Inside/outside is geometry-based
-        // — for a pointer event and for a focused element's centre — because an
+        // (for a pointer event and for a focused element's centre) because an
         // `always` panel's content is a sibling overlay on top, not inside the
         // peek's DOM subtree. Capture so it's seen before content handlers.
         const withinCentre = (el: Element): boolean => {
@@ -593,7 +593,7 @@ class EdgeGroupController extends CompositeDisposable {
         if (!peek) {
             return;
         }
-        // If focus is inside the peek (a keyboard close — Esc / pin / close),
+        // If focus is inside the peek (a keyboard close: Esc / pin / close),
         // return it to the strip tab so it isn't dropped onto <body>.
         const doc = this.group.element.ownerDocument;
         const restoreFocus =

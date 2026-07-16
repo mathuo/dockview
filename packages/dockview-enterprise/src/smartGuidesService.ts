@@ -56,7 +56,7 @@ function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
     };
 }
 
-/** Local alias for the core geometry type — keeps these container-relative
+/** Local alias for the core geometry type. Keeps these container-relative
  *  boxes named `Rect` at the call sites while reusing one structural source. */
 type Rect = Box;
 
@@ -88,8 +88,8 @@ interface AxisResult {
     readonly coord: number;
     readonly delta: number;
     /** Index into the 3 probes (leading edge / centre / trailing edge) that
-     *  latched onto the candidate — tracked so the sticky branch keeps gluing
-     *  the SAME part of the box rather than silently switching probes. */
+     *  latched onto the candidate, tracked so the sticky branch keeps gluing
+     *  the same part of the box rather than silently switching probes. */
     readonly probe: number;
 }
 
@@ -107,7 +107,7 @@ class GuideLayer {
     private readonly _element: HTMLElement;
     private readonly _lines: HTMLElement[] = [];
     private _preview: HTMLElement | undefined;
-    // Last-applied state — a frame whose guides are unchanged skips the DOM
+    // Last-applied state: a frame whose guides are unchanged skips the DOM
     // write entirely (no interleaved reads, so the browser coalesces what does
     // change into a single reflow at paint).
     private _lastLines = '';
@@ -253,7 +253,7 @@ const SOURCE_RANK: Record<CandidateSource, number> = {
 };
 
 /**
- * Smart Guides — Figma-style alignment guides + magnetic snapping for floating
+ * Smart Guides: Figma-style alignment guides + magnetic snapping for floating
  * groups.
  *
  * The float drag loop stays fully owned by `Overlay`; this service is a pure
@@ -341,14 +341,14 @@ export class SmartGuidesService
     private get _opts(): ResolvedOptions {
         // Read each pointer-move frame, but the inputs (the host option +
         // runtime override) change only a handful of times per session. Cache by
-        // reference identity — `updateOptions` replaces `_override` with a fresh
+        // reference identity: `updateOptions` replaces `_override` with a fresh
         // object and a host option change swaps `smartGuides`, so either edit
         // invalidates this without per-frame re-resolution/allocation.
         const base = this.host.options.smartGuides;
         const cache = this._optsCache;
         // An explicit app-level option update swaps the `smartGuides` reference
         // (component `updateOptions` rebuilds the options object). That wins over
-        // earlier runtime overrides — drop them so the two don't fight (#10).
+        // earlier runtime overrides; drop them so the two don't fight (#10).
         if (
             cache &&
             cache.base !== base &&
@@ -452,8 +452,8 @@ export class SmartGuidesService
         session.pendingMerge = merge;
 
         // `showGuides` governs the alignment lines only. The dock/merge preview
-        // always shows when a merge is pending — it's the warning for an action
-        // that WILL commit on drop, so it must never be silent.
+        // always shows when a merge is pending: it's the warning for an action
+        // that will commit on drop, so it must never be silent.
         session.layer.render(
             opts.showGuides ? this._guideLines(session, snappedBox) : [],
             context.container
@@ -529,7 +529,7 @@ export class SmartGuidesService
         // a horizontal sash → a y line).
         if (opts.snapSplitters) {
             for (const r of this.host.getGridSplitterRects()) {
-                // Skip hidden / collapsed sashes (zero-area rects) — a real sash
+                // Skip hidden / collapsed sashes (zero-area rects): a real sash
                 // has a positive extent on both axes; a 0×0 rect would otherwise
                 // become a phantom candidate at coord 0 (the container edge).
                 if (r.width <= 0 || r.height <= 0) {
@@ -592,8 +592,8 @@ export class SmartGuidesService
         engaged: AxisEngagement | undefined,
         opts: ResolvedOptions
     ): AxisResult | undefined {
-        // Sticky: stay glued via the SAME probe that engaged (not the nearest of
-        // all three) until that probe moves past snapDistance + release — so a
+        // Sticky: stay glued via the same probe that engaged (not the nearest of
+        // all three) until that probe moves past snapDistance + release, so a
         // small float can't silently re-latch its centre onto an edge line.
         if (engaged !== undefined) {
             const delta = engaged.coord - probes[engaged.probe].coord;
@@ -647,7 +647,7 @@ export class SmartGuidesService
     }
 
     /** Every candidate line the (already snapped) box's probes land on, so two
-     *  simultaneous alignments (e.g. left edges AND tops) draw two guides. */
+     *  simultaneous alignments (e.g. left edges and tops) draw two guides. */
     private _guideLines(
         session: DragSession,
         snapped: { left: number; top: number; width: number; height: number }
@@ -676,7 +676,7 @@ export class SmartGuidesService
      * choosing the **best** target rather than the first in iteration order: a
      * tab-strip overlap (the dragged centre over a target) suggests a **center**
      * merge into a shared tabset; an edge flush against a target's opposite edge
-     * — with ≥ 50% perpendicular overlap — suggests docking **beside** it. Among
+     * (with ≥ 50% perpendicular overlap) suggests docking **beside** it. Among
      * matches, a centre stack beats an adjacency, and within a kind the nearest
      * target wins.
      */
@@ -711,9 +711,9 @@ export class SmartGuidesService
         const hOverlap = overlapRatio(d.left, d.right, e.left, e.right);
         const vOverlap = overlapRatio(d.top, d.bottom, e.top, e.bottom);
 
-        // Tabset merge: the dragged float's CENTRE sits over the target (it is
+        // Tabset merge: the dragged float's centre sits over the target (it is
         // genuinely stacked on top), with the tab strips flush. Requiring the
-        // centre inside — not just top-alignment + edge overlap — stops a plain
+        // centre inside, not merely top-alignment + edge overlap, stops a plain
         // alignment of two overlapping floats reading as a merge (§11).
         const cx = (d.left + d.right) / 2;
         const cy = (d.top + d.bottom) / 2;

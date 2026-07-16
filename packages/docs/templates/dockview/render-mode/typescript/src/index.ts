@@ -23,7 +23,7 @@ class Panel implements IContentRenderer {
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        // A tall inner element so each panel can be scrolled — this is what
+        // A tall inner element so each panel can be scrolled, which is what
         // makes the 'onlyWhenVisible' vs 'always' render modes observable.
         const inner = document.createElement('div');
         inner.style.height = '1000px';

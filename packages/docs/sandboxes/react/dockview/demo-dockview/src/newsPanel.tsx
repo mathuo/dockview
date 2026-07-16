@@ -11,7 +11,7 @@ type Headline = {
     source: string;
 };
 
-// Illustrative feed — static headlines, styled to read like a live tape.
+// Illustrative feed: static headlines, styled to read like a live tape.
 const HEADLINES: Headline[] = [
     { ago: '00:12', ticker: 'BTC/USD', tone: 'green', text: 'Bitcoin breaks above $67K as spot ETF inflows accelerate for a fourth session', source: 'Reuters' },
     { ago: '01:48', ticker: 'NVDA', tone: 'green', text: 'NVIDIA lifts data-centre guidance; analysts raise targets on AI demand', source: 'Bloomberg' },

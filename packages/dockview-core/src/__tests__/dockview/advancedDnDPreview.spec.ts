@@ -16,7 +16,7 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * AdvancedDnD Phase 4 — the keyboard-docking seam. `showPreviewOverlay`
+ * AdvancedDnD Phase 4: the keyboard-docking seam. `showPreviewOverlay`
  * renders the same drop overlay a mouse drag shows, without a live drag, and
  * the returned disposable clears it.
  */
@@ -35,7 +35,7 @@ describe('AdvancedDnD showPreviewOverlay', () => {
     afterEach(() => dockview.dispose());
 
     const service = (): IAdvancedDnDService =>
-        // internal seam — consumed by the (future) KeyboardNavigationModule
+        // internal seam, consumed by the (future) KeyboardNavigationModule
         (
             dockview as unknown as {
                 _moduleRegistry: {

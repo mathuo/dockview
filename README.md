@@ -40,7 +40,7 @@ Please see the website: https://dockview.dev
 
 | Package | Description | Version |
 | --- | --- | --- |
-| [`dockview`](https://www.npmjs.com/package/dockview) | JavaScript — zero dependencies, full feature set out of the box | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
+| [`dockview`](https://www.npmjs.com/package/dockview) | JavaScript, zero dependencies, full feature set out of the box | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
 | [`dockview-react`](https://www.npmjs.com/package/dockview-react) | React bindings (peer: `react` ≥16.8) | [![npm version](https://badge.fury.io/js/dockview-react.svg)](https://www.npmjs.com/package/dockview-react) |
 | [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) | Vue 3 bindings (peer: `vue` ≥3.4) | [![npm version](https://badge.fury.io/js/dockview-vue.svg)](https://www.npmjs.com/package/dockview-vue) |
 | [`dockview-angular`](https://www.npmjs.com/package/dockview-angular) | Angular bindings (peer: `@angular/core` ≥21) | [![npm version](https://badge.fury.io/js/dockview-angular.svg)](https://www.npmjs.com/package/dockview-angular) |
@@ -111,7 +111,7 @@ Contributions are welcome! Please open an [issue](https://github.com/mathuo/dock
 
 ## License
 
-MIT — see [LICENSE](./LICENSE) for details.
+MIT. See [LICENSE](./LICENSE) for details.
 
 ---
 

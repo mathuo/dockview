@@ -3,7 +3,7 @@ import { DockviewOptions } from './options';
 /**
  * Internal mapping of the user-facing `dndStrategy` option into the
  * per-backend capability flags consumed by drag-source / drop-target
- * construction sites. Not part of the public API — consumers only see
+ * construction sites. Not part of the public API; consumers only see
  * the `dndStrategy` option itself.
  */
 export interface DndCapabilities {
@@ -34,11 +34,11 @@ export function resolveDndCapabilities(
         default:
             // On touch-primary devices (phones / basic tablets) HTML5 DnD's
             // native long-press intercepts the gesture before our pointer
-            // backend can react — Android Chrome launches a system drag with
+            // backend can react. Android Chrome launches a system drag with
             // its half-transparent thumbnail, and the long-press context menu
             // never opens. Disable HTML5 there so the pointer backend owns
             // every gesture. Hybrid devices (touchscreen laptops, Surface,
-            // iPad with mouse) keep both backends — mouse uses HTML5, touch
+            // iPad with mouse) keep both backends: mouse uses HTML5, touch
             // falls back to whichever backend the underlying element wired.
             return isCoarsePrimaryInput()
                 ? { html5: false, pointer: true, pointerHandlesMouse: true }

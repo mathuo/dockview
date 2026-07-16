@@ -128,7 +128,7 @@ describe('PopupService', () => {
         test('closes the popover (after the open grace window)', () => {
             // Touch long-press callers fire pointerdown events tied to the
             // gesture that opened the popover. PopupService suppresses
-            // outside-dismissal for a short grace window — advance past it.
+            // outside-dismissal for a short grace window, so advance past it.
             const nowSpy = jest.spyOn(Date, 'now');
             nowSpy.mockReturnValue(0);
 
@@ -159,7 +159,7 @@ describe('PopupService', () => {
             el.className = 'my-popup';
             service.openPopover(el, { x: 0, y: 0 });
 
-            // Within grace window — must not dismiss.
+            // Within the grace window, so it must not dismiss.
             nowSpy.mockReturnValue(50);
 
             const outside = document.createElement('div');

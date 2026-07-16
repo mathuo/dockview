@@ -1,11 +1,11 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 
-// Public Turnstile site key (safe to expose — it's rendered into the page). The
+// Public Turnstile site key (safe to expose, it's rendered into the page). The
 // matching secret lives only in the licensing worker (TURNSTILE_SECRET_KEY).
 const TURNSTILE_SITE_KEY = '0x4AAAAAADx1eYe1Ro1u3YUq';
 
-// Cloudflare's visible "always passes" TEST site key. Used on localhost so
+// Cloudflare's visible "always passes" test site key. Used on localhost so
 // local dev doesn't depend on the real widget's domain allowlist or network.
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 

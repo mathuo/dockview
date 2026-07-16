@@ -81,7 +81,7 @@ describe('DockviewGroupPanelApiImpl', () => {
                 'test-id',
                 accessor as unknown as DockviewComponent
             );
-            // _group is undefined — no initialize() call
+            // _group is undefined, no initialize() call
 
             expect(() => cut.collapse()).not.toThrow();
             expect(accessor.setEdgeGroupCollapsed).not.toHaveBeenCalled();
@@ -106,7 +106,7 @@ describe('DockviewGroupPanelApiImpl', () => {
             );
 
             expect(cut.isCollapsed()).toBe(false);
-            // accessor should NOT have been called since there is no group
+            // accessor should not have been called since there is no group
             expect(accessor.isEdgeGroupCollapsed).not.toHaveBeenCalled();
         });
     });

@@ -14,7 +14,7 @@ import { GroupDragSource } from './groupDragSource';
  * group to redock it into the grid. The redock half is provided by the shared
  * {@link GroupDragSource}; the move half is owned by the overlay.
  *
- * The bar is intentionally contentless — styling is driven entirely through
+ * The bar is intentionally contentless; styling is driven entirely through
  * the `--dv-floating-titlebar-*` theme variables.
  */
 export class FloatingTitleBar extends CompositeDisposable {
@@ -29,7 +29,7 @@ export class FloatingTitleBar extends CompositeDisposable {
         return this._element;
     }
 
-    /** The window's current anchor group — the one this bar drags/activates. */
+    /** The window's current anchor group, the one this bar drags/activates. */
     get group(): DockviewGroupPanel {
         return this._group;
     }

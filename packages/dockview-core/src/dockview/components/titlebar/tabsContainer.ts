@@ -104,7 +104,7 @@ export class TabsContainer
     private _hidden = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     /**
-     * Clamps/redirects a header drop index — wired by the PinnedTabs module to
+     * Clamps/redirects a header drop index, wired by the PinnedTabs module to
      * keep drops on the correct side of the pin boundary. Identity by default
      * so behaviour is unchanged when the module is absent.
      */
@@ -119,7 +119,7 @@ export class TabsContainer
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
     private _overflowTabGroups: string[] = [];
-    /** Pinned tabs that have clipped out of the strip — rendered in a "Pinned"
+    /** Pinned tabs that have clipped out of the strip, rendered in a "Pinned"
      *  section at the top of the dropdown. Empty unless the PinnedTabs module is
      *  active and the pinned block itself overflows. */
     private _overflowPinnedTabs: string[] = [];
@@ -291,7 +291,7 @@ export class TabsContainer
                     const related = event.relatedTarget as HTMLElement | null;
                     if (!this.voidContainer.element.contains(related)) {
                         if (this._element.contains(related)) {
-                            // Moved to another part of the header — keep state
+                            // Moved to another part of the header, so keep state
                             this.tabs.setExternalInsertionIndex(null);
                         } else {
                             // Left the header entirely
@@ -542,9 +542,9 @@ export class TabsContainer
                 const context = this.createOverflowRenderContext(root, anchor);
 
                 // When the AdvancedOverflowModule is registered it upgrades the
-                // dropdown in place (search + MRU + keyboard), building AND
+                // dropdown in place (search + MRU + keyboard), building and
                 // opening the popover itself. Absent (the free path), core
-                // renders the flat list and opens it — byte-identical to before.
+                // renders the flat list and opens it, byte-identical to before.
                 const advancedOverflow = this.accessor.advancedOverflowService;
                 if (advancedOverflow) {
                     advancedOverflow.renderOverflow({
@@ -566,7 +566,7 @@ export class TabsContainer
      * overflow list and the advanced overflow module. Everything the module
      * needs to rebuild the dropdown body in a custom order lives here, so the
      * row DOM, group-header DOM, click-to-activate, and (critically) the
-     * window-bound popover open/close stay in core — the module never captures
+     * window-bound popover open/close stay in core, so the module never captures
      * the wrong `window` for a popped-out group.
      */
     private createOverflowRenderContext(
@@ -686,7 +686,7 @@ export class TabsContainer
                         tg.expand();
                     }
                     // `block: 'nearest'` keeps this from scrolling ancestor
-                    // scroll containers (incl. the page) vertically — a bare
+                    // scroll containers (incl. the page) vertically; a bare
                     // scrollIntoView() defaults to `block: 'start'`, which
                     // yanks the whole dockview up when it sits low in a
                     // scrollable page. We only want to reveal the tab
@@ -748,7 +748,7 @@ export class TabsContainer
         // dedicated "Pinned" header, so an overflowing pinned block stays
         // reachable ahead of the regular overflow rows. Build the rows first and
         // only add the header if at least one survived (a panel can close
-        // between the overflow event and this click) — no orphan header.
+        // between the overflow event and this click), avoiding an orphan header.
         const pinnedRows = this._overflowPinnedTabs
             .map((panelId) => context.buildRow(panelId))
             .filter((row): row is NonNullable<typeof row> => row != null);

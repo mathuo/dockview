@@ -464,7 +464,7 @@ describe('overlayRenderContainer', () => {
         cut.detatch(panel);
         const container2 = cut.attach({ panel, referenceContainer });
 
-        // A fresh overlay element is created — must be hidden until positioned
+        // A fresh overlay element is created, so it must be hidden until positioned
         expect(container2.style.visibility).toBe('hidden');
 
         await exhaustMicrotaskQueue();
@@ -482,7 +482,7 @@ describe('overlayRenderContainer', () => {
         //   3. the rAF then ran `if (style.visibility === 'hidden') style.visibility = ''`,
         //      leaving the overlay computed-visible with pointer-events:none at a stale
         //      position. onDidDimensionsChange skips non-visible panels, so subsequent
-        //      sash drags never repositioned the overlay — its stale content leaked into
+        //      sash drags never repositioned the overlay, and its stale content leaked into
         //      neighbouring panel areas.
         const cut = new OverlayRenderContainer(
             parentContainer,
@@ -537,8 +537,8 @@ describe('overlayRenderContainer', () => {
         expect(container.style.visibility).toBe('hidden');
         expect(container.style.pointerEvents).toBe('none');
 
-        // Now simulate an in-flight resize completing AFTER the visibility flip.
-        // The rAF runs and must NOT clobber `visibility:hidden`.
+        // Now simulate an in-flight resize completing after the visibility flip.
+        // The rAF runs and must not clobber `visibility:hidden`.
         (panel as Writable<IDockviewPanel>).api.isVisible = true;
         onDidVisibilityChange.fire({}); // schedules a resize rAF
         (panel as Writable<IDockviewPanel>).api.isVisible = false;
@@ -718,7 +718,7 @@ describe('overlayRenderContainer', () => {
 
     test('disposing the container while a renderer throws does not propagate (#1220)', () => {
         // Same root cause as the test above, but exercised through the
-        // container's own dispose() — the failure path in the original bug
+        // container's own dispose(), the failure path in the original bug
         // report's stack trace.
         const cut = new OverlayRenderContainer(
             parentContainer,

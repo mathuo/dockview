@@ -41,10 +41,10 @@ function createTabs(): Tabs {
  * The forced-overflow seam the `MultiRowTabsModule` consumes: it pushes the
  * surplus rows (beyond `overflow.maxRows`) into the dropdown even though nothing
  * clips horizontally in wrap mode. jsdom has zero geometry, so
- * `isChildEntirelyVisibleWithinParent` reports every tab as fully visible — the
- * default overflow set is empty here, isolating the forcing predicate.
+ * `isChildEntirelyVisibleWithinParent` reports every tab as fully visible, so
+ * the default overflow set is empty here, isolating the forcing predicate.
  */
-describe('tabs — forced overflow seam', () => {
+describe('tabs: forced overflow seam', () => {
     const fire = (
         tabs: Tabs,
         reset: boolean
@@ -100,7 +100,7 @@ describe('tabs — forced overflow seam', () => {
         tabs.setForcedOverflow((id) => id === 'b');
 
         // The `OverflowObserver` reports no overflow in wrap mode and asks for a
-        // reset — the forced set must still be surfaced (as a non-reset fire).
+        // reset, but the forced set must still be surfaced (as a non-reset fire).
         const event = fire(tabs, true);
         expect(event.tabs).toEqual(['b']);
         expect(event.reset).toBe(false);

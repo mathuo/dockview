@@ -19,7 +19,7 @@ const RELEASES: Release[] = [
         tag: 'v8',
         badge: 'Latest',
         summary:
-            'An additive release focused on the tab header and drag and drop — pinned and wrapping tabs, an aim-at-a-cell drop compass, floating-group snapping, layout history, auto-hide edge groups, and keyboard docking. Every capability is opt-in, so upgrading is safe by default.',
+            'An additive release focused on the tab header and drag and drop: pinned and wrapping tabs, an aim-at-a-cell drop compass, floating-group snapping, layout history, auto-hide edge groups, and keyboard docking. Every capability is opt-in, so upgrading is safe by default.',
         notes: '/docs/releases/whats-new/whats-new-v8',
         migration: '/docs/releases/migrating/migrating-to-v8',
     },
@@ -35,7 +35,7 @@ const RELEASES: Release[] = [
         version: 'Dockview 6.0',
         tag: 'v6',
         summary:
-            'The largest release since 4.0 — tab groups, edge groups, an overhauled theme system with an interactive theme builder, and a richer event surface on DockviewApi.',
+            'The largest release since 4.0: tab groups, edge groups, an overhauled theme system with an interactive theme builder, and a richer event surface on DockviewApi.',
         notes: '/docs/releases/whats-new/whats-new-v6',
     },
 ];
@@ -73,7 +73,7 @@ export default function WhatsNew(): JSX.Element {
     return (
         <Layout
             title="What's new"
-            description="Release highlights for Dockview — the newest version first, with links to the full release notes and migration guides."
+            description="Release highlights for Dockview, newest version first, with links to the full release notes and migration guides."
         >
             <main className="whats-new-page">
                 <div className="container">

@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview-vue</h1>
 
-<p>Vue 3 bindings for dockview — zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
+<p>Vue 3 bindings for dockview, a zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
 
 </div>
 

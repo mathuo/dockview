@@ -54,7 +54,7 @@ export function heatColor(t: number): string {
     return `hsl(${(220 - tt * 220).toFixed(0)}, 72%, 48%)`;
 }
 
-// Theme-aware tint of a base colour at a given strength (0..1) — used for the
+// Theme-aware tint of a base colour at a given strength (0..1), used for the
 // signal / correlation heat cells so they track light/dark.
 export function tint(color: string, strength: number): string {
     const pct = Math.round(Math.max(0, Math.min(1, strength)) * 100);
@@ -122,7 +122,7 @@ export const VisibilityGate: React.FC<{
     return <div style={{ height: '100%' }}>{visible ? children : null}</div>;
 };
 
-// Brief up/down flag after a numeric value changes — drives tick flashes.
+// Brief up/down flag after a numeric value changes. Drives tick flashes.
 export function useFlash(value: number): 'up' | 'down' | null {
     const prev = React.useRef(value);
     const [dir, setDir] = React.useState<'up' | 'down' | null>(null);
@@ -229,7 +229,7 @@ export const SectionLabel: React.FC<{
     );
 };
 
-// A row of compact label/value tiles — the stat strips that fill terminal
+// A row of compact label/value tiles: the stat strips that fill terminal
 // headers (24h H/L, volume, VWAP, spread…).
 export const StatStrip: React.FC<{ children: React.ReactNode; cols?: number }> = ({
     children,
@@ -315,7 +315,7 @@ export const Chip: React.FC<{
     } as const;
     const [fg, bg] = map[tone];
     // On a solid bright fill, dark text reads better on green/yellow, white on
-    // red/blue/neutral — keeps chips legible instead of low-contrast white.
+    // red/blue/neutral, which keeps chips legible instead of low-contrast white.
     const solidText =
         tone === 'green' || tone === 'yellow' ? '#04060c' : '#ffffff';
     return (

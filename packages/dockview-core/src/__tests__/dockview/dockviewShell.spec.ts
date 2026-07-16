@@ -781,7 +781,7 @@ describe('ShellManager', () => {
             shell.dispose();
         });
 
-        test('updateTheme is idempotent — calling twice with same args gives same result', () => {
+        test('updateTheme is idempotent: calling twice with same args gives same result', () => {
             const shell = makeShell({ left: { id: 'left' } }, 0, 35);
 
             shell.updateTheme(10, 44);

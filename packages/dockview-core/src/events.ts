@@ -163,7 +163,7 @@ export class Emitter<T> implements IDisposable {
 
     public fire(e: T): void {
         if (this._pauseTokens.size > 0) {
-            // while paused, the event is dropped entirely — `_last` is not
+            // while paused, the event is dropped entirely: `_last` is not
             // updated, so replay subscribers won't see values fired during a pause
             return;
         }

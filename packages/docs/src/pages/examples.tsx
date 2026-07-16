@@ -9,7 +9,7 @@ type Framework = 'react' | 'vue' | 'angular' | 'typescript';
 interface Example {
     name: string;
     frameworks: Framework[];
-    /** Requires a `dockview-enterprise` feature — marked with the Enterprise pill. */
+    /** Requires a `dockview-enterprise` feature, marked with the Enterprise pill. */
     enterprise?: boolean;
 }
 

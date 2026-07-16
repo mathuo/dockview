@@ -133,9 +133,9 @@ export class PopoutWindowService implements IPopoutWindowService {
      * The popout window's innerWidth/innerHeight are often 0/stale until it has
      * painted, and the nested gridview lays its children out to the size passed
      * to layout() (a plain group fills via CSS instead). To stop content
-     * rendering into a zero box until a manual resize — and to avoid the race a
-     * fixed number of animation frames had — observe the gridview element with
-     * a ResizeObserver created in the POPOUT window's OWN realm. A parent-realm
+     * rendering into a zero box until a manual resize, and to avoid the race a
+     * fixed number of animation frames had, observe the gridview element with
+     * a ResizeObserver created in the popout window's own realm. A parent-realm
      * observer fires unreliably across the window boundary; a same-realm one
      * fires reliably, including the initial observation once the window is
      * sized.

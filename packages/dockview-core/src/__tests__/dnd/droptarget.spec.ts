@@ -86,7 +86,7 @@ describe('droptarget', () => {
                 createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
             );
 
-            // 100,50 within 200x100 is the centre by default — the resolver wins.
+            // 100,50 within 200x100 is the centre by default, but the resolver wins.
             expect(droptarget.state).toBe('right');
             expect(calls[0]).toMatchObject({
                 x: 100,

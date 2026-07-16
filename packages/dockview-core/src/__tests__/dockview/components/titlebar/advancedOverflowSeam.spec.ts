@@ -29,10 +29,10 @@ beforeAll(() => {
  * body through `createOverflowRenderContext` and, when
  * `accessor.advancedOverflowService` is present, hands it to the module;
  * otherwise it renders the free flat list. No module is registered in core, so
- * this proves the `?.`-guard falls through to the free helper — the byte-for-byte
- * behaviour dockview shipped before the seam existed.
+ * this proves the `?.`-guard falls through to the free helper, giving the
+ * byte-for-byte behaviour dockview shipped before the seam existed.
  */
-describe('advanced overflow seam — free fallback (no module)', () => {
+describe('advanced overflow seam: free fallback (no module)', () => {
     let container: HTMLElement;
 
     const make = (): DockviewComponent => {
@@ -97,7 +97,7 @@ describe('advanced overflow seam — free fallback (no module)', () => {
             dockview.addPanel({ id, component: 'default', title: id })
         );
 
-        // Drive the render seam directly with a pinned bucket — jsdom has no
+        // Drive the render seam directly with a pinned bucket. jsdom has no
         // geometry, so the clip detection can't be triggered through layout.
         const header = panels[0].group.model.header as any;
         header.toggleDropdown({

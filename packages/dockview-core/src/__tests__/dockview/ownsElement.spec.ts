@@ -16,8 +16,8 @@ class TestPanel implements IContentRenderer {
 
 /**
  * `ownsElement` is the cross-document containment primitive the keyboard
- * accessibility services use instead of a single-document `rootElement.contains`
- * — so a keydown / focus inside a popped-out window (a separate `document`) is
+ * accessibility services use instead of a single-document `rootElement.contains`,
+ * so a keydown / focus inside a popped-out window (a separate `document`) is
  * still recognised as belonging to this dock. jsdom can't open a real second
  * window, so the popout document is simulated by stubbing `getPopoutWindows`.
  */

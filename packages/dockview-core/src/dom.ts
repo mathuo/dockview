@@ -548,7 +548,7 @@ export function findRelativeZIndexParent(el: HTMLElement): HTMLElement | null {
     return tmp;
 }
 
-/** Whether the user has requested reduced motion — the JS counterpart to the
+/** Whether the user has requested reduced motion: the JS counterpart to the
  *  `prefers-reduced-motion` media query, for animations driven in script. */
 export function prefersReducedMotion(doc: Document = document): boolean {
     const mq = doc.defaultView?.matchMedia?.(
@@ -569,7 +569,7 @@ export function resolveOpaqueBackground(element: HTMLElement): string {
     let el: HTMLElement | null = element;
     while (el) {
         const bg = win.getComputedStyle(el).backgroundColor;
-        // Skip `transparent` and any fully-transparent colour — a computed
+        // Skip `transparent` and any fully-transparent colour. A computed
         // `rgba(…, 0)` (e.g. `rgba(255,255,255,0)`) is see-through regardless of
         // its RGB, so it isn't an opaque backdrop.
         if (bg && bg !== 'transparent' && !/,\s*0\)\s*$/.test(bg)) {

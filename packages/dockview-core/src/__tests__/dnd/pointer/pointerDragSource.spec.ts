@@ -5,7 +5,7 @@ import { IDisposable } from '../../../lifecycle';
 
 describe('PointerDragSource', () => {
     afterEach(() => {
-        // Defensive: ensure no drag leaks across tests via the singleton.
+        // Make sure no drag leaks across tests via the singleton.
         PointerDragController.getInstance().cancel();
         jest.useRealTimers();
     });
@@ -63,7 +63,7 @@ describe('PointerDragSource', () => {
 
         fireEvent.pointerDown(element, pointerEventInit());
         // Flick past pressTolerance (default 8px) within the initiation
-        // delay — drag intent in any direction arms the drag now.
+        // delay: drag intent in any direction arms the drag now.
         fireEvent.pointerMove(window, pointerEventInit({ clientX: 20 }));
         expect(onDragStart).toHaveBeenCalledTimes(1);
 
@@ -100,7 +100,7 @@ describe('PointerDragSource', () => {
         });
 
         fireEvent.pointerDown(element, pointerEventInit());
-        // 4px finger jitter — under pressTolerance, drag does not arm yet.
+        // 4px finger jitter is under pressTolerance, so the drag does not arm yet.
         fireEvent.pointerMove(window, pointerEventInit({ clientX: 4 }));
         expect(onDragStart).not.toHaveBeenCalled();
         // After the initiation delay fires, subsequent motion past
@@ -182,7 +182,7 @@ describe('PointerDragSource', () => {
             element,
             pointerEventInit({ pointerType: 'mouse' })
         );
-        // Mouse arms immediately — no need to advance timers.
+        // Mouse arms immediately, so there's no need to advance timers.
         fireEvent.pointerMove(
             window,
             pointerEventInit({ pointerType: 'mouse', clientX: 10 })

@@ -1139,7 +1139,7 @@
 }
 
 // When the header is at the bottom, the active-tab marker sits on the tab's
-// top edge — the side nearest the content. (For a top header it sits on the
+// top edge, the side nearest the content. (For a top header it sits on the
 // bottom edge; this overrides that.) The selector matches the full per-theme
 // active-marker chain so it still applies inside a theme.
 .dv-groupview.dv-groupview-header-bottom {

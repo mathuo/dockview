@@ -1,5 +1,5 @@
 // Force every tab to be reported as clipped so `toggleDropdown` would, by
-// default, push them all into the overflow set — isolating the effect of the
+// default, push them all into the overflow set, isolating the effect of the
 // overflow-exclusion predicate from jsdom's zero-geometry.
 jest.mock('../../../../dom', () => {
     const actual = jest.requireActual('../../../../dom');
@@ -48,7 +48,7 @@ function createTabs(): Tabs {
     return new Tabs(group, accessor, { showTabsOverflowControl: true });
 }
 
-describe('tabs — overflow exclusion seam', () => {
+describe('tabs: overflow exclusion seam', () => {
     const overflowIds = (tabs: Tabs): string[] => {
         const events: { tabs: string[] }[] = [];
         const sub = tabs.onOverflowTabsChange((e) => events.push(e));

@@ -70,7 +70,7 @@ export class PopupService extends CompositeDisposable {
 
         // Outside-pointerdown dismissal is suppressed for a short grace window:
         // touch long-press callers (chip / tab context menus) open the popover
-        // while the user's finger is still pressing the source — Android Chrome
+        // while the user's finger is still pressing the source. Android Chrome
         // can dispatch a follow-up pointerdown tied to the gesture that lands
         // just outside the wrapper and would dismiss it before it's seen. Enter
         // dismisses as well (commit-and-close); resize dismisses except on

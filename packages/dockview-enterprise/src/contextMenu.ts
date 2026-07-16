@@ -98,7 +98,7 @@ function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
 
     // Skip auto-focus on touch-primary devices: focusing the input pops the
     // on-screen keyboard, which fires `window resize`, which `PopupService`
-    // listens to and uses to dismiss the popover — so the menu opens, the
+    // listens to and uses to dismiss the popover, so the menu opens, the
     // keyboard appears, and the menu immediately closes before the user can
     // type. The user can still tap the input to focus it intentionally.
     if (!isCoarsePrimaryInput()) {
@@ -202,7 +202,7 @@ export class ContextMenuController implements IContextMenuService {
 
     /**
      * The tab menu items: the app's own items (if any) with the built-in
-     * `'pin'` item prepended when {@link _shouldInjectPin} applies — so the app
+     * `'pin'` item prepended when {@link _shouldInjectPin} applies, so the app
      * keeps full control of its list, and pinning is added without disturbing
      * it. Reuses the existing `'pin'` token rendering below.
      */

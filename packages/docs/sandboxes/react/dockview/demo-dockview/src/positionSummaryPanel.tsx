@@ -16,7 +16,7 @@ import {
 } from './panelKit';
 
 // Deterministic per-ticker drift so marks (for symbols without a live feed) are
-// stable across renders — the data is illustrative, not real.
+// stable across renders. The data is illustrative, not real.
 function hashDrift(s: string): number {
     let h = 0;
     for (let i = 0; i < s.length; i++) {

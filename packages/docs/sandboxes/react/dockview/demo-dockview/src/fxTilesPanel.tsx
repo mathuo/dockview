@@ -228,7 +228,7 @@ const FxTile: React.FC<{ pair: Pair; quote: Quote }> = ({ pair, quote }) => {
     );
 };
 
-// A category tab in the nested dockview — a grid of tiles for its pairs.
+// A category tab in the nested dockview, showing a grid of tiles for its pairs.
 const FxCategoryPanel: React.FC<IDockviewPanelProps<{ categoryId: string }>> = (
     props
 ) => {
@@ -249,7 +249,7 @@ const FxCategoryPanel: React.FC<IDockviewPanelProps<{ categoryId: string }>> = (
                 // Only a top border: the outer FX card (fxTilesPanel wrapper)
                 // already frames the other three sides, so a full border here
                 // would double up against it. This top edge is the header
-                // divider under the G10/EM/Crosses tabs — matching a normal
+                // divider under the G10/EM/Crosses tabs, matching a normal
                 // panel's `PanelHeader` divider inside its card.
                 borderTop: `1px solid ${c.border}`,
                 background: c.bg,
@@ -272,7 +272,7 @@ const nestedComponents = { fxcat: FxCategoryPanel };
 export const FxTilesPanel: React.FC = () => {
     const c = usePanelColors();
     // Use the parent demo's live theme so the nested dockview follows the theme
-    // picker / builder exactly (not just a light/dark approximation).
+    // picker / builder exactly (not only a light/dark approximation).
     const parentTheme = React.useContext(ThemeContext);
     const theme = parentTheme ?? (c.isDark ? themeAbyss : themeLight);
 
@@ -346,7 +346,7 @@ export const FxTilesPanel: React.FC = () => {
                     background: c.bg,
                     // Match every other panel's `PanelShell`: a full hairline
                     // card border (+ the same subtle top highlight) around the
-                    // panel content — here the nested dockview — so the FX panel
+                    // panel content (here the nested dockview), so the FX panel
                     // reads as a card like the rest.
                     border: `1px solid ${c.border}`,
                     boxShadow: `inset 0 1px 0 ${

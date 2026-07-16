@@ -64,7 +64,7 @@ const App = (props: { theme?: string }) => {
         addEdgePanel(api, bottom.id, 'output', 'Output');
         addEdgePanel(api, bottom.id, 'problems', 'Problems');
 
-        // auto-hide both edge groups to their strips — click a tab to peek
+        // auto-hide both edge groups to their strips; click a tab to peek
         api.autoHideEdgeGroup('left');
         api.autoHideEdgeGroup('bottom');
     };

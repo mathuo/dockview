@@ -1,20 +1,20 @@
 /**
- * License key validation — pure, dependency-free, synchronous.
+ * License key validation: pure, dependency-free, synchronous.
  *
  * This is a re-implementation of the issuer's scheme
  * (`dockview-licencing/src/lib/{checksum,licence}.ts`) so `dockview-enterprise`
- * can verify a key entirely offline. It MUST stay byte-compatible with the
- * issuer — the cross-repo golden fixture in the spec (a real minted key) is
+ * can verify a key entirely offline. It must stay byte-compatible with the
+ * issuer; the cross-repo golden fixture in the spec (a real minted key) is
  * the guard against drift.
  *
- * The checksum is an FNV-1a integrity guard, NOT a signature: the whole scheme
+ * The checksum is an FNV-1a integrity guard, not a signature: the whole scheme
  * is public and forgeable by design. The watermark is the enforcement, not the
  * key. See `enterprise-modules/license.md`.
  */
 
 export type LicenseState =
     | 'valid' // within [ValidFrom, ValidUntil]
-    | 'expired' // past ValidUntil — no longer licensed, watermarked
+    | 'expired' // past ValidUntil: no longer licensed, watermarked
     | 'invalid' // checksum mismatch / malformed / corrupt
     | 'missing'; // no key supplied
 
@@ -46,7 +46,7 @@ const MONTHS = [
 ];
 
 /**
- * UTF-8 encode a string to bytes without `TextEncoder` — so the checksum is
+ * UTF-8 encode a string to bytes without `TextEncoder`, so the checksum is
  * identical in every environment (browser, Node, and jsdom, which lacks
  * `TextEncoder`). Produces the same bytes the issuer's `TextEncoder` does.
  */
@@ -59,7 +59,7 @@ function* utf8Bytes(str: string): Generator<number> {
             yield 0xc0 | (code >> 6);
             yield 0x80 | (code & 0x3f);
         } else if (code >= 0xd800 && code <= 0xdbff) {
-            // High surrogate — combine with the following low surrogate.
+            // High surrogate: combine with the following low surrogate.
             const lo = str.charCodeAt(++i);
             code = 0x10000 + ((code - 0xd800) << 10) + (lo - 0xdc00);
             yield 0xf0 | (code >> 18);
@@ -76,7 +76,7 @@ function* utf8Bytes(str: string): Generator<number> {
 
 /**
  * FNV-1a 64-bit, 16 lowercase hex chars. Byte-identical to the issuer's
- * `licenceChecksum` (which uses BigInt) — but computed here with two 32-bit
+ * `licenceChecksum` (which uses BigInt), but computed here with two 32-bit
  * halves because this package targets < ES2020, where BigInt literals are
  * unavailable. Empty input returns the offset basis ("cbf29ce484222325").
  *
@@ -103,7 +103,7 @@ export function fnv1a(input: string): string {
 
 /**
  * Strip characters that get accidentally pasted with a key (zero-width marks,
- * BOM, CR/LF) and trim — the noise that sneaks in when a key is copied from a
+ * BOM, CR/LF) and trim off the noise that sneaks in when a key is copied from a
  * PDF or email.
  */
 function cleanKey(key: string): string {
@@ -141,7 +141,7 @@ function parseLicenseDate(value: string): Date | null {
  */
 export function parseLicenseKey(key: string): ParsedLicense | null {
     const cleaned = cleanKey(key);
-    // Body and checksum are separated by the `__` delimiter; split on the LAST
+    // Body and checksum are separated by the `__` delimiter; split on the last
     // one so a `_`-containing body can't be confused with the delimiter.
     const idx = cleaned.lastIndexOf('__');
     if (idx === -1) {
@@ -179,10 +179,10 @@ export function parseLicenseKey(key: string): ParsedLicense | null {
  * so the result is deterministic and testable; the service passes the baked-in
  * `DOCKVIEW_RELEASE_DATE`).
  *
- * Enforcement is VERSION-based, not wall-clock: a key covers every dockview
+ * Enforcement is version-based, not wall-clock: a key covers every dockview
  * version released on or before its `ValidUntil` date. If this build was
  * released after `ValidUntil` the key is `expired` (watermarked); otherwise it
- * is `valid` — so a deployed app on a covered version keeps working forever,
+ * is `valid`, so a deployed app on a covered version keeps working forever,
  * and only upgrading to a build past the license window trips the watermark. A
  * build released before `ValidFrom` is treated leniently as `valid`.
  */

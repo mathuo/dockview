@@ -16,7 +16,7 @@ import { LicenseModule } from './licenseService';
 // superset of `dockview`.
 export * from 'dockview';
 
-// TabGroupChipsModule / TabGroupChipsService are now FREE and live in
+// TabGroupChipsModule / TabGroupChipsService are now free and live in
 // dockview-core; they remain re-exported here via `export * from 'dockview'`
 // above so `dockview-enterprise` stays a drop-in superset.
 export { ContextMenuController, ContextMenuModule } from './contextMenu';
@@ -66,8 +66,8 @@ export type { LicenseState } from './licenseValidator';
 
 /**
  * The enterprise feature modules, including the license gate. Registered
- * automatically on import (below), so merely importing `dockview-enterprise`
- * activates these modules — and the license watermark-unless-licensed check —
+ * automatically on import (below), so importing `dockview-enterprise`
+ * activates these modules (and the license watermark-unless-licensed check)
  * for every component in the process.
  */
 export const Modules: DockviewModule<any>[] = [
@@ -85,7 +85,7 @@ export const Modules: DockviewModule<any>[] = [
     LicenseModule,
 ];
 
-// Self-register on import (a side effect — hence `sideEffects: true` in
+// Self-register on import (a side effect, hence `sideEffects: true` in
 // package.json). This makes the package batteries-included: no explicit
 // registerModules() call is required of the consumer.
 registerModules(Modules);

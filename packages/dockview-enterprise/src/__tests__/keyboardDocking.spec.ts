@@ -6,7 +6,7 @@ import { KeyboardDockingModule } from '../keyboardDockingService';
 
 // Keyboard docking (spatial focus + Ctrl+M move mode) ships in the default
 // `Modules` bundle, but register it explicitly here so this spec is
-// self-contained regardless of the jest setup — `registerModules` dedups by
+// self-contained regardless of the jest setup. `registerModules` dedups by
 // name, so this is a no-op when the bundle is already registered.
 registerModules([KeyboardDockingModule]);
 
@@ -24,7 +24,7 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * KeyboardNavigationModule — keyboard docking thin vertical. Ctrl+M enters move
+ * KeyboardNavigationModule: keyboard docking thin vertical. Ctrl+M enters move
  * mode, arrows cycle the target, Enter docks (tab-into), Escape cancels.
  */
 describe('accessibility: keyboard docking', () => {
@@ -222,7 +222,7 @@ describe('accessibility: keyboard docking', () => {
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).toContain('Moving P2');
 
-        // float as a terminal action — no edge phase
+        // float as a terminal action, no edge phase
         fireEvent.keyDown(dockview.element, {
             key: 'f',
             ctrlKey: true,
@@ -263,7 +263,7 @@ describe('accessibility: keyboard docking', () => {
 });
 
 /**
- * Switch tabs within the focused group by keyboard — Ctrl+] / Ctrl+[ cycle
+ * Switch tabs within the focused group by keyboard. Ctrl+] / Ctrl+[ cycle
  * the active group's panels (wrapping round), driven by the rebindable keymap.
  */
 describe('accessibility: tab switching', () => {
@@ -353,7 +353,7 @@ describe('accessibility: tab switching', () => {
 });
 
 /**
- * Pin / unpin the active panel by keyboard — Ctrl+Shift+Enter by default,
+ * Pin / unpin the active panel by keyboard, Ctrl+Shift+Enter by default,
  * rebindable via `keymap.togglePin`. Inert unless `pinnedTabs.enabled`.
  */
 describe('accessibility: toggle pin', () => {
@@ -416,7 +416,7 @@ describe('accessibility: toggle pin', () => {
         make({ keymap: { togglePin: 'alt+p' } }, { enabled: true });
         twoTabs();
 
-        // default binding overridden — Ctrl+Shift+Enter does nothing now
+        // default binding overridden, so Ctrl+Shift+Enter does nothing now
         pressTogglePin();
         expect(dockview.activePanel?.api.isPinned).toBe(false);
 
@@ -520,7 +520,7 @@ describe('accessibility: focus the tab strip', () => {
 });
 
 /**
- * Move focus between groups by keyboard — F6 / Shift+F6 step to the next /
+ * Move focus between groups by keyboard. F6 / Shift+F6 step to the next /
  * previous group in gridview order (wrapping round).
  */
 describe('accessibility: group focus navigation', () => {
@@ -593,7 +593,7 @@ describe('accessibility: group focus navigation', () => {
 });
 
 /**
- * Spatial group focus — Ctrl+Shift+Arrow focuses the group geometrically in
+ * Spatial group focus. Ctrl+Shift+Arrow focuses the group geometrically in
  * that direction. jsdom has no layout, so a clean 2x2 grid is mocked via
  * getBoundingClientRect.
  */
@@ -703,7 +703,7 @@ describe('accessibility: spatial group focus', () => {
 });
 
 /**
- * L4 focus management — closing a panel/group that holds focus must hand it to
+ * L4 focus management: closing a panel/group that holds focus must hand it to
  * a deterministic neighbour, never drop it on <body>. The service snapshots
  * focus before the remove and restores after if it was pulled out of the dock.
  */
@@ -721,7 +721,7 @@ describe('accessibility: focus restore on close', () => {
         dockview.layout(1000, 1000);
     };
 
-    // one group, two tabs — only the active tab carries aria-selected="true"
+    // one group, two tabs; only the active tab carries aria-selected="true"
     const twoTabs = (): void => {
         dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
         dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
@@ -741,7 +741,7 @@ describe('accessibility: focus restore on close', () => {
     test('returns focus to a neighbour when the close pulls it out of the dock', () => {
         make(true);
         twoTabs(); // p2 active
-        activeTab().focus(); // focus p2's tab — a real in-dock focusable element
+        activeTab().focus(); // focus p2's tab, a real in-dock focusable element
         expect(container.contains(document.activeElement)).toBe(true);
 
         const group = dockview.activeGroup!;
@@ -781,7 +781,7 @@ describe('accessibility: focus restore on close', () => {
 });
 
 /**
- * L4 — focus across maximize/restore. Maximizing hides sibling groups via
+ * L4 focus across maximize/restore. Maximizing hides sibling groups via
  * visibility toggling and leaves the maximized group's DOM in place, so the
  * active panel keeps focus across the transition. This guards against a future
  * change that re-renders on maximize (which would silently drop focus).
@@ -845,7 +845,7 @@ describe('accessibility: focus across maximize', () => {
 
         // jsdom doesn't blur a hidden element (the whole reason this case slips
         // through in unit-land), so emulate the real browser dropping focus to
-        // <body> when g1 is hidden — during the will phase, after the service
+        // <body> when g1 is hidden, during the will phase, after the service
         // has already snapshotted that focus was inside the dock.
         const sub = dockview.onWillMutateLayout((e) => {
             if (e.kind === 'maximize') {
@@ -865,7 +865,7 @@ describe('accessibility: focus across maximize', () => {
 });
 
 /**
- * L4 — Esc inside a floating group returns focus to the invoking control (the
+ * L4: Esc inside a floating group returns focus to the invoking control (the
  * last thing focused in the main dock). Runs in the bubble phase and respects
  * defaultPrevented so panel content that uses Esc keeps priority.
  */
@@ -963,7 +963,7 @@ class ButtonPanel implements IContentRenderer {
 }
 
 /**
- * L4 — Tab is trapped within a floating group: at the last tabbable Tab wraps
+ * L4: Tab is trapped within a floating group. At the last tabbable Tab wraps
  * to the first, at the first Shift+Tab wraps to the last, so focus doesn't leak
  * to the grid behind the (non-modal) float.
  */
@@ -1053,7 +1053,7 @@ describe('accessibility: floating group Tab containment', () => {
 });
 
 /**
- * L5 i18n — the keyboard-docking narration flows through the same `messages`
+ * L5 i18n: the keyboard-docking narration flows through the same `messages`
  * catalog as the announcements, so a translator owns every string.
  */
 describe('accessibility: docking narration i18n', () => {

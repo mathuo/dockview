@@ -19,7 +19,7 @@ const NO_MODIFIERS: DragModifiers = {
 };
 
 /**
- * Smart Guides — independent X/Y edge + center snapping against other floats and
+ * Smart Guides: independent X/Y edge + center snapping against other floats and
  * the container, with engage/release hysteresis.
  *
  * Driven at the service boundary with a mock host + synthetic drag contexts:
@@ -41,7 +41,7 @@ describe('smart guides', () => {
         target: DockviewGroupPanel;
         position: SmartGuidesSnapPosition;
     }[];
-    // Distinct identity per drag — the service keys per-drag state by group.
+    // Distinct identity per drag; the service keys per-drag state by group.
     const group = {} as DockviewGroupPanel;
 
     const make = (
@@ -88,7 +88,7 @@ describe('smart guides', () => {
             container.querySelectorAll<HTMLElement>('.dv-smart-guide')
         ).filter((l) => l.style.display === 'block');
 
-    // Float-only options — isolate from the container edges that are on by default.
+    // Float-only options: isolate from the container edges that are on by default.
     const floatsOnly = (
         extra: SmartGuidesOptions = {}
     ): SmartGuidesOptions => ({
@@ -104,7 +104,7 @@ describe('smart guides', () => {
     test('snaps a float left edge to another float left edge within snapDistance', () => {
         make({});
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };
-        // dragged left edge at 106 — 6px from the other float's left edge (100).
+        // dragged left edge at 106, 6px from the other float's left edge (100).
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 106, top: 400, width: 50, height: 50 }, [other])
         );
@@ -119,7 +119,7 @@ describe('smart guides', () => {
     test('snaps the top edge (Y axis) and draws a horizontal guide', () => {
         make(floatsOnly());
         const other: Box = { left: 100, top: 200, width: 200, height: 150 };
-        // top edge at 195 — 5px from the other float's top (200); far on X.
+        // top edge at 195, 5px from the other float's top (200); far on X.
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 600, top: 195, width: 50, height: 50 }, [other])
         );
@@ -131,7 +131,7 @@ describe('smart guides', () => {
         expect(lines[0].style.height).toBe('1px');
     });
 
-    test('resolves X and Y independently — two simultaneous guides', () => {
+    test('resolves X and Y independently: two simultaneous guides', () => {
         make(floatsOnly());
         // One neighbour: align the dragged float's left edge AND top edge to it.
         const other: Box = { left: 100, top: 100, width: 200, height: 150 };
@@ -171,7 +171,7 @@ describe('smart guides', () => {
     test('snaps centers together', () => {
         make(floatsOnly());
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };
-        // dragged center 202 vs the other float centre 200 — only the centres
+        // dragged center 202 vs the other float centre 200; only the centres
         // line up (no edge is in range).
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 172, top: 400, width: 60, height: 50 }, [other])
@@ -190,7 +190,7 @@ describe('smart guides', () => {
         expect(visibleLines()[0].style.left).toBe('20px');
     });
 
-    test('hysteresis — stays engaged within release, frees past it (no oscillation)', () => {
+    test('hysteresis: stays engaged within release, frees past it (no oscillation)', () => {
         make(floatsOnly());
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };
         const at = (left: number) =>
@@ -202,7 +202,7 @@ describe('smart guides', () => {
         expect(at(100)).toEqual({ top: 400, left: 100 });
         // 10px away (> snapDistance 8, < snapDistance+release 12): stays snapped
         expect(at(110)).toEqual({ top: 400, left: 100 });
-        // 13px away (> 12): releases — and is now out of the 8px engage range
+        // 13px away (> 12): releases, and is now out of the 8px engage range
         expect(at(113)).toBeUndefined();
     });
 
@@ -225,7 +225,7 @@ describe('smart guides', () => {
         ).toBeUndefined();
     });
 
-    test('no snap outside snapDistance — pass-through, no guides', () => {
+    test('no snap outside snapDistance: pass-through, no guides', () => {
         make({});
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };
         const result = service.transformFloatingGroupDrag(
@@ -254,7 +254,7 @@ describe('smart guides', () => {
         expect(visibleLines()[0].style.left).toBe('100px');
     });
 
-    test('inert when `smartGuides` is unset — no overlay, no adjustment', () => {
+    test('inert when `smartGuides` is unset: no overlay, no adjustment', () => {
         make(undefined);
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 106, top: 400, width: 50, height: 50 }, [
@@ -307,8 +307,8 @@ describe('smart guides', () => {
             ctx({ left: 106, top: 400, width: 50, height: 50 }, others)
         );
 
-        // A later frame whose `others` snapshot has drifted must NOT rebuild the
-        // candidate set — the float at x=100 is still the snap target.
+        // A later frame whose `others` snapshot has drifted must not rebuild the
+        // candidate set; the float at x=100 is still the snap target.
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 104, top: 400, width: 50, height: 50 }, [
                 { left: 500, top: 50, width: 200, height: 150 },
@@ -323,7 +323,7 @@ describe('smart guides', () => {
     const preview = (): HTMLElement | null =>
         container.querySelector('.dv-smart-guide-preview');
     // Disable alignment (no float/container candidates) so the snapped box is
-    // the raw proposed box — the snap-together geometry is then exact.
+    // the raw proposed box, so the snap-together geometry is then exact.
     const noAlign = (extra: SmartGuidesOptions = {}): SmartGuidesOptions => ({
         snapTargets: { floats: false, container: false },
         ...extra,
@@ -496,7 +496,7 @@ describe('smart guides', () => {
         make({
             snapTargets: { floats: false, container: false, splitters: true },
         });
-        // a collapsed sash measures 0×0 — must not become a phantom line at x=0
+        // a collapsed sash measures 0×0, so it must not become a phantom line at x=0
         splitterRects = [{ left: 0, top: 0, width: 0, height: 0 }];
         expect(
             service.transformFloatingGroupDrag(
@@ -540,7 +540,7 @@ describe('smart guides', () => {
     test('updateOptions merges an override at runtime', () => {
         make(floatsOnly());
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };
-        // 25px away — outside the default 8px, inside an overridden 30px.
+        // 25px away: outside the default 8px, inside an overridden 30px.
         service.updateOptions({ snapDistance: 30 });
         expect(
             service.transformFloatingGroupDrag(
@@ -614,9 +614,9 @@ describe('smart guides', () => {
     });
 
     test('top-aligning a float off to the side of a target is not a merge', () => {
-        // Wide float, tops flush, ≥50% horizontal overlap of the narrow target —
-        // but its CENTRE is past the target's edge, so it is an alignment, not a
-        // tabset stack. Must NOT suggest or commit a merge.
+        // Wide float, tops flush, ≥50% horizontal overlap of the narrow target,
+        // but its centre is past the target's edge, so it is an alignment, not a
+        // tabset stack. Must not suggest or commit a merge.
         const t: Box = { left: 100, top: 100, width: 100, height: 200 };
         make(noAlign(), [{ group: targetGroup, box: t }]);
 
@@ -630,7 +630,7 @@ describe('smart guides', () => {
     });
 
     test('`showGuides: false` still previews + commits a pending merge', () => {
-        // showGuides hides alignment LINES only — a merge that will commit on
+        // showGuides hides alignment lines only. A merge that will commit on
         // drop must never be silent.
         const t: Box = { left: 300, top: 100, width: 200, height: 200 };
         make(noAlign({ showGuides: false }), [{ group: targetGroup, box: t }]);
@@ -649,7 +649,7 @@ describe('smart guides', () => {
 
     test('an engaged edge stays glued on a small float (no probe switch)', () => {
         // A 20px-wide float: as it moves, its centre probe can get nearer to the
-        // engaged line than the latched edge. It must keep gluing the EDGE, not
+        // engaged line than the latched edge. It must keep gluing the edge, not
         // silently re-snap its centre (which would jump the box).
         make(floatsOnly());
         const other: Box = { left: 100, top: 50, width: 200, height: 150 };

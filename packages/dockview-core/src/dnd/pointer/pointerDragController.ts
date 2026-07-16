@@ -12,13 +12,13 @@ export interface ActiveDrag {
 }
 
 /**
- * Singleton — only one pointer-driven drag active at a time.
+ * Only one pointer-driven drag can be active at a time.
  *
  * State is shared across every Dockview instance on the page. Targets
  * from instance B receive hit-tests from drags originating in instance A;
  * that's intentional for cross-instance drops since `LocalSelectionTransfer`
  * is also process-wide. The corollary is that every Tabs subscriber to
- * `onDragMove` fires for every pointer drag globally — each subscriber
+ * `onDragMove` fires for every pointer drag globally; each subscriber
  * hit-tests against its own DOM, so this is O(N) per pointermove where N
  * is the number of registered listeners across all instances.
  */
@@ -105,7 +105,7 @@ export class PointerDragController extends CompositeDisposable {
 
         const { pointerEvent, source } = args;
 
-        // Call `getData()` before mutating controller state — a throw
+        // Call `getData()` before mutating controller state. A throw
         // here would otherwise leave `_active` populated with no window
         // listeners installed, blocking every subsequent drag.
         const dataDisposable = args.getData();
@@ -135,7 +135,7 @@ export class PointerDragController extends CompositeDisposable {
         };
         this._onDragStart.fire(startEvent);
 
-        // Source's owning window — popout drags fire on their own window,
+        // Source's owning window; popout drags fire on their own window,
         // not the main one.
         const targetWindow: Window =
             source.ownerDocument?.defaultView ?? globalThis.window;

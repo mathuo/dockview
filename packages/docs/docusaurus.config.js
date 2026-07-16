@@ -398,9 +398,9 @@ const config = {
                             },
                             {
                                 // /enterprise is the separate worker deployment,
-                                // not a Docusaurus route — use pathname:// so the
-                                // broken-link checker doesn't validate it (same as
-                                // the sitemap link above).
+                                // not a Docusaurus route, so use pathname:// to
+                                // keep the broken-link checker from validating it
+                                // (same as the sitemap link above).
                                 label: 'Privacy policy',
                                 href: 'pathname:///enterprise/privacy',
                                 target: '_self',

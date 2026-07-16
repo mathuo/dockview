@@ -32,7 +32,7 @@ export type PanelColors = {
     scrollThumb: string;
 };
 
-// Near-black background with vivid, saturated accents — a bank-terminal look
+// Near-black background with vivid, saturated accents, a bank-terminal look
 // (Citi Velocity / Bloomberg) where the strong green/red pops hard off black.
 export const DARK_COLORS: PanelColors = {
     isDark: true,

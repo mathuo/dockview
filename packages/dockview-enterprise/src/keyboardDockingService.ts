@@ -63,16 +63,16 @@ const DEFAULT_KEYMAP: DockingKeybindings = {
 };
 
 /**
- * Advanced keyboard control — drive the layout itself without a mouse. Opt-in
+ * Advanced keyboard control: drive the layout itself without a mouse. Opt-in
  * via `keyboardNavigation` (shared with the default navigation module).
  *
- * - **Spatial group focus** (`Ctrl+Shift+Arrows`) — move focus to the visually
+ * - **Spatial group focus** (`Ctrl+Shift+Arrows`): move focus to the visually
  *   adjacent group via the `adjacentGroupInDirection` geometry primitive.
- * - **Keyboard docking** (`Ctrl+M`) — arms a two-phase move of the active panel
+ * - **Keyboard docking** (`Ctrl+M`): arms a two-phase move of the active panel
  *   with a live drop preview + screen-reader narration:
- *     1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
+ *     1. Pick target: arrows cycle the groups (incl. the panel's own, so a tab
  *        can be split out); `Enter` selects one.
- *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
+ *     2. Pick edge: arrows choose a split edge (left/right/top/bottom) or the
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
  *   From the target phase, `Ctrl+Shift+F` floats the panel as a terminal
  *   action; `Escape` cancels.
@@ -93,7 +93,7 @@ export class KeyboardDockingService
     constructor(private readonly host: IKeyboardNavigationHost) {
         super();
 
-        // Capture phase, on the document — matches the navigation listener so
+        // Capture phase, on the document, matching the navigation listener so
         // edge groups (outside the gridview) are covered. Mirrored onto each
         // popout document so docking can be driven from inside a popped-out
         // window (a separate `document`).
@@ -312,7 +312,7 @@ export class KeyboardDockingService
         const move = this._move!;
         const group = this._resolveTargetGroup();
         if (!group) {
-            // every candidate group was removed mid-move — bail out cleanly
+            // every candidate group was removed mid-move, so bail out cleanly
             this._abortMove();
             return;
         }

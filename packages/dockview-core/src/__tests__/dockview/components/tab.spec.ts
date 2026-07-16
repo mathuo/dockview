@@ -443,7 +443,7 @@ describe('tab', () => {
                 clientY: 0,
             });
             // A downward flick past pressTolerance, before the initiation
-            // delay fires — drag intent in any direction begins the drag
+            // delay fires. Drag intent in any direction begins the drag
             // (strip-scrolling lives on the empty container space, not on
             // tabs themselves).
             fireEvent.pointerMove(window, {

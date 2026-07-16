@@ -175,7 +175,7 @@ export class PointerDropTarget
             return;
         }
 
-        // An `edge` cell reports its position but renders nothing — the consumer
+        // An `edge` cell reports its position but renders nothing. The consumer
         // (e.g. the layout-edge dock) owns the preview + commit.
         if (resolved.edge) {
             this._removeOverlay();

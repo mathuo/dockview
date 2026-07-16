@@ -24,7 +24,7 @@ const LINE_SIZE_VARIABLE = '--dv-tabs-and-actions-container-height';
  * The wrapped-row neighbour of `current` one row up or down, or `undefined` when
  * there is no row in that direction. Tabs are bucketed into rows by `offsetTop`
  * (the same signal `countRows` uses); within the target row the tab whose
- * horizontal centre is nearest `current`'s is chosen — so Up/Down lands on the
+ * horizontal centre is nearest `current`'s is chosen, so Up/Down lands on the
  * geometrically-aligned tab rather than a fixed index. Pure geometry (reads
  * layout only) so it is unit-testable with mocked offsets.
  */
@@ -40,7 +40,7 @@ export function findVerticalNeighbour(
     const targetTop =
         rowTops[direction === 'up' ? currentRow - 1 : currentRow + 1];
     if (targetTop === undefined) {
-        // Already on the top / bottom row — no wrap-around.
+        // Already on the top or bottom row: no wrap-around.
         return undefined;
     }
 
@@ -85,30 +85,30 @@ function resolveMaxRows(
 interface RowMeasurement {
     /**
      * The number of wrapped lines the tabs occupy in their natural (uncapped)
-     * layout — the count of distinct tab cross-axis offsets (`offsetTop` for a
+     * layout: the count of distinct tab cross-axis offsets (`offsetTop` for a
      * horizontal header's rows, `offsetLeft` for a vertical header's columns).
      * Zero for an empty strip. Capped tabs stay in flow (clipped, not removed),
      * so this is always the natural count. (jsdom reports offset 0 for every
-     * tab, so this is 1 there regardless of size — real wrapping is e2e.)
+     * tab, so this is 1 there regardless of size; real wrapping is e2e.)
      */
     rows: number;
     /**
-     * Panel ids of the tabs that wrapped onto a line at/after the `maxRows` cap
-     * — the surplus set routed to the overflow dropdown. Empty when uncapped or
+     * Panel ids of the tabs that wrapped onto a line at/after the `maxRows` cap:
+     * the surplus set routed to the overflow dropdown. Empty when uncapped or
      * when the natural layout already fits within the cap.
      */
     surplus: string[];
 }
 
 /**
- * Bucket a tab list's tabs by their cross-axis offset — `offsetTop` for a
- * horizontal header (rows), `offsetLeft` for a vertical header (columns) — to
+ * Bucket a tab list's tabs by their cross-axis offset (`offsetTop` for a
+ * horizontal header's rows, `offsetLeft` for a vertical header's columns) to
  * derive the natural line count and, given a cap, the surplus set of panel ids
  * on lines beyond it.
  *
  * Lines are ordered by DOM (flex-fill) order rather than by raw offset value:
  * flex-wrap fills line 0 fully, then line 1, and so on, so the first DOM tab
- * carrying a new offset opens the next line. This is direction-agnostic — it is
+ * carrying a new offset opens the next line. This is direction-agnostic: it is
  * correct for a `vertical-rl` strip whose columns grow right-to-left (first
  * column is the right-most, i.e. the largest `offsetLeft`), where sorting by
  * offset would mis-order the columns.
@@ -178,14 +178,14 @@ function sameSet(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
  * natural row count from per-tab `offsetTop` buckets, and hands the surplus set
  * (tabs on rows beyond the cap) to the free forced-overflow seam so those tabs
  * spill into the dropdown. Detection is a row-count test, not the free path's
- * horizontal-clip test — nothing clips horizontally when tabs wrap.
+ * horizontal-clip test, since nothing clips horizontally when tabs wrap.
  *
  * Wraps both horizontal headers (into rows) and vertical/edge-group headers
  * (into columns); a hidden header is a no-op.
  *
  * Wrap is (re)evaluated on construction, on `overflow` option changes, and on a
  * runtime header-direction flip (`setHeaderPosition` horizontal↔vertical) via
- * the group API's `onDidHeaderDirectionChange` signal — so a group that flips
+ * the group API's `onDidHeaderDirectionChange` signal, so a group that flips
  * orientation re-measures on the correct axis (rows vs columns).
  */
 class WrapController extends CompositeDisposable {
@@ -214,7 +214,7 @@ class WrapController extends CompositeDisposable {
             this.group.model.onDidAddPanel(() => this.remeasure()),
             this.group.model.onDidRemovePanel(() => this.remeasure()),
             // A title edit changes a vertical tab's natural (rotated) length, so
-            // the tallest-tab height may move — re-measure so the uniform height
+            // the tallest-tab height may move; re-measure so the uniform height
             // still contains every tab. A no-op for horizontal wrap.
             this.group.model.onDidPanelTitleChange(() => this.remeasure()),
             // A header-direction flip swaps the wrap axis (rows↔columns): the
@@ -264,7 +264,7 @@ class WrapController extends CompositeDisposable {
 
     /** Refresh the vertical uniform-tab-height, then re-count columns. Used for
      *  panel churn / title edits (a resize keeps titles, so its RO path skips the
-     *  height refresh and just re-counts). */
+     *  height refresh and re-counts). */
     private remeasure(): void {
         const list = this.host.getTabsListElement(this.group);
         if (list) {
@@ -338,7 +338,7 @@ class WrapController extends CompositeDisposable {
         if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
             return;
         }
-        // Inert unless the strip is currently wrapping a horizontal header —
+        // Inert unless the strip is currently wrapping a horizontal header;
         // mirror the wrap gate (`apply`) and core's `:not(...-vertical)` guard.
         if (
             !list.classList.contains(WRAP_CLASS) ||
@@ -434,11 +434,11 @@ class WrapController extends CompositeDisposable {
     }
 
     /**
-     * Pin a vertical (edge-group) header's WIDTH to the wrapped column count.
+     * Pin a vertical (edge-group) header's width to the wrapped column count.
      *
      * A horizontal header grows its height to fit wrapped rows purely in CSS:
      * the strip's width is definite, so flex-wrap intrinsic sizing accounts for
-     * the rows. A vertical header can't — the strip wraps on its (percentage)
+     * the rows. A vertical header can't: the strip wraps on its (percentage)
      * height, which is indefinite during intrinsic-width resolution, so the
      * header's `auto` width is computed for a single column and stays clamped
      * when a resize reflows the tabs into more columns. The surplus columns then
@@ -501,7 +501,7 @@ class WrapController extends CompositeDisposable {
 }
 
 /**
- * Multi-row (wrapping) tabs. Adds `overflow.mode: 'wrap'` — tabs wrap onto
+ * Multi-row (wrapping) tabs. Adds `overflow.mode: 'wrap'`: tabs wrap onto
  * multiple rows and the header grows, instead of clipping into the chevron
  * dropdown. Consumes the free tab-list seam + header-aware content sizing; owns
  * no tab model, overflow detection, or sizing math.

@@ -852,7 +852,7 @@ describe('dockviewGroupPanelModel', () => {
         // Regression: swapping the render container on an already-populated
         // group (e.g. restoring a popout group from JSON, where the popout
         // window gets its own OverlayRenderContainer) used to leave the active
-        // onlyWhenVisible panel's content detached — so nothing rendered.
+        // onlyWhenVisible panel's content detached, so nothing rendered.
         const dockviewComponent = new DockviewComponent(
             document.createElement('div'),
             {
@@ -1608,7 +1608,7 @@ describe('dockviewGroupPanelModel', () => {
             });
 
             expect(tabGroup.collapsed).toBe(true);
-            // No transition occurred — chip / tabs render collapsed from the start.
+            // No transition occurred; chip / tabs render collapsed from the start.
             expect(collapseEvents).toHaveLength(0);
         });
 
@@ -2098,10 +2098,10 @@ describe('dockviewGroupPanelModel', () => {
     describe('content drop-target zones (mouse + touch parity)', () => {
         // Regression: when a group's location changes (grid → floating /
         // popout / edge), the content drop target's accepted zones must be
-        // updated on BOTH the HTML5 dropTarget (mouse path) and the
+        // updated on both the HTML5 dropTarget (mouse path) and the
         // pointerDropTarget (touch path). Without the parallel call, touch
         // drops on a non-grid group's content area would land in zones the
-        // HTML5 path forbids — different layout outcomes between input
+        // HTML5 path forbids, giving different layout outcomes between input
         // methods.
         function getContentTargets(group: DockviewGroupPanel): {
             dropTarget: { setTargetZones: jest.Mock };

@@ -34,7 +34,7 @@ export class TabGroupChipsService implements ITabGroupChipsService {
     }
 
     dispose(): void {
-        // No internal state to tear down — emitters live on the host.
+        // No internal state to tear down; emitters live on the host.
     }
 }
 

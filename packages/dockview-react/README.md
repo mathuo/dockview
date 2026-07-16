@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview-react</h1>
 
-<p>React bindings for dockview — zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
+<p>React bindings for dockview, a zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
 
 </div>
 

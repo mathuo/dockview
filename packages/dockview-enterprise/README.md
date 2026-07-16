@@ -14,8 +14,8 @@ gate. Importing the package self-registers all of them.
 npm install dockview-enterprise
 ```
 
-It depends on `dockview`; use it **instead of** `dockview` (not alongside) —
-everything `dockview` exports is re-exported here.
+It depends on `dockview`; use it **instead of** `dockview` (not alongside). Everything
+`dockview` exports is re-exported here.
 
 ## Usage
 
@@ -29,7 +29,7 @@ LicenseManager.setLicenseKey('your-license-key');
 
 Merely importing `dockview-enterprise` registers the enterprise modules and the
 license check, so the feature options (`pinnedTabs`, `smartGuides`, …) become
-available on every `DockviewComponent` — no explicit `registerModules` call is
+available on every `DockviewComponent`. No explicit `registerModules` call is
 needed.
 
 Using a framework binding (`dockview-react` / `dockview-vue` /

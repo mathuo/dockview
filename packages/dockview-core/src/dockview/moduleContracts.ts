@@ -1,6 +1,6 @@
 /**
  * Service + host interfaces for the pluggable feature modules. Core references
- * only these interfaces — never a module's implementation — so each module is
+ * only these interfaces, never a module's implementation, so each module is
  * decoupled from core and independently testable / removable. Keep this file
  * implementation-free.
  */
@@ -58,8 +58,8 @@ export interface IContextMenuHost {
     /**
      * The PinnedTabs module service, or `undefined` when that module is not
      * registered. The tab context menu auto-injects a Pin/Unpin item only when
-     * this is present (and pinning is enabled) — an optional enhancement, never
-     * a hard dependency.
+     * this is present (and pinning is enabled); it's an optional enhancement,
+     * never a hard dependency.
      */
     readonly pinnedTabsService: IPinnedTabsService | undefined;
     getPopupServiceForGroup(group: DockviewGroupPanel): PopupService;
@@ -112,7 +112,7 @@ export interface ITabGroupChipsService extends IDisposable {
 export interface IKeyboardNavigationHost {
     /**
      * The outermost dockview element (the shell, which also contains edge
-     * groups). A getter — it must resolve to the shell once that exists, not
+     * groups). A getter: it must resolve to the shell once that exists, not
      * the inner gridview, or keydowns from edge groups are missed.
      */
     readonly rootElement: HTMLElement;
@@ -135,20 +135,20 @@ export interface IKeyboardNavigationHost {
      */
     ownsElement(node: Node): boolean;
     /**
-     * The next / previous group in gridview (spatial) order, wrapping round —
-     * the one piece of navigation that needs the grid internals. All other
-     * focus logic lives in the service, using the public group API.
+     * The next / previous group in gridview (spatial) order, wrapping round.
+     * This is the one piece of navigation that needs the grid internals. All
+     * other focus logic lives in the service, using the public group API.
      */
     adjacentGroup(
         group: DockviewGroupPanel,
         reverse: boolean
     ): DockviewGroupPanel | undefined;
-    /** The nearest grid group in a spatial direction — drives Alt+Arrow nav. */
+    /** The nearest grid group in a spatial direction; drives Alt+Arrow nav. */
     adjacentGroupInDirection(
         group: DockviewGroupPanel,
         direction: GroupNavigationDirection
     ): DockviewGroupPanel | undefined;
-    /** Fires before / after a structural layout change — used to restore focus on close. */
+    /** Fires before / after a structural layout change; used to restore focus on close. */
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
@@ -158,7 +158,7 @@ export interface IKeyboardNavigationHost {
         group: DockviewGroupPanel,
         position: Position
     ): void;
-    /** Float the panel into a new floating group — the keyboard-move "float" terminal action. */
+    /** Float the panel into a new floating group: the keyboard-move "float" terminal action. */
     floatPanel(panel: IDockviewPanel): void;
 }
 
@@ -202,8 +202,8 @@ export interface IAdvancedDnDService extends IDisposable {
         group?: DockviewGroupPanel
     ): DroptargetOverlayModel | undefined;
     /**
-     * Render the drop-preview overlay on a group at `position` — the same
-     * overlay a mouse drag shows — without a live drag. Returns a disposable
+     * Render the drop-preview overlay on a group at `position` (the same
+     * overlay a mouse drag shows) without a live drag. Returns a disposable
      * that clears it. Used by keyboard docking so keyboard and mouse previews
      * are identical (single source of truth). Commit the move via the public
      * `api.moveGroupOrPanel({ to: { group, position } })`.
@@ -219,7 +219,7 @@ export interface IAdvancedDnDService extends IDisposable {
 /**
  * The narrow surface the layout-history service needs from the host
  * (`DockviewComponent`). It reads/writes whole-layout snapshots and listens to
- * the mutation-transaction boundary — the only place a *pre-image* can be taken
+ * the mutation-transaction boundary, the only place a *pre-image* can be taken
  * before a mutation runs.
  */
 export interface ILayoutHistoryHost {
@@ -229,11 +229,11 @@ export interface ILayoutHistoryHost {
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void;
-    /** Fires before a structural mutation — used to capture the pre-image. */
+    /** Fires before a structural mutation; used to capture the pre-image. */
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
-    /** Fires after a structural mutation — used to capture the post-image. */
+    /** Fires after a structural mutation; used to capture the post-image. */
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
-    /** Coalesced (microtask-buffered) ping after any layout change — the only
+    /** Coalesced (microtask-buffered) ping after any layout change; the only
      *  signal for sash resize, which does not go through the mutation boundary. */
     readonly onDidLayoutChange: Event<void>;
     /** Settles once any in-flight popout-window restoration (from `fromJSON`)
@@ -242,7 +242,7 @@ export interface ILayoutHistoryHost {
     readonly popoutRestorationPromise: Promise<void>;
 }
 
-/** Entry labels — the mutation kinds plus the synthetic `'resize'` (sash drag,
+/** Entry labels: the mutation kinds plus the synthetic `'resize'` (sash drag,
  *  which has no mutation-boundary kind of its own). */
 export type LayoutHistoryKind = DockviewLayoutMutationKind | 'resize';
 
@@ -279,14 +279,14 @@ export interface ILayoutHistoryService extends IDisposable {
 export interface IDropGuideHost {
     readonly options: DockviewComponentOptions;
     /**
-     * Fires on each drag-over with the hovered group + native event — the
+     * Fires on each drag-over with the hovered group + native event; the
      * signal the compass widget mounts/follows. The service filters for
      * `kind === 'content'`.
      */
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     /**
      * Whether a drop at `position` on `group`'s content is actually allowed
-     * (the per-position `canDisplayOverlay` veto) — used to gate which compass
+     * (the per-position `canDisplayOverlay` veto), used to gate which compass
      * cells are shown, so only legal drops appear.
      */
     canDropOnGroup(
@@ -296,12 +296,12 @@ export interface IDropGuideHost {
     ): boolean;
     /**
      * The element the content drop target measures its quadrants against (the
-     * `dndPanelOverlay` outline — the whole group, or just its content). The
+     * `dndPanelOverlay` outline: the whole group, or just its content). The
      * compass paints its cells in this frame so they line up with where a drop
      * actually resolves, not a different box.
      */
     getDropOverlayElement(group: DockviewGroupPanel): HTMLElement | undefined;
-    /** The layout root element — the (positioned) surface the outer-cell
+    /** The layout root element: the (positioned) surface the outer-cell
      *  landing preview is drawn over (where a whole-layout-edge dock lands). */
     getLayoutElement(): HTMLElement;
 }
@@ -309,7 +309,7 @@ export interface IDropGuideHost {
 export interface IDropGuideService extends IDisposable {
     /**
      * The cell hit-test resolver, installed by the host at the drop-target seam
-     * in place of the default cursor-quadrant logic — or `undefined` when the
+     * in place of the default cursor-quadrant logic, or `undefined` when the
      * compass is disabled (`dndGuide` unset), so the default behaviour runs.
      */
     readonly resolver: PositionResolver | undefined;
@@ -337,21 +337,21 @@ export interface ISmartGuidesHost {
     getFloatingContainer(): HTMLElement;
     /**
      * Fires with the dragged group the first time a floating group move-drag
-     * actually moves — the signal to (re)build per-drag state from a clean slate.
+     * actually moves; the signal to (re)build per-drag state from a clean slate.
      * Tears down any session left over from a drag that ended without a normal
      * pointerup (e.g. a redock long-press, which aborts without an end event).
      */
     readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel>;
     /**
      * Fires with the dragged group when a floating group's move-drag ends
-     * (pointerup / cancel) — the signal to tear down the guides and per-drag
+     * (pointerup / cancel); the signal to tear down the guides and per-drag
      * state. A resize-end fires it too; with no active drag session that is a
      * harmless no-op.
      */
     readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel>;
     /**
      * The live floating windows other than `exclude`, each with its group
-     * identity and container-relative box — the snap-together detector needs
+     * identity and container-relative box; the snap-together detector needs
      * identity (which neighbour to dock into), not just geometry.
      */
     getFloatingGroupSnapshots(
@@ -401,7 +401,7 @@ export interface ISmartGuidesService extends IDisposable {
     /**
      * Snap the proposed drag position against the other floating groups,
      * drawing an alignment guide on the snapped edge. Returns an adjusted
-     * top-left, or nothing to leave the proposed position unchanged — which is
+     * top-left, or nothing to leave the proposed position unchanged, which is
      * also the pass-through when `smartGuides` is unset / disabled.
      */
     transformFloatingGroupDrag(
@@ -422,34 +422,34 @@ export interface ISmartGuidesService extends IDisposable {
 /**
  * The narrow surface the auto-hide service needs from the host
  * (`DockviewComponent`). Collapse/expand is delegated to the existing free
- * edge-group machinery (`setEdgeGroupCollapsed` → shell) — the module owns
+ * edge-group machinery (`setEdgeGroupCollapsed` → shell); the module owns
  * interaction + presentation, never layout/sizing.
  */
 export interface IAutoHideEdgeGroupHost {
     readonly options: DockviewComponentOptions;
-    /** Fires when any group is added — the service filters for `location.type === 'edge'`. */
+    /** Fires when any group is added; the service filters for `location.type === 'edge'`. */
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
     /** The edge group at a position, or undefined. */
     getEdgeGroupPanel(
         position: EdgeGroupPosition
     ): DockviewGroupPanel | undefined;
-    /** Collapse/expand an edge group — the single mutate path (fires
+    /** Collapse/expand an edge group: the single mutate path (fires
      *  `onDidCollapsedChange`, no-op guarded). */
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void;
     /** Whether this edge group should behave as an auto-hide (pinnable) tool
-     *  window — the per-group flag resolved against the global
+     *  window: the per-group flag resolved against the global
      *  `autoHideEdgeGroups` option. Lets static and auto-hiding edge groups
      *  co-exist. */
     isEdgeGroupAutoHide(group: DockviewGroupPanel): boolean;
     /** Fires when a group's resolved auto-hide state changes at runtime
      *  (per-group `setAutoHide`), so a controller can dock/undock retroactively. */
     readonly onDidEdgeGroupAutoHideChange: Event<DockviewGroupPanel>;
-    /** The element the slide-out peek mounts on — the shell, which is also the
+    /** The element the slide-out peek mounts on: the shell, which is also the
      *  `OverlayRenderContainer` root, so `always`-rendered content anchors in
      *  the same coordinate space as the peek. */
     readonly overlayRoot: HTMLElement;
-    /** The size an edge group expands to — sizes the peek overlay. */
+    /** The size an edge group expands to; sizes the peek overlay. */
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
     /** Record the peek state so `group.api.isPeeking()` / `onDidPeekChange`
      *  reflect it (the module owns the actual overlay). */
@@ -457,7 +457,7 @@ export interface IAutoHideEdgeGroupHost {
     /** Reposition a single `renderer:'always'` panel's overlay over its
      *  reference container, optionally forcing it visible. The peek reparents a
      *  group's content container into the slide-out overlay; the always-rendered
-     *  content is NOT reparented (its parent stays constant) — it's re-anchored
+     *  content is not reparented (its parent stays constant); it's re-anchored
      *  over the moving container and force-shown for the duration of the peek.
      *  `clip` (viewport rect) clips the overlay to the peek's reveal window so an
      *  `always` panel emerges from the strip's inner edge instead of sliding in
@@ -495,10 +495,10 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
  */
 export interface IAutoEdgeGroupHost {
     readonly options: DockviewComponentOptions;
-    /** Fires before an edge drop overlay is shown — the affordance draws its
+    /** Fires before an edge drop overlay is shown; the affordance draws its
      *  outer-band highlight (or lets the inner band render the core overlay). */
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
-    /** Fires before a layout-edge drop commits — the affordance preempts the
+    /** Fires before a layout-edge drop commits; the affordance preempts the
      *  outer band and reveals an edge group. */
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     /** The element the outer-band highlight mounts on (the shell / overlay root). */
@@ -522,8 +522,8 @@ export interface IAutoEdgeGroupService extends IDisposable {
      *  the normal cursor quadrant. `undefined` when disabled. */
     readonly resolver: PositionResolver | undefined;
     /** Edge-band detection only: an `edge` cell when the pointer is in the outer
-     *  band, else `null`. Used to COMPOSE with another resolver (e.g. the
-     *  drop-guide compass) — the outer edge reveals an edge group and everything
+     *  band, else `null`. Used to compose with another resolver (e.g. the
+     *  drop-guide compass): the outer edge reveals an edge group and everything
      *  else falls through to the other resolver. */
     resolveEdge(args: PositionResolverArgs): PositionResolverResult | null;
 }
@@ -540,14 +540,14 @@ export interface IAutoEdgeGroupService extends IDisposable {
  */
 export interface IMultiRowTabsHost {
     readonly options: DockviewComponentOptions;
-    /** Fires when any group is added — the service attaches a wrap controller. */
+    /** Fires when any group is added; the service attaches a wrap controller. */
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
-    /** Fires after `updateOptions` — the service re-applies wrap to every group
+    /** Fires after `updateOptions`; the service re-applies wrap to every group
      *  so a runtime `overflow.mode` change takes effect. */
     readonly onDidOptionsChange: Event<void>;
     /**
-     * The scrollable tab list element (`.dv-tabs-container`) for a group — the
+     * The scrollable tab list element (`.dv-tabs-container`) for a group: the
      * element the wrap class is toggled on and whose child tab geometry the
      * row-count measurement reads. Undefined if the group has no tab header.
      */
@@ -560,7 +560,7 @@ export interface IMultiRowTabsHost {
     relayoutGroup(group: DockviewGroupPanel): void;
     /**
      * Force a set of the group's panels into the overflow dropdown regardless of
-     * horizontal fit — the wrap controller's surplus set (the tabs on rows
+     * horizontal fit: the wrap controller's surplus set (the tabs on rows
      * beyond `overflow.maxRows`). In wrap mode nothing clips horizontally, so the
      * free `OverflowObserver` never surfaces these; this seam routes them to the
      * dropdown and re-evaluates it immediately. Passing `() => false` clears the
@@ -588,7 +588,7 @@ export interface IMultiRowTabsService extends IDisposable {
  * layout or sizing is touched.
  */
 export interface IPinnedTabsHost {
-    /** The owning component's id — the `viewId` a within-component drag payload
+    /** The owning component's id: the `viewId` a within-component drag payload
      *  (`PanelTransfer`) carries, so the pinned second row can originate a drag
      *  the main strip's drop targets accept. */
     readonly id: string;
@@ -596,13 +596,13 @@ export interface IPinnedTabsHost {
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
     /** Fires after a panel's pinned flag is mutated via the gated
-     *  `setPanelPinned` — the service's sole trigger to re-order the strip. */
+     *  `setPanelPinned`; the service's sole trigger to re-order the strip. */
     readonly onDidPanelPinnedChange: Event<DockviewPanelPinnedChangeEvent>;
-    /** Fires after a `fromJSON` restore completes — the service seeds its
+    /** Fires after a `fromJSON` restore completes; the service seeds its
      *  pinned store from the restored panels' `isPinned` flags and re-asserts
      *  the invariant. */
     readonly onDidLayoutFromJSON: Event<void>;
-    /** Fires when a panel is removed — the service prunes it from its pinned
+    /** Fires when a panel is removed; the service prunes it from its pinned
      *  bookkeeping so a closed pinned panel's id can't leak. */
     readonly onDidRemovePanel: Event<IDockviewPanel>;
 }
@@ -616,7 +616,7 @@ export interface IPinnedTabsHost {
 export interface IPinnedTabsService extends IDisposable {
     /** Re-assert the pinned-first invariant on a single group's tab strip. */
     enforceOrder(group: DockviewGroupPanel): void;
-    /** Pure predicate (handed to each group's `Tabs`) — true keeps the panel
+    /** Pure predicate (handed to each group's `Tabs`); true keeps the panel
      *  out of the overflow dropdown. */
     isExcludedFromOverflow(panelId: string): boolean;
     /** Clamp/redirect a proposed header drop `index` against the group's pin
@@ -643,7 +643,7 @@ export interface IOverflowRow {
     readonly panel: IDockviewPanel;
     /**
      * Expand the panel's tab group if collapsed, activate the panel (origin
-     * `'user'`) and close the popover — identical to clicking the row. Used by
+     * `'user'`) and close the popover, identical to clicking the row. Used by
      * the keyboard controller (Enter).
      */
     activate(): void;
@@ -652,7 +652,7 @@ export interface IOverflowRow {
 /**
  * Core-provided builders handed to {@link IAdvancedOverflowService.renderOverflow}
  * so the module can rebuild the free dropdown body (rows + group headers) in a
- * custom order — search-filtered, MRU-ordered — without re-implementing the row
+ * custom order (search-filtered, MRU-ordered) without re-implementing the row
  * DOM, the group-header DOM, or the window-bound popover open/close. The popover
  * control stays in core so it renders in the correct document for popped-out
  * groups (a `getPopupServiceForGroup(group)`-bound `PopupService`).
@@ -685,7 +685,7 @@ export interface AdvancedOverflowRenderParams {
     readonly overflowTabs: string[];
     /** Overflow tab-group ids. */
     readonly overflowTabGroups: string[];
-    /** Pinned panel ids whose tabs have clipped out of the strip — rendered in
+    /** Pinned panel ids whose tabs have clipped out of the strip, rendered in
      *  a dedicated "Pinned" section at the top of the dropdown, above the search
      *  box and MRU list. Empty unless the PinnedTabs module is active and the
      *  pinned block itself overflows. */

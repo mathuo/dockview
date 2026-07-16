@@ -67,13 +67,13 @@
     }
 
     /**
-     * Multi-column (wrapping) tabs for a VERTICAL (edge-group) header — the
+     * Multi-column (wrapping) tabs for a vertical (edge-group) header: the
      * mirror of the horizontal rule above with the axes swapped. The main axis
      * is vertical (bounded by the header height, so overflowing tabs wrap) and
      * the cross axis is horizontal (grows into additional columns). The header
      * grows in width via the `:has()` rule in tabsContainer.scss.
      *
-     * NOTE: column flow direction under `writing-mode: vertical-rl` differs
+     * Column flow direction under `writing-mode: vertical-rl` differs
      * between left and right header positions; this needs visual verification
      * in a real browser (jsdom lays out neither writing-mode nor flex-wrap).
      */
@@ -97,8 +97,8 @@
         // (rotated) title length, so a column fits only a few tabs and a tiny
         // per-tab height difference flips how many fit, ragged-ing the grid into
         // a staircase (see the variable's doc in options.ts). One shared height
-        // makes every column hold the same count, so the columns line up — the
-        // mirror of the horizontal rule pinning tabs to the fixed row height.
+        // makes every column hold the same count, so the columns line up,
+        // mirroring the horizontal rule that pins tabs to the fixed row height.
         // Falls back to auto (natural per-tab height) when the module hasn't set
         // the variable, so core-only wrap is unchanged.
         .dv-tab {
@@ -292,7 +292,7 @@
     }
 }
 
-// Pinned tabs (PinnedTabs module). Presentation only — the classes are inert
+// Pinned tabs (PinnedTabs module). Presentation only: the classes are inert
 // unless a panel is pinned (nothing pins panels without the module), so this is
 // a no-op for the default free layout. `--pinned` marks a pinned tab and shows
 // a leading pin glyph (a real inline SVG injected by the tab, `.dv-tab-pin`);
@@ -313,7 +313,7 @@
         flex-shrink: 0;
         margin-right: 4px;
         opacity: 0.7;
-        // Decorative indicator — clicks/drags belong to the tab beneath it.
+        // Decorative indicator; clicks/drags belong to the tab beneath it.
         pointer-events: none;
 
         .dv-svg {
@@ -327,7 +327,7 @@
         min-width: 0;
     }
 
-    // Pinned tabs have no close button (Chrome / VS-Code style) — pinning
+    // Pinned tabs have no close button (Chrome / VS-Code style); pinning
     // protects the tab from an accidental close. Close via the context menu or
     // the keyboard, or unpin first.
     .dv-default-tab-action {
@@ -355,7 +355,7 @@
 // slide underneath. Inert unless the class is present (nothing sets it without
 // the module), so the default layout is unchanged. Tabs already carry an opaque
 // active/inactive background, so scrolling tabs don't show through. Scoped to
-// the horizontal, non-wrapping strip — sticky-left has no meaning in a vertical
+// the horizontal, non-wrapping strip; sticky-left has no meaning in a vertical
 // header or a wrapped (no horizontal scroll) layout.
 .dv-tabs-container:not(.dv-tabs-container--wrap):not(
         .dv-tabs-container-vertical

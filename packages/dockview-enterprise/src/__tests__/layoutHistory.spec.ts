@@ -24,7 +24,7 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * LayoutHistory (Phase B) — snapshot-based undo/redo of discrete layout
+ * LayoutHistory (Phase B): snapshot-based undo/redo of discrete layout
  * mutations. Opt-in via `layoutHistory.enabled`. Only user-originated mutations
  * are recorded by default; `undoableProgrammaticMutations` opts api calls in.
  */
@@ -142,13 +142,13 @@ describe('LayoutHistory undo/redo', () => {
 
     test('programmatic (api-origin) mutations are excluded by default', () => {
         const d = make({ enabled: true });
-        // api-origin mutation — should not enter the user undo stack
+        // api-origin mutation; should not enter the user undo stack
         d.withOrigin('api', () =>
             d.addPanel({ id: 'p1', component: 'default' })
         );
         expect(d.canUndo).toBe(false);
 
-        // user-origin mutation — recorded
+        // user-origin mutation, recorded
         d.addPanel({ id: 'p2', component: 'default' });
         expect(d.canUndo).toBe(true);
 
@@ -281,7 +281,7 @@ describe('LayoutHistory resize coalescing', () => {
         const svc = new LayoutHistoryService(h);
         seed(h);
 
-        // a "drag" — several pings, each a slightly different layout
+        // a "drag": several pings, each a slightly different layout
         h.snapshot = 1;
         h.layout.fire();
         h.snapshot = 2;
@@ -309,7 +309,7 @@ describe('LayoutHistory resize coalescing', () => {
         h.snapshot = 1;
         h.layout.fire(); // open a resize run (before=0)
 
-        // a discrete close arrives mid-window — must close the resize run first
+        // a discrete close arrives mid-window, so it must close the resize run first
         h.will.fire({ kind: 'remove', origin: 'user' });
         h.snapshot = 2;
         h.did.fire({ kind: 'remove', origin: 'user' });
@@ -349,7 +349,7 @@ describe('LayoutHistory resize coalescing', () => {
         h.will.fire({ kind: 'add', origin: 'user' });
         h.snapshot = 1;
         h.did.fire({ kind: 'add', origin: 'user' });
-        h.layout.fire(); // settle — must NOT open a resize run
+        h.layout.fire(); // settle, must not open a resize run
         jest.advanceTimersByTime(1000);
 
         // only the discrete add is recorded

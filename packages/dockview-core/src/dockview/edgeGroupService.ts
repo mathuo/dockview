@@ -11,7 +11,7 @@ import { defineModule } from './modules';
  * orchestration remain on DockviewComponent.
  */
 export interface IEdgeGroupServiceHost {
-    // Intentionally empty — the service has no callbacks into the host.
+    // Intentionally empty: the service has no callbacks into the host.
 }
 
 export interface IEdgeGroupService extends IDisposable {
@@ -30,7 +30,7 @@ export interface IEdgeGroupService extends IDisposable {
     findPositionOf(group: DockviewGroupPanel): EdgeGroupPosition | undefined;
 
     /**
-     * Per-group auto-hide opt-in. `undefined` means "unset" — callers should
+     * Per-group auto-hide opt-in. `undefined` means "unset", so callers should
      * fall back to the global `autoHideEdgeGroups` option. This lets a static
      * edge group and an auto-hiding one co-exist in the same layout.
      */
@@ -39,8 +39,8 @@ export interface IEdgeGroupService extends IDisposable {
 
     /**
      * Per-group "auto-reveal" flag. When set, an edge group tears itself down
-     * to zero footprint when emptied (instead of collapsing to a strip) — the
-     * state used by drag-revealed edges.
+     * to zero footprint when emptied (instead of collapsing to a strip). This
+     * is the state used by drag-revealed edges.
      */
     setAutoReveal(group: DockviewGroupPanel, value: boolean): void;
     isAutoReveal(group: DockviewGroupPanel): boolean;
@@ -62,7 +62,7 @@ export class EdgeGroupService implements IEdgeGroupService {
     private readonly _autoHide = new WeakMap<DockviewGroupPanel, boolean>();
     private readonly _autoReveal = new WeakMap<DockviewGroupPanel, boolean>();
 
-    // No constructor needed — the host is currently unused. The
+    // No constructor needed; the host is currently unused. The
     // IEdgeGroupServiceHost slot stays for symmetry with the other modules
     // and to leave room for future host callbacks.
 

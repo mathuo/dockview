@@ -69,9 +69,9 @@ export class OverflowListView extends CompositeDisposable {
     private readonly _focusTarget: HTMLElement;
     private readonly _search: ResolvedSearch;
 
-    /** Candidate panel ids (pre-filter, pre-order) — the search scope's set. */
+    /** Candidate panel ids (pre-filter, pre-order): the search scope's set. */
     private readonly _baseIds: string[];
-    /** Pinned tabs that clipped out of the strip — rendered in a "Pinned"
+    /** Pinned tabs that clipped out of the strip. Rendered in a "Pinned"
      *  section above the main list, and excluded from it to avoid a duplicate
      *  row when the search scope is the whole group. */
     private readonly _pinnedIds: string[];
@@ -146,7 +146,7 @@ export class OverflowListView extends CompositeDisposable {
         this._focusTarget.setAttribute('aria-controls', this._list.id);
 
         // Keydown on the body (bubble phase) so it fires before PopupService's
-        // window-level Enter/Escape dismissal — letting us intercept Enter to
+        // window-level Enter/Escape dismissal, so we can intercept Enter to
         // activate the highlighted row before the popover closes.
         const onKeyDown = (event: KeyboardEvent): void =>
             this._onKeyDown(event);
@@ -255,8 +255,8 @@ export class OverflowListView extends CompositeDisposable {
         // dedicated "Pinned" header, filtered by the same query. They keep
         // their pinned (strip) order rather than joining the MRU sort. Append
         // the rows first, then add the header only if at least one survived
-        // (a panel can close between the overflow event and this render) — no
-        // orphan header.
+        // (a panel can close between the overflow event and this render), so
+        // there's no orphan header.
         const pinnedMatches = this._pinnedIds.filter((id) =>
             matchesQuery(this._titleOf.get(id) ?? id, query)
         );
@@ -360,7 +360,7 @@ export class OverflowListView extends CompositeDisposable {
                 context.focusTrigger();
                 break;
             case 'Tab':
-                // Trap focus within the popover — there is a single focus
+                // Trap focus within the popover. There's a single focus
                 // target (the search input or the listbox), so keep it there.
                 event.preventDefault();
                 break;
@@ -371,7 +371,7 @@ export class OverflowListView extends CompositeDisposable {
 }
 
 /**
- * Advanced overflow module service — one per component. Owns the MRU model
+ * Advanced overflow module service, one per component. Owns the MRU model
  * (component-scoped, so recency survives a group closing) and constructs an
  * {@link OverflowListView} per popover-open. Self-wires MRU tracking off the
  * host's group / active-panel events via {@link init}.
@@ -393,7 +393,7 @@ export class AdvancedOverflowService
         });
     }
 
-    /** The MRU model — exposed for the module's `init` wiring and unit tests. */
+    /** The MRU model, exposed for the module's `init` wiring and unit tests. */
     get mru(): MruTracker {
         return this._mru;
     }

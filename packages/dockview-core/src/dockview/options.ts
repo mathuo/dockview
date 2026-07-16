@@ -85,13 +85,13 @@ export interface DropOverlayModelParams {
     group?: DockviewGroupPanel;
 }
 
-/** A layout change to be announced — see the `getAnnouncement` option. */
+/** A layout change to be announced; see the `getAnnouncement` option. */
 export interface LiveRegionEvent {
     /**
      * What changed: a panel was added (`'open'`) or removed (`'close'`); a
      * group was maximized (`'maximize'`) / restored (`'restore'`); or a group
      * moved to a floating window (`'float'`), back into the grid (`'dock'`), or
-     * out to a popout window (`'popout'`). `panel` is the affected panel — for
+     * out to a popout window (`'popout'`). `panel` is the affected panel; for
      * group events, the group's active panel.
      */
     kind:
@@ -224,7 +224,7 @@ export interface SmartGuidesSnapTargets {
 }
 
 /**
- * Options for the Smart Guides module — Figma-style alignment guides + magnetic
+ * Options for the Smart Guides module: Figma-style alignment guides + magnetic
  * snapping while dragging a floating group. Omit `smartGuides` entirely to leave
  * float dragging unchanged: the module is then inert and the drag loop is a
  * byte-for-byte pass-through.
@@ -236,7 +236,7 @@ export interface SmartGuidesOptions {
      *  Default `8`. */
     snapDistance?: number;
     /** Extra px beyond `snapDistance` the pointer must travel before an engaged
-     *  snap releases — asymmetric hysteresis that stops boundary oscillation.
+     *  snap releases; asymmetric hysteresis that stops boundary oscillation.
      *  Default `4`. */
     releaseDistance?: number;
     /** Render the alignment guide lines while snapping. Default `true`. */
@@ -273,7 +273,7 @@ export type OverflowThumbnailRenderer = (
  * The CSS class the `MultiRowTabsModule` toggles on a group's tab list
  * (`.dv-tabs-container`) to switch it into wrap layout. Shared here so core
  * (the reorder controller's wrap detection + the SCSS rules) and the module
- * agree on the one string — renaming it in one place would otherwise silently
+ * agree on the one string; renaming it in one place would otherwise silently
  * break the seam across the package boundary.
  */
 export const OVERFLOW_WRAP_TABS_CLASS = 'dv-tabs-container--wrap';
@@ -295,8 +295,8 @@ export const OVERFLOW_WRAP_TABS_CAPPED_CLASS = 'dv-tabs-container--wrap-capped';
 export const OVERFLOW_MAX_TAB_ROWS_VARIABLE = '--dv-max-tab-rows';
 
 /**
- * The custom property the `MultiRowTabsModule` sets on a WRAPPED VERTICAL
- * (edge-group) tab list to pin every wrapped tab to a single, uniform height —
+ * The custom property the `MultiRowTabsModule` sets on a wrapped vertical
+ * (edge-group) tab list to pin every wrapped tab to a single, uniform height:
  * the tallest tab's natural height, measured live by the controller. A vertical
  * tab's natural height tracks its (rotated) title length, so a column only fits
  * a handful of tabs and tiny per-tab height differences flip how many fit,
@@ -312,7 +312,7 @@ export const OVERFLOW_WRAP_TABS_VERTICAL_TAB_HEIGHT_VARIABLE =
 /**
  * Tab-header overflow behaviour. One shared block across the overflow axis:
  * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
- * Each capability names the module it needs — without that module the field is
+ * Each capability names the module it needs; without that module the field is
  * ignored and the free single-row strip + dropdown is used.
  */
 export interface DockviewOverflowOptions {
@@ -364,7 +364,7 @@ export interface DockviewOptions {
      * Adjust a floating group's position while it is being dragged. Runs on
      * each pointer-move frame with the proposed top-left (before the container
      * clamp) and returns an adjusted top-left, or nothing to leave it
-     * unchanged. Use it for snapping, alignment, or custom bounds. Move only —
+     * unchanged. Use it for snapping, alignment, or custom bounds. Move only:
      * resizing a floating group is unaffected.
      *
      * `context.others` holds the bounds of the other floating groups (relative
@@ -375,7 +375,7 @@ export interface DockviewOptions {
         context: FloatingGroupDragContext
     ) => { top: number; left: number } | void;
     /**
-     * Enable Smart Guides — alignment guides + magnetic snapping while a
+     * Enable Smart Guides: alignment guides + magnetic snapping while a
      * floating group is being dragged. Omit to disable entirely (float dragging
      * is then unchanged). Provided by the Smart Guides module.
      */
@@ -387,7 +387,7 @@ export interface DockviewOptions {
      *   above the group's tab bar. Dragging it moves the floating window;
      *   shift+drag (mouse) / long-press (touch) redocks into the grid. Style
      *   it with the `--dv-floating-titlebar-*` theme variables.
-     * - `'tabbar'`: the legacy behaviour — the empty space in the tab bar
+     * - `'tabbar'`: the legacy behaviour, where the empty space in the tab bar
      *   (the "void container") doubles as the move handle. No dedicated bar
      *   is rendered.
      */
@@ -410,13 +410,13 @@ export interface DockviewOptions {
      *   browsers, certain Safari versions, embedded webviews). Cross-window
      *   HTML5 drag and the HTML5 native drag image are not available in this
      *   mode.
-     * - `'html5'`: HTML5 drag-and-drop only — disables touch / pen drag.
+     * - `'html5'`: HTML5 drag-and-drop only; disables touch / pen drag.
      */
     dndStrategy?: DockviewDndStrategy;
     /**
      * Override how a pointer location maps to a drop {@link Position} (or `null`
-     * for no drop) on the 5-way group/layout drop targets — the group content
-     * and the whole-layout edges — replacing the built-in cursor-quadrant logic.
+     * for no drop) on the 5-way group/layout drop targets (the group content
+     * and the whole-layout edges), replacing the built-in cursor-quadrant logic.
      * Tab/header reorder targets are unaffected. Unset ⇒ the default quadrant
      * behaviour, unchanged. Read live, so it can be swapped via
      * {@link DockviewApi.updateOptions}.
@@ -465,19 +465,19 @@ export interface DockviewOptions {
      *
      * Use built-in string shortcuts or provide a `ContextMenuItemConfig`
      * object for custom items. The available shortcuts are:
-     * - `'close'` — close this panel
-     * - `'closeOthers'` — close every other panel in the group
-     * - `'closeAll'` — close every panel in the group
-     * - `'closeLeft'` / `'closeRight'` — close the panels before / after this
+     * - `'close'`: close this panel
+     * - `'closeOthers'`: close every other panel in the group
+     * - `'closeAll'`: close every panel in the group
+     * - `'closeLeft'` / `'closeRight'`: close the panels before / after this
      *   one in the tab strip
-     * - `'maximize'` — maximize the group (renders as *Restore* and disables
+     * - `'maximize'`: maximize the group (renders as *Restore* and disables
      *   for non-grid panels, tracking the group's live maximized state)
-     * - `'float'` — move the panel into a floating window (disabled when
+     * - `'float'`: move the panel into a floating window (disabled when
      *   already floating)
-     * - `'popout'` — move the panel into a new browser window (disabled when
+     * - `'popout'`: move the panel into a new browser window (disabled when
      *   already popped out)
-     * - `'pin'` — toggle the panel's pinned state (PinnedTabs module)
-     * - `'separator'` — a divider line
+     * - `'pin'`: toggle the panel's pinned state (PinnedTabs module)
+     * - `'separator'`: a divider line
      *
      * If omitted, no context menu is shown.
      * Return an empty array to suppress the menu for specific cases.
@@ -490,12 +490,12 @@ export interface DockviewOptions {
      *
      * Use built-in string shortcuts or provide a `ContextMenuItemConfig`
      * object for custom items. The available shortcuts are:
-     * - `'rename'` — renders an inline text input to rename the tab group
-     * - `'colorPicker'` — renders a grid of color swatches for the tab group
-     * - `'collapse'` — collapse the tab group (renders as *Expand* when the
+     * - `'rename'`: renders an inline text input to rename the tab group
+     * - `'colorPicker'`: renders a grid of color swatches for the tab group
+     * - `'collapse'`: collapse the tab group (renders as *Expand* when the
      *   group is already collapsed)
-     * - `'close'` — close every panel belonging to the tab group
-     * - `'separator'` — a divider line
+     * - `'close'`: close every panel belonging to the tab group
+     * - `'separator'`: a divider line
      *
      * If omitted, no context menu is shown on chip right-click.
      * Return an empty array to suppress the menu for specific cases.
@@ -522,7 +522,7 @@ export interface DockviewOptions {
         group: DockviewGroupPanel
     ) => IGroupDragGhostRenderer;
     /**
-     * Shape the drop overlay shown over a group's drop targets — the tab
+     * Shape the drop overlay shown over a group's drop targets: the tab
      * strip (`'tab'`), the header void space (`'header_space'`) and the
      * panel content area (`'content'`). Return a {@link DroptargetOverlayModel}
      * to override that target's default overlay (size, activation threshold,
@@ -537,7 +537,7 @@ export interface DockviewOptions {
     ) => DroptargetOverlayModel | undefined;
     /**
      * Built-in screen-reader announcements of layout changes (a visually-hidden
-     * `aria-live` region narrating panel open/close etc.). On by default —
+     * `aria-live` region narrating panel open/close etc.). On by default;
      * set to `false` to disable, e.g. when the host app provides its own
      * announcement system. Honoured live via `updateOptions`.
      */
@@ -546,7 +546,7 @@ export interface DockviewOptions {
      * Localise or override the built-in announcement strings (the default
      * messages are English). Return a string to use it, `null` / `''` to
      * suppress that announcement, or `undefined` to keep the default. This is
-     * how non-English apps translate announcements — core ships no message
+     * how non-English apps translate announcements; core ships no message
      * catalog, only the default strings + this hook.
      */
     getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
@@ -558,11 +558,11 @@ export interface DockviewOptions {
      */
     announcer?: (event: AnnouncementEvent) => void;
     /**
-     * Translate / override the strings dockview speaks to assistive technology
-     * — both the LiveRegion announcements and the keyboard-docking narration.
-     * Provide any subset of {@link DockviewMessages}; unset entries keep the
-     * English defaults. (`getAnnouncement` still applies first, per-event, for
-     * announcements.)
+     * Translate / override the strings dockview speaks to assistive technology,
+     * covering both the LiveRegion announcements and the keyboard-docking
+     * narration. Provide any subset of {@link DockviewMessages}; unset entries
+     * keep the English defaults. (`getAnnouncement` still applies first,
+     * per-event, for announcements.)
      */
     messages?: Partial<DockviewMessages>;
     /**
@@ -570,10 +570,10 @@ export interface DockviewOptions {
      * pass an object to override individual ones via `keymap`. Off by default
      * (opt-in while the feature matures). Enables:
      *
-     * - **Switch tab** within the focused group — `Ctrl`+`]` / `Ctrl`+`[`.
-     * - **Move focus between groups** — `F6` / `Shift`+`F6` (sequential) or
+     * - **Switch tab** within the focused group: `Ctrl`+`]` / `Ctrl`+`[`.
+     * - **Move focus between groups**: `F6` / `Shift`+`F6` (sequential) or
      *   `Ctrl`+`Shift`+arrow keys (spatial: focus the group in that direction).
-     * - **Dock the active panel** without a mouse — `Ctrl`+`M` arms a two-phase
+     * - **Dock the active panel** without a mouse: `Ctrl`+`M` arms a two-phase
      *   move (arrows cycle the target group with a live drop preview +
      *   screen-reader narration, `Enter` docks, `Escape` cancels).
      *
@@ -584,7 +584,7 @@ export interface DockviewOptions {
     keyboardNavigation?: boolean | KeyboardNavigationOptions;
     /**
      * Undo / redo for layout mutations (close / move / float / popout / add /
-     * maximize / tab-group changes). Off by default — set `{ enabled: true }`
+     * maximize / tab-group changes). Off by default; set `{ enabled: true }`
      * to record. Drive it via `api.undo()` / `api.redo()`; dockview binds no
      * keys itself (that's the host app's call, and collides with the keyboard
      * navigation keymap). Honoured live via `updateOptions`.
@@ -623,11 +623,11 @@ export interface DockviewOptions {
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
-     * a `value` (any CSS color expression — hex, rgb(), `var(...)`, etc.),
+     * a `value` (any CSS color expression: hex, rgb(), `var(...)`, etc.),
      * and an optional `label` shown in the context menu picker.
      *
      * If omitted, the default 9-color palette is used. The list fully
-     * replaces the defaults — there is no merge.
+     * replaces the defaults; there is no merge.
      */
     tabGroupColors?: DockviewTabGroupColorEntry[];
     /**
@@ -651,7 +651,7 @@ export interface DockviewOptions {
 }
 
 export interface PinnedTabsOptions {
-    /** Master switch. Default: undefined (dormant — pinning is a no-op). */
+    /** Master switch. Default: undefined (dormant; pinning is a no-op). */
     enabled?: boolean;
     /**
      * `'inline'` (default) keeps pinned tabs first within the existing strip;
@@ -661,14 +661,14 @@ export interface PinnedTabsOptions {
     mode?: 'inline' | 'separate-row';
     /**
      * Render pinned tabs icon-only (title + close button hidden), VS-Code /
-     * Chrome style. Default false — dockview's default tab has no favicon, so
+     * Chrome style. Default false; dockview's default tab has no favicon, so
      * pinned tabs stay labelled (with a pin glyph) unless you opt in. Best
      * enabled alongside a custom tab renderer that shows an icon.
      */
     compact?: boolean;
     /**
      * Drag a tab across the pin boundary to toggle its pinned state
-     * (VS-Code-style). Default false — dragging across the boundary is clamped
+     * (VS-Code-style). Default false; dragging across the boundary is clamped
      * back, matching Chrome, where pinning is an explicit action only.
      */
     togglePinOnCrossBoundaryDrag?: boolean;
@@ -690,7 +690,7 @@ export interface LayoutHistoryOptions {
     /** Max undo depth (bounded ring). Default `25`. */
     depth?: number;
     /** Also record mutations originating from `DockviewApi` calls (the app's
-     *  own programmatic changes). Default `false` — only user gestures. */
+     *  own programmatic changes). Default `false`; only user gestures. */
     undoableProgrammaticMutations?: boolean;
     /** Clear the stacks when the whole layout is replaced via `fromJSON` /
      *  `clear`. Default `true`. */

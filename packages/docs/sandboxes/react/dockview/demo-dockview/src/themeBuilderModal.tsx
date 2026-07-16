@@ -35,7 +35,7 @@ const Section = (props: {
     </Card>
 );
 
-// Numeric slider — the kit `Slider` already matches this call signature.
+// Numeric slider. The kit `Slider` already matches this call signature.
 const SliderRow = Slider;
 
 const TextRow = (props: {

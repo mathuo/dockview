@@ -20,9 +20,9 @@ import {
 interface HistoryEntry {
     readonly kind: LayoutHistoryKind;
     readonly origin: DockviewLayoutMutationEvent['origin'];
-    /** Pre-image — what undo restores. */
+    /** Pre-image: what undo restores. */
     readonly before: SerializedDockview;
-    /** Post-image — what redo restores. */
+    /** Post-image: what redo restores. */
     readonly after: SerializedDockview;
     readonly timestamp: number;
 }
@@ -41,8 +41,8 @@ const DISCRETE: ReadonlySet<DockviewLayoutMutationKind> = new Set([
     'tab-group',
 ]);
 
-/** Bulk transactions that replace the whole layout — they clear history rather
- *  than recording (undoing *across* a full restore resurrects a foreign layout). */
+/** Bulk transactions that replace the whole layout. They clear history rather
+ *  than recording, since undoing across a full restore resurrects a foreign layout. */
 const BULK: ReadonlySet<DockviewLayoutMutationKind> = new Set([
     'load',
     'clear',
@@ -75,11 +75,11 @@ function resolveOptions(options: DockviewComponentOptions): {
  * restores `after`. Opt-in via `layoutHistory.enabled`.
  *
  * Discrete mutations (close/move/float/popout/add/maximize/tab-group) record one
- * step each off the will/did boundary. **Resize** (sash drag) has no boundary —
+ * step each off the will/did boundary. Resize (sash drag) has no boundary, so
  * it's caught off the coalesced `onDidLayoutChange` ping, using the last settled
  * snapshot as the pre-image (the "lazy pre-image"), and a continuous drag is
  * debounced into a single entry. A bulk `load`/`clear` clears the stacks. Undo /
- * redo restore popout windows, which re-open asynchronously — the guard is held
+ * redo restore popout windows, which re-open asynchronously, so the guard is held
  * across that re-open via `popoutRestorationPromise`.
  */
 export class LayoutHistoryService
@@ -101,7 +101,7 @@ export class LayoutHistoryService
     }
 
     // --- resize coalescing (off the post-only onDidLayoutChange ping) ---
-    /** The last settled snapshot — the pre-image for the next resize run. */
+    /** The last settled snapshot, used as the pre-image for the next resize run. */
     private _baseline: SerializedDockview | undefined;
     /** The resize entry currently being coalesced (open during a drag). */
     private _pendingResize:
@@ -163,7 +163,7 @@ export class LayoutHistoryService
         // A discrete mutation closes any open resize run first, so a resize and
         // an unrelated close never fold into one undo step.
         this._finalizeResize();
-        // Fully inert when off — never touch toJSON() (zero overhead, and no
+        // Fully inert when off: never touch toJSON() (zero overhead, and no
         // side effects on hosts whose serialization reads live geometry).
         if (!this._opts.enabled) {
             this._pendingBefore = undefined;
@@ -175,7 +175,7 @@ export class LayoutHistoryService
             return;
         }
         // Capture the pre-image only when this mutation will actually be
-        // recorded — avoids a wasted toJSON() on ignored mutations.
+        // recorded, which avoids a wasted toJSON() on ignored mutations.
         this._pendingBefore = this._records(e)
             ? this._host.toJSON()
             : undefined;
@@ -202,7 +202,7 @@ export class LayoutHistoryService
         const before = this._pendingBefore;
         this._pendingBefore = undefined;
         if (!before || !this._records(e)) {
-            // Not recorded, but the layout still changed — keep the baseline
+            // Not recorded, but the layout still changed. Keep the baseline
             // current so the next resize's pre-image is right (only when resize
             // recording is on, else don't bother calling toJSON()).
             if (this._opts.recordResize) {
@@ -226,7 +226,7 @@ export class LayoutHistoryService
         this._undo.push(entry);
         // A fresh mutation invalidates the redo future.
         this._redo.length = 0;
-        // Bounded ring — drop the oldest beyond the depth limit.
+        // Bounded ring: drop the oldest beyond the depth limit.
         const depth = Math.max(1, this._opts.depth);
         while (this._undo.length > depth) {
             this._undo.shift();
@@ -242,7 +242,7 @@ export class LayoutHistoryService
         }
         const opts = this._opts;
         if (!opts.enabled || !opts.recordResize) {
-            // Feature off — don't hold a stale baseline / pending run.
+            // Feature off: don't hold a stale baseline or pending run.
             this._baseline = undefined;
             this._clearResizeTimer();
             this._pendingResize = undefined;
@@ -255,7 +255,7 @@ export class LayoutHistoryService
             this._baseline = this._host.toJSON();
             return;
         }
-        // A genuine resize ping — open or extend the coalesced run.
+        // A genuine resize ping: open or extend the coalesced run.
         const after = this._host.toJSON();
         if (!this._pendingResize) {
             this._pendingResize = { before: this._baseline, after };
@@ -299,7 +299,7 @@ export class LayoutHistoryService
     }
 
     undo(): void {
-        // A pending resize drag is a real step — commit it before undoing it.
+        // A pending resize drag is a real step, so commit it before undoing it.
         this._finalizeResize();
         const entry = this._undo.pop();
         if (!entry) {
@@ -322,7 +322,7 @@ export class LayoutHistoryService
     }
 
     /**
-     * Restore a snapshot. `reuseExistingPanels` is mandatory — without it every
+     * Restore a snapshot. `reuseExistingPanels` is mandatory; without it every
      * undo disposes and recreates every renderer (content flash, lost focus).
      * The re-entrancy guard stops the mutations this fires from re-recording.
      */
@@ -344,9 +344,9 @@ export class LayoutHistoryService
             throw e;
         }
         if (restoresPopout) {
-            // Floating groups restore synchronously, but popout WINDOWS re-open
+            // Floating groups restore synchronously, but popout windows re-open
             // asynchronously and re-fire the mutation boundary on the root once
-            // their window loads — hold the guard until that settles, or the
+            // their window loads. Hold the guard until that settles, or the
             // re-open records a spurious entry.
             this._host.popoutRestorationPromise.then(release, release);
         } else {

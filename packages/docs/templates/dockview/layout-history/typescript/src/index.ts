@@ -9,7 +9,7 @@ import {
     themeLight,
 } from 'dockview';
 
-// dockview.dev docs license key — replace with your own key in production.
+// dockview.dev docs license key. Replace with your own key in production.
 LicenseManager.setLicenseKey(
     '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
 );
@@ -74,7 +74,7 @@ api.addPanel({
 });
 api.addPanel({ id: 'panel_5', component: 'default', title: 'Panel 5' });
 
-// The seed layout shouldn't be undoable — start with a clean history.
+// The seed layout shouldn't be undoable, so start with a clean history.
 api.clearHistory();
 
 // Drive the toolbar's disabled state from the history stack.

@@ -983,7 +983,7 @@ describe('overlay', () => {
 
             drag(200, 200);
 
-            // The raw 100000 must never reach setBounds — it's clamped to the
+            // The raw 100000 must never reach setBounds; it's clamped to the
             // container range first (every applied offset stays near the
             // 400x400 container, nowhere near the requested 100000).
             const bounds = spy.mock.calls.at(-1)![0] as Record<string, number>;

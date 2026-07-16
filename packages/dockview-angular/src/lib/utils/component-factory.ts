@@ -39,7 +39,7 @@ export class AngularFrameworkComponentFactory {
      * Refresh the component maps in place so that rebinding an `@Input()`
      * component map (e.g. `[components]`) after init is honoured. The core
      * calls the factory live on each panel creation, so updating these
-     * references is enough — no re-init required.
+     * references is enough. No re-init required.
      */
     updateComponents(maps: {
         components: Record<string, Type<any> | TemplateRef<any>>;

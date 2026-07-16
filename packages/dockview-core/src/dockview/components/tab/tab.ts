@@ -87,7 +87,7 @@ export class Tab extends CompositeDisposable {
         this._element.setAttribute('role', 'tab');
         this._element.setAttribute('aria-selected', 'false');
         // Give the tab an explicit accessible name (the panel title) so its
-        // WAI-ARIA name isn't computed from its subtree — otherwise it would
+        // WAI-ARIA name isn't computed from its subtree. Otherwise it would
         // swallow the close button's "Close {title}" label, and the tabpanel
         // (which is `aria-labelledby` this tab) would inherit that clutter.
         // Kept in sync with `onDidTitleChange` below.
@@ -110,9 +110,9 @@ export class Tab extends CompositeDisposable {
         toggleClass(this.element, 'dv-inactive-tab', true);
 
         // Pinned tabs get a marker class (and, unless disabled, a compact
-        // icon-only class). Driven off the panel's pinned state — inert when
-        // nothing is pinned (i.e. when the PinnedTabs module is absent) — and
-        // re-applied here because a reorder recreates the Tab.
+        // icon-only class). Driven off the panel's pinned state, and inert when
+        // nothing is pinned (i.e. when the PinnedTabs module is absent).
+        // Re-applied here because a reorder recreates the Tab.
         this._updatePinnedClasses();
 
         const canDisplayOverlay = (
@@ -295,7 +295,7 @@ export class Tab extends CompositeDisposable {
         toggleClass(this.element, 'dv-tab--pinned', pinned);
         toggleClass(this.element, 'dv-tab--pinned-compact', compact);
 
-        // A real inline pin glyph (inherits `currentColor` via `.dv-svg`) —
+        // A real inline pin glyph (inherits `currentColor` via `.dv-svg`),
         // more robust and themeable than a CSS mask, and the only visual
         // identity a compact pinned tab has. Only injected for the default tab
         // renderer: a custom `tabComponent` owns its own markup, so we don't

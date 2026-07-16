@@ -93,7 +93,7 @@
     --ifm-navbar-link-hover-color: var(--ifm-color-primary);
     --ifm-navbar-height: 4rem;
 
-    // Coloured header (ink) tokens — brand navy (#0A1440)
+    // Coloured header (ink) tokens: brand navy (#0A1440)
     --dv-header-bg: #0a1440;
     --dv-header-border: #1c2a5e;
     --dv-header-fg: #c8cbe4;
@@ -177,7 +177,7 @@
     }
 }
 
-// Coloured "ink" header — light theme only, so dark mode keeps its own dark
+// Coloured "ink" header, light theme only, so dark mode keeps its own dark
 // navbar. Scoped to the desktop bar (.navbar__inner) so the mobile slide-out
 // menu, which shares --ifm-navbar-background-color, stays light and readable.
 :root:not([data-theme='dark']) {
@@ -739,7 +739,7 @@ html.dv-demo-route .main-wrapper {
     top: -0.15em;
 }
 
-/* on a sidebar item — push to the right edge of the link */
+/* on a sidebar item: push to the right edge of the link */
 .menu__link .enterprise-badge--sidebar {
     margin-left: auto;
     font-size: 0.58rem;
@@ -758,7 +758,7 @@ html.dv-demo-route .main-wrapper {
 }
 
 /* Pricing page: the two editions presented side by side above the feature
-   comparison. No cards or fills, just two plain columns. */
+   comparison. No cards or fills, two plain columns. */
 .pricing-editions {
     display: grid;
     grid-template-columns: 1fr 1fr;

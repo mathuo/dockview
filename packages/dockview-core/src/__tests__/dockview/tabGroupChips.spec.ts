@@ -20,7 +20,7 @@ class TestPanel implements IContentRenderer {
  * onDidAddPanelToTabGroup / onDidRemovePanelFromTabGroup / onDidTabGroupChange)
  * are fired by TabGroupChipsModule's per-group forwarding. The underlying
  * createTabGroup/addPanelToTabGroup operations live in core, but the events
- * only propagate when the module is registered — hence these tests live here.
+ * only propagate when the module is registered, hence these tests live here.
  */
 describe('tab group events (TabGroupChipsModule)', () => {
     let container: HTMLElement;
@@ -127,7 +127,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
             panelId: 'panel1',
         });
 
-        // Change the group label — should fire change event
+        // Change the group label; should fire change event
         newTg.setLabel('Updated');
         expect(changes).toContain(newTg.id);
 
@@ -242,7 +242,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
         });
         expect(panelsRemoved).toEqual([{ tgId: tg.id, panelId: 'panel2' }]);
 
-        // 6. Dissolve — should remove remaining panels and destroy
+        // 6. Dissolve; should remove remaining panels and destroy
         panelsRemoved.length = 0;
         dockview.api.dissolveTabGroup({
             groupId,
@@ -262,7 +262,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
 
     test('regression: tab-group events fire on a source group born during moveGroup-from-edge', () => {
         // moveGroup from an edge group to the grid creates a fresh `source`
-        // group via this.createGroup() and adds it via gridview.addView(...) —
+        // group via this.createGroup() and adds it via gridview.addView(...),
         // bypassing doAddGroup, so BaseGrid._onDidAdd never fires for source.
         // TabGroupChipsModule attaches per-group event forwarding via
         // host.onDidAddGroup (driven by BaseGrid._onDidAdd through the
@@ -287,7 +287,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
             position: { referenceGroup: edgeGroup.id },
         });
 
-        // Move the edge group to the grid — internally creates a fresh
+        // Move the edge group to the grid; internally creates a fresh
         // `source` group via createGroup + gridview.addView (the path that
         // bypasses doAddGroup / _onDidAddGroup).
         dv.moveGroup({
@@ -298,7 +298,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
         const movedPanel = dv.getGroupPanel('edge-p1')!;
         const movedGroup = movedPanel.group;
 
-        // Subscribe AFTER the move so we can prove the event propagates.
+        // Subscribe after the move so we can prove the event propagates.
         const events: string[] = [];
         dv.api.onDidCreateTabGroup((e) => events.push(e.tabGroup.id));
 
@@ -308,7 +308,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
             label: 'test',
         });
 
-        // Should fire — but doesn't if attachToGroup never ran.
+        // Should fire, but doesn't if attachToGroup never ran.
         expect(events).toEqual([tg.id]);
 
         dv.dispose();

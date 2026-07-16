@@ -2,8 +2,8 @@
  * Most-recently-used ordering for overflow tab-switching, private to the
  * advanced overflow module.
  *
- * Keeps, per group, the group's panel ids ordered by last activation — front is
- * most recently activated. Component-scoped (one tracker per component) so
+ * Keeps, per group, the group's panel ids ordered by last activation; the front
+ * is the most recently activated. Component-scoped (one tracker per component) so
  * recency survives a group closing and a panel moving between groups. There is
  * no second consumer, so this deliberately stays a module-local model rather
  * than a shared core primitive.
@@ -13,7 +13,7 @@ export class MruTracker {
 
     /**
      * Seed a group's recency list from its current tab order (front = first
-     * tab). Called on group attach. Idempotent — re-seeding replaces the list,
+     * tab). Called on group attach. Idempotent: re-seeding replaces the list,
      * but existing recency is preserved for ids already tracked so a re-attach
      * doesn't reset ordering.
      */
@@ -32,7 +32,7 @@ export class MruTracker {
         }
     }
 
-    /** Drop a group's recency list — called when the group is removed. */
+    /** Drop a group's recency list, called when the group is removed. */
     detach(groupId: string): void {
         this._byGroup.delete(groupId);
     }
@@ -65,7 +65,7 @@ export class MruTracker {
         ids.unshift(panelId);
     }
 
-    /** Remove a panel from every group's list — called when a panel is closed. */
+    /** Remove a panel from every group's list, called when a panel is closed. */
     remove(panelId: string): void {
         for (const ids of this._byGroup.values()) {
             const index = ids.indexOf(panelId);
