@@ -12,7 +12,8 @@
         "typecheck": "tsc",
         "build-templates": "node scripts/buildTemplates.mjs",
         "build-templates:local": "node scripts/buildTemplates.mjs --local",
-        "record-clips": "node scripts/record/recordClips.mjs"
+        "record-clips": "node scripts/record/recordClips.mjs",
+        "test:smoke": "npm run build-templates:local && playwright test --config playwright.smoke.config.ts"
     },
     "browserslist": {
         "production": [
