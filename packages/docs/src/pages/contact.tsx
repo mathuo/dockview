@@ -429,8 +429,8 @@ export default function Contact(): JSX.Element {
                         Questions about licensing, Enterprise features or
                         anything else? Send us a message and we&rsquo;ll get back
                         to you. You can also email{' '}
-                        <a href="mailto:contact@dockview.dev">
-                            contact@dockview.dev
+                        <a href="mailto:info@dockview.dev">
+                            info@dockview.dev
                         </a>
                         .
                     </p>
