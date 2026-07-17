@@ -79,6 +79,17 @@ For clarity, none of the following changed in v8:
 All of v8's new capabilities are enabled through new `DockviewOptions` fields.
 They are off by default; set the ones you want:
 
+:::info Most of these need dockview-enterprise
+Pinned tabs, multi-row and wrapping tabs, the drop-guide compass, smart guides,
+layout history, and edge-group docking are enterprise features. They live in the
+`dockview-enterprise` package and need a licence key. On the free `dockview`
+package these options are inert (the console logs a note naming the package to
+install), so a v7 project that sets, say, `pinnedTabs` sees nothing happen until
+it adds the package. See [Enterprise setup](/docs/overview/enterprise-setup) to
+install and apply a key, and [Licensing](/docs/overview/features) for the full
+free-versus-enterprise list.
+:::
+
 | Option                 | Enables                                                                |
 | ---------------------- | ---------------------------------------------------------------------- |
 | `pinnedTabs`           | [Pinned tabs](/docs/core/panels/pinnedTabs)                            |
