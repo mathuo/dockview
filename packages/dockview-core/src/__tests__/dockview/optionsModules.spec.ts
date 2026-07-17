@@ -99,7 +99,7 @@ describe('validateOptionModules', () => {
         );
     });
 
-    test('dockToEdgeGroups requires AutoEdgeGroup — a paid feature end to end', () => {
+    test('dockToEdgeGroups requires AutoEdgeGroup, a paid feature end to end', () => {
         validateOptionModules(
             options({ dockToEdgeGroups: true }),
             nothingRegistered
@@ -135,7 +135,7 @@ describe('validateOptionModules', () => {
     // Enumerated rather than hand-listed: the hand-listed test above missed
     // `dndGuide: false`, which fired because its rule tested presence rather
     // than truthiness. A rule that can't be expressed as a plain `false` is
-    // skipped — every such option here nests its own opt-out, covered above.
+    // skipped: every such option here nests its own opt-out, covered above.
     test.each([
         ['dndGuide'],
         ['keyboardNavigation'],

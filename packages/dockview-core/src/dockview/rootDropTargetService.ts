@@ -30,7 +30,7 @@ const AUTO_EDGE_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
 /**
  * `hasEdgeDragReveal` gates the widened band, *not* the `dockToEdgeGroups`
  * option alone: without the affordance nothing consumes the outer sub-band, so
- * widening would only enlarge the plain grid-split trigger — a 3.2x bigger
+ * widening would only enlarge the plain grid-split trigger, a 3.2x bigger
  * target for the same behaviour the default band already gives.
  */
 function resolveRootOverlayModel(
@@ -54,7 +54,7 @@ export interface IRootDropTargetHost {
      *
      * Read lazily, never at construction: module services are created in
      * registration order, and this one is built before any module that could
-     * provide the affordance — so at construction the answer is always `false`,
+     * provide the affordance, so at construction the answer is always `false`,
      * even when the affordance is on its way. The module's `init` hook
      * re-applies the options once every service exists.
      */

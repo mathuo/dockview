@@ -20,10 +20,9 @@ class TestPanel implements IContentRenderer {
 
 /**
  * Docking a dragged panel to a layout edge is an AutoEdgeGroup (enterprise)
- * feature — `features.mdx` ticks only the Enterprise column. Core used to carry
- * a single-band fallback that performed the dock whenever the module was
- * absent, which handed the feature to free builds; these tests pin the tier
- * boundary so it can't come back.
+ * feature: `features.mdx` ticks only the Enterprise column. These tests pin the
+ * tier boundary so core can't hand the feature to free builds through a
+ * single-band fallback that performs the dock whenever the module is absent.
  *
  * `AllModules` is core-only, so this file always runs as a free build: the
  * enterprise modules self-register on import of `dockview-enterprise`, which
@@ -38,7 +37,7 @@ describe('dockToEdgeGroups is enterprise-only', () => {
     let dockview: DockviewComponent;
     const built: DockviewComponent[] = [];
 
-    /** A component with only core modules — i.e. the free package. */
+    /** A component with only core modules, i.e. the free package. */
     function freeDockview(
         options: Partial<DockviewComponentOptions>
     ): DockviewComponent {
@@ -74,8 +73,8 @@ describe('dockToEdgeGroups is enterprise-only', () => {
     /**
      * The resolved edge activation band, read off the drop target the service
      * built. Reaches through privates deliberately: the band is not exposed
-     * anywhere public, and the alternative — simulating dragover at a measured
-     * offset — would assert the same thing through far more machinery.
+     * anywhere public, and the alternative (simulating dragover at a measured
+     * offset) would assert the same thing through far more machinery.
      */
     function bandActivationSize(dv: DockviewComponent): number | undefined {
         const svc = (dv as never as { _rootDropTargetService: unknown })
@@ -111,7 +110,7 @@ describe('dockToEdgeGroups is enterprise-only', () => {
         ).toEqual([]);
     });
 
-    test('the panel is still moved — the drop degrades, it does not vanish', () => {
+    test('the panel is still moved; the drop degrades, it does not vanish', () => {
         const a = dockview.addPanel({ id: 'a', component: 'default' });
         dockview.addPanel({ id: 'b', component: 'default' });
 
@@ -123,12 +122,12 @@ describe('dockToEdgeGroups is enterprise-only', () => {
     test('the option does not widen the edge activation band', () => {
         // The widened band exists to fit the affordance's outer "dock as edge
         // group" sub-band. With no affordance nothing consumes it, so widening
-        // would only enlarge the plain grid-split trigger — a bigger target for
+        // would only enlarge the plain grid-split trigger, a bigger target for
         // behaviour the default band already gives.
         //
         // Pinned to the concrete default rather than compared against a second
         // free build: two builds agreeing proves nothing if the band ever
-        // resolves to undefined. 32 is the widened value this must never be —
+        // resolves to undefined. 32 is the widened value this must never be;
         // see the enterprise-side edgeDragRevealBand spec for the positive.
         expect(bandActivationSize(dockview)).toBe(DEFAULT_ACTIVATION);
         expect(
@@ -138,7 +137,7 @@ describe('dockToEdgeGroups is enterprise-only', () => {
 
     test('setting the option reports the missing module', () => {
         // The option is inert here, so the diagnostic is the only thing telling
-        // the user why — see optionsModules.ts.
+        // the user why; see optionsModules.ts.
         const messages = (console.error as jest.Mock).mock.calls.map(
             (c) => c[0] as string
         );

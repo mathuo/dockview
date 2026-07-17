@@ -1,6 +1,6 @@
 // Deep-imports a dockview-core internal on purpose. `ENTERPRISE_MODULE_NAMES`
-// is not part of core's public API — core holds it only to word its own
-// missing-module messages — and widening the published surface just to make it
+// is not part of core's public API; core holds it only to word its own
+// missing-module messages, and widening the published surface just to make it
 // testable would be a worse trade than this one test-only reach. Specs are
 // excluded from the tsc build (see tsconfig `exclude`), so this path never
 // ships.
@@ -17,7 +17,7 @@ import { Modules } from '../index';
  * Drift is not a cosmetic problem: an enterprise module missing from the set
  * degrades its error from "npm install dockview-enterprise" to a bare "not
  * registered", which is exactly the uninformative failure the message exists to
- * prevent — and it would only surface to a user who doesn't have the package.
+ * prevent, and it would only surface to a user who doesn't have the package.
  * This test is the only thing holding the two in sync.
  */
 describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
@@ -40,7 +40,7 @@ describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
             .sort();
 
         // If this fails: a module was renamed or moved to core (free), and
-        // ENTERPRISE_MODULE_NAMES still claims it's paid — users would be told
+        // ENTERPRISE_MODULE_NAMES still claims it's paid, so users would be told
         // to install a package they don't need.
         expect(stale).toEqual([]);
     });
@@ -48,7 +48,7 @@ describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
 
 /**
  * The second half of the same problem. `OPTION_MODULE_RULES` in core says which
- * option needs which module; it is hand-written, and core cannot derive it —
+ * option needs which module; it is hand-written, and core cannot derive it:
  * it can't import the modules it might be missing. So an enterprise option can
  * be added with no rule, and it fails *silently*: the free user sets it, nothing
  * happens, nothing is logged. `keyboardNavigation` shipped exactly that way.
@@ -59,8 +59,8 @@ describe('ENTERPRISE_MODULE_NAMES mirrors dockview-enterprise', () => {
  * Know what this does *not* buy you: coverage is measured against the
  * declaration, which is itself hand-written. An option added with **neither** a
  * declaration nor a rule passes both tests and stays just as silent. This
- * narrows the manual step to one place — next to the module that knows the
- * answer — rather than eliminating it. Adding an option to a module means adding
+ * narrows the manual step to one place, next to the module that knows the
+ * answer, rather than eliminating it. Adding an option to a module means adding
  * it to `options` too, and nothing here will remind you.
  */
 describe('OPTION_MODULE_RULES covers every gated enterprise option', () => {
@@ -100,7 +100,7 @@ describe('OPTION_MODULE_RULES covers every gated enterprise option', () => {
             .sort();
 
         // If this fails: core demands a module for an option the module doesn't
-        // own — the `dockToEdgeGroups` class of bug, where the wrong module gets
+        // own: the `dockToEdgeGroups` class of bug, where the wrong module gets
         // named (or a free feature gets billed as paid).
         expect(unclaimed).toEqual([]);
     });

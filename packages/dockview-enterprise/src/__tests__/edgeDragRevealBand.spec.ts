@@ -19,7 +19,7 @@ class TestPanel implements IContentRenderer {
  * trigger for a feature they don't have.
  *
  * The gate has a trap: `RootDropTargetService` resolves the band in its own
- * constructor, during module initialisation — and core's modules initialise
+ * constructor, during module initialisation, and core's modules initialise
  * before this package's, so at that moment `hasEdgeDragReveal` is *always*
  * false, however the component is configured. A naive gate would therefore
  * collapse the band to the default for paying users too. Core defers the

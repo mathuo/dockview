@@ -1111,11 +1111,11 @@ export class DockviewComponent
 
         // No `dockToEdgeGroups` handling here: docking a dragged panel to an
         // edge is an AutoEdgeGroup (enterprise) feature, and that module owns
-        // edge-drop routing entirely — it preempts its outer "dock as edge
+        // edge-drop routing entirely: it preempts its outer "dock as edge
         // group" band via `onWillDrop.preventDefault` above and lets the inner
         // "split the grid" band fall through to the move below. Without the
         // module a root-edge drop splits the grid, exactly as when the option
-        // is unset — the option's only other effect, widening the activation
+        // is unset; the option's only other effect, widening the activation
         // band, is gated on the same service (see rootDropTargetService).
 
         if (data) {
@@ -1194,7 +1194,7 @@ export class DockviewComponent
 
     /**
      * Whether the two-band edge drag-reveal affordance is registered. See
-     * {@link IRootDropTargetHost.hasEdgeDragReveal} — must not be read during
+     * {@link IRootDropTargetHost.hasEdgeDragReveal}; must not be read during
      * module initialisation, only from `init`/postConstruct onwards.
      */
     get hasEdgeDragReveal(): boolean {
@@ -1417,7 +1417,7 @@ export class DockviewComponent
      * Pin/unpin a panel's tab. The single gated entry point behind
      * `panel.api.setPinned`. Dormant unless `pinnedTabs.enabled` is set (a
      * silent no-op), and a silent no-op when the PinnedTabs module is not
-     * registered — reaching past the `enabled` check means the option was set,
+     * registered: reaching past the `enabled` check means the option was set,
      * so the option rule has already named the missing module. When active it
      * mutates the panel's pinned flag (which fires
      * `panel.api.onDidChangePinned`) and the component-level
@@ -2907,7 +2907,7 @@ export class DockviewComponent
         if (!service) {
             // Throws rather than degrading to a no-op like every other module
             // entry point: the return type is non-optional, so there is no
-            // group to hand back. Not routed through assertModule — that would
+            // group to hand back. Not routed through assertModule: that would
             // log and then throw, reporting the same problem twice.
             throw new Error(
                 missingModuleMessage('EdgeGroup', 'api.addEdgeGroup')

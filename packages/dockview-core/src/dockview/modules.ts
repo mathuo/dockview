@@ -70,7 +70,7 @@ export interface DockviewModule<THost = unknown> {
     dependsOn?: DockviewModule<any>[];
     /**
      * Top-level option keys that must report *this* module when it isn't
-     * registered — the module's half of the contract with core's
+     * registered: the module's half of the contract with core's
      * `OPTION_MODULE_RULES`, which core cannot derive because it can't import
      * the modules it might be missing.
      *
@@ -83,7 +83,7 @@ export interface DockviewModule<THost = unknown> {
      * Options this module merely *reads* don't belong here: `edgeGroupPeek` only
      * tunes `autoHideEdgeGroups` and is inert alone, and where one opt-in gates
      * two modules in the same package (`keyboardNavigation`) only the module the
-     * message should name declares it — one mistake, one message.
+     * message should name declares it: one mistake, one message.
      */
     options?: string[];
 }
@@ -160,14 +160,14 @@ export function _resetMissingModuleWarnings(): void {
  * Builds the text for a module that a caller needed but which isn't
  * registered. `reason` describes what the user did to need it (an option they
  * set, an api method they called) and is quoted verbatim. Pass several when one
- * module is needed for several reasons at once — a single message listing them
+ * module is needed for several reasons at once: a single message listing them
  * beats one message per reason each repeating the same install instructions.
  *
  * Exported so the rare caller that must throw (see `assertModule`) can raise
  * the same message rather than a thinner second one.
  *
  * Enterprise modules get the install/import fix inline, because importing
- * `dockview-enterprise` self-registers every enterprise module — there is no
+ * `dockview-enterprise` self-registers every enterprise module, so there is no
  * separate `registerModules` step for the user to get wrong.
  */
 export function missingModuleMessage(
@@ -216,7 +216,7 @@ export function logMissingModule(
  * don't crash in production.
  *
  * The one exception is an entry point that must return a value it cannot
- * synthesise — `addEdgeGroup(): DockviewGroupPanelApi` has no group to hand
+ * synthesise: `addEdgeGroup(): DockviewGroupPanelApi` has no group to hand
  * back and no `undefined` in its return type, so it throws
  * `missingModuleMessage(...)` directly instead of calling this. Don't route
  * such a caller through here: it would log *and* throw, reporting twice.
@@ -234,8 +234,8 @@ export function logMissingModule(
  *    (`clearHistory()` on an absent history has genuinely nothing to do).
  *
  * 2. **Only if the option rule can't already have fired.** A command reachable
- *    without its gating option — `api.undo()` works on a component that never
- *    set `layoutHistory` — needs this, because no rule will have run. A command
+ *    without its gating option (`api.undo()` works on a component that never
+ *    set `layoutHistory`) needs this, because no rule will have run. A command
  *    that can't be reached until the option is set doesn't: `setPanelPinned`
  *    returns early unless `pinnedTabs.enabled`, so by the time it could warn,
  *    the option rule has already named the same module. Guarding it too would
@@ -244,12 +244,12 @@ export function logMissingModule(
  * Rule 2 tolerates one overlap: setting `layoutHistory.enabled` *and* calling
  * `api.undo()` without the module reports both, since the reasons differ and
  * dedup is per module+reason. That's the price of covering the far more likely
- * case — calling `undo()` having never set the option at all.
+ * case: calling `undo()` having never set the option at all.
  *
  * Interaction handlers are queries in this sense too: a right-click reaching an
  * absent ContextMenu module means the app never asked for one, so it stays
  * silent (`?.`) and the browser's own menu shows. Options are where intent is
- * declared — see `optionsModules.ts`.
+ * declared; see `optionsModules.ts`.
  */
 export function assertModule<T>(
     service: T | undefined,

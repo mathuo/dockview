@@ -4,7 +4,7 @@
  * silently doing nothing.
  *
  * This is the "declared intent" diagnostic. It fires when the user asks for a
- * feature via options — at construction and on every `updateOptions`. It
+ * feature via options, at construction and on every `updateOptions`. It
  * deliberately does *not* fire on user interaction: right-clicking without the
  * ContextMenu module stays silent (the browser's own menu shows), because the
  * `?.` service-slot call sites can't tell a missing module from a feature the
@@ -26,12 +26,10 @@
  * so naming the right module is the only thing you have to get right here.
  *
  * The one trap is picking the module. Don't infer it from what core does at
- * runtime: core may carry a fallback that hands a paid feature to free builds,
- * and reading that as "the option is free" turns one bug into two. Pick the
- * module that *implements the documented feature*; if core also does it, that's
- * a leak to fix in core, not a reason to drop the rule. `dockToEdgeGroups` was
- * the cautionary case: core once carried a single-band fallback that made it
- * look free, and the fix was to remove the fallback, not to weaken this rule.
+ * runtime: a core fallback that hands a paid feature to free builds would read
+ * as "the option is free" and turn one bug into two. Pick the module that
+ * *implements the documented feature*; if core also does it, that is a leak to
+ * fix in core, not a reason to drop the rule.
  */
 
 import { logMissingModule } from './modules';
@@ -47,7 +45,7 @@ export interface OptionModuleRule {
      */
     optionKey: keyof DockviewComponentOptions;
     /**
-     * How the user expressed intent, quoted verbatim into the message — name
+     * How the user expressed intent, quoted verbatim into the message. Name
      * the exact option path and value, e.g. `overflow.mode: 'wrap'`.
      */
     reason: string;
@@ -55,7 +53,7 @@ export interface OptionModuleRule {
     moduleName: string;
     /**
      * Whether `options` requests the feature. Receives the options the caller
-     * passed, never the merged set — every key of `DockviewOptions` is present
+     * passed, never the merged set: every key of `DockviewOptions` is present
      * (as `undefined`) on the merged object, so a presence test there is always
      * true. An option left out, `undefined`, or explicitly disabled must return
      * false: silence is correct for a feature nobody asked for.
@@ -122,7 +120,7 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         reason: 'autoHideEdgeGroups',
         moduleName: 'AutoHideEdgeGroup',
         // Without the module a collapsed edge group renders an empty strip and
-        // can't be pinned back — the activators are the module's whole job, so
+        // can't be pinned back; the activators are the module's whole job, so
         // core has no fallback here.
         when: (o) => isAnyEdgeGroupEnabled(o.autoHideEdgeGroups),
     },
@@ -133,8 +131,8 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         moduleName: 'AutoEdgeGroup',
         // Dock-to-edge is a paid feature end to end: features.mdx ticks only
         // the Enterprise column and autoEdgeGroups.mdx is `enterprise: true`.
-        // Core implements no part of it — its edge-drop handler always splits
-        // the grid, and the widened activation band is gated on the service —
+        // Core implements no part of it: its edge-drop handler always splits
+        // the grid, and the widened activation band is gated on the service,
         // so without the module the option is inert and this is the only thing
         // that says so.
         when: (o) => isAnyEdgeGroupEnabled(o.dockToEdgeGroups),
@@ -167,7 +165,7 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         reason: 'dndGuide',
         moduleName: 'DropGuide',
         // Truthiness, not presence: `dndGuide` is `boolean | {...}`, so a
-        // `!= null` test would fire on `dndGuide: false` — billing a user for
+        // `!= null` test would fire on `dndGuide: false`, billing a user for
         // turning the compass off.
         when: (o) => !!o.dndGuide,
     },
@@ -175,7 +173,7 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         optionKey: 'keyboardNavigation',
         reason: 'keyboardNavigation',
         moduleName: 'KeyboardNavigation',
-        // Any truthy value opts in (`true` or an options object) — mirrors
+        // Any truthy value opts in (`true` or an options object), mirroring
         // `readKeyboardNavigation` in the enterprise keyboard modules. Baseline
         // a11y (ARIA, within-strip arrow keys, live region, focus indicators)
         // is free and needs no option; this opt-in buys layout-level keyboard
@@ -197,7 +195,7 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
  * instructions twice. Logging is deduplicated per module+reasons (see
  * `logMissingModule`), so re-validating on every `updateOptions` stays quiet.
  *
- * Pass the options the caller supplied, not the merged set — see
+ * Pass the options the caller supplied, not the merged set; see
  * {@link OptionModuleRule.when}.
  */
 export function validateOptionModules(
