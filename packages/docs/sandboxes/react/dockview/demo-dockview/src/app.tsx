@@ -423,6 +423,56 @@ const PopoutMenuItem = ({
     );
 };
 
+type TabOverflowMode = 'dropdown' | 'wrap';
+
+interface TabModeMenuItemProps {
+    mode: TabOverflowMode;
+    active: boolean;
+    onSelect: (mode: TabOverflowMode) => void;
+}
+
+const TAB_MODE_LABELS: Record<TabOverflowMode, string> = {
+    dropdown: 'Overflow dropdown',
+    wrap: 'Wrap onto rows',
+};
+
+/**
+ * Radio-style item for `overflow.mode`. `updateOptions` re-applies wrap to every
+ * group, so the two modes can be swapped while the dock is live; the tick marks
+ * whichever is currently active.
+ */
+const TabModeMenuItem = ({
+    close,
+    componentProps,
+}: IContextMenuItemComponentProps) => {
+    const { mode, active, onSelect } = componentProps as TabModeMenuItemProps;
+
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                onSelect(mode);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+        >
+            {TAB_MODE_LABELS[mode]}
+            {/* Kept mounted (not conditionally rendered) so the reserved space
+                stops the menu width changing as the tick moves between modes. */}
+            <span
+                className="material-symbols-outlined"
+                style={{
+                    fontSize: '14px',
+                    marginLeft: 'auto',
+                    visibility: active ? 'visible' : 'hidden',
+                }}
+            >
+                check
+            </span>
+        </div>
+    );
+};
+
 const colors = [
     'rgba(255,0,0,0.2)',
     'rgba(0,255,0,0.2)',
@@ -735,6 +785,17 @@ const DockviewDemo = (props: {
         return () => window.clearTimeout(handle);
     }, [effectiveTheme.colorScheme]);
 
+    const [tabOverflowMode, setTabOverflowMode] =
+        React.useState<TabOverflowMode>('dropdown');
+
+    // `'wrap'` needs the MultiRowTabsModule, which the `dockview-enterprise`
+    // import above registers. Memoized so the prop only reaches `updateOptions`
+    // when the mode actually changes.
+    const overflow = React.useMemo(
+        () => ({ mode: tabOverflowMode }),
+        [tabOverflowMode]
+    );
+
     const getTabContextMenuItems = React.useCallback(
         ({ panel, group }: GetTabContextMenuItemsParams) => {
             const items: (
@@ -746,10 +807,14 @@ const DockviewDemo = (props: {
                 | 'maximize'
                 | 'separator'
                 | 'pin'
-                | { component: React.FC<IContextMenuItemComponentProps> }
+                | {
+                      component: React.FC<IContextMenuItemComponentProps>;
+                      componentProps?: object;
+                  }
                 | { label: string; action: () => void }
             )[] = [
-                'pin',
+                // No 'pin' here: `pinnedTabs.enabled` makes the context menu
+                // module inject Pin/Unpin at the top of the list already.
                 'separator',
                 'close',
                 'closeOthers',
@@ -758,6 +823,17 @@ const DockviewDemo = (props: {
                 'closeRight',
                 'separator',
                 'maximize',
+                'separator',
+                // Switches `overflow.mode` between the single-row strip + chevron
+                // dropdown and multi-row wrapping tabs.
+                ...(['dropdown', 'wrap'] as TabOverflowMode[]).map((mode) => ({
+                    component: TabModeMenuItem,
+                    componentProps: {
+                        mode,
+                        active: tabOverflowMode === mode,
+                        onSelect: setTabOverflowMode,
+                    } satisfies TabModeMenuItemProps,
+                })),
                 'separator',
                 // Float / popout are shown here as custom component items (with
                 // icons); the `'float'` and `'popout'` built-in shortcuts do the
@@ -821,7 +897,7 @@ const DockviewDemo = (props: {
 
             return items;
         },
-        [api]
+        [api, tabOverflowMode]
     );
 
     const getTabGroupChipContextMenuItems = React.useCallback(
@@ -960,6 +1036,7 @@ const DockviewDemo = (props: {
                                             autoHideEdgeGroups
                                             dockToEdgeGroups
                                             pinnedTabs={{ enabled: true }}
+                                            overflow={overflow}
                                             floatingGroupDragHandle="titlebar"
                                             dndGuide={true}
                                             smartGuides={{ snapDistance: 8 }}
