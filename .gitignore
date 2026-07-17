@@ -25,3 +25,11 @@ playwright/.cache/
 
 # Vite writes a transient bundled config next to vite.config.ts
 *.timestamp-*.mjs
+
+# Claude Code local state (machine-local settings + full worktree checkouts)
+.claude/settings.local.json
+.claude/worktrees/
+
+# Generated demo-recorder output (the recorder tooling itself is tracked)
+scripts/record/out/
+packages/docs/scripts/record/out/

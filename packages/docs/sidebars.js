@@ -25,6 +25,7 @@ const sidebars = {
                 'overview/features',
                 'overview/quickstart',
                 'overview/installation',
+                'overview/enterprise-setup',
                 {
                     type: 'link',
                     label: "What's new",

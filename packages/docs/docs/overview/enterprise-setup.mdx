@@ -1,0 +1,77 @@
+---
+id: enterprise-setup
+title: Enterprise setup
+sidebar_position: 5
+description: How to install dockview-enterprise and apply a licence key.
+---
+
+The enterprise features (pinned tabs, multi-row and wrapping tabs, the drop-guide
+compass, smart guides, layout history, edge-group docking, context menus, and
+layout keyboard operability) ship in a separate package, `dockview-enterprise`,
+and are unlocked with a licence key. This page covers installing the package and
+applying your key. For the full list of what is free and what is enterprise, see
+[Licensing](/docs/overview/features).
+
+## Install
+
+`dockview-enterprise` is a drop-in superset of the free `dockview` package: it
+re-exports the whole `dockview` API and adds the enterprise features. Importing
+it registers those features for every dockview instance in your app.
+
+### JavaScript
+
+Install `dockview-enterprise` **instead of** `dockview` (not alongside it), and
+import from it wherever you would have imported from `dockview`:
+
+```sh
+npm install dockview-enterprise
+```
+
+The stylesheet is unchanged; the styles live in the core package that
+`dockview-enterprise` re-exports:
+
+```css
+@import 'dockview/dist/styles/dockview.css';
+```
+
+### React, Vue, or Angular
+
+Keep installing and importing your components from the framework binding
+(`dockview-react`, `dockview-vue`, or `dockview-angular`), and add
+`dockview-enterprise` next to it:
+
+```sh
+npm install dockview-enterprise
+```
+
+Then add a one-line side-effect import once, anywhere that runs at start-up
+(your entry point is a good place), to activate the enterprise features:
+
+```ts
+import 'dockview-enterprise';
+```
+
+## Apply your licence key
+
+Set your key once, before creating any dockview instance:
+
+```ts
+import { LicenseManager } from 'dockview-enterprise';
+
+LicenseManager.setLicenseKey('your-license-key');
+```
+
+That is the whole setup. With the package imported, the enterprise options become
+available on every `DockviewComponent`, and the key clears the watermark.
+
+## Running without a key
+
+The enterprise features never lock your app out. If no key is set, or the key is
+invalid or expired, dockview draws a small watermark in a corner and logs a single
+console message; every feature keeps working. Setting a valid key removes the
+watermark.
+
+## Getting a key
+
+[Start a free trial](/trial) for a short-dated key, or see
+[Licensing](/docs/overview/features) for plans and to buy.
