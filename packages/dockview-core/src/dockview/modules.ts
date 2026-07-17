@@ -176,8 +176,9 @@ export function missingModuleMessage(
 ): string {
     const reasons = reason === undefined ? [] : ([] as string[]).concat(reason);
     const quoted = reasons.map((r) => `\`${r}\``).join(', ');
+    const requires = reasons.length > 1 ? 'require' : 'requires';
     const needed = reasons.length
-        ? `${quoted} require${reasons.length > 1 ? '' : 's'} the "${moduleName}" module`
+        ? `${quoted} ${requires} the "${moduleName}" module`
         : `The "${moduleName}" module is required`;
 
     if (ENTERPRISE_MODULE_NAMES.has(moduleName)) {
