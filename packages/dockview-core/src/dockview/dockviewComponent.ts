@@ -3037,24 +3037,33 @@ export class DockviewComponent
         return this._edgeGroupService?.get(position);
     }
 
-    /** Pin (expand) the edge group at a position; auto-hide module feature. */
+    /** Pin (expand) the edge group at a position. Reports the missing module if
+     *  AutoHideEdgeGroup is absent, since this command is reachable without the
+     *  `autoHideEdgeGroups` option that would otherwise have named it. */
     pinEdgeGroup(position: EdgeGroupPosition): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.pin(position);
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.pinEdgeGroup'
+        )?.pin(position);
     }
 
     /** Auto-hide (collapse to strip) the edge group at a position. */
     autoHideEdgeGroup(position: EdgeGroupPosition): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.autoHide(
-            position
-        );
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.autoHideEdgeGroup'
+        )?.autoHide(position);
     }
 
     /** Peek (slide out) / close the collapsed edge group at a position. */
     peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.peek(
-            position,
-            peek
-        );
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.peekEdgeGroup'
+        )?.peek(position, peek);
     }
 
     /** The auto-hide peek mounts on the shell, the same element the
