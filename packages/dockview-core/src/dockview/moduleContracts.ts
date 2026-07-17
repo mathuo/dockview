@@ -489,9 +489,11 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
  * `onWillDrop` seams (no new core overlay code): on a layout-edge drag it
  * classifies the pointer into an outer "dock as edge group" band and an inner
  * "split the grid" band, drawing its own outer-band highlight and routing an
- * outer-band drop to `revealEdgeGroupWithData`. The presence of this service
- * also disables core's single-band `dockToEdgeGroups` fallback so the inner band
- * falls through to the default grid split.
+ * outer-band drop to `revealEdgeGroupWithData`. The inner band falls through to
+ * core's default grid split.
+ *
+ * This service is what makes `dockToEdgeGroups` do anything: core implements no
+ * part of it, and gates the widened activation band on this service's presence.
  */
 export interface IAutoEdgeGroupHost {
     readonly options: DockviewComponentOptions;

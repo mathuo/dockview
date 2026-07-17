@@ -609,10 +609,12 @@ export interface DockviewOptions {
      * panel leaves.
      *
      * A per-edge set: `true` enables dock-to-edge on all four edges, or name
-     * edges individually. Requires both the `RootDropTarget` (drag overlays)
-     * and `EdgeGroup` modules; a no-op if either is absent. Distinct from
-     * `dndEdges`, which only shapes the outer drop overlay (and still splits
-     * the grid). Off by default.
+     * edges individually. Off by default.
+     *
+     * Requires the `AutoEdgeGroup` module (and the `EdgeGroup` module it builds
+     * on); a no-op if absent, where a root-edge drop splits the grid as usual.
+     * Distinct from `dndEdges`, which only shapes the outer drop overlay (and
+     * still splits the grid).
      */
     dockToEdgeGroups?: EdgeGroupSet;
     /**

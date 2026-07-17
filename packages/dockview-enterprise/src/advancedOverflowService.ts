@@ -442,6 +442,7 @@ export const AdvancedOverflowModule = defineModule<
     IAdvancedOverflowHost
 >({
     name: 'AdvancedOverflow',
+    options: ['overflow'],
     serviceKey: 'advancedOverflowService',
     create: (host) => new AdvancedOverflowService(host),
     init: (host, service) => {

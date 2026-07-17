@@ -85,8 +85,10 @@ import {
     assertModule,
     DockviewModule,
     getRegisteredModules,
+    missingModuleMessage,
     ModuleRegistry,
 } from './modules';
+import { validateOptionModules } from './optionsModules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost, PopoutGroupEntry } from './popoutWindowService';
@@ -883,12 +885,20 @@ export class DockviewComponent
 
     /** Toggle Smart Guides snapping at runtime (no-op if the module is absent). */
     setSmartGuidesEnabled(enabled: boolean): void {
-        this._smartGuidesService?.setEnabled(enabled);
+        assertModule(
+            this._smartGuidesService,
+            'SmartGuides',
+            'api.setSmartGuidesEnabled'
+        )?.setEnabled(enabled);
     }
 
     /** Merge a partial Smart Guides option override in at runtime. */
     updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
-        this._smartGuidesService?.updateOptions(options);
+        assertModule(
+            this._smartGuidesService,
+            'SmartGuides',
+            'api.updateSmartGuidesOptions'
+        )?.updateOptions(options);
     }
 
     /** Fires when a dragged float commits an alignment snap on drop. */
@@ -1099,25 +1109,14 @@ export class DockviewComponent
 
         const data = getPanelData();
 
-        if (
-            data &&
-            position !== 'center' &&
-            isEdgeGroupEnabled(
-                this.options.dockToEdgeGroups,
-                position as EdgeGroupPosition
-            ) &&
-            this._edgeGroupService &&
-            !this._moduleRegistry.services.autoEdgeGroupService
-        ) {
-            // `dockToEdgeGroups` baseline (single band): a root-edge drop reveals
-            // an edge group instead of splitting the grid. When the two-band
-            // drag-reveal affordance is registered it owns edge-drop routing:
-            // it preempts the outer band via `onWillDrop.preventDefault` and lets
-            // the inner band fall through here to the default grid split, so
-            // this single-band fallback is disabled.
-            this.revealEdgeGroupWithData(position, data);
-            return;
-        }
+        // No `dockToEdgeGroups` handling here: docking a dragged panel to an
+        // edge is an AutoEdgeGroup (enterprise) feature, and that module owns
+        // edge-drop routing entirely: it preempts its outer "dock as edge
+        // group" band via `onWillDrop.preventDefault` above and lets the inner
+        // "split the grid" band fall through to the move below. Without the
+        // module a root-edge drop splits the grid, exactly as when the option
+        // is unset; the option's only other effect, widening the activation
+        // band, is gated on the same service (see rootDropTargetService).
 
         if (data) {
             this.moveGroupOrPanel({
@@ -1157,12 +1156,20 @@ export class DockviewComponent
     /** Undo the previous recorded layout mutation (no-op if nothing to undo or
      *  the LayoutHistory module is absent). Requires `layoutHistory.enabled`. */
     undo(): void {
-        this._layoutHistoryService?.undo();
+        assertModule(
+            this._layoutHistoryService,
+            'LayoutHistory',
+            'api.undo'
+        )?.undo();
     }
 
     /** Re-apply the next layout mutation (no-op if nothing to redo). */
     redo(): void {
-        this._layoutHistoryService?.redo();
+        assertModule(
+            this._layoutHistoryService,
+            'LayoutHistory',
+            'api.redo'
+        )?.redo();
     }
 
     get canUndo(): boolean {
@@ -1183,6 +1190,15 @@ export class DockviewComponent
             this._layoutHistoryService?.onDidChangeHistory ??
             NO_LAYOUT_HISTORY_CHANGES
         );
+    }
+
+    /**
+     * Whether the two-band edge drag-reveal affordance is registered. See
+     * {@link IRootDropTargetHost.hasEdgeDragReveal}; must not be read during
+     * module initialisation, only from `init`/postConstruct onwards.
+     */
+    get hasEdgeDragReveal(): boolean {
+        return !!this._moduleRegistry.services.autoEdgeGroupService;
     }
 
     isGridEmpty(): boolean {
@@ -1400,8 +1416,10 @@ export class DockviewComponent
     /**
      * Pin/unpin a panel's tab. The single gated entry point behind
      * `panel.api.setPinned`. Dormant unless `pinnedTabs.enabled` is set (a
-     * silent no-op), and a warn-once no-op when the PinnedTabs module is not
-     * registered. When active it mutates the panel's pinned flag (which fires
+     * silent no-op), and a silent no-op when the PinnedTabs module is not
+     * registered: reaching past the `enabled` check means the option was set,
+     * so the option rule has already named the missing module. When active it
+     * mutates the panel's pinned flag (which fires
      * `panel.api.onDidChangePinned`) and the component-level
      * `onDidPanelPinnedChange`; the module reacts to enforce pinned-first
      * ordering.
@@ -1416,11 +1434,12 @@ export class DockviewComponent
             return;
         }
 
-        const service = assertModule(
-            this.pinnedTabsService,
-            'PinnedTabs',
-            'setPinned'
-        );
+        // Not routed through assertModule: reaching here means
+        // `pinnedTabs.enabled` is set, so the option rule in optionsModules.ts
+        // has already reported the missing module at construction (or at the
+        // updateOptions that enabled it). Warning again here would report the
+        // same module twice for one mistake.
+        const service = this.pinnedTabsService;
         if (!service) {
             return;
         }
@@ -1483,6 +1502,8 @@ export class DockviewComponent
             this._moduleRegistry.register(module);
         }
         this._moduleRegistry.initialize(this);
+
+        this.reportMissingOptionModules(options);
 
         // Surface popout removal symmetrically with `onDidAddPopoutGroup`. The
         // service is the single point every removal path funnels through, both
@@ -2763,6 +2784,11 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
+        // Validate what the caller passed, not the merged result: every key of
+        // DockviewOptions is present (as `undefined`) on `this.options`, so a
+        // presence test there would fire for every rule.
+        this.reportMissingOptionModules(options);
+
         this._floatingGroupService?.updateBounds(options);
 
         this._rootDropTargetService?.setOptions(options);
@@ -2815,6 +2841,19 @@ export class DockviewComponent
         this._layoutFromShell(this.gridview.width, this.gridview.height);
     }
 
+    /**
+     * Report any option the caller set whose module isn't registered. Logs
+     * once per module+reason; never throws, matching the module system's
+     * degrade-to-no-op contract.
+     */
+    private reportMissingOptionModules(
+        options: Partial<DockviewComponentOptions>
+    ): void {
+        validateOptionModules(options, (moduleName) =>
+            this._moduleRegistry.has(moduleName)
+        );
+    }
+
     override layout(
         width: number,
         height: number,
@@ -2864,13 +2903,15 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi {
-        const service = assertModule(
-            this._edgeGroupService,
-            'EdgeGroup',
-            'api.addEdgeGroup'
-        );
+        const service = this._edgeGroupService;
         if (!service) {
-            throw new Error(`dockview: EdgeGroup module is not registered`);
+            // Throws rather than degrading to a no-op like every other module
+            // entry point: the return type is non-optional, so there is no
+            // group to hand back. Not routed through assertModule: that would
+            // log and then throw, reporting the same problem twice.
+            throw new Error(
+                missingModuleMessage('EdgeGroup', 'api.addEdgeGroup')
+            );
         }
         if (service.has(position)) {
             throw new Error(
@@ -2935,8 +2976,8 @@ export class DockviewComponent
      * (never re-created; `addEdgeGroup` throws on a duplicate position). No-op if
      * the EdgeGroup module is absent.
      *
-     * This is the primitive behind the dock-to-edge groups; the two-band
-     * drag-reveal affordance and the `dockToEdgeGroups` baseline both route here.
+     * This is the primitive behind the dock-to-edge groups: the two-band
+     * drag-reveal affordance routes its outer-band drops here.
      */
     revealEdgeGroupWithData(
         position: EdgeGroupPosition,
@@ -2996,24 +3037,33 @@ export class DockviewComponent
         return this._edgeGroupService?.get(position);
     }
 
-    /** Pin (expand) the edge group at a position; auto-hide module feature. */
+    /** Pin (expand) the edge group at a position. Reports the missing module if
+     *  AutoHideEdgeGroup is absent, since this command is reachable without the
+     *  `autoHideEdgeGroups` option that would otherwise have named it. */
     pinEdgeGroup(position: EdgeGroupPosition): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.pin(position);
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.pinEdgeGroup'
+        )?.pin(position);
     }
 
     /** Auto-hide (collapse to strip) the edge group at a position. */
     autoHideEdgeGroup(position: EdgeGroupPosition): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.autoHide(
-            position
-        );
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.autoHideEdgeGroup'
+        )?.autoHide(position);
     }
 
     /** Peek (slide out) / close the collapsed edge group at a position. */
     peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void {
-        this._moduleRegistry.services.autoHideEdgeGroupService?.peek(
-            position,
-            peek
-        );
+        assertModule(
+            this._moduleRegistry.services.autoHideEdgeGroupService,
+            'AutoHideEdgeGroup',
+            'api.peekEdgeGroup'
+        )?.peek(position, peek);
     }
 
     /** The auto-hide peek mounts on the shell, the same element the

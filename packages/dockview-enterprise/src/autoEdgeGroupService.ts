@@ -289,6 +289,7 @@ export const AutoEdgeGroupModule = defineModule<
     IAutoEdgeGroupHost
 >({
     name: 'AutoEdgeGroup',
+    options: ['dockToEdgeGroups'],
     serviceKey: 'autoEdgeGroupService',
     dependsOn: [EdgeGroupModule],
     create: (host) => new AutoEdgeGroupService(host),

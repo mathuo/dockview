@@ -735,6 +735,7 @@ export const AutoHideEdgeGroupModule = defineModule<
     IAutoHideEdgeGroupHost
 >({
     name: 'AutoHideEdgeGroup',
+    options: ['autoHideEdgeGroups'],
     serviceKey: 'autoHideEdgeGroupService',
     dependsOn: [EdgeGroupModule],
     create: (host) => new AutoHideEdgeGroupService(host),

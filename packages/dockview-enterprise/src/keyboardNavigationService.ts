@@ -368,6 +368,7 @@ export const KeyboardNavigationModule = defineModule<
     IKeyboardNavigationHost
 >({
     name: 'KeyboardNavigation',
+    options: ['keyboardNavigation'],
     serviceKey: 'keyboardNavigationService',
     create: (host) => new KeyboardNavigationService(host),
 });

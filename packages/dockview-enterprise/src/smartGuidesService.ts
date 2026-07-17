@@ -856,6 +856,7 @@ export const SmartGuidesModule = defineModule<
     ISmartGuidesHost
 >({
     name: 'SmartGuides',
+    options: ['smartGuides'],
     serviceKey: 'smartGuidesService',
     dependsOn: [FloatingGroupModule],
     create: (host) => new SmartGuidesService(host),
