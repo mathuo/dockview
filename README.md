@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="packages/docs/static/img/dockview-lockup-dark.svg">
-  <img src="packages/docs/static/img/dockview-lockup-light.svg" alt="Dockview" width="480">
+  <source media="(prefers-color-scheme: dark)" srcset="static/img/dockview-lockup-dark.svg">
+  <img src="static/img/dockview-lockup-light.svg" alt="Dockview" width="480">
 </picture>
 
 <h1>docking engine for the web</h1>
@@ -20,7 +20,7 @@
 
 ---
 
-![A Dockview layout showing docked, tabbed and split panels in a trading workbench](packages/docs/static/img/demo-hero.webp)
+![A Dockview layout showing docked, tabbed and split panels in a trading workbench](static/img/demo-hero.webp)
 
 Please see the website: https://dockview.dev
 

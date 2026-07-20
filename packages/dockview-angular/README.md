@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/dockview-lockup-dark.svg?raw=true">
-  <img src="https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/dockview-lockup-light.svg?raw=true" alt="Dockview" width="480">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/mathuo/dockview/blob/HEAD/static/img/dockview-lockup-dark.svg?raw=true">
+  <img src="https://github.com/mathuo/dockview/blob/HEAD/static/img/dockview-lockup-light.svg?raw=true" alt="Dockview" width="480">
 </picture>
 
 <h1>dockview-angular</h1>
@@ -20,7 +20,7 @@
 
 ---
 
-![A Dockview layout showing docked, tabbed and split panels in a trading workbench](https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/demo-hero.webp?raw=true)
+![A Dockview layout showing docked, tabbed and split panels in a trading workbench](https://github.com/mathuo/dockview/blob/HEAD/static/img/demo-hero.webp?raw=true)
 
 Please see the website: https://dockview.dev
 
