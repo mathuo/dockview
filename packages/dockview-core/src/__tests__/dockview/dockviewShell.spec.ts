@@ -792,4 +792,124 @@ describe('ShellManager', () => {
             shell.dispose();
         });
     });
+
+    describe('resize observer visibility guard (#1495)', () => {
+        // Reproduces #1495: a nested dockview whose `onlyWhenVisible` host
+        // panel is deactivated has its shell element hidden/detached, which
+        // fires a (0, 0) resize. Without a visibility guard that zero size is
+        // propagated to the edge-group splitview, clamping the edge group to
+        // its minimum size and losing the user's sizing.
+        let observerCallbacks: Array<(entries: any[]) => void>;
+        let rAFCallbacks: FrameRequestCallback[];
+        let originalResizeObserver: typeof window.ResizeObserver;
+
+        beforeEach(() => {
+            observerCallbacks = [];
+            rAFCallbacks = [];
+
+            originalResizeObserver = window.ResizeObserver;
+            (window as any).ResizeObserver = class {
+                constructor(cb: (entries: any[]) => void) {
+                    observerCallbacks.push(cb);
+                }
+                observe(): void {
+                    /* noop */
+                }
+                unobserve(): void {
+                    /* noop */
+                }
+                disconnect(): void {
+                    /* noop */
+                }
+            };
+
+            jest.spyOn(window, 'requestAnimationFrame').mockImplementation(
+                (cb) => {
+                    rAFCallbacks.push(cb);
+                    return rAFCallbacks.length;
+                }
+            );
+        });
+
+        afterEach(() => {
+            window.ResizeObserver = originalResizeObserver;
+            jest.restoreAllMocks();
+        });
+
+        function fireResize(width: number, height: number): void {
+            for (const cb of observerCallbacks) {
+                cb([{ contentRect: { width, height } }]);
+            }
+            const pending = [...rAFCallbacks];
+            rAFCallbacks = [];
+            for (const cb of pending) {
+                cb(performance.now());
+            }
+        }
+
+        function setVisible(shell: ShellManager, visible: boolean): void {
+            // jsdom does not compute offsetParent; drive it explicitly so the
+            // guard sees the shell as hidden (null) or visible (an element).
+            Object.defineProperty(shell.element, 'offsetParent', {
+                configurable: true,
+                get: () => (visible ? document.body : null),
+            });
+        }
+
+        // Build a shell with a real layout and an edge group sized to `size`
+        // (as an established sash drag would leave it), returning the shell.
+        function makeSizedShell(
+            position: 'left' | 'right',
+            size: number
+        ): ShellManager {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                layoutGrid
+            );
+            setVisible(shell, true);
+            fireResize(1000, 800);
+            shell.addEdgeView(position, { id: position }, makeGroup());
+            const splitview = (shell as any)._outerSplitview;
+            const index =
+                position === 'left'
+                    ? (shell as any)._leftIndex
+                    : (shell as any)._rightIndex;
+            splitview.resizeView(index, size);
+            return shell;
+        }
+
+        test('preserves the edge group size when the shell is hidden', () => {
+            const shell = makeSizedShell('right', 300);
+            expect(shell.toJSON().right!.size).toBe(300);
+
+            // Host panel deactivates: element hidden → (0, 0) resize fires.
+            setVisible(shell, false);
+            fireResize(0, 0);
+
+            // The size must be preserved, not clamped to the minimum.
+            expect(shell.toJSON().right!.size).toBe(300);
+
+            // Reactivating restores the same layout without any size change.
+            setVisible(shell, true);
+            fireResize(1000, 800);
+            expect(shell.toJSON().right!.size).toBe(300);
+
+            shell.dispose();
+        });
+
+        test('does not lay out at zero when detached from the document', () => {
+            const shell = makeSizedShell('left', 250);
+            expect(shell.toJSON().left!.size).toBe(250);
+
+            // offsetParent stays truthy but the element leaves the document —
+            // still a hidden/meaningless (0, 0) measurement.
+            shell.element.remove();
+            fireResize(0, 0);
+
+            expect(shell.toJSON().left!.size).toBe(250);
+
+            shell.dispose();
+        });
+    });
 });
