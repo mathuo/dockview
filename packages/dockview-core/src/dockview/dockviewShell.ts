@@ -6,7 +6,7 @@ import {
     Orientation,
     Splitview,
 } from '../splitview/splitview';
-import { watchElementResize } from '../dom';
+import { isInDocument, watchElementResize } from '../dom';
 
 export type EdgeGroupPosition = 'top' | 'bottom' | 'left' | 'right';
 
@@ -490,6 +490,28 @@ export class ShellManager implements IDisposable {
 
         this._disposables.addDisposables(
             watchElementResize(this._shellElement, (entry) => {
+                /**
+                 * When the shell (or an ancestor) becomes hidden — e.g. a
+                 * nested dockview whose `onlyWhenVisible` host panel is
+                 * deactivated — the element collapses to (0, 0) or is detached
+                 * from the DOM. Propagating that zero size would relayout the
+                 * edge-group splitview at 0, clamping the low-priority edge
+                 * groups down to their minimum size and destroying the user's
+                 * sizing. Skip these cases so sizes are preserved while hidden;
+                 * mirrors the guard in the `Resizable` base class. See #1495.
+                 *
+                 * offsetParent === null is equivalent to display: none on the
+                 * element or one of its ancestors.
+                 * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
+                 */
+                if (!this._shellElement.offsetParent) {
+                    return;
+                }
+
+                if (!isInDocument(this._shellElement)) {
+                    return;
+                }
+
                 const width = Math.round(entry.contentRect.width);
                 const height = Math.round(entry.contentRect.height);
                 if (
