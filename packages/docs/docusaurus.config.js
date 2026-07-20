@@ -51,6 +51,10 @@ const config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
+    // Serve both the docs-local `static` directory and the repository root
+    // `static` directory. Shared assets referenced from package READMEs live in
+    // the root `static/` so their links stay resilient to docs restructuring.
+    staticDirectories: ['static', path.resolve(__dirname, '../../static')],
     stylesheets: [
         {
             href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
