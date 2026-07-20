@@ -1654,20 +1654,33 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
-    // Regression test for #1410. A within-group tab-group move disposes the
+    // Regression tests for #1410. A within-group tab-group move disposes the
     // dragged chip's drag sources (`disposeChipDrag`) so the transfer
     // singleton is cleared synchronously — but, unlike a cross-group move,
     // the chip element itself survives the reorder. If the sources aren't
     // re-armed by the following `updateTabGroups()`, the chip keeps
     // `draggable=true` and fires a native `dragstart`, but no longer sets a
     // transfer payload — leaving the group undraggable after its first move.
-    test('within-group chip stays draggable after a move (#1410)', async () => {
+    //
+    // `setupTwoTabGroups` builds one group holding two tab groups (Feature +
+    // Monitoring), so relocating one is a within-group reorder, and returns
+    // the handles the tests drive the real commit path with.
+    async function setupTwoTabGroups(tabAnimation?: 'smooth' | 'default') {
         const container = document.createElement('div');
 
         const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 return new PanelContentPartTest(options.id, options.name);
             },
+            ...(tabAnimation
+                ? {
+                      theme: {
+                          name: 'test',
+                          className: 'test',
+                          tabAnimation,
+                      } as any,
+                  }
+                : {}),
         });
         dockview.layout(1000, 1000);
 
@@ -1675,8 +1688,6 @@ describe('dockviewComponent', () => {
             dockview.addPanel({ id: `panel${i}`, component: 'default' });
         }
 
-        // Both tab groups live in the same group, so relocating one is a
-        // within-group reorder (moveTabGroup), not a cross-group move.
         const group = dockview.getGroupPanel('panel1')!.group;
         const feature = group.model.createTabGroup({
             label: 'Feature',
@@ -1694,30 +1705,75 @@ describe('dockviewComponent', () => {
         // Chips are rendered on a microtask via _scheduleTabGroupUpdate.
         await Promise.resolve();
 
+        const tabs = (group.model.header as any).tabs;
+        const manager = tabs._tabGroupManager;
         const featureChip = group.element.querySelector(
             '.dv-tab-group-chip'
         ) as HTMLElement;
         expect(featureChip).toBeTruthy();
 
-        // First drag: dragstart populates the transfer with the chip payload.
+        return {
+            dockview,
+            group,
+            feature,
+            monitoring,
+            tabs,
+            manager,
+            featureChip,
+        };
+    }
+
+    test('within-group chip stays draggable across repeated moves (#1410)', async () => {
+        const { dockview, group, feature, tabs, manager, featureChip } =
+            await setupTwoTabGroups();
+
+        // A committed group move disposes the chip's drag sources, so its
+        // entry is left without live sources until `update()` re-arms them.
+        const dragSourcesArmed = () => {
+            const entry = manager._chipRenderers.get(feature.id);
+            return !!entry?.html5DragSource && !!entry?.pointerDragSource;
+        };
+
+        // Two consecutive within-group moves, driving the real production
+        // commit path (`Tabs._commitGroupMove` → `disposeChipDrag` +
+        // `moveTabGroup` → `updateTabGroups()`), asserting the chip remains
+        // draggable each time. Before the fix only the first move worked.
+        for (let move = 0; move < 2; move++) {
+            fireEvent.dragStart(featureChip);
+            expect(getPanelData()?.tabGroupId).toBe(feature.id);
+            fireEvent.dragEnd(featureChip);
+
+            tabs._commitGroupMove(feature.id, group.model.panels.length);
+
+            // The same chip element survives (repositioned, not recreated)
+            // and both backends are re-armed.
+            expect(group.element.contains(featureChip)).toBe(true);
+            expect(dragSourcesArmed()).toBe(true);
+        }
+
+        // Final drag still works after the repeated moves.
         fireEvent.dragStart(featureChip);
         expect(getPanelData()?.tabGroupId).toBe(feature.id);
         fireEvent.dragEnd(featureChip);
 
-        // Commit a within-group move exactly as the tabs-list drop handler
-        // does: synchronously tear down the source chip's drag sources
-        // (`_commitGroupMove` → `disposeChipDrag`), then reorder — which
-        // re-syncs the chips via `updateTabGroups()`.
-        const manager = (group.model.header as any).tabs._tabGroupManager;
-        manager.disposeChipDrag(feature.id);
-        group.model.moveTabGroup(feature.id, group.model.panels.length);
+        dockview.dispose();
+    });
 
-        // The same chip element survives a within-group move (it is
-        // repositioned, not recreated).
+    test('within-group chip stays draggable after a move in smooth mode (#1410)', async () => {
+        // Matches the reported example config (tabAnimation: 'smooth'), which
+        // takes the FLIP branch of `_commitGroupMove`.
+        const { dockview, group, feature, tabs, featureChip } =
+            await setupTwoTabGroups('smooth');
+
+        fireEvent.dragStart(featureChip);
+        expect(getPanelData()?.tabGroupId).toBe(feature.id);
+        fireEvent.dragEnd(featureChip);
+
+        tabs._commitGroupMove(feature.id, group.model.panels.length);
+
         expect(group.element.contains(featureChip)).toBe(true);
 
-        // Second drag must still populate the transfer payload — without the
-        // re-arm this is `undefined` and the group can no longer be moved.
+        // Second drag must still populate the transfer payload.
         fireEvent.dragStart(featureChip);
         expect(getPanelData()?.tabGroupId).toBe(feature.id);
         fireEvent.dragEnd(featureChip);
