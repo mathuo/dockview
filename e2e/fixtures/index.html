@@ -110,6 +110,10 @@
                 // by default (`contextMenuItem: false`) so the base context-menu
                 // spec keeps seeing exactly its app-supplied items.
                 const pinAutoInject = params.get('pinautoinject') === '1';
+                // Handle to the inner dockview mounted by the 'nested-dockview'
+                // panel (set in createComponent), so the #1495 nested-edge-group
+                // spec can read/serialize the inner edge group.
+                let nestedHandle = null;
                 const dockview = new lib.DockviewComponent(el, {
                     keyboardNavigation: true,
                     overflow,
@@ -164,6 +168,72 @@
                         { label: 'Custom Action', action: () => {} },
                     ],
                     createComponent: (options) => {
+                        // A panel that hosts its own (nested) dockview with a
+                        // right edge group — drives the #1495 scenario where the
+                        // host panel uses the default `onlyWhenVisible` renderer,
+                        // so switching the outer tab detaches this content and
+                        // fires a 0x0 resize inside the nested dockview.
+                        if (options.name === 'nested-dockview') {
+                            const element = document.createElement('div');
+                            element.className = 'dv-nested-host';
+                            element.style.width = '100%';
+                            element.style.height = '100%';
+                            let inner = null;
+                            let edgeAdded = false;
+                            return {
+                                element,
+                                init() {
+                                    inner = new lib.DockviewComponent(element, {
+                                        createComponent: (o) => {
+                                            const e =
+                                                document.createElement('div');
+                                            e.className = 'dv-test-panel';
+                                            e.textContent = o.id;
+                                            return {
+                                                element: e,
+                                                init() {},
+                                                dispose() {},
+                                            };
+                                        },
+                                    });
+                                    inner.addPanel({
+                                        id: 'inner-main',
+                                        component: 'default',
+                                    });
+                                    nestedHandle = inner;
+                                },
+                                // Forward the host content-area size to the inner
+                                // dockview (as a real embedding app would). Add
+                                // the edge group only once the inner dockview has
+                                // a real size, so it lands at its configured
+                                // 300px rather than being distributed to minimum.
+                                layout(width, height) {
+                                    if (!inner) return;
+                                    inner.layout(width, height);
+                                    if (!edgeAdded && width > 0 && height > 0) {
+                                        edgeAdded = true;
+                                        inner.addEdgeGroup('right', {
+                                            id: 'inner-edge',
+                                            initialSize: 300,
+                                        });
+                                        inner.addPanel({
+                                            id: 'inner-edge-panel',
+                                            component: 'default',
+                                            position: {
+                                                referenceGroup: 'inner-edge',
+                                                direction: 'within',
+                                            },
+                                        });
+                                    }
+                                },
+                                dispose() {
+                                    if (inner) inner.dispose();
+                                    inner = null;
+                                    nestedHandle = null;
+                                },
+                            };
+                        }
+
                         const element = document.createElement('div');
                         element.className = 'dv-test-panel';
                         element.tabIndex = 0;
@@ -241,6 +311,31 @@
                         if (g) g.api.setHeaderPosition(position);
                     },
                     closePanel: (id) => panels[id] && panels[id].api.close(),
+                    // #1495: a panel hosting a nested dockview that has a right
+                    // edge group. It is the only outer panel, so it stays active
+                    // and its nested dockview lays out to a real size.
+                    setupNestedEdgeGroup: () => {
+                        panels['host'] = dockview.addPanel({
+                            id: 'host',
+                            component: 'nested-dockview',
+                            title: 'host',
+                        });
+                    },
+                    // Hide/show the nested host by toggling display:none on it —
+                    // the inner shell's offsetParent becomes null (while still in
+                    // the document) and its ResizeObserver reports 0x0. This is
+                    // the "host panel becomes hidden" case #1495 is about: a real
+                    // browser fires the 0x0 that the shell's guard must skip.
+                    setNestedHostVisible: (visible) => {
+                        const host = document.querySelector('.dv-nested-host');
+                        if (host) host.style.display = visible ? '' : 'none';
+                    },
+                    // The nested dockview's right edge-group size, as serialized
+                    // (this is the value #1495 reports resetting to the minimum).
+                    nestedEdgeSize: () =>
+                        nestedHandle
+                            ? nestedHandle.toJSON().edgeGroups?.right?.size
+                            : undefined,
                     // Add a panel, optionally splitting a new group off in a
                     // direction (records an 'add' mutation for layout history).
                     addPanelAt: (id, direction) => {
