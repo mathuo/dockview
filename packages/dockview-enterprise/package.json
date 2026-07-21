@@ -55,6 +55,6 @@
         "format:check": "biome format src"
     },
     "dependencies": {
-        "dockview": "7.0.3"
+        "dockview": "^7.0.3"
     }
 }
