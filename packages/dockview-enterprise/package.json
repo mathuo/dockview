@@ -1,6 +1,6 @@
 {
     "name": "dockview-enterprise",
-    "version": "7.0.2",
+    "version": "7.0.3",
     "description": "Enterprise feature modules and licensing for dockview",
     "keywords": [
         "dockview",
@@ -55,6 +55,6 @@
         "format:check": "biome format src"
     },
     "dependencies": {
-        "dockview": "7.0.2"
+        "dockview": "^7.0.3"
     }
 }
