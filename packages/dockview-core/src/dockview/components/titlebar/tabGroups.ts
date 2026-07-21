@@ -64,9 +64,17 @@ export interface TabGroupManagerCallbacks {
 
 interface ChipRendererEntry {
     chip: ITabGroupChipRenderer;
-    /** Created by the manager so it can be toggled live on strategy changes. */
-    html5DragSource: IDragSource;
-    pointerDragSource: IDragSource;
+    /**
+     * Created by the manager so it can be toggled live on strategy changes.
+     * Undefined between an in-flight drag being torn down by
+     * `disposeChipDrag` and the following `update()` re-arming it — the chip
+     * element outlives a within-group move even though its drag sources do
+     * not. (#1410)
+     */
+    html5DragSource: IDragSource | undefined;
+    pointerDragSource: IDragSource | undefined;
+    /** Disposes the two drag sources + their shared dragend listener. */
+    dragSourcesDisposable: IDisposable | undefined;
     disposable: IDisposable;
     dropTarget: Droptarget;
 }
@@ -120,6 +128,7 @@ export class TabGroupManager {
             if (!activeGroupIds.has(groupId)) {
                 entry.chip.element.remove();
                 entry.chip.dispose();
+                entry.dragSourcesDisposable?.dispose();
                 entry.disposable.dispose();
                 this._chipRenderers.delete(groupId);
             }
@@ -278,9 +287,9 @@ export class TabGroupManager {
         const caps = resolveDndCapabilities(this._ctx.accessor.options);
         for (const entry of this._chipRenderers.values()) {
             entry.chip.element.draggable = caps.html5;
-            entry.html5DragSource.setDisabled(!caps.html5);
-            entry.pointerDragSource.setDisabled(!caps.pointer);
-            entry.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
+            entry.html5DragSource?.setDisabled(!caps.html5);
+            entry.pointerDragSource?.setDisabled(!caps.pointer);
+            entry.pointerDragSource?.setTouchOnly(!caps.pointerHandlesMouse);
         }
     }
 
@@ -290,8 +299,15 @@ export class TabGroupManager {
      * iframe shield are released before the cross-group move detaches
      * the chip (chip dispose is scheduled on a microtask via
      * `_scheduleTabGroupUpdate`, which is too late for callers that read
-     * `getPanelData()` synchronously after the move). This is idempotent;
-     * the subsequent `update()` will also dispose the sources.
+     * `getPanelData()` synchronously after the move).
+     *
+     * A cross-group move dissolves the source chip entirely, but a
+     * within-group reorder keeps the same chip element — so the sources are
+     * cleared to `undefined` here and the subsequent `update()` re-arms them
+     * via `_ensureChipForGroup`. Without that re-arm the chip would fire a
+     * native `dragstart` (the element keeps `draggable=true`) but never set
+     * a transfer payload, leaving the group permanently undraggable after
+     * its first move. (#1410)
      */
     disposeChipDrag(tabGroupId: string): void {
         const entry = this._chipRenderers.get(tabGroupId);
@@ -300,8 +316,10 @@ export class TabGroupManager {
         }
         // Optional-chained because tests may inject minimal entries
         // that skip the manager's normal `_ensureChipForGroup` flow.
-        entry.html5DragSource?.dispose();
-        entry.pointerDragSource?.dispose();
+        entry.dragSourcesDisposable?.dispose();
+        entry.html5DragSource = undefined;
+        entry.pointerDragSource = undefined;
+        entry.dragSourcesDisposable = undefined;
     }
 
     /** Cloned chip rect used as the pointer follow-finger ghost. */
@@ -331,6 +349,7 @@ export class TabGroupManager {
         for (const [, entry] of this._chipRenderers) {
             entry.chip.element.remove();
             entry.chip.dispose();
+            entry.dragSourcesDisposable?.dispose();
             entry.disposable.dispose();
         }
         this._chipRenderers.clear();
@@ -361,19 +380,20 @@ export class TabGroupManager {
         });
     }
 
-    private _ensureChipForGroup(tabGroup: ITabGroup): void {
-        if (this._chipRenderers.has(tabGroup.id)) {
-            return;
-        }
-
-        const createChip =
-            this._ctx.accessor.options.createTabGroupChipComponent;
-        const chip: ITabGroupChipRenderer = createChip
-            ? createChip(tabGroup)
-            : new TabGroupChip(this._ctx.accessor.tabGroupColorPalette);
-
-        chip.init({ tabGroup, api: this._ctx.accessor.api });
-
+    /**
+     * Create the HTML5 + pointer drag sources for a chip (and the direct
+     * dragend listener that clears the transfer synchronously). Extracted so
+     * both the initial chip build and the post-move re-arm in
+     * `_ensureChipForGroup` share one wiring path. (#1410)
+     */
+    private _createChipDragSources(
+        chip: ITabGroupChipRenderer,
+        tabGroup: ITabGroup
+    ): {
+        html5DragSource: IDragSource;
+        pointerDragSource: IDragSource;
+        disposable: IDisposable;
+    } {
         const caps = resolveDndCapabilities(this._ctx.accessor.options);
         chip.element.draggable = caps.html5;
 
@@ -441,13 +461,12 @@ export class TabGroupManager {
         // the listener survives chip disposal in the detach-then-dragend
         // cross-group path; `once: true` auto-removes after the single
         // dragend that we care about. (#1254)
-        chip.element.addEventListener(
-            'dragend',
-            () => {
-                panelTransfer.clearData(PanelTransfer.prototype);
-            },
-            { once: true }
-        );
+        const onDragEndClear = () => {
+            panelTransfer.clearData(PanelTransfer.prototype);
+        };
+        chip.element.addEventListener('dragend', onDragEndClear, {
+            once: true,
+        });
 
         const pointerDragSource = pointerBackend.createDragSource(
             chip.element,
@@ -468,6 +487,50 @@ export class TabGroupManager {
             }
         );
 
+        return {
+            html5DragSource,
+            pointerDragSource,
+            disposable: {
+                dispose: () => {
+                    html5DragSource.dispose();
+                    pointerDragSource.dispose();
+                    chip.element.removeEventListener('dragend', onDragEndClear);
+                },
+            },
+        };
+    }
+
+    private _ensureChipForGroup(tabGroup: ITabGroup): void {
+        const existing = this._chipRenderers.get(tabGroup.id);
+        if (existing) {
+            // A committed group move tears down the chip's drag sources via
+            // `disposeChipDrag`, but a within-group reorder keeps the same
+            // chip element alive. Re-arm the sources so the group stays
+            // draggable; without this the chip is stuck after its first
+            // move — `dragstart` still fires (the element keeps
+            // `draggable=true`) but no transfer payload is set. (#1410)
+            if (!existing.html5DragSource) {
+                const sources = this._createChipDragSources(
+                    existing.chip,
+                    tabGroup
+                );
+                existing.html5DragSource = sources.html5DragSource;
+                existing.pointerDragSource = sources.pointerDragSource;
+                existing.dragSourcesDisposable = sources.disposable;
+            }
+            return;
+        }
+
+        const createChip =
+            this._ctx.accessor.options.createTabGroupChipComponent;
+        const chip: ITabGroupChipRenderer = createChip
+            ? createChip(tabGroup)
+            : new TabGroupChip(this._ctx.accessor.tabGroupColorPalette);
+
+        chip.init({ tabGroup, api: this._ctx.accessor.api });
+
+        const dragSources = this._createChipDragSources(chip, tabGroup);
+
         const disposables: IDisposable[] = [
             tabGroup.onDidChange(() => {
                 chip.update?.({ tabGroup });
@@ -480,8 +543,6 @@ export class TabGroupManager {
             tabGroup.onDidCollapseChange(() => {
                 this._updateTabGroupClasses();
             }),
-            html5DragSource,
-            pointerDragSource,
         ];
 
         // Context menu: built-in TabGroupChip already aggregates right-click
@@ -490,8 +551,12 @@ export class TabGroupManager {
         // directly on their element.
         const onContextMenu = (event: MouseEvent) => {
             // A long-press on a chip should preempt the in-flight pointer
-            // drag and open the menu instead.
-            pointerDragSource.cancelPending();
+            // drag and open the menu instead. Resolve the source from the
+            // entry so a post-move re-armed source is cancelled, not the
+            // stale one captured at build time. (#1410)
+            this._chipRenderers
+                .get(tabGroup.id)
+                ?.pointerDragSource?.cancelPending();
             this._callbacks.onChipContextMenu(tabGroup, event);
         };
         if (chip instanceof TabGroupChip) {
@@ -556,8 +621,9 @@ export class TabGroupManager {
         const disposable = new CompositeDisposable(...disposables);
         this._chipRenderers.set(tabGroup.id, {
             chip,
-            html5DragSource,
-            pointerDragSource,
+            html5DragSource: dragSources.html5DragSource,
+            pointerDragSource: dragSources.pointerDragSource,
+            dragSourcesDisposable: dragSources.disposable,
             disposable,
             dropTarget,
         });

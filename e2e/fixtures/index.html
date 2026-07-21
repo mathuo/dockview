@@ -383,6 +383,56 @@
                         });
                         return { groupId, tabGroupId: tabGroup.id };
                     },
+                    // Two tab groups (chips) in a single group so one can be
+                    // dragged past the other and back — the within-group move
+                    // that must stay repeatable (#1410). Flat order is
+                    // red,green,blue,yellow so the chips render Feature then
+                    // Monitoring. Returns the ids the spec needs.
+                    setupTwoTabGroupChips: () => {
+                        for (const id of ['red', 'green', 'blue', 'yellow']) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        const groupId = panels['red'].group.id;
+                        const feature = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Feature',
+                        });
+                        const monitoring = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Monitoring',
+                        });
+                        for (const panelId of ['red', 'green']) {
+                            dockview.api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: feature.id,
+                                panelId,
+                            });
+                        }
+                        for (const panelId of ['blue', 'yellow']) {
+                            dockview.api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: monitoring.id,
+                                panelId,
+                            });
+                        }
+                        return {
+                            groupId,
+                            featureId: feature.id,
+                            monitoringId: monitoring.id,
+                        };
+                    },
+                    // DOM order of the tab-group chip labels — reflects the
+                    // relative order of the tab groups in the strip.
+                    chipLabels: () =>
+                        Array.from(
+                            document.querySelectorAll(
+                                '.dv-tab-group-chip-label'
+                            )
+                        ).map((el) => el.textContent),
                     floatingCount: () => dockview.floatingGroups.length,
                     // Reload-safe maximize queries: read the live component, not
                     // the `panels` map (which is empty after a restore into a
