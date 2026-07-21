@@ -459,7 +459,11 @@ export class VuePart<T extends Record<string, any> = any> {
     init(): void {
         this._renderDisposable?.dispose();
         this._renderDisposable = this.registry
-            ? this.registry.mount(this.vueComponent, this.element, this.props)
+            ? this.registry.mount(
+                  this.vueComponent as VueComponent,
+                  this.element,
+                  this.props
+              )
             : mountVueComponent(
                   this.vueComponent,
                   this.parent,
