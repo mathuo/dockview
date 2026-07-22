@@ -23,13 +23,17 @@ function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
     return coreOptions as SplitviewOptions;
 }
 
+/**
+ * The template renders multiple root nodes (the host element plus
+ * `<DockviewPortals>`), so Vue cannot automatically forward fallthrough
+ * attributes such as `style` and `class`. Disable automatic inheritance and
+ * bind `$attrs` explicitly onto the host element below so consumer-supplied
+ * attributes continue to reach the root container.
+ */
+defineOptions({ inheritAttrs: false });
+
 const emit = defineEmits<SplitviewVueEvents>();
 const props = defineProps<ISplitviewVueProps>();
-
-// Two root nodes (host element + `<DockviewPortals>`) prevent Vue from
-// auto-inheriting fallthrough attributes, so bind `$attrs` (class, style, ...)
-// onto the host element explicitly below.
-defineOptions({ inheritAttrs: false });
 
 const { el, registry } = useViewComponent(
     {

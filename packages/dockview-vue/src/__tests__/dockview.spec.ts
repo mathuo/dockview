@@ -66,6 +66,31 @@ describe('DockviewVue Component', () => {
         expect(readyEvent.api).toBeInstanceOf(DockviewApi);
     });
 
+    test('forwards fallthrough style/class attributes to the root container', async () => {
+        // Regression test for #1510: the SFC renders multiple root nodes
+        // (the host element plus <DockviewPortals>), so Vue cannot
+        // auto-inherit fallthrough attributes. They must be bound explicitly
+        // onto the root dockview container.
+        wrapper = mount(DockviewVue, {
+            attrs: {
+                class: 'my-custom-dockview',
+                style: 'height: 500px; width: 800px;',
+            },
+            attachTo: document.body,
+            global: {
+                components: { MockPanel },
+            },
+        });
+        await flushPromises();
+
+        const root = document.body.querySelector(
+            '.my-custom-dockview'
+        ) as HTMLElement | null;
+        expect(root).not.toBeNull();
+        expect(root!.style.height).toBe('500px');
+        expect(root!.style.width).toBe('800px');
+    });
+
     test('should pass defaultTabComponent to core options on mount', async () => {
         wrapper = mountDockview({
             defaultTabComponent: 'MockTab',
