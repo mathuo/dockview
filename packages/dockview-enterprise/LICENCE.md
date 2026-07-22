@@ -11,15 +11,18 @@
   `src/lib/legal.ts`.
 
   Licensor identity confirmed 2026-07-07: Dockview Ltd, company number 17326398,
-  registered office 8 Weald Close, Bromley, England, BR2 8PD. Keep in step with the
-  identity constants in the licencing app's `src/lib/legal.ts`.
+  registered office 8 Weald Close, Bromley, England, BR2 8PD. As of v1.5 the
+  registered office is NOT stated in this Agreement — the Licensor is identified
+  by registered name + company number, and the registered office is disclosed on
+  the website footer and on invoices instead. Keep in step with the identity
+  constants in the licencing app's `src/lib/legal.ts`.
 -->
 
 # Dockview Software Licence Agreement
 
-**Version 1.4 · Effective 2026-07-09**
+**Version 1.5 · Effective 2026-07-22**
 
-This Software Licence Agreement ("Agreement") is entered into between Dockview Ltd (registered in England and Wales under company number 17326398, with registered office at 8 Weald Close, Bromley, England, BR2 8PD) ("Licensor") and the individual or entity identified at the point of purchase ("Licensee"). By completing checkout and accepting these terms, or by signing an order form that references this Agreement, Licensee agrees to be bound by this Agreement.
+This Software Licence Agreement ("Agreement") is entered into between Dockview Ltd (registered in England and Wales under company number 17326398) ("Licensor") and the individual or entity identified at the point of purchase ("Licensee"). By completing checkout and accepting these terms, or by signing an order form that references this Agreement, Licensee agrees to be bound by this Agreement.
 
 > **This is not an open-source licence.** The `dockview-enterprise` package is proprietary, commercial software. Only the Enterprise Features require a paid licence; other portions of Dockview are made available under a separate open-source (MIT) licence and are unaffected by this Agreement.
 
@@ -52,7 +55,7 @@ Licensee shall pay each invoiced amount in full and may not reduce it by any set
 
 ## 4. Perpetual Right to Versions Released During the Term
 
-Notwithstanding the expiry or non-renewal of the Annual Term, Licensee retains an irrevocable, perpetual, non-transferable (except as permitted under Section 15) right to continue using, in its software applications, any version of Dockview — including any major version release — that was generally available during an Annual Term for which Licensee had paid in full. Renewal is required only to access Updates, new features, and support released after the Annual Term ends. The rights granted under this Section 4 do not survive termination of this Agreement by Licensor for material breach (see Section 8).
+Notwithstanding the expiry or non-renewal of the Annual Term, Licensee retains an irrevocable, perpetual, non-transferable (except as permitted under Section 15) right to continue using, in its software applications, any version of Dockview (including any major version release) that was generally available during an Annual Term for which Licensee had paid in full. Renewal is required only to access Updates, new features, and support released after the Annual Term ends. The rights granted under this Section 4 do not survive termination of this Agreement by Licensor for material breach (see Section 8).
 
 ## 5. Permitted Use and Restrictions
 
