@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>dockview-vue attribute-forwarding e2e fixture</title>
+        <style>
+            html,
+            body,
+            #app {
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+            /* Deliberately NO `#app > div { height/width }` rule here (unlike
+               vue.html). The DockviewVue host element is sized ONLY by the
+               `style` attribute passed to `<DockviewVue>` below. So if
+               fallthrough of `style` to the host `<div ref="el">` ever
+               regresses (issue #1510), the host collapses to 0x0,
+               `api.layout(clientWidth, clientHeight)` sees 0 and nothing
+               renders — which the spec detects. */
+            .vue-panel {
+                height: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+            }
+        </style>
+
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <!-- Globals loaded in dependency order (see vue.html for the rationale). -->
+        <script src="/node_modules/vue/dist/vue.global.js"></script>
+        <script src="/packages/dockview/dist/dockview.js"></script>
+        <script src="/packages/dockview-vue/dist/dockview-vue.umd.cjs"></script>
+
+        <script>
+            (function () {
+                const { createApp, ref } = window.Vue;
+                const { DockviewVue } = window['dockview-vue'];
+
+                const Panel = {
+                    name: 'Panel',
+                    props: ['params'],
+                    template: `<div class="vue-panel">{{ params.api.id }}</div>`,
+                };
+
+                let dvApi = null;
+
+                const Root = {
+                    name: 'Root',
+                    components: { DockviewVue },
+                    setup() {
+                        return {
+                            components: { panel: Panel },
+                            onReady: (event) => {
+                                dvApi = event.api;
+                                dvApi.addPanel({
+                                    id: 'one',
+                                    component: 'panel',
+                                    title: 'one',
+                                });
+                                window.__ready = true;
+                            },
+                        };
+                    },
+                    /**
+                     * `class` and `style` here are non-prop (fallthrough)
+                     * attributes. They must land on the host `<div ref="el">`
+                     * — the outer dockview container — exactly as they did
+                     * before 7.0.3 (issue #1510). The 3px red outline gives the
+                     * spec a computed style to assert on; the 100% height/width
+                     * is what actually sizes the layout.
+                     */
+                    template: `
+                        <DockviewVue
+                            class="custom-dockview-host"
+                            style="height: 100%; width: 100%; outline: 3px solid rgb(255, 0, 0);"
+                            :components="components"
+                            @ready="onReady"
+                        />`,
+                };
+
+                createApp(Root).mount('#app');
+
+                window.__attrs = {
+                    hostRect: () => {
+                        const host = document.querySelector(
+                            '.custom-dockview-host'
+                        );
+                        if (!host) return null;
+                        const r = host.getBoundingClientRect();
+                        return { width: r.width, height: r.height };
+                    },
+                    // The host must own the dockview root (a `.dv-dockview`
+                    // descendant) — proving the class landed on the container,
+                    // not some unrelated node.
+                    hostHasDockview: () =>
+                        !!document.querySelector(
+                            '.custom-dockview-host .dv-dockview'
+                        ),
+                    hostOutlineColor: () => {
+                        const host = document.querySelector(
+                            '.custom-dockview-host'
+                        );
+                        return host
+                            ? getComputedStyle(host).outlineColor
+                            : null;
+                    },
+                };
+            })();
+        </script>
+    </body>
+</html>
