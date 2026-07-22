@@ -173,4 +173,111 @@ describe('DockviewGroupPanelApiImpl', () => {
             expect(events).toHaveLength(0);
         });
     });
+
+    describe('setPinned / isPinned', () => {
+        function makeAccessor() {
+            return fromPartial<DockviewComponent>({
+                setEdgeGroupPinned: jest.fn(),
+                isEdgeGroupPinned: jest.fn().mockReturnValue(true),
+            });
+        }
+
+        test('setPinned(false) delegates to accessor.setEdgeGroupPinned', () => {
+            const accessor = makeAccessor();
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+            const group = fromPartial<DockviewGroupPanel>({});
+            cut.initialize(group);
+
+            cut.setPinned(false);
+
+            expect(accessor.setEdgeGroupPinned).toHaveBeenCalledWith(
+                group,
+                false
+            );
+        });
+
+        test('isPinned() delegates to accessor.isEdgeGroupPinned and returns its value', () => {
+            const accessor = makeAccessor();
+            (accessor.isEdgeGroupPinned as jest.Mock).mockReturnValue(false);
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+            const group = fromPartial<DockviewGroupPanel>({});
+            cut.initialize(group);
+
+            expect(cut.isPinned()).toBe(false);
+            expect(accessor.isEdgeGroupPinned).toHaveBeenCalledWith(group);
+        });
+
+        test('isPinned() returns true when group is not initialized', () => {
+            const accessor = makeAccessor();
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+
+            expect(cut.isPinned()).toBe(true);
+            expect(accessor.isEdgeGroupPinned).not.toHaveBeenCalled();
+        });
+
+        test('setPinned() is a no-op when group is not initialized', () => {
+            const accessor = makeAccessor();
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+
+            expect(() => cut.setPinned(false)).not.toThrow();
+            expect(accessor.setEdgeGroupPinned).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('onDidPinnedChange', () => {
+        function makeAccessor() {
+            return fromPartial<DockviewComponent>({
+                setEdgeGroupPinned: jest.fn(),
+                isEdgeGroupPinned: jest.fn().mockReturnValue(true),
+            });
+        }
+
+        test('emits with isPinned=false when _onDidPinnedChange is fired', () => {
+            const accessor = makeAccessor();
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+            const group = fromPartial<DockviewGroupPanel>({ id: 'g1' });
+            cut.initialize(group);
+
+            const events: { isPinned: boolean }[] = [];
+            cut.onDidPinnedChange((e) => events.push(e));
+
+            cut._onDidPinnedChange.fire({ isPinned: false });
+
+            expect(events).toHaveLength(1);
+            expect(events[0].isPinned).toBe(false);
+        });
+
+        test('emits with isPinned=true when pinned is restored', () => {
+            const accessor = makeAccessor();
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+            const group = fromPartial<DockviewGroupPanel>({ id: 'g1' });
+            cut.initialize(group);
+
+            const events: { isPinned: boolean }[] = [];
+            cut.onDidPinnedChange((e) => events.push(e));
+
+            cut._onDidPinnedChange.fire({ isPinned: true });
+
+            expect(events).toHaveLength(1);
+            expect(events[0].isPinned).toBe(true);
+        });
+    });
 });

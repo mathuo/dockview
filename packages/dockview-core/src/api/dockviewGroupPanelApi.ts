@@ -32,6 +32,10 @@ export interface DockviewGroupPanelCollapsedChangeEvent {
     readonly isCollapsed: boolean;
 }
 
+export interface DockviewGroupPanelPinnedChangeEvent {
+    readonly isPinned: boolean;
+}
+
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     /**
@@ -47,6 +51,11 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * Never fires for non-edge groups.
      */
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;
+    /**
+     * Fired when an edge group's pinned state changes.
+     * Never fires for non-edge groups.
+     */
+    readonly onDidPinnedChange: Event<DockviewGroupPanelPinnedChangeEvent>;
     readonly location: DockviewGroupLocation;
     /**
      * Whether this group is locked against drop interactions.
@@ -79,6 +88,18 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * Always returns false for non-edge groups.
      */
     isCollapsed(): boolean;
+    /**
+     * Pin or unpin this edge group.
+     * Pinned groups push the layout when expanded (default).
+     * Unpinned groups expand as a floating overlay over the content.
+     * No-op for non-edge groups.
+     */
+    setPinned(pinned: boolean): void;
+    /**
+     * Returns true if this edge group is pinned.
+     * Always returns true for non-edge groups.
+     */
+    isPinned(): boolean;
 }
 
 export interface DockviewGroupPanelLocationChangeEvent {
@@ -105,6 +126,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         new Emitter<DockviewGroupPanelCollapsedChangeEvent>();
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent> =
         this._onDidCollapsedChange.event;
+
+    readonly _onDidPinnedChange =
+        new Emitter<DockviewGroupPanelPinnedChangeEvent>();
+    readonly onDidPinnedChange: Event<DockviewGroupPanelPinnedChangeEvent> =
+        this._onDidPinnedChange.event;
 
     get location(): DockviewGroupLocation {
         if (!this._group) {
@@ -157,6 +183,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             this._onDidLocationChange,
             this._onDidActivePanelChange,
             this._onDidCollapsedChange,
+            this._onDidPinnedChange,
             this._onDidVisibilityChange.event((event) => {
                 // When becoming visible, apply any pending size change
                 if (event.isVisible && this._pendingSize) {
@@ -277,6 +304,20 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             return false;
         }
         return this.accessor.isEdgeGroupCollapsed(this._group);
+    }
+
+    setPinned(pinned: boolean): void {
+        if (!this._group) {
+            return;
+        }
+        this.accessor.setEdgeGroupPinned(this._group, pinned);
+    }
+
+    isPinned(): boolean {
+        if (!this._group) {
+            return true;
+        }
+        return this.accessor.isEdgeGroupPinned(this._group);
     }
 
     initialize(group: DockviewGroupPanel): void {
