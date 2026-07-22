@@ -5,21 +5,20 @@ description: "Highlights and breaking changes in Dockview 8.0: pinned tabs, mult
 ---
 
 Dockview 8.0 is an additive release focused on the tab header and drag-and-drop:
-pinned and wrapping tabs, an aim-at-a-cell drop compass and floating-group
-snapping, undo/redo for layout changes, auto-hide edge groups, and keyboard
-docking across popout windows. Every new capability is opt-in through a new
-`DockviewOptions` field, so upgrading is safe by default.
+pinned, wrapping and colour-grouped tabs, context menus, an aim-at-a-cell drop
+compass and floating-group snapping, undo/redo for layout changes, auto-hide edge
+groups, and keyboard docking across popout windows. Every new capability is
+opt-in and off by default, so upgrading is safe.
 
 This page covers the headline additions. For the upgrade notes and the single
 [breaking change](#breaking-changes), see
 [Migrating to v8](/docs/releases/migrating/migrating-to-v8).
 
 :::info The `dockview-enterprise` package
-v8 introduces `dockview-enterprise`, a separately-licensed package for the
-features marked **Enterprise** in [Licensing](/docs/overview/licence): pinned
-tabs, multi-row tabs, the drop guide compass, smart guides, layout history,
-auto-hide edge groups, dock-to-edge groups, and keyboard docking. The free,
-open-source `dockview` packages are unchanged.
+v8 introduces `dockview-enterprise`, a separately-licensed package. Most of the
+additions below are part of it; [Licensing](/docs/overview/licence) is the full
+free-versus-enterprise list. The free, open-source `dockview` packages are
+unchanged.
 :::
 
 ## Highlights
@@ -46,8 +45,38 @@ spill back into the dropdown, or upgrade the dropdown itself into a searchable,
 most-recently-used tab switcher with `overflow.search` and `overflow.mru`.
 Wrapping applies to vertical (edge-group) headers too, filling additional
 columns instead of rows. See
-[Multi-row tabs](/docs/core/panels/multiRowTabs) and
+[Multi-row tabs](/docs/core/panels/multiRowTabs).
+
+### Advanced overflow
+
+The overflow dropdown can now become a command-palette style tab switcher in
+place: a search box that filters the group's tabs, most-recently-used ordering,
+and full keyboard navigation. The chevron trigger and count badge are unchanged,
+only the popover body. It is configured through the same
+[`overflow`](/docs/core/panels/tabOverflow) option via `overflow.search` and
+`overflow.mru`, and the fields are safe to leave set on the free package, where
+the plain list renders exactly as before. See
 [Advanced overflow](/docs/core/panels/advancedOverflow).
+
+### Tab groups (free)
+
+Tabs within a group can now be organised visually with coloured chips. Tabs can
+be grouped, collapsed, expanded, recoloured, and reordered by drag and drop, with
+a custom chip renderer if you want to draw them yourself, and grouping
+round-trips through serialization. Build groups through `api.createTabGroup`,
+`api.addPanelToTabGroup` and `api.removePanelFromTabGroup`, and tune the palette
+with the new `tabGroupColors` and `tabGroupAccent` options.
+
+See [Tab groups](/docs/core/panels/tabGroups).
+
+### Context menus
+
+Dockview can now show a context menu when you right-click a tab or a tab group
+chip. Menus are opt-in: nothing appears unless you supply a builder through the
+new `getTabContextMenuItems` or `getTabGroupChipContextMenuItems`, which returns
+a list mixing built-in string shortcuts (such as the new `'pin'` item) with your
+own label or component items. Return an empty array to suppress the menu for a
+particular tab. See [Context menus](/docs/core/panels/contextMenus).
 
 ### Drop guide compass
 
