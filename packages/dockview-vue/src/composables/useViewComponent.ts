@@ -6,9 +6,16 @@ import {
     markRaw,
     getCurrentInstance,
     type ComponentInternalInstance,
+    type Ref,
 } from 'vue';
 import type { DockviewIDisposable } from 'dockview';
 import { findComponent, VueRendererRegistry } from '../utils';
+
+export interface UseViewComponentReturn<TApi> {
+    el: Ref<HTMLElement | null>;
+    instance: Ref<TApi | null>;
+    registry: VueRendererRegistry;
+}
 
 export interface ViewComponentConfig<
     TApi,
@@ -57,10 +64,26 @@ export function useViewComponent<
     >,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
-) {
+): UseViewComponentReturn<TApi> {
     const el = ref<HTMLElement | null>(null);
-    const instance = ref<TApi | null>(null);
+    // Pin the ref type: `ref<TApi>()` would infer `Ref<UnwrapRef<TApi>>`,
+    // which both widens the public type and is what triggered the
+    // non-portable declaration (TS2742) this composable used to emit.
+    const instance = ref<TApi | null>(null) as Ref<TApi | null>;
     const eventDisposables: DockviewIDisposable[] = [];
+
+    /**
+     * Capture the component instance once, synchronously, during setup.
+     * `getCurrentInstance()` only returns a value during setup and lifecycle
+     * hooks — calling it later from an async watch callback returns `null`, so
+     * the reference is resolved here and reused everywhere below.
+     */
+    const inst = getCurrentInstance();
+    if (!inst) {
+        throw new Error(
+            `${config.componentName}: getCurrentInstance() returned null`
+        );
+    }
 
     /**
      * Components are teleported into the view's DOM (rendered by
@@ -86,13 +109,6 @@ export function useViewComponent<
         () => (props as any).components,
         () => {
             if (instance.value) {
-                const inst = getCurrentInstance();
-                if (!inst) {
-                    throw new Error(
-                        `${config.componentName}: getCurrentInstance() returned null`
-                    );
-                }
-
                 instance.value.updateOptions({
                     createComponent: (options: {
                         id: string;
@@ -119,14 +135,6 @@ export function useViewComponent<
     onMounted(() => {
         if (!el.value) {
             throw new Error(`${config.componentName}: element is not mounted`);
-        }
-
-        const inst = getCurrentInstance();
-
-        if (!inst) {
-            throw new Error(
-                `${config.componentName}: getCurrentInstance() returned null`
-            );
         }
 
         const frameworkOptions = {
