@@ -78,6 +78,10 @@ export const ControlsContent = (props: {
     toggleCustomWatermark: () => void;
     hasCustomGhost: boolean;
     toggleCustomGhost: () => void;
+    dndGuide: boolean;
+    onToggleDndGuide: () => void;
+    smartGuides: boolean;
+    onToggleSmartGuides: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -134,6 +138,18 @@ export const ControlsContent = (props: {
                     icon="drag_indicator"
                     checked={props.hasCustomGhost}
                     onChange={props.toggleCustomGhost}
+                />
+                <Switch
+                    label="Drop guide compass"
+                    icon="explore"
+                    checked={props.dndGuide}
+                    onChange={props.onToggleDndGuide}
+                />
+                <Switch
+                    label="Smart guides"
+                    icon="straighten"
+                    checked={props.smartGuides}
+                    onChange={props.onToggleSmartGuides}
                 />
                 {props.showLogs && (
                     <div style={{ paddingTop: 6 }}>

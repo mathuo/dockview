@@ -256,6 +256,10 @@ export const Sidebar = (props: {
     toggleCustomWatermark: () => void;
     hasCustomGhost: boolean;
     toggleCustomGhost: () => void;
+    dndGuide: boolean;
+    onToggleDndGuide: () => void;
+    smartGuides: boolean;
+    onToggleSmartGuides: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -823,6 +827,10 @@ export const Sidebar = (props: {
                         toggleCustomWatermark={props.toggleCustomWatermark}
                         hasCustomGhost={props.hasCustomGhost}
                         toggleCustomGhost={props.toggleCustomGhost}
+                        dndGuide={props.dndGuide}
+                        onToggleDndGuide={props.onToggleDndGuide}
+                        smartGuides={props.smartGuides}
+                        onToggleSmartGuides={props.onToggleSmartGuides}
                         debug={props.debug}
                         onToggleDebug={props.onToggleDebug}
                         showLogs={props.showLogs}

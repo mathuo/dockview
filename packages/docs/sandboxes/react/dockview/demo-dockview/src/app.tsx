@@ -946,6 +946,8 @@ const DockviewDemo = (props: {
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
     const [customGhost, setCustomGhost] = React.useState<boolean>(false);
+    const [dndGuide, setDndGuide] = React.useState<boolean>(false);
+    const [smartGuides, setSmartGuides] = React.useState<boolean>(true);
 
     const [gapCheck, setGapCheck] = React.useState<boolean>(false);
 
@@ -1038,8 +1040,12 @@ const DockviewDemo = (props: {
                                             pinnedTabs={{ enabled: true }}
                                             overflow={overflow}
                                             floatingGroupDragHandle="titlebar"
-                                            dndGuide={true}
-                                            smartGuides={{ snapDistance: 8 }}
+                                            dndGuide={dndGuide}
+                                            smartGuides={
+                                                smartGuides
+                                                    ? { snapDistance: 8 }
+                                                    : undefined
+                                            }
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
                                             }
@@ -1160,6 +1166,10 @@ const DockviewDemo = (props: {
                     toggleCustomWatermark={() => setWatermark(!watermark)}
                     hasCustomGhost={customGhost}
                     toggleCustomGhost={() => setCustomGhost(!customGhost)}
+                    dndGuide={dndGuide}
+                    onToggleDndGuide={() => setDndGuide(!dndGuide)}
+                    smartGuides={smartGuides}
+                    onToggleSmartGuides={() => setSmartGuides(!smartGuides)}
                     debug={debug}
                     onToggleDebug={() => setDebug(!debug)}
                     showLogs={showLogs}
