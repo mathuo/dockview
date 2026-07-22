@@ -35,11 +35,6 @@ defineOptions({ inheritAttrs: false });
 const emit = defineEmits<PaneviewVueEvents>();
 const props = defineProps<IPaneviewVueProps>();
 
-// Two root nodes (host element + `<DockviewPortals>`) prevent Vue from
-// auto-inheriting fallthrough attributes, so bind `$attrs` (class, style, ...)
-// onto the host element explicitly below.
-defineOptions({ inheritAttrs: false });
-
 const { el, registry } = useViewComponent(
     {
         componentName: 'paneview-vue',
