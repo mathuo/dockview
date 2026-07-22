@@ -287,7 +287,13 @@ describe('droptarget', () => {
 
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: (_e, position) => position !== 'center',
-                acceptedTargetZones: ['left', 'right', 'top', 'bottom', 'center'],
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
                 getOverrideTarget: () => model,
             });
             droptarget.onDrop((e) => drops.push(e.position));
@@ -317,7 +323,13 @@ describe('droptarget', () => {
 
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: (_e, position) => position !== 'center',
-                acceptedTargetZones: ['left', 'right', 'top', 'bottom', 'center'],
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
                 getOverrideTarget: () => model,
             });
 
@@ -346,7 +358,13 @@ describe('droptarget', () => {
 
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: () => true,
-                acceptedTargetZones: ['left', 'right', 'top', 'bottom', 'center'],
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
                 getOverrideTarget: () => model,
             });
             droptarget.onDrop((e) => drops.push(e.position));
@@ -374,7 +392,13 @@ describe('droptarget', () => {
 
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: () => true,
-                acceptedTargetZones: ['left', 'right', 'top', 'bottom', 'center'],
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
                 getOverrideTarget: () => model,
             });
             droptarget.onDrop((e) => drops.push(e.position));
@@ -432,7 +456,13 @@ describe('droptarget', () => {
             const calls: any[] = [];
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: () => true,
-                acceptedTargetZones: ['left', 'right', 'top', 'bottom', 'center'],
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
                 getOverlayOutline: () => outline,
                 getPositionResolver: () => ({
                     resolve: (args) => {
