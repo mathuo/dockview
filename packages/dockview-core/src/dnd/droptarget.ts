@@ -257,15 +257,17 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 this.options.getOverrideTarget?.()?.getElements();
             },
             onDragOver: (e) => {
+                if (this._disabled) {
+                    this.clearOwnOverlay();
+                    return;
+                }
+
                 Droptarget.ACTUAL_TARGET = this;
 
                 const overrideTarget = this.options.getOverrideTarget?.();
 
                 if (this._acceptedTargetZonesSet.size === 0) {
-                    if (overrideTarget) {
-                        return;
-                    }
-                    this.removeDropTarget();
+                    this.clearOwnOverlay();
                     return;
                 }
 
@@ -279,9 +281,14 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                     return; // avoid div!0
                 }
 
-                const rect = (
-                    e.currentTarget as HTMLElement
-                ).getBoundingClientRect();
+                // Measure the pointer against the same box `width`/`height`
+                // describe. `e.currentTarget` is always the listener element,
+                // so when `getOverlayOutline` widens the frame (themes with
+                // `dndPanelOverlay: 'group'` outline the whole group, not just
+                // the content) the two disagree by the header + spacing offset
+                // and every resolved position is shifted by it. The pointer
+                // backend already measures the outline; match it.
+                const rect = target.getBoundingClientRect();
                 const x = (e.clientX ?? 0) - rect.left;
                 const y = (e.clientY ?? 0) - rect.top;
 
@@ -290,21 +297,25 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 /**
                  * If the event has already been used by another DropTarget instance
                  * then don't show a second drop target, only one target should be
-                 * active at any one time
+                 * active at any one time. The anchored overlay belongs to whichever
+                 * target claimed the event, so leave it alone here.
                  */
-                if (this.isAlreadyUsed(e) || resolved === null) {
-                    // no drop target should be displayed
+                if (this.isAlreadyUsed(e)) {
                     this.removeDropTarget();
+                    return;
+                }
+
+                if (resolved === null) {
+                    // The resolver declined this point: no drop target should be
+                    // displayed.
+                    this.clearOwnOverlay();
                     return;
                 }
 
                 const quadrant = resolved.position;
 
                 if (!this.options.canDisplayOverlay(e, quadrant)) {
-                    if (overrideTarget) {
-                        return;
-                    }
-                    this.removeDropTarget();
+                    this.clearOwnOverlay();
                     return;
                 }
 
@@ -322,7 +333,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 this._onWillShowOverlay.fire(willShowOverlayEvent);
 
                 if (willShowOverlayEvent.defaultPrevented) {
-                    this.removeDropTarget();
+                    this.clearOwnOverlay();
                     return;
                 }
 
@@ -330,8 +341,11 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
 
                 // An `edge` cell reports its position but renders nothing. The
                 // consumer (e.g. the layout-edge dock) owns the preview + commit.
+                // The anchored overlay from the previous frame (the inner cell
+                // crossed on the way out) has to go, or it double-highlights
+                // alongside the consumer's own whole-layout-edge preview.
                 if (resolved.edge) {
-                    this.removeDropTarget();
+                    this.clearOwnOverlay();
                     this._state = quadrant;
                     this._edge = true;
                     return;
@@ -358,6 +372,20 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 const target = this.options.getOverrideTarget?.();
 
                 if (target) {
+                    // The anchor container owns its own lifecycle — the overlay
+                    // slides to whichever target the cursor reaches next, and
+                    // `drop`/`dragend` tear it down — so don't clear it here.
+                    // HTML5 fires `dragleave` spuriously when crossing between
+                    // child elements, and clearing would churn the container
+                    // (and kill its move transition) on every one.
+                    //
+                    // The latched state must still go: `onDragEnd` commits
+                    // `_state` when this is the actual target, so a drag that
+                    // leaves the layout and is released outside would otherwise
+                    // drop at the last hovered position. A spurious leave is
+                    // harmless — the next `dragover` frame re-resolves it.
+                    this._state = undefined;
+                    this._edge = false;
                     return;
                 }
 
@@ -544,6 +572,32 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
             height,
             activationSizeOptions.value
         );
+    }
+
+    /**
+     * Tear down whatever this target is showing, on any frame it resolves to no
+     * overlay. Two things make this more than `removeDropTarget`:
+     *
+     * - With `dndOverlayMounting: 'absolute'` the overlay lives in an anchor
+     *   container shared by every drop target in the component, and
+     *   `removeDropTarget` only owns the in-place dropzone — so the container
+     *   needs clearing explicitly or the last frame's highlight lingers.
+     * - It must only clear the container when this target actually put
+     *   something there. The root edge target sits over every group and
+     *   declines `center` on each frame in the middle of the layout purely so
+     *   the event falls through; clearing from there would destroy and rebuild
+     *   the group's overlay every frame, killing its move transition.
+     *
+     * Resetting `_state` unconditionally is the other half: a target that
+     * resolves to nothing must not stay latched, or a later drop commits a
+     * position the cursor left long ago.
+     */
+    private clearOwnOverlay(): void {
+        const owned = this._state !== undefined;
+        this.removeDropTarget();
+        if (owned) {
+            this.options.getOverrideTarget?.()?.clear();
+        }
     }
 
     private removeDropTarget(): void {

@@ -7,7 +7,10 @@ import {
     positionToDirection,
 } from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
-import { createOffsetDragOverEvent } from '../__test_utils__/utils';
+import {
+    createOffsetDragOverEvent,
+    mockGetBoundingClientRect,
+} from '../__test_utils__/utils';
 
 describe('droptarget', () => {
     let element: HTMLElement;
@@ -147,6 +150,96 @@ describe('droptarget', () => {
             expect(droptarget.state).toBeUndefined();
         });
 
+        test('a null result clears an anchored overlay', () => {
+            // `dndOverlayMounting: 'absolute'` renders into a shared container
+            // the drop target does not own, so a resolver that declines must
+            // clear it explicitly or the previous frame's highlight lingers.
+            let position: Position | null = 'center';
+            const cleared: boolean[] = [];
+            const overrideTarget = {
+                getElements: () => ({
+                    root: document.createElement('div'),
+                    overlay: document.createElement('div'),
+                    changed: false,
+                }),
+                exists: () => true,
+                clear: () => cleared.push(true),
+            };
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ALL,
+                getOverrideTarget: () => overrideTarget,
+                getPositionResolver: () => ({
+                    resolve: () => (position ? { position } : null),
+                }),
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+            expect(droptarget.state).toBe('center');
+            expect(cleared).toEqual([]);
+
+            // the cursor moves into a dead zone
+            position = null;
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+            expect(droptarget.state).toBeUndefined();
+            expect(cleared).toEqual([true]);
+        });
+
+        test('an edge cell clears an anchored overlay', () => {
+            // Moving from an inner cell out to an outer (edge) cell: the target
+            // renders nothing for an edge cell, so the anchored group overlay
+            // from the previous frame must go — otherwise it double-highlights
+            // alongside the consumer's whole-layout-edge preview.
+            let resolved: { position: Position; edge: boolean } = {
+                position: 'left',
+                edge: false,
+            };
+            const cleared: boolean[] = [];
+            const overrideTarget = {
+                getElements: () => ({
+                    root: document.createElement('div'),
+                    overlay: document.createElement('div'),
+                    changed: false,
+                }),
+                exists: () => true,
+                clear: () => cleared.push(true),
+            };
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ALL,
+                getOverrideTarget: () => overrideTarget,
+                getPositionResolver: () => ({ resolve: () => resolved }),
+            });
+
+            // over the inner left cell — the group overlay is anchored
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 60, clientY: 50 })
+            );
+            expect(droptarget.state).toBe('left');
+            expect(cleared).toEqual([]);
+
+            // out onto the outer left cell
+            resolved = { position: 'left', edge: true };
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 20, clientY: 50 })
+            );
+            expect(cleared).toEqual([true]);
+            // the position is still latched for the consumer to commit
+            expect(droptarget.state).toBe('left');
+        });
+
         test('absent → the default quadrant is unchanged', () => {
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: () => true,
@@ -160,6 +253,239 @@ describe('droptarget', () => {
             );
             // x=2 of width 200 is inside the 20% left band.
             expect(droptarget.state).toBe('left');
+        });
+    });
+
+    describe('anchored overlay ownership', () => {
+        // With `dndOverlayMounting: 'absolute'` every drop target in the
+        // component shares one anchor container. A target that renders nothing
+        // this frame must reset its own state — but must NOT clear the shared
+        // container unless it owns what is in it. The root edge target declines
+        // `center` on every frame in the middle of the layout purely so the
+        // event falls through to the group beneath it.
+        function anchor() {
+            const cleared: number[] = [];
+            let n = 0;
+            return {
+                cleared,
+                model: {
+                    getElements: () => ({
+                        root: document.createElement('div'),
+                        overlay: document.createElement('div'),
+                        changed: false,
+                    }),
+                    exists: () => true,
+                    clear: () => cleared.push(++n),
+                },
+            };
+        }
+
+        test('a rejected position does not latch a stale drop', () => {
+            // Mirrors the root edge target: edges allowed, centre declined.
+            const { model } = anchor();
+            const drops: Position[] = [];
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: (_e, position) => position !== 'center',
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
+                getOverrideTarget: () => model,
+            });
+            droptarget.onDrop((e) => drops.push(e.position));
+
+            // into the left edge band — the target renders and latches 'left'
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 2, clientY: 50 })
+            );
+            expect(droptarget.state).toBe('left');
+
+            // out into the middle, which this target declines
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+            expect(droptarget.state).toBeUndefined();
+
+            // dropping in the middle must not commit the stale 'left'
+            fireEvent.drop(element);
+            expect(drops).toEqual([]);
+        });
+
+        test('a target that owns nothing does not clear the shared container', () => {
+            const { cleared, model } = anchor();
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: (_e, position) => position !== 'center',
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
+                getOverrideTarget: () => model,
+            });
+
+            // never rendered, and declines the centre: the overlay in the shared
+            // container belongs to a group beneath, so it must be left alone
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+
+            expect(cleared).toEqual([]);
+        });
+
+        test('leaving the target unlatches it so dragend cannot commit', () => {
+            // `onDragEnd` commits `_state` when this is the actual target — the
+            // anchored path's normal commit route. A drag that leaves the
+            // layout and is released outside must not drop at the last hovered
+            // position.
+            const { cleared, model } = anchor();
+            const drops: Position[] = [];
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
+                getOverrideTarget: () => model,
+            });
+            droptarget.onDrop((e) => drops.push(e.position));
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 2, clientY: 50 })
+            );
+            expect(droptarget.state).toBe('left');
+
+            fireEvent.dragLeave(element);
+            expect(droptarget.state).toBeUndefined();
+            // the container is left alone — the overlay slides to whichever
+            // target comes next, and dragend/drop tear it down
+            expect(cleared).toEqual([]);
+
+            fireEvent.dragEnd(element);
+            expect(drops).toEqual([]);
+        });
+
+        test('`disabled` stops the target resolving', () => {
+            const { model } = anchor();
+            const drops: Position[] = [];
+
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
+                getOverrideTarget: () => model,
+            });
+            droptarget.onDrop((e) => drops.push(e.position));
+
+            droptarget.disabled = true;
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 2, clientY: 50 })
+            );
+
+            expect(droptarget.state).toBeUndefined();
+            fireEvent.drop(element);
+            expect(drops).toEqual([]);
+        });
+    });
+
+    describe('getOverlayOutline', () => {
+        // A theme with `dndPanelOverlay: 'group'` outlines the whole group while
+        // the drop target listens on the content container, which sits below the
+        // tab header. The pointer must be measured against the outline — the box
+        // `width`/`height` describe — or every resolved position is shifted by
+        // the header offset.
+        test('the pointer is measured against the outline, not the listener element', () => {
+            const outline = document.createElement('div');
+            outline.appendChild(element);
+
+            jest.spyOn(outline, 'offsetHeight', 'get').mockImplementation(
+                () => 100
+            );
+            jest.spyOn(outline, 'offsetWidth', 'get').mockImplementation(
+                () => 200
+            );
+            jest.spyOn(outline, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 200,
+                        height: 100,
+                    }) as DOMRect
+            );
+            // the content container: inset by a 35px tab header
+            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 35,
+                        width: 200,
+                        height: 65,
+                    }) as DOMRect
+            );
+
+            const calls: any[] = [];
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: [
+                    'left',
+                    'right',
+                    'top',
+                    'bottom',
+                    'center',
+                ],
+                getOverlayOutline: () => outline,
+                getPositionResolver: () => ({
+                    resolve: (args) => {
+                        calls.push(args);
+                        return { position: 'center' };
+                    },
+                }),
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+
+            // outline-relative (100, 50) — the centre of the 200x100 outline.
+            // Measured against the content container it would be (100, 15).
+            expect(calls[0]).toMatchObject({
+                x: 100,
+                y: 50,
+                width: 200,
+                height: 100,
+            });
         });
     });
 

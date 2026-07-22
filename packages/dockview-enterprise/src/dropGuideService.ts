@@ -226,10 +226,10 @@ class CompassWidget {
 
     /**
      * Paint the cells `gate` accepts (so only legal drops show), centred on
-     * `outline` (the frame the drop target measures) and translated into this
-     * widget's own box so the cells line up with where a drop resolves even when
-     * the two boxes differ (e.g. `dndPanelOverlay: 'group'` measures the whole
-     * group, but the widget is mounted in the content container).
+     * `outline` (the frame the drop target measures). The service mounts this
+     * widget on `outline`, so the translation below is normally zero; it is kept
+     * so the cells still line up with where a drop resolves should the two boxes
+     * ever diverge.
      */
     render(
         outline: HTMLElement,
@@ -314,6 +314,8 @@ export class DropGuideService
               group: DockviewGroupPanel;
               widget: CompassWidget;
               outline: HTMLElement;
+              /** The element the content drop target listens on. */
+              content: HTMLElement;
           }
         | undefined;
     private _endListeners: CompositeDisposable | undefined;
@@ -389,6 +391,34 @@ export class DropGuideService
     }
 
     /**
+     * Drive the compass off raw pointer movement, which reports where the cursor
+     * actually is — `onWillShowOverlay` only fires while it is over a cell of a
+     * group that accepts the drop, so on its own the widget would sit there for
+     * the rest of the drag.
+     *
+     * The compass is the aiming UI for one group's content drop target, and that
+     * target only receives events while the cursor is over its element. So the
+     * widget lives exactly as long as the cursor is over that element: move onto
+     * the tab strip, a sash, another group, or out of the window and it goes.
+     */
+    private _onMove(event: DragEvent | PointerEvent): void {
+        if (!this._mounted) {
+            return;
+        }
+        const r = this._mounted.content.getBoundingClientRect();
+        const inside =
+            event.clientX >= r.left &&
+            event.clientX <= r.right &&
+            event.clientY >= r.top &&
+            event.clientY <= r.bottom;
+        if (!inside) {
+            this._unmount();
+            return;
+        }
+        this._clearFeedbackIfOffCells(event);
+    }
+
+    /**
      * Clear the feedback when the cursor is over no cell (a dead zone between
      * cells, or off the group). `onWillShowOverlay` only fires on a cell, so
      * without this the highlight + edge preview would linger. It only ever
@@ -453,12 +483,19 @@ export class DropGuideService
             return;
         }
 
-        const widget = new CompassWidget(content);
-        const all = new Set(INNER_CELLS);
-        const configured = this._configuredZones();
         // The frame the drop target measures (the whole group or only the
         // content, per `dndPanelOverlay`); fall back to the content container.
         const outline = this.host.getDropOverlayElement(group) ?? content;
+        // Mount in that same frame. The widget clips to its own box, so
+        // mounting anywhere else means cells computed in the outline's
+        // coordinates get cut off by a smaller clip box while staying
+        // hit-testable — with `dndPanelOverlay: 'group'` the cross is centred
+        // on the group but clipped to the content, losing the top of the ring
+        // to the tab header. Same element ⟹ clip box, paint box and hit-test
+        // box are one.
+        const widget = new CompassWidget(outline);
+        const all = new Set(INNER_CELLS);
+        const configured = this._configuredZones();
         // Cache the veto per direction: the inner and outer cell of a direction
         // share a position, and `canDropOnGroup` can fire `onUnhandledDragOver`
         // for a cross-component drag, so resolve each position at most once.
@@ -481,15 +518,15 @@ export class DropGuideService
                 return ok;
             }
         );
-        this._mounted = { group, widget, outline };
+        this._mounted = { group, widget, outline, content };
 
         // The drag has no "left everything" event. Tear the widget down when the
-        // drag ends (drop / dragend / pointerup / cancel); drive the feedback off
-        // every move so it tracks dead zones the overlay event skips.
+        // drag ends (drop / dragend / pointerup / cancel); drive the rest off
+        // every move, which is the only signal that reports leaving the group.
         const win = group.element.ownerDocument.defaultView ?? window;
         const end = (): void => this._unmount();
         const move = (ev: Event): void =>
-            this._clearFeedbackIfOffCells(ev as DragEvent | PointerEvent);
+            this._onMove(ev as DragEvent | PointerEvent);
         this._endListeners = new CompositeDisposable(
             listen(win, 'drop', end),
             listen(win, 'dragend', end),
