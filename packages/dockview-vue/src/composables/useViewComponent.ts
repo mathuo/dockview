@@ -6,9 +6,16 @@ import {
     markRaw,
     getCurrentInstance,
     type ComponentInternalInstance,
+    type Ref,
 } from 'vue';
 import type { DockviewIDisposable } from 'dockview';
 import { findComponent, VueRendererRegistry } from '../utils';
+
+export interface UseViewComponentReturn<TApi> {
+    el: Ref<HTMLElement | null>;
+    instance: Ref<TApi | null>;
+    registry: VueRendererRegistry;
+}
 
 export interface ViewComponentConfig<
     TApi,
@@ -57,9 +64,12 @@ export function useViewComponent<
     >,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
-) {
+): UseViewComponentReturn<TApi> {
     const el = ref<HTMLElement | null>(null);
-    const instance = ref<TApi | null>(null);
+    // Pin the ref type: `ref<TApi>()` would infer `Ref<UnwrapRef<TApi>>`,
+    // which both widens the public type and is what triggered the
+    // non-portable declaration (TS2742) this composable used to emit.
+    const instance = ref<TApi | null>(null) as Ref<TApi | null>;
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**

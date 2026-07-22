@@ -106,11 +106,21 @@ export function mountVueComponent<T extends Record<string, any>>(
 ) {
     let vNode = createVNode(component, Object.freeze(props));
 
-    vNode.appContext = parent.appContext;
-    vNode.appContext.provides = {
-        ...(vNode.appContext.provides ? vNode.appContext.provides : {}),
-        ...((parent as any).provides ? (parent as any).provides : {}),
-    };
+    /**
+     * Clone the parent's app context instead of mutating it. Assigning
+     * `vNode.appContext = parent.appContext` and then writing to `.provides`
+     * would pollute the shared, app-level `provides` object for every other
+     * component in the application. A shallow copy with a freshly merged
+     * `provides` gives this vnode the parent's injectables without the side
+     * effect.
+     */
+    vNode.appContext = {
+        ...parent.appContext,
+        provides: {
+            ...(parent.appContext?.provides ?? {}),
+            ...((parent as any).provides ?? {}),
+        },
+    } as typeof parent.appContext;
 
     render(vNode, element);
 

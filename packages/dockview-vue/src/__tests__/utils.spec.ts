@@ -315,6 +315,33 @@ describe('VuePart', () => {
     });
 });
 
+describe('mountVueComponent', () => {
+    test('does not mutate the shared parent app context provides', () => {
+        // Regression test: the detached render path used to do
+        // `vNode.appContext = parent.appContext` followed by writing to
+        // `.provides`, which mutated the shared, app-level provides object for
+        // every other component. The parent's app context must be untouched.
+        const sharedProvides: Record<string | symbol, unknown> = {
+            existing: 'value',
+        };
+        const parent = {
+            appContext: { components: {}, provides: sharedProvides },
+            provides: { fromInstance: 'x' },
+        } as any;
+
+        mountVueComponent(
+            { template: '<div/>' } as any,
+            parent,
+            { params: {} } as any,
+            document.createElement('div')
+        );
+
+        expect(parent.appContext.provides).toBe(sharedProvides);
+        expect(parent.appContext.provides).toEqual({ existing: 'value' });
+        expect('fromInstance' in parent.appContext.provides).toBe(false);
+    });
+});
+
 describe('VueHeaderActionsRenderer', () => {
     let onDidAddPanel: DockviewEmitter<any>;
     let onDidRemovePanel: DockviewEmitter<any>;
