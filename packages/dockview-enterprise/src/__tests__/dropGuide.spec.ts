@@ -206,13 +206,81 @@ describe('drop guide', () => {
         expect(content.querySelector('.dv-drop-guide')).toBeNull();
     });
 
-    test('paints cells in the drop-target outline frame, translated into its box', () => {
+    describe('teardown on leaving the content area', () => {
+        // The compass aims one group's content drop target, and that target
+        // only gets events while the cursor is over its element. Nothing else
+        // reports leaving: `onWillShowOverlay` simply stops firing, so without
+        // this the widget sits on the group for the rest of the drag.
+        const CONTENT_RECT = {
+            left: 100,
+            top: 100,
+            right: 300,
+            bottom: 200,
+            width: 200,
+            height: 100,
+            x: 100,
+            y: 100,
+            toJSON: () => ({}),
+        } as DOMRect;
+
+        function mounted(): {
+            group: DockviewGroupPanel;
+            content: HTMLElement;
+        } {
+            const { group, content } = groupWithContent();
+            jest.spyOn(content, 'getBoundingClientRect').mockReturnValue(
+                CONTENT_RECT
+            );
+            overlayEmitter.fire({
+                kind: 'content',
+                group,
+            } as DockviewWillShowOverlayLocationEvent);
+            expect(content.querySelector('.dv-drop-guide')).toBeTruthy();
+            return { group, content };
+        }
+
+        function move(clientX: number, clientY: number): void {
+            const ev = new Event('dragover') as any;
+            Object.defineProperty(ev, 'clientX', { get: () => clientX });
+            Object.defineProperty(ev, 'clientY', { get: () => clientY });
+            window.dispatchEvent(ev);
+        }
+
+        test('stays while the cursor is inside', () => {
+            make(true);
+            const { content } = mounted();
+
+            move(200, 150);
+            expect(content.querySelector('.dv-drop-guide')).toBeTruthy();
+        });
+
+        test('clears when the cursor moves up into the tab strip', () => {
+            make(true);
+            const { content } = mounted();
+
+            // just above the content container — the tab strip
+            move(200, 90);
+            expect(content.querySelector('.dv-drop-guide')).toBeNull();
+        });
+
+        test('clears when the cursor leaves the group sideways', () => {
+            make(true);
+            const { content } = mounted();
+
+            move(400, 150);
+            expect(content.querySelector('.dv-drop-guide')).toBeNull();
+        });
+    });
+
+    test('mounts in the drop-target outline frame, not the content container', () => {
         make(true);
         const { group, content } = groupWithContent();
-        // the drop target measures a frame offset from the content the widget
-        // mounts in (e.g. dndPanelOverlay: 'group' includes the tab header).
-        const outline = document.createElement('div');
-        jest.spyOn(outline, 'getBoundingClientRect').mockReturnValue({
+        // `dndPanelOverlay: 'group'`: the drop target measures the whole group,
+        // a bigger box than the content container. The widget clips to its own
+        // box, so mounting in the content would cut the top of the cross off
+        // against the tab header while leaving it hit-testable.
+        const outline = group.element;
+        const rect = {
             left: 10,
             top: 40,
             width: 200,
@@ -222,7 +290,10 @@ describe('drop guide', () => {
             x: 10,
             y: 40,
             toJSON: () => ({}),
-        } as DOMRect);
+        } as DOMRect;
+        const spy = jest
+            .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+            .mockReturnValue(rect);
         dropOverlayEl = () => outline;
 
         overlayEmitter.fire({
@@ -230,12 +301,20 @@ describe('drop guide', () => {
             group,
         } as DockviewWillShowOverlayLocationEvent);
 
-        // centre cell: (200/2 - 19) + dx(10), (100/2 - 19) + dy(40)
-        const center = content.querySelector<HTMLElement>(
+        expect(outline.querySelector('.dv-drop-guide')?.parentElement).toBe(
+            outline
+        );
+        expect(content.querySelector('.dv-drop-guide')).toBeNull();
+
+        // measured frame == mount frame, so the cells need no translation:
+        // centre cell at (200/2 - 19), (100/2 - 19)
+        const center = outline.querySelector<HTMLElement>(
             '.dv-drop-guide-cell-center'
         )!;
-        expect(center.style.left).toBe('91px');
-        expect(center.style.top).toBe('71px');
+        expect(center.style.left).toBe('81px');
+        expect(center.style.top).toBe('31px');
+
+        spy.mockRestore();
     });
 
     test('highlights the aimed cell (the only feedback for an outer cell)', () => {
