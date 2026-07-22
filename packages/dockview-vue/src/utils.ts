@@ -117,8 +117,10 @@ export function mountVueComponent<T extends Record<string, any>>(
     vNode.appContext = {
         ...parent.appContext,
         provides: {
-            ...(parent.appContext?.provides ?? {}),
-            ...((parent as any).provides ?? {}),
+            // Object spread ignores null/undefined, so no `?? {}` guard is
+            // needed for either source.
+            ...parent.appContext?.provides,
+            ...(parent as any).provides,
         },
     } as typeof parent.appContext;
 
