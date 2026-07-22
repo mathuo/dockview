@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>dockview-vue (grid/split/pane) attribute-forwarding e2e fixture</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+            /* Each view host is sized by its own SFC's static
+               `style="height: 100%; width: 100%"`, so it fills the wrapper
+               below. The forwarded `class`/`style` (outline) is what these
+               specs assert on — a fallthrough regression drops the custom
+               class and outline even though the static size keeps it visible. */
+            .wrapper {
+                width: 300px;
+                height: 200px;
+            }
+        </style>
+
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <!-- Globals loaded in dependency order (see vue.html for the rationale). -->
+        <script src="/node_modules/vue/dist/vue.global.js"></script>
+        <script src="/packages/dockview/dist/dockview.js"></script>
+        <script src="/packages/dockview-vue/dist/dockview-vue.umd.cjs"></script>
+
+        <script>
+            (function () {
+                const { createApp } = window.Vue;
+                const { GridviewVue, SplitviewVue, PaneviewVue } =
+                    window['dockview-vue'];
+                const { Orientation } = window.dockview;
+
+                const Panel = {
+                    name: 'Panel',
+                    props: ['params'],
+                    template: `<div class="vue-panel"></div>`,
+                };
+
+                let readyCount = 0;
+                const markReady = () => {
+                    readyCount++;
+                    if (readyCount === 3) {
+                        window.__ready = true;
+                    }
+                };
+
+                const Root = {
+                    name: 'Root',
+                    components: { GridviewVue, SplitviewVue, PaneviewVue },
+                    setup() {
+                        return {
+                            components: { panel: Panel },
+                            horizontal: Orientation.HORIZONTAL,
+                            markReady,
+                        };
+                    },
+                    /**
+                     * Each view receives a fallthrough `class` and `style`
+                     * (a red outline). Both must land on that view's host
+                     * `<div ref="el">` — the outer container — as in
+                     * dockview-vue < 7.0.3 (issue #1510). The composable-based
+                     * views (grid/split/pane) share the same host-binding code
+                     * path as <DockviewVue>, so they must forward too.
+                     */
+                    template: `
+                        <div class="wrapper">
+                            <GridviewVue
+                                class="custom-gridview-host"
+                                style="outline: 3px solid rgb(255, 0, 0);"
+                                :orientation="horizontal"
+                                :components="components"
+                                @ready="markReady"
+                            />
+                        </div>
+                        <div class="wrapper">
+                            <SplitviewVue
+                                class="custom-splitview-host"
+                                style="outline: 3px solid rgb(255, 0, 0);"
+                                :orientation="horizontal"
+                                :components="components"
+                                @ready="markReady"
+                            />
+                        </div>
+                        <div class="wrapper">
+                            <PaneviewVue
+                                class="custom-paneview-host"
+                                style="outline: 3px solid rgb(255, 0, 0);"
+                                :components="components"
+                                @ready="markReady"
+                            />
+                        </div>`,
+                };
+
+                createApp(Root).mount('#app');
+
+                // For each view: does the element carrying the forwarded class
+                // own the view's inner container (matches-or-contains it)? That
+                // proves the class landed on the real host `<div ref="el">`.
+                const ownsContainer = (hostClass, containerClass) => {
+                    const host = document.querySelector('.' + hostClass);
+                    if (!host) return null;
+                    return (
+                        host.matches('.' + containerClass) ||
+                        !!host.querySelector('.' + containerClass)
+                    );
+                };
+                const outlineColor = (hostClass) => {
+                    const host = document.querySelector('.' + hostClass);
+                    return host ? getComputedStyle(host).outlineColor : null;
+                };
+
+                window.__views = {
+                    gridview: () => ({
+                        ownsContainer: ownsContainer(
+                            'custom-gridview-host',
+                            'dv-grid-view'
+                        ),
+                        outlineColor: outlineColor('custom-gridview-host'),
+                    }),
+                    splitview: () => ({
+                        ownsContainer: ownsContainer(
+                            'custom-splitview-host',
+                            'dv-split-view-container'
+                        ),
+                        outlineColor: outlineColor('custom-splitview-host'),
+                    }),
+                    paneview: () => ({
+                        ownsContainer: ownsContainer(
+                            'custom-paneview-host',
+                            'dv-pane-container'
+                        ),
+                        outlineColor: outlineColor('custom-paneview-host'),
+                    }),
+                };
+            })();
+        </script>
+    </body>
+</html>
