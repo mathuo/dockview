@@ -5,12 +5,10 @@ sidebar_position: 5
 description: How to install dockview-enterprise and apply a licence key.
 ---
 
-The enterprise features (pinned tabs, multi-row and wrapping tabs, the drop-guide
-compass, smart guides, layout history, edge-group docking, context menus, and
-layout keyboard operability) ship in a separate package, `dockview-enterprise`,
-and are unlocked with a licence key. This page covers installing the package and
-applying your key. For the full list of what is free and what is enterprise, see
-[Licensing](/docs/overview/features).
+The enterprise features ship in a separate package, `dockview-enterprise`, and
+are unlocked with a licence key. This page covers installing the package and
+applying your key. For what is included, see
+[Licensing](/docs/overview/licence).
 
 ## Install
 
@@ -62,16 +60,24 @@ LicenseManager.setLicenseKey('your-license-key');
 ```
 
 That is the whole setup. With the package imported, the enterprise options become
-available on every `DockviewComponent`, and the key clears the watermark.
+available on every `DockviewComponent`.
 
-## Running without a key
+Without a licence key, or with an invalid one, Dockview shows a watermark.
+[Contact us for a licence](/docs/overview/licence).
 
-The enterprise features never lock your app out. If no key is set, or the key is
-invalid or expired, dockview draws a small watermark in a corner and logs a single
-console message; every feature keeps working. Setting a valid key removes the
-watermark.
+## What the expiry date means
+
+**Any version of Dockview published on or before your key's expiry date keeps
+working with that key forever.** The check uses the release date of the build you
+are running, not today's date, so a deployed application never starts
+watermarking itself.
+
+The date limits which new versions you get, not how long your app runs.
+Upgrading past it shows the watermark; staying on a covered version does not.
+
+Validation is offline: Dockview makes no network requests to check a key.
 
 ## Getting a key
 
 [Start a free trial](/trial) for a short-dated key, or see
-[Licensing](/docs/overview/features) for plans and to buy.
+[Licensing](/docs/overview/licence) for plans and to buy.

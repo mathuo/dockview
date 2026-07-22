@@ -23,7 +23,7 @@
 it re-exports the entire `dockview` API and adds the enterprise features plus
 licensing. Importing the package enables all of them.
 
-See [licensing](https://dockview.dev/docs/overview/features) for what's included.
+See [licensing](https://dockview.dev/docs/overview/licence) for what's included.
 
 ## Install
 
@@ -59,7 +59,7 @@ import 'dockview-enterprise';
 
 Enterprise features are governed by a license key set via
 `LicenseManager.setLicenseKey(...)`. See
-[licensing](https://dockview.dev/docs/overview/features).
+[licensing](https://dockview.dev/docs/overview/licence).
 
 `dockview-enterprise` is proprietary software governed by a commercial licence
 agreement. See [LICENCE.md](./LICENCE.md).

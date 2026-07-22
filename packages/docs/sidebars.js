@@ -22,7 +22,7 @@ const sidebars = {
             collapsed: false,
             items: [
                 'overview/introduction',
-                'overview/features',
+                'overview/licence',
                 'overview/quickstart',
                 'overview/installation',
                 'overview/enterprise-setup',

@@ -356,7 +356,7 @@ const config = {
                         // The in-site licensing / edition-comparison page. Its
                         // "Purchase a licence" CTA links out to the separate
                         // marketing deployment at /enterprise.
-                        to: '/docs/overview/features',
+                        to: '/docs/overview/licence',
                         label: 'Licensing',
                         position: 'right',
                     },
@@ -394,7 +394,7 @@ const config = {
                             },
                             {
                                 label: 'Licensing',
-                                to: '/docs/overview/features',
+                                to: '/docs/overview/licence',
                             },
                             {
                                 label: 'Contact us',

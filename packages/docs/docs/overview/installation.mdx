@@ -87,4 +87,81 @@ import 'dockview-angular/dist/styles/dockview.css';
 ```
 </FrameworkSpecific>
 
+## Enterprise
+
+The enterprise features are in a separate package, `dockview-enterprise`,
+unlocked with a licence key. See [Licensing](/docs/overview/licence) for what is
+included.
+
+<FrameworkSpecific framework='JavaScript'>
+`dockview-enterprise` is a drop-in superset of `dockview`: it re-exports the
+whole `dockview` API and adds the enterprise features. Install it **instead of**
+`dockview` (not alongside it), and import from it wherever you would have
+imported from `dockview`:
+
+```sh
+npm install dockview-enterprise
+```
+
+The stylesheet is unchanged.
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='React'>
+Keep installing and importing your components from `dockview-react`, and add
+`dockview-enterprise` next to it:
+
+```sh
+npm install dockview-enterprise
+```
+
+Then add a one-line side-effect import once, anywhere that runs at start-up:
+
+```ts
+import 'dockview-enterprise';
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+Keep installing and importing your components from `dockview-vue`, and add
+`dockview-enterprise` next to it:
+
+```sh
+npm install dockview-enterprise
+```
+
+Then add a one-line side-effect import once, anywhere that runs at start-up:
+
+```ts
+import 'dockview-enterprise';
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+Keep installing and importing your components from `dockview-angular`, and add
+`dockview-enterprise` next to it:
+
+```sh
+npm install dockview-enterprise
+```
+
+Then add a one-line side-effect import once, anywhere that runs at start-up:
+
+```ts
+import 'dockview-enterprise';
+```
+</FrameworkSpecific>
+
+Set your key once, before creating any Dockview instance:
+
+```ts
+import { LicenseManager } from 'dockview-enterprise';
+
+LicenseManager.setLicenseKey('your-license-key');
+```
+
+See [Enterprise setup](/docs/overview/enterprise-setup) for the full setup,
+including what happens without a key.
+
+## Next steps
+
 Once installed, head to [Core Concepts](/docs/core/overview) to set up your first layout.

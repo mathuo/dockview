@@ -258,8 +258,7 @@ export interface SmartGuidesOptions {
 /**
  * Per-row content preview for the advanced overflow dropdown. The substrate
  * cannot snapshot arbitrary panel content, so the app supplies the preview.
- * Reserved for `AdvancedOverflowModule` (see `advanced-overflow.md`); ignored
- * until that module is present.
+ * Reserved for `AdvancedOverflowModule`; ignored until that module is present.
  */
 export type OverflowThumbnailRenderer = (
     panel: IDockviewPanel
