@@ -1,6 +1,6 @@
 {
     "name": "dockview",
-    "version": "7.0.3",
+    "version": "7.0.4",
     "description": "Docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
     "keywords": [
         "splitview",
@@ -74,9 +74,9 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^7.0.3"
+        "dockview-core": "^7.0.4"
     },
     "devDependencies": {
-        "dockview-modules": "^7.0.3"
+        "dockview-modules": "^7.0.4"
     }
 }
