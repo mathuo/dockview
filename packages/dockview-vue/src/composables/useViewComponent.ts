@@ -63,6 +63,19 @@ export function useViewComponent<
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**
+     * Capture the component instance once, synchronously, during setup.
+     * `getCurrentInstance()` only returns a value during setup and lifecycle
+     * hooks — calling it later from an async watch callback returns `null`, so
+     * the reference is resolved here and reused everywhere below.
+     */
+    const inst = getCurrentInstance();
+    if (!inst) {
+        throw new Error(
+            `${config.componentName}: getCurrentInstance() returned null`
+        );
+    }
+
+    /**
      * Components are teleported into the view's DOM (rendered by
      * `<DockviewPortals>` in the host template) so panels stay in the Vue
      * component tree. See {@link VueRendererRegistry}.
@@ -86,13 +99,6 @@ export function useViewComponent<
         () => (props as any).components,
         () => {
             if (instance.value) {
-                const inst = getCurrentInstance();
-                if (!inst) {
-                    throw new Error(
-                        `${config.componentName}: getCurrentInstance() returned null`
-                    );
-                }
-
                 instance.value.updateOptions({
                     createComponent: (options: {
                         id: string;
@@ -119,14 +125,6 @@ export function useViewComponent<
     onMounted(() => {
         if (!el.value) {
             throw new Error(`${config.componentName}: element is not mounted`);
-        }
-
-        const inst = getCurrentInstance();
-
-        if (!inst) {
-            throw new Error(
-                `${config.componentName}: getCurrentInstance() returned null`
-            );
         }
 
         const frameworkOptions = {

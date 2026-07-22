@@ -231,6 +231,36 @@ describe('GridviewVue components prop resolves without registration', () => {
         expect(api.getPanel('cell-1')).toBeDefined();
     });
 
+    test('changing the components prop at runtime does not crash', async () => {
+        // Regression test: useViewComponent used to call getCurrentInstance()
+        // inside the async `components` watcher, where Vue returns null, so
+        // updating the prop at runtime threw. The instance is now captured
+        // once during setup.
+        const Other = defineComponent({
+            name: 'OtherGridComponent',
+            props: ['params'],
+            template: '<div class="other-grid">Other</div>',
+        });
+
+        wrapper = mount(GridviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Cell: MockGridComponent },
+            },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        await expect(
+            wrapper.setProps({ components: { Cell: Other } })
+        ).resolves.not.toThrow();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
+        expect(() =>
+            api.addPanel({ id: 'cell-1', component: 'Cell' })
+        ).not.toThrow();
+    });
+
     test('throws when component name is not in the map and not registered', async () => {
         wrapper = mount(GridviewVue, {
             props: {
