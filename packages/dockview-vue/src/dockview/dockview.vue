@@ -45,6 +45,15 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     return coreOptions as DockviewOptions;
 }
 
+/**
+ * The template renders multiple root nodes (the host element plus
+ * `<DockviewPortals>`), so Vue cannot automatically forward fallthrough
+ * attributes such as `style` and `class`. Disable automatic inheritance and
+ * bind `$attrs` explicitly onto the host element below so consumer-supplied
+ * attributes continue to reach the root dockview container.
+ */
+defineOptions({ inheritAttrs: false });
+
 const emit = defineEmits<VueEvents>();
 
 const props = defineProps<IDockviewVueProps>();

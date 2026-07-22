@@ -23,6 +23,15 @@ function extractCoreOptions(props: IGridviewVueProps): GridviewOptions {
     return coreOptions as GridviewOptions;
 }
 
+/**
+ * The template renders multiple root nodes (the host element plus
+ * `<DockviewPortals>`), so Vue cannot automatically forward fallthrough
+ * attributes such as `style` and `class`. Disable automatic inheritance and
+ * bind `$attrs` explicitly onto the host element below so consumer-supplied
+ * attributes continue to reach the root container.
+ */
+defineOptions({ inheritAttrs: false });
+
 const emit = defineEmits<GridviewVueEvents>();
 const props = defineProps<IGridviewVueProps>();
 
