@@ -107,9 +107,11 @@ export function fnv1a(input: string): string {
  */
 function cleanKey(key: string): string {
     // CR, LF, zero-width space/non-joiner/joiner (U+200B–200D), BOM (U+FEFF).
-    // Kept as an alternation (not a character class): a class containing the
-    // zero-width joiner trips the linter's misleading-character-class rule.
-    return key.replace(/\r|\n|\u200B|\u200C|\u200D|\uFEFF/g, '').trim();
+    // The class holds literal zero-width characters to strip, not an emoji
+    // zero-width-joiner sequence, so the misleading-character-class rule is a
+    // false positive here.
+    // biome-ignore lint/suspicious/noMisleadingCharacterClass: literal zero-width chars, not an emoji ZWJ sequence
+    return key.replace(/[\r\n\u200B\u200C\u200D\uFEFF]/g, '').trim();
 }
 
 /** Parse `DD_MMM_YYYY` (UTC) → Date, rejecting impossible dates (e.g. 31_Feb). */
