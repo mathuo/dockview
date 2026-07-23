@@ -1080,10 +1080,7 @@ export class TabReorderController extends CompositeDisposable {
         if (this._wrapMode) {
             return;
         }
-        if (
-            !this._animState ||
-            this._animState.currentInsertionIndex === null
-        ) {
+        if (this._animState?.currentInsertionIndex == null) {
             this.resetTabTransforms();
             return;
         }

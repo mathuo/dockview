@@ -107,8 +107,11 @@ export function fnv1a(input: string): string {
  */
 function cleanKey(key: string): string {
     // CR, LF, zero-width space/non-joiner/joiner (U+200B–200D), BOM (U+FEFF).
-    // Kept as an alternation (not a character class): a class containing the
-    // zero-width joiner trips the linter's misleading-character-class rule.
+    // Deliberately an alternation, not a character class. A class containing the
+    // zero-width joiner is both a SonarQube bug (S5868) and a Biome error
+    // (noMisleadingCharacterClass). S6035 suggests collapsing this to a class,
+    // but that fix introduces the S5868 bug, so the alternation is the correct
+    // form and S6035 is left unresolved here.
     return key.replace(/\r|\n|\u200B|\u200C|\u200D|\uFEFF/g, '').trim();
 }
 
