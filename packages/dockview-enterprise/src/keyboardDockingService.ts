@@ -224,53 +224,61 @@ export class KeyboardDockingService
         const move = this._move!;
 
         if (e.key === 'Escape') {
-            this._consume(e);
-            if (move.phase === 'edge') {
-                move.phase = 'target';
-                move.position = 'center';
-                this._render();
-            } else {
-                this._exit();
-                this.host.announce(this._messages.moveCancelled());
-                this._restoreFocus();
-            }
-            return;
+            this._onEscapeKey(e, move);
+        } else if (e.key === 'Enter') {
+            this._onEnterKey(e, move);
+        } else if (move.phase === 'target') {
+            this._onTargetPhaseKey(e, move);
+        } else {
+            this._onEdgePhaseKey(e, move);
         }
+    }
 
-        if (e.key === 'Enter') {
-            this._consume(e);
-            if (move.phase === 'target') {
-                move.phase = 'edge';
-                move.position = 'center';
-                this._render();
-            } else {
-                this._commit();
-            }
-            return;
+    private _onEscapeKey(e: KeyboardEvent, move: MoveState): void {
+        this._consume(e);
+        if (move.phase === 'edge') {
+            move.phase = 'target';
+            move.position = 'center';
+            this._render();
+        } else {
+            this._exit();
+            this.host.announce(this._messages.moveCancelled());
+            this._restoreFocus();
         }
+    }
 
+    private _onEnterKey(e: KeyboardEvent, move: MoveState): void {
+        this._consume(e);
         if (move.phase === 'target') {
-            // Float is a terminal action from the target phase: pull the moving
-            // panel out into a new floating group instead of docking it.
-            if (matchesBinding(e, this._keymap.float)) {
-                this._consume(e);
-                this._float();
-                return;
-            }
-            const n = move.groups.length;
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                this._consume(e);
-                move.groupIndex = (move.groupIndex + 1) % n;
-                this._render();
-            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                this._consume(e);
-                move.groupIndex = (move.groupIndex - 1 + n) % n;
-                this._render();
-            }
+            move.phase = 'edge';
+            move.position = 'center';
+            this._render();
+        } else {
+            this._commit();
+        }
+    }
+
+    private _onTargetPhaseKey(e: KeyboardEvent, move: MoveState): void {
+        // Float is a terminal action from the target phase: pull the moving
+        // panel out into a new floating group instead of docking it.
+        if (matchesBinding(e, this._keymap.float)) {
+            this._consume(e);
+            this._float();
             return;
         }
+        const n = move.groups.length;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            this._consume(e);
+            move.groupIndex = (move.groupIndex + 1) % n;
+            this._render();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            this._consume(e);
+            move.groupIndex = (move.groupIndex - 1 + n) % n;
+            this._render();
+        }
+    }
 
-        // edge phase
+    private _onEdgePhaseKey(e: KeyboardEvent, move: MoveState): void {
         const edge = EDGE_FROM_KEY[e.key];
         if (edge) {
             this._consume(e);

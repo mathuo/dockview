@@ -54,7 +54,7 @@ export interface LicenseServiceOptions {
     releaseDate?: () => Date;
 }
 
-// TODO(§11 / no-pro-in-public): confirm final copy + URL. Neutral wording only.
+// Neutral enterprise info link surfaced in the watermark caption.
 const INFO_URL = 'https://dockview.dev/enterprise';
 
 // The dockview brand lockup (mark + "dockview" wordmark), monotone. Every shape

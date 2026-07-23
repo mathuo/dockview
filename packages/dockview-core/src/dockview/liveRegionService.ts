@@ -188,7 +188,7 @@ export class LiveRegionService
             this._regions.set(win, pair);
         }
 
-        for (const [win, pair] of [...this._regions]) {
+        for (const [win, pair] of this._regions) {
             if (!desired.has(win)) {
                 pair.polite.remove();
                 pair.assertive.remove();
