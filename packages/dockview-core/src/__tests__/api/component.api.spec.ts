@@ -211,7 +211,7 @@ describe('component.api', () => {
             expect(cut.maximumSize).toBe(500);
             expect(cut.width).toBe(100);
             expect(cut.height).toBe(200);
-            expect(cut.length).toBe(3);
+            expect(cut).toHaveLength(3);
             expect(cut.orientation).toBe(Orientation.HORIZONTAL);
             expect(cut.panels).toEqual(['a', 'b']);
             expect(cut.onDidLayoutFromJSON).toBe(onDidLayoutFromJSON);
