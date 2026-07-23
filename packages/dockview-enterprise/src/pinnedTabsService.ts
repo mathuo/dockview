@@ -344,7 +344,7 @@ class SecondRowController extends CompositeDisposable {
      */
     private _incomingPinTarget(): IDockviewPanel | undefined {
         const data = getPanelData();
-        if (!data || data.panelId == null || data.groupId !== this.group.id) {
+        if (data?.panelId == null || data.groupId !== this.group.id) {
             return undefined;
         }
         const panel = this.group.model.panels.find(

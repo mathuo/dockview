@@ -303,7 +303,7 @@ export class SmartGuidesService
             ),
             {
                 dispose: () => {
-                    for (const group of [...this._sessions.keys()]) {
+                    for (const group of this._sessions.keys()) {
                         this._endSession(group);
                     }
                 },
@@ -528,27 +528,7 @@ export class SmartGuidesService
         // The grid's splitters behind the float (a vertical sash → an x line,
         // a horizontal sash → a y line).
         if (opts.snapSplitters) {
-            for (const r of this.host.getGridSplitterRects()) {
-                // Skip hidden / collapsed sashes (zero-area rects): a real sash
-                // has a positive extent on both axes; a 0×0 rect would otherwise
-                // become a phantom candidate at coord 0 (the container edge).
-                if (r.width <= 0 || r.height <= 0) {
-                    continue;
-                }
-                if (r.width <= r.height) {
-                    x.push({
-                        coord: r.left + r.width / 2,
-                        kind: 'edge',
-                        source: 'splitter',
-                    });
-                } else {
-                    y.push({
-                        coord: r.top + r.height / 2,
-                        kind: 'edge',
-                        source: 'splitter',
-                    });
-                }
-            }
+            this._pushSplitterCandidates(x, y);
         }
 
         const layer = new GuideLayer(
@@ -566,6 +546,31 @@ export class SmartGuidesService
         };
         this._sessions.set(context.group, session);
         return session;
+    }
+
+    /** Add snap candidates for the grid's splitters behind the float. */
+    private _pushSplitterCandidates(x: Candidate[], y: Candidate[]): void {
+        for (const r of this.host.getGridSplitterRects()) {
+            // Skip hidden / collapsed sashes (zero-area rects): a real sash
+            // has a positive extent on both axes; a 0×0 rect would otherwise
+            // become a phantom candidate at coord 0 (the container edge).
+            if (r.width <= 0 || r.height <= 0) {
+                continue;
+            }
+            if (r.width <= r.height) {
+                x.push({
+                    coord: r.left + r.width / 2,
+                    kind: 'edge',
+                    source: 'splitter',
+                });
+            } else {
+                y.push({
+                    coord: r.top + r.height / 2,
+                    kind: 'edge',
+                    source: 'splitter',
+                });
+            }
+        }
     }
 
     private _probes(
@@ -602,7 +607,26 @@ export class SmartGuidesService
             }
         }
 
-        // Acquire: the highest-priority candidate within the engage threshold.
+        const best = this._acquireBest(candidates, probes, opts);
+        return best
+            ? { coord: best.coord, delta: best.delta, probe: best.probe }
+            : undefined;
+    }
+
+    /** Acquire: the highest-priority candidate within the engage threshold,
+     *  ranked edge-over-center, then source priority, then nearest. */
+    private _acquireBest(
+        candidates: Candidate[],
+        probes: Probe[],
+        opts: ResolvedOptions
+    ):
+        | {
+              coord: number;
+              delta: number;
+              probe: number;
+              key: [number, number, number];
+          }
+        | undefined {
         let best:
             | {
                   coord: number;
@@ -629,9 +653,7 @@ export class SmartGuidesService
                 }
             }
         }
-        return best
-            ? { coord: best.coord, delta: best.delta, probe: best.probe }
-            : undefined;
+        return best;
     }
 
     private _keyLess(

@@ -625,15 +625,15 @@ class EdgeGroupController extends CompositeDisposable {
         return this._peek !== undefined;
     }
 
-    peek(open: boolean): void {
-        if (open) {
-            const panel = this.group.activePanel;
-            if (panel) {
-                this._openPeek(panel);
-            }
-        } else {
-            this._closePeek();
+    openPeek(): void {
+        const panel = this.group.activePanel;
+        if (panel) {
+            this._openPeek(panel);
         }
+    }
+
+    closePeek(): void {
+        this._closePeek();
     }
 
     /** Re-dock: restore content, then expand (pin) the group via the host. */
@@ -726,7 +726,11 @@ export class AutoHideEdgeGroupService
     peek(position: EdgeGroupPosition, peek: boolean): void {
         const group = this.host.getEdgeGroupPanel(position);
         const controller = group && this._controllers.get(group);
-        controller?.peek(peek);
+        if (peek) {
+            controller?.openPeek();
+        } else {
+            controller?.closePeek();
+        }
     }
 }
 

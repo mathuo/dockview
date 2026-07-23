@@ -77,21 +77,11 @@
     border-bottom: none;
     color: var(--dv-activegroup-visiblepanel-tab-color);
     font-size: 12px;
-}
 
-.dv-edge-peek-title {
-    flex: 1 1 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-// Nested under the header so the two-class selector (specificity 0,2,0) wins
-// over broad app `button {}` rules (e.g. `.app button`, 0,1,1) that would
-// otherwise paint a border/outline on the chrome icons.
-.dv-edge-peek-header {
     // Behave like the tab close icon: borderless, monotone, with a hover
-    // background highlight.
+    // background highlight. Nesting keeps the two-class selector (specificity
+    // 0,2,0) winning over broad app `button {}` rules (e.g. `.app button`,
+    // 0,1,1) that would otherwise paint a border/outline on the chrome icons.
     .dv-edge-peek-pin,
     .dv-edge-peek-close {
         flex: 0 0 auto;
@@ -118,6 +108,13 @@
             outline-offset: -1px;
         }
     }
+}
+
+.dv-edge-peek-title {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 // A floating window hosts its own gridview as the overlay content; it must

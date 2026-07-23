@@ -51,23 +51,22 @@ const MONTHS = [
  * `TextEncoder`). Produces the same bytes the issuer's `TextEncoder` does.
  */
 function* utf8Bytes(str: string): Generator<number> {
-    for (let i = 0; i < str.length; i++) {
-        let code = str.charCodeAt(i);
+    // Iterating a string with `for…of` yields whole code points, so surrogate
+    // pairs are combined automatically (no manual high/low surrogate handling).
+    for (const ch of str) {
+        const code = ch.codePointAt(0)!;
         if (code < 0x80) {
             yield code;
         } else if (code < 0x800) {
             yield 0xc0 | (code >> 6);
             yield 0x80 | (code & 0x3f);
-        } else if (code >= 0xd800 && code <= 0xdbff) {
-            // High surrogate: combine with the following low surrogate.
-            const lo = str.charCodeAt(++i);
-            code = 0x10000 + ((code - 0xd800) << 10) + (lo - 0xdc00);
-            yield 0xf0 | (code >> 18);
-            yield 0x80 | ((code >> 12) & 0x3f);
+        } else if (code < 0x10000) {
+            yield 0xe0 | (code >> 12);
             yield 0x80 | ((code >> 6) & 0x3f);
             yield 0x80 | (code & 0x3f);
         } else {
-            yield 0xe0 | (code >> 12);
+            yield 0xf0 | (code >> 18);
+            yield 0x80 | ((code >> 12) & 0x3f);
             yield 0x80 | ((code >> 6) & 0x3f);
             yield 0x80 | (code & 0x3f);
         }
@@ -108,6 +107,8 @@ export function fnv1a(input: string): string {
  */
 function cleanKey(key: string): string {
     // CR, LF, zero-width space/non-joiner/joiner (U+200B–200D), BOM (U+FEFF).
+    // Kept as an alternation (not a character class): a class containing the
+    // zero-width joiner trips the linter's misleading-character-class rule.
     return key.replace(/\r|\n|\u200B|\u200C|\u200D|\uFEFF/g, '').trim();
 }
 
