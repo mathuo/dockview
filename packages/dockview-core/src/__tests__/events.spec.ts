@@ -568,6 +568,43 @@ describe('events', () => {
             expect(Emitter.MEMORY_LEAK_WATCHER.size).toBe(0);
         });
 
+        it('warns about a leaked listener, deferred to a microtask', async () => {
+            Emitter.setLeakageMonitorEnabled(true);
+
+            const emitter = new Emitter<number>();
+            emitter.event(() => {
+                // leaked: never disposed
+            });
+
+            emitter.dispose();
+            // the leak check is deferred, so nothing is logged synchronously
+            expect(warnSpy).not.toHaveBeenCalled();
+
+            await new Promise<void>((resolve) => queueMicrotask(resolve));
+
+            // the deferred check now reports the leaked listener
+            expect(warnSpy).toHaveBeenCalled();
+            expect(warnSpy.mock.calls[0][0]).toBe('dockview: stacktrace');
+        });
+
+        it('does not warn when the listener is disposed out-of-order in the same block', async () => {
+            Emitter.setLeakageMonitorEnabled(true);
+
+            const emitter = new Emitter<number>();
+            const stream = emitter.event(() => {
+                // noop
+            });
+
+            // dispose the emitter, then the listener, in the same execution
+            // block: the deferred check must see the listener already removed.
+            emitter.dispose();
+            stream.dispose();
+
+            await new Promise<void>((resolve) => queueMicrotask(resolve));
+
+            expect(warnSpy).not.toHaveBeenCalled();
+        });
+
         it('warns when disposing a listener that was already removed while tracking', () => {
             Emitter.setLeakageMonitorEnabled(true);
 
