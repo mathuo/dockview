@@ -1007,4 +1007,577 @@ describe('overlay', () => {
             overlay.dispose();
         });
     });
+
+    describe('visibility', () => {
+        test('setVisible toggles the dv-hidden class and isVisible flag', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+
+            const overlay = new Overlay({
+                height: 100,
+                width: 100,
+                left: 10,
+                top: 10,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+            });
+
+            expect(overlay.isVisible).toBe(true);
+            expect(overlay.element.classList.contains('dv-hidden')).toBe(false);
+
+            overlay.setVisible(false);
+            expect(overlay.isVisible).toBe(false);
+            expect(overlay.element.classList.contains('dv-hidden')).toBe(true);
+
+            overlay.setVisible(true);
+            expect(overlay.isVisible).toBe(true);
+            expect(overlay.element.classList.contains('dv-hidden')).toBe(false);
+
+            overlay.dispose();
+        });
+
+        test('setVisible is a no-op when the value is unchanged', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+
+            const overlay = new Overlay({
+                height: 100,
+                width: 100,
+                left: 10,
+                top: 10,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+            });
+
+            // already visible → no class change
+            overlay.setVisible(true);
+            expect(overlay.isVisible).toBe(true);
+            expect(overlay.element.classList.contains('dv-hidden')).toBe(false);
+
+            overlay.dispose();
+        });
+    });
+
+    describe('minimum-in-viewport (no constraint configured)', () => {
+        test('omitting the minimum options leaves clamping unconstrained', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            // No minimumInViewportWidth/Height → getMinimumWidth/Height return 0
+            const overlay = new Overlay({
+                height: 200,
+                width: 100,
+                left: 10,
+                top: 20,
+                container,
+                content,
+            });
+
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 80,
+                    top: 100,
+                    width: 40,
+                    height: 50,
+                })
+            );
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 20,
+                        top: 30,
+                        width: 100,
+                        height: 100,
+                    })
+            );
+
+            // top: clamp(overlay.top(100) - container.top(30), 0, max(0, 100-50)) = 50
+            // left: clamp(overlay.left(80) - container.left(20), 0, max(0, 100-40)) = 60
+            expect(() => overlay.setBounds()).not.toThrow();
+            expect(overlay.toJSON()).toEqual({
+                top: 50,
+                left: 60,
+                width: 40,
+                height: 50,
+            });
+
+            overlay.dispose();
+        });
+
+        test('the minimumInViewport setters feed the clamping offsets', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            const overlay = new Overlay({
+                height: 100,
+                width: 100,
+                left: 10,
+                top: 10,
+                container,
+                content,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 100,
+                        height: 100,
+                    })
+            );
+            // overlay is wider/taller than the container and positioned well
+            // beyond it, so it will be clamped to the maximum allowed offset.
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 500,
+                    top: 500,
+                    width: 200,
+                    height: 200,
+                })
+            );
+
+            // Without a configured minimum the max offset is
+            //   max(0, container(100) - overlay(200)) = 0.
+            // Setting a 20px in-viewport minimum widens it to
+            //   max(0, 100 - 200 + (200 - 20)) = 80,
+            // so the clamped edge lands at 80 instead of 0.
+            overlay.minimumInViewportWidth = 20;
+            overlay.minimumInViewportHeight = 20;
+
+            overlay.setBounds();
+
+            const bounds = overlay.toJSON() as Record<string, number>;
+            expect(bounds.top).toBe(80);
+            expect(bounds.left).toBe(80);
+
+            overlay.dispose();
+        });
+    });
+
+    describe('cancelPendingDrag', () => {
+        function setup() {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            const overlay = new Overlay({
+                height: 50,
+                width: 50,
+                left: 10,
+                top: 10,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 200,
+                        height: 200,
+                    })
+            );
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 10,
+                    top: 10,
+                    width: 50,
+                    height: 50,
+                })
+            );
+
+            const dragTarget = document.createElement('div');
+            container.appendChild(dragTarget);
+            overlay.setupDrag(dragTarget);
+
+            return { overlay, dragTarget };
+        }
+
+        test('does nothing when no drag is in flight', () => {
+            const { overlay } = setup();
+            expect(() => overlay.cancelPendingDrag()).not.toThrow();
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-dragging'
+                )
+            ).toBe(false);
+            overlay.dispose();
+        });
+
+        test('aborts an in-flight drag and clears the dragging class', () => {
+            const { overlay, dragTarget } = setup();
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+            }) as any;
+            down.pointerId = 1;
+            dragTarget.dispatchEvent(down);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-dragging'
+                )
+            ).toBe(true);
+
+            overlay.cancelPendingDrag();
+
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-dragging'
+                )
+            ).toBe(false);
+
+            overlay.dispose();
+        });
+    });
+
+    describe('setupDrag guards and pointer capture', () => {
+        function setup() {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            const overlay = new Overlay({
+                height: 50,
+                width: 50,
+                left: 10,
+                top: 10,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 200,
+                        height: 200,
+                    })
+            );
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 10,
+                    top: 10,
+                    width: 50,
+                    height: 50,
+                })
+            );
+
+            return { overlay, container, content };
+        }
+
+        test('captures and releases the pointer over a full drag', () => {
+            const { overlay, container } = setup();
+
+            const dragTarget = document.createElement('div');
+            const setPointerCapture = jest.fn();
+            const releasePointerCapture = jest.fn();
+            (dragTarget as any).setPointerCapture = setPointerCapture;
+            (dragTarget as any).releasePointerCapture = releasePointerCapture;
+            container.appendChild(dragTarget);
+            overlay.setupDrag(dragTarget);
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+            }) as any;
+            down.pointerId = 7;
+            dragTarget.dispatchEvent(down);
+
+            expect(setPointerCapture).toHaveBeenCalledWith(7);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 7;
+            window.dispatchEvent(move);
+
+            const up = new MouseEvent('pointerup', { bubbles: true }) as any;
+            up.pointerId = 7;
+            window.dispatchEvent(up);
+
+            expect(releasePointerCapture).toHaveBeenCalledWith(7);
+
+            overlay.dispose();
+        });
+
+        test('ignores pointerdown when defaultPrevented', () => {
+            const { overlay, container } = setup();
+            const dragTarget = document.createElement('div');
+            container.appendChild(dragTarget);
+            overlay.setupDrag(dragTarget);
+
+            const onDidStartMoving = jest.fn();
+            overlay.onDidStartMoving(onDidStartMoving);
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+                cancelable: true,
+            }) as any;
+            down.pointerId = 1;
+            down.preventDefault();
+            dragTarget.dispatchEvent(down);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            // no drag was started
+            expect(onDidStartMoving).not.toHaveBeenCalled();
+
+            overlay.dispose();
+        });
+
+        test('shift+pointerdown on the content starts a drag', () => {
+            const { overlay, content } = setup();
+            overlay.setupDrag(document.createElement('div'));
+
+            const onDidStartMoving = jest.fn();
+            overlay.onDidStartMoving(onDidStartMoving);
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+                shiftKey: true,
+            }) as any;
+            down.pointerId = 1;
+            content.dispatchEvent(down);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            expect(onDidStartMoving).toHaveBeenCalledTimes(1);
+
+            overlay.dispose();
+        });
+
+        test('pointerdown on the content without shift does not drag', () => {
+            const { overlay, content } = setup();
+            overlay.setupDrag(document.createElement('div'));
+
+            const onDidStartMoving = jest.fn();
+            overlay.onDidStartMoving(onDidStartMoving);
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+            }) as any;
+            down.pointerId = 1;
+            content.dispatchEvent(down);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            expect(onDidStartMoving).not.toHaveBeenCalled();
+
+            overlay.dispose();
+        });
+
+        test('inDragMode begins tracking immediately', () => {
+            const { overlay } = setup();
+
+            const dragTarget = document.createElement('div');
+            overlay.setupDrag(dragTarget, { inDragMode: true });
+
+            const onDidStartMoving = jest.fn();
+            overlay.onDidStartMoving(onDidStartMoving);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            expect(onDidStartMoving).toHaveBeenCalledTimes(1);
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-dragging'
+                )
+            ).toBe(true);
+
+            overlay.dispose();
+        });
+    });
+
+    describe('resize handles (additional directions)', () => {
+        function setup() {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            const overlay = new Overlay({
+                height: 100,
+                width: 100,
+                left: 50,
+                top: 50,
+                minimumInViewportWidth: 25,
+                minimumInViewportHeight: 25,
+                container,
+                content,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 400,
+                        height: 400,
+                    })
+            );
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 50,
+                    top: 50,
+                    width: 100,
+                    height: 100,
+                })
+            );
+
+            return { overlay, container };
+        }
+
+        function resizeVia(
+            container: HTMLElement,
+            direction: string,
+            move: { clientX: number; clientY: number }
+        ) {
+            const handle = container.querySelector(
+                `.dv-resize-handle-${direction}`
+            ) as HTMLElement;
+            expect(handle).toBeTruthy();
+
+            const setPointerCapture = jest.fn();
+            const releasePointerCapture = jest.fn();
+            (handle as any).setPointerCapture = setPointerCapture;
+            (handle as any).releasePointerCapture = releasePointerCapture;
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 150,
+                clientY: 150,
+                bubbles: true,
+                cancelable: true,
+            }) as any;
+            down.pointerId = 3;
+            handle.dispatchEvent(down);
+
+            const pmove = new MouseEvent('pointermove', {
+                clientX: move.clientX,
+                clientY: move.clientY,
+                bubbles: true,
+            }) as any;
+            pmove.pointerId = 3;
+            window.dispatchEvent(pmove);
+
+            const up = new MouseEvent('pointerup', { bubbles: true }) as any;
+            up.pointerId = 3;
+            window.dispatchEvent(up);
+
+            return { setPointerCapture, releasePointerCapture };
+        }
+
+        test('bottom handle resizes height and captures/releases the pointer', () => {
+            const { overlay, container } = setup();
+
+            const { setPointerCapture, releasePointerCapture } = resizeVia(
+                container,
+                'bottom',
+                { clientX: 150, clientY: 200 }
+            );
+
+            expect(setPointerCapture).toHaveBeenCalledWith(3);
+            expect(releasePointerCapture).toHaveBeenCalledWith(3);
+
+            const bounds = overlay.toJSON();
+            expect(bounds.height).toBeGreaterThan(0);
+            expect(bounds.height).toBeLessThanOrEqual(400);
+
+            overlay.dispose();
+        });
+
+        test.each([
+            ['bottomright', { clientX: 250, clientY: 250 }],
+            ['topleft', { clientX: 80, clientY: 80 }],
+            ['topright', { clientX: 250, clientY: 80 }],
+            ['bottomleft', { clientX: 80, clientY: 250 }],
+        ] as const)('%s corner resizes both dimensions', (corner, point) => {
+            const { overlay, container } = setup();
+
+            resizeVia(container, corner, point);
+
+            const bounds = overlay.toJSON();
+            expect(bounds.width).toBeGreaterThan(0);
+            expect(bounds.height).toBeGreaterThan(0);
+
+            overlay.dispose();
+        });
+    });
 });

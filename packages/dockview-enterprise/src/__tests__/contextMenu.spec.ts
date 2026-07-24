@@ -1,6 +1,6 @@
 import { fireEvent } from '@testing-library/dom';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { ContextMenuController } from '../contextMenu';
+import { ContextMenuController, ContextMenuModule } from '../contextMenu';
 import { DockviewComponent } from 'dockview-core';
 import { DockviewGroupPanel } from 'dockview-core';
 import { IDockviewPanel } from 'dockview-core';
@@ -1439,6 +1439,497 @@ describe('ContextMenuController', () => {
 
             const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
             expect(labels(menuEl)).toEqual(['Close']);
+        });
+    });
+
+    describe('custom element item in show()', () => {
+        test('appends the provided element directly', () => {
+            const customEl = document.createElement('section');
+            customEl.className = 'my-custom-element';
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([{ element: customEl }]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(menuEl.contains(customEl)).toBe(true);
+            expect(menuEl.querySelector('.my-custom-element')).toBe(customEl);
+        });
+    });
+
+    describe('color swatch click', () => {
+        function makeChipAccessor(palette: TabGroupColorPalette) {
+            const openPopover = jest.fn();
+            const close = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close,
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue(['colorPicker']),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+                tabGroupColorPalette: palette,
+            });
+            return { accessor, openPopover };
+        }
+
+        test('calls tabGroup.setColor() with the entry id on click', () => {
+            const palette = new TabGroupColorPalette([
+                { id: 'brand', value: '#123456', label: 'Brand' },
+                { id: 'accent', value: '#abcdef', label: 'Accent' },
+            ]);
+            const { accessor, openPopover } = makeChipAccessor(palette);
+            const controller = new ContextMenuController(accessor);
+
+            const setColor = jest.fn();
+            const tabGroup = fromPartial<ITabGroup>({
+                color: 'brand',
+                setColor,
+            });
+            controller.showForChip(
+                tabGroup,
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const swatches = menuEl.querySelectorAll(
+                '.dv-context-menu-color-swatch'
+            );
+            fireEvent.click(swatches[1]);
+
+            expect(setColor).toHaveBeenCalledWith('accent');
+        });
+
+        test('omits the title attribute for palette entries without a label', () => {
+            const palette = new TabGroupColorPalette([
+                { id: 'nolabel', value: '#010203' },
+            ]);
+            const { accessor, openPopover } = makeChipAccessor(palette);
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial<ITabGroup>({ color: 'other', setColor: jest.fn() }),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const swatch = menuEl.querySelector(
+                '.dv-context-menu-color-swatch'
+            ) as HTMLElement;
+            expect(swatch.title).toBe('');
+            expect(
+                swatch.classList.contains(
+                    'dv-context-menu-color-swatch--selected'
+                )
+            ).toBe(false);
+        });
+    });
+
+    describe('config items with no renderable field', () => {
+        test('show() renders nothing for a config with no element/component/label', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([{ componentProps: { foo: 'bar' } }]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(menuEl.children).toHaveLength(0);
+        });
+
+        test('showForChip() renders nothing for a config with no element/label', () => {
+            const openPopover = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close: jest.fn(),
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue([{ componentProps: { foo: 'bar' } }]),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial({}),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(menuEl.children).toHaveLength(0);
+        });
+    });
+
+    describe('showForChip() early returns', () => {
+        test('does nothing when getTabGroupChipContextMenuItems is not provided', () => {
+            const { accessor, openPopover } = makeAccessor();
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.showForChip(fromPartial({}), makeGroup(), event);
+
+            expect(openPopover).not.toHaveBeenCalled();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        test('does nothing when the callback returns an empty array', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabGroupChipContextMenuItems: jest.fn().mockReturnValue([]),
+            });
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.showForChip(fromPartial({}), makeGroup(), event);
+
+            expect(openPopover).not.toHaveBeenCalled();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        test('calls preventDefault() and opens the popover when items exist', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabGroupChipContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['collapse']),
+            });
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.showForChip(
+                fromPartial<ITabGroup>({ collapsed: false, toggle: jest.fn() }),
+                makeGroup(),
+                event
+            );
+
+            expect(spy).toHaveBeenCalled();
+            expect(openPopover).toHaveBeenCalled();
+        });
+    });
+
+    describe('showForChip() item types', () => {
+        function makeChipAccessor(items: unknown[]) {
+            const openPopover = jest.fn();
+            const close = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close,
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue(items),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+            });
+            return { accessor, openPopover, close };
+        }
+
+        test('renders a separator', () => {
+            const { accessor, openPopover } = makeChipAccessor(['separator']);
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial({}),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(
+                menuEl.querySelectorAll('.dv-context-menu-separator')
+            ).toHaveLength(1);
+        });
+
+        test('appends a custom element item directly', () => {
+            const customEl = document.createElement('span');
+            customEl.className = 'chip-custom-element';
+            const { accessor, openPopover } = makeChipAccessor([
+                { element: customEl },
+            ]);
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial({}),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(menuEl.contains(customEl)).toBe(true);
+        });
+
+        test('renders a custom label item and runs its action on click', () => {
+            const action = jest.fn();
+            const { accessor, openPopover, close } = makeChipAccessor([
+                { label: 'Chip Action', action },
+            ]);
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial({}),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Chip Action');
+
+            fireEvent.click(item);
+            expect(action).toHaveBeenCalled();
+            expect(close).toHaveBeenCalled();
+        });
+
+        test('label item with no action does not throw on click', () => {
+            const { accessor, openPopover, close } = makeChipAccessor([
+                { label: 'No Action' },
+            ]);
+            const controller = new ContextMenuController(accessor);
+
+            controller.showForChip(
+                fromPartial({}),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(() => fireEvent.click(item)).not.toThrow();
+            expect(close).toHaveBeenCalled();
+        });
+    });
+
+    describe("chip 'rename' input", () => {
+        function makeChipAccessor(items: unknown[]) {
+            const openPopover = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close: jest.fn(),
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue(items),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+            });
+            return { accessor, openPopover };
+        }
+
+        function renderRename(
+            tabGroup: ITabGroup,
+            rafImpl?: (cb: FrameRequestCallback) => number
+        ): HTMLInputElement {
+            const raf = jest
+                .spyOn(globalThis, 'requestAnimationFrame')
+                .mockImplementation(
+                    rafImpl ??
+                        ((cb: FrameRequestCallback) => {
+                            cb(0);
+                            return 0;
+                        })
+                );
+            try {
+                const { accessor, openPopover } = makeChipAccessor(['rename']);
+                const controller = new ContextMenuController(accessor);
+                controller.showForChip(
+                    tabGroup,
+                    makeGroup(),
+                    new MouseEvent('contextmenu', { cancelable: true })
+                );
+                const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+                return menuEl.querySelector(
+                    '.dv-context-menu-rename-input'
+                ) as HTMLInputElement;
+            } finally {
+                raf.mockRestore();
+            }
+        }
+
+        afterEach(() => {
+            // matchMedia may be assigned by individual tests; clean up.
+            // @ts-expect-error jsdom does not define matchMedia by default.
+            delete globalThis.matchMedia;
+        });
+
+        test('seeds the input with the current group label', () => {
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'My Group',
+                setLabel: jest.fn(),
+            });
+            const input = renderRename(tabGroup);
+            expect(input.value).toBe('My Group');
+            expect(input.placeholder).toBe('Name This Group');
+        });
+
+        test('calls setLabel() as the user types', () => {
+            const setLabel = jest.fn();
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Old',
+                setLabel,
+            });
+            const input = renderRename(tabGroup);
+
+            fireEvent.input(input, { target: { value: 'New Name' } });
+            expect(setLabel).toHaveBeenCalledWith('New Name');
+        });
+
+        test('stops propagation of non Escape/Enter keydowns', () => {
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Group',
+                setLabel: jest.fn(),
+            });
+            const input = renderRename(tabGroup);
+
+            const letter = new KeyboardEvent('keydown', {
+                key: 'a',
+                bubbles: true,
+                cancelable: true,
+            });
+            const letterSpy = jest.spyOn(letter, 'stopPropagation');
+            input.dispatchEvent(letter);
+            expect(letterSpy).toHaveBeenCalled();
+        });
+
+        test('lets Escape and Enter propagate (does not stop them)', () => {
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Group',
+                setLabel: jest.fn(),
+            });
+            const input = renderRename(tabGroup);
+
+            for (const key of ['Escape', 'Enter']) {
+                const event = new KeyboardEvent('keydown', {
+                    key,
+                    bubbles: true,
+                    cancelable: true,
+                });
+                const spy = jest.spyOn(event, 'stopPropagation');
+                input.dispatchEvent(event);
+                expect(spy).not.toHaveBeenCalled();
+            }
+        });
+
+        test('stops propagation of clicks on the input', () => {
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Group',
+                setLabel: jest.fn(),
+            });
+            const input = renderRename(tabGroup);
+
+            const click = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+            });
+            const spy = jest.spyOn(click, 'stopPropagation');
+            input.dispatchEvent(click);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        test('auto-focuses and selects on a fine-pointer device', () => {
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Group',
+                setLabel: jest.fn(),
+            });
+            // jsdom has no matchMedia by default => treated as non-coarse, so
+            // the auto-focus path runs.
+            const focus = jest.spyOn(HTMLInputElement.prototype, 'focus');
+            const select = jest.spyOn(HTMLInputElement.prototype, 'select');
+            try {
+                renderRename(tabGroup);
+                expect(focus).toHaveBeenCalled();
+                expect(select).toHaveBeenCalled();
+            } finally {
+                focus.mockRestore();
+                select.mockRestore();
+            }
+        });
+
+        test('skips auto-focus on a coarse (touch) primary device', () => {
+            // @ts-expect-error assigning a test double for matchMedia.
+            globalThis.matchMedia = (query: string) =>
+                ({
+                    matches: query.includes('coarse'),
+                }) as MediaQueryList;
+
+            const tabGroup = fromPartial<ITabGroup>({
+                label: 'Group',
+                setLabel: jest.fn(),
+            });
+            const raf = jest.spyOn(globalThis, 'requestAnimationFrame');
+            try {
+                renderRename(tabGroup);
+                // The auto-focus is scheduled via requestAnimationFrame; on a
+                // coarse device that scheduling is skipped entirely.
+                expect(raf).not.toHaveBeenCalled();
+            } finally {
+                raf.mockRestore();
+            }
+        });
+    });
+
+    describe('ContextMenuModule', () => {
+        test('the service factory builds a ContextMenuController for the host', () => {
+            const { accessor } = makeAccessor();
+            const factory = ContextMenuModule.services!.contextMenuService;
+            const service = factory(accessor);
+            expect(service).toBeInstanceOf(ContextMenuController);
+        });
+
+        test('module metadata is wired to the context menu service slot', () => {
+            expect(ContextMenuModule.moduleName).toBe('ContextMenu');
+            expect(Object.keys(ContextMenuModule.services ?? {})).toContain(
+                'contextMenuService'
+            );
+            expect(ContextMenuModule.options).toEqual(
+                expect.arrayContaining([
+                    'getTabContextMenuItems',
+                    'getTabGroupChipContextMenuItems',
+                    'createContextMenuItemComponent',
+                ])
+            );
         });
     });
 });
