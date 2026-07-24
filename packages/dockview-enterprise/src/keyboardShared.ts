@@ -106,7 +106,7 @@ export function bindDocumentListeners(
             desired.add(doc);
             attach(doc);
         }
-        for (const doc of [...attached]) {
+        for (const doc of attached) {
             if (!desired.has(doc)) {
                 detach(doc);
             }
@@ -120,7 +120,7 @@ export function bindDocumentListeners(
     return {
         dispose: () => {
             sub.dispose();
-            for (const doc of [...attached]) {
+            for (const doc of attached) {
                 detach(doc);
             }
         },

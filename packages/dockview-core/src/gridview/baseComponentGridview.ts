@@ -240,7 +240,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         if ('styles' in options) {
             // this.gridview.styles = options.styles; // not supported
         }
-        if ('disableResizing' in options) {
+        if ('disableAutoResizing' in options) {
             this.disableResizing = options.disableAutoResizing ?? false;
         }
         if ('locked' in options) {

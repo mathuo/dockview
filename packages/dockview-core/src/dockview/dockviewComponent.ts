@@ -495,22 +495,17 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }
 
-/** A never-firing history-change event, the fallback `onDidChangeHistory`
- *  returns when the LayoutHistory module is absent, so the api event is always
- *  valid and subscribable. */
-const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
-    dispose: () => {
-        // noop, nothing ever fires
-    },
-});
-
-/** A never-firing event, the fallback the Smart Guides snap events return when
- *  the module is absent, so the api events are always subscribable. */
+/** A never-firing event, the fallback the api returns when the backing module
+ *  is absent, so the api events are always valid and subscribable. */
 const NO_EVENT: Event<any> = () => ({
     dispose: () => {
         // noop, nothing ever fires
     },
 });
+
+/** A never-firing history-change event, the fallback `onDidChangeHistory`
+ *  returns when the LayoutHistory module is absent. */
+const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = NO_EVENT;
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
@@ -3330,44 +3325,55 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
-        const edgeEntries = this._edgeGroupService?.entries() ?? [];
-        if (this._edgeGroupService?.hasAny()) {
-            const shellSerialized = this._shellManager!.toJSON();
-
-            // Augment each entry with the serialized group state + the
-            // component-owned per-group presentation flags (the shell only
-            // knows geometry/collapse).
-            for (const [position, group] of edgeEntries) {
-                const entry = shellSerialized[position];
-                if (!entry) {
-                    continue;
-                }
-                // Don't persist a transient empty auto-reveal edge (it's
-                // mid-teardown to zero footprint, and the deferred removeEdgeGroup
-                // microtask hasn't run yet). Restoring it would recreate an edge
-                // that can never tear itself down, since nothing is ever removed
-                // from it to fire onDidRemovePanel.
-                if (
-                    this._edgeGroupService!.isAutoReveal(group) &&
-                    group.model.isEmpty
-                ) {
-                    delete shellSerialized[position];
-                    continue;
-                }
-                entry.group = group.toJSON();
-                if (this._edgeGroupService!.isAutoReveal(group)) {
-                    entry.autoReveal = true;
-                }
-                const autoHide = this._edgeGroupService!.isAutoHide(group);
-                if (autoHide !== undefined) {
-                    entry.autoHide = autoHide;
-                }
-            }
-
-            result.edgeGroups = shellSerialized;
+        const edgeGroups = this._serializeEdgeGroups();
+        if (edgeGroups) {
+            result.edgeGroups = edgeGroups;
         }
 
         return result;
+    }
+
+    /**
+     * Serialize the edge groups, augmenting each shell entry with the serialized
+     * group state + the component-owned per-group presentation flags (the shell
+     * only knows geometry/collapse). Returns `undefined` when there are none.
+     */
+    private _serializeEdgeGroups():
+        | SerializedDockview['edgeGroups']
+        | undefined {
+        if (!this._edgeGroupService?.hasAny()) {
+            return undefined;
+        }
+        const shellSerialized = this._shellManager!.toJSON();
+
+        for (const [position, group] of this._edgeGroupService.entries()) {
+            const entry = shellSerialized[position];
+            if (!entry) {
+                continue;
+            }
+            // Don't persist a transient empty auto-reveal edge (it's
+            // mid-teardown to zero footprint, and the deferred removeEdgeGroup
+            // microtask hasn't run yet). Restoring it would recreate an edge
+            // that can never tear itself down, since nothing is ever removed
+            // from it to fire onDidRemovePanel.
+            if (
+                this._edgeGroupService.isAutoReveal(group) &&
+                group.model.isEmpty
+            ) {
+                delete shellSerialized[position];
+                continue;
+            }
+            entry.group = group.toJSON();
+            if (this._edgeGroupService.isAutoReveal(group)) {
+                entry.autoReveal = true;
+            }
+            const autoHide = this._edgeGroupService.isAutoHide(group);
+            if (autoHide !== undefined) {
+                entry.autoHide = autoHide;
+            }
+        }
+
+        return shellSerialized;
     }
 
     fromJSON(

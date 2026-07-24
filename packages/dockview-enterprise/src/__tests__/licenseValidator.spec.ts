@@ -15,6 +15,19 @@ const GOLDEN_KEY =
 
 const GOLDEN_BODY = GOLDEN_KEY.slice(0, GOLDEN_KEY.lastIndexOf('__'));
 
+// Independent oracle: FNV-1a 64-bit computed over Node's own canonical UTF-8
+// encoding, using BigInt (a different arithmetic path than the verifier's
+// two-32-bit-halves impl). Lets us assert `fnv1a` — and therefore `utf8Bytes` —
+// is byte-identical to a standard encoder across the 1/2/3/4-byte ranges,
+// including surrogate pairs, without needing an issuer-minted fixture.
+function fnv1aReference(input: string): string {
+    let h = 0xcbf29ce484222325n;
+    for (const b of Buffer.from(input, 'utf8')) {
+        h = ((h ^ BigInt(b)) * 0x100000001b3n) & 0xffffffffffffffffn;
+    }
+    return h.toString(16).padStart(16, '0');
+}
+
 describe('fnv1a', () => {
     test('empty input is the FNV-1a 64-bit offset basis', () => {
         expect(fnv1a('')).toBe('cbf29ce484222325');
@@ -32,6 +45,23 @@ describe('fnv1a', () => {
 
     test('a single-byte change flips the digest', () => {
         expect(fnv1a(GOLDEN_BODY)).not.toBe(fnv1a(GOLDEN_BODY + ' '));
+    });
+
+    test('utf8 encoding matches a standard encoder across byte-lengths', () => {
+        // 1-byte (ASCII), 2-byte (Latin-1 supplement), 3-byte (CJK), and
+        // 4-byte (astral / surrogate-pair emoji) code points, plus a mix.
+        for (const s of [
+            'A',
+            'é',
+            'ñ',
+            '£',
+            '日本語',
+            '😀',
+            '𐀀',
+            'Acmé_Trådîng_🚀',
+        ]) {
+            expect(fnv1a(s)).toBe(fnv1aReference(s));
+        }
     });
 });
 
@@ -71,6 +101,39 @@ describe('parseLicenseKey', () => {
             10
         )}\r\n`;
         expect(parseLicenseKey(noisy)).not.toBeNull();
+    });
+
+    // Build a valid-checksum key with an arbitrary ValidUntil so the date
+    // parser's branches can be exercised through the public API.
+    const keyWithValidUntil = (validUntil: string): string => {
+        const body =
+            `[KeyId:K]_[Company:C]_[Plan:team]_[AppName:A]_[Email:e@x.com]` +
+            `_[ValidFrom:01_Jul_2026]_[ValidUntil:${validUntil}]`;
+        return `${body}__${fnv1a(body)}`;
+    };
+
+    test('date field with an unknown month name parses to null', () => {
+        expect(
+            parseLicenseKey(keyWithValidUntil('01_Zzz_2027'))!.validUntil
+        ).toBeNull();
+    });
+
+    test('date field with an impossible calendar day parses to null', () => {
+        // 31 Feb overflows into March, so it is rejected.
+        expect(
+            parseLicenseKey(keyWithValidUntil('31_Feb_2027'))!.validUntil
+        ).toBeNull();
+    });
+
+    test('date field with a malformed shape parses to null', () => {
+        expect(
+            parseLicenseKey(keyWithValidUntil('2027-07-01'))!.validUntil
+        ).toBeNull();
+    });
+
+    test('a well-formed date parses to the matching UTC calendar day', () => {
+        const d = parseLicenseKey(keyWithValidUntil('29_Feb_2028'))!.validUntil;
+        expect(d).toEqual(new Date(Date.UTC(2028, 1, 29))); // leap day
     });
 });
 

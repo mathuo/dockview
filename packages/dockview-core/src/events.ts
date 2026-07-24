@@ -190,18 +190,24 @@ export class Emitter<T> implements IDisposable {
 
             if (this._listeners.length > 0) {
                 if (Emitter.ENABLE_TRACKING) {
+                    // Defer the leak check AND the clear to a microtask: this
+                    // lets listeners disposed out-of-order later in the same
+                    // execution block remove themselves from `_listeners` first,
+                    // so they aren't falsely reported. Clearing synchronously
+                    // here (as before) left the microtask iterating an empty
+                    // array, so the leak warning never fired.
                     queueMicrotask(() => {
-                        // don't check until stack of execution is completed to allow for out-of-order disposals within the same execution block
                         for (const listener of this._listeners) {
                             console.warn(
                                 'dockview: stacktrace',
                                 listener.stacktrace?.print()
                             );
                         }
+                        this._listeners = [];
                     });
+                } else {
+                    this._listeners = [];
                 }
-
-                this._listeners = [];
             }
 
             if (Emitter.ENABLE_TRACKING && this._event) {
