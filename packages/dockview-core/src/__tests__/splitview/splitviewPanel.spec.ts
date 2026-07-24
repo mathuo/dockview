@@ -353,9 +353,9 @@ describe('splitviewPanel', () => {
             })
         );
 
-        expect((panel.toJSON() as { maximumSize?: number }).maximumSize).toBe(
-            undefined
-        );
+        expect(
+            (panel.toJSON() as { maximumSize?: number }).maximumSize
+        ).toBeUndefined();
 
         panel.dispose();
     });

@@ -1563,49 +1563,15 @@ describe('overlay', () => {
             overlay.dispose();
         });
 
-        test('bottomright corner resizes both dimensions', () => {
+        test.each([
+            ['bottomright', { clientX: 250, clientY: 250 }],
+            ['topleft', { clientX: 80, clientY: 80 }],
+            ['topright', { clientX: 250, clientY: 80 }],
+            ['bottomleft', { clientX: 80, clientY: 250 }],
+        ] as const)('%s corner resizes both dimensions', (corner, point) => {
             const { overlay, container } = setup();
 
-            resizeVia(container, 'bottomright', {
-                clientX: 250,
-                clientY: 250,
-            });
-
-            const bounds = overlay.toJSON();
-            expect(bounds.width).toBeGreaterThan(0);
-            expect(bounds.height).toBeGreaterThan(0);
-
-            overlay.dispose();
-        });
-
-        test('topleft corner resizes both dimensions', () => {
-            const { overlay, container } = setup();
-
-            resizeVia(container, 'topleft', { clientX: 80, clientY: 80 });
-
-            const bounds = overlay.toJSON();
-            expect(bounds.width).toBeGreaterThan(0);
-            expect(bounds.height).toBeGreaterThan(0);
-
-            overlay.dispose();
-        });
-
-        test('topright corner resizes both dimensions', () => {
-            const { overlay, container } = setup();
-
-            resizeVia(container, 'topright', { clientX: 250, clientY: 80 });
-
-            const bounds = overlay.toJSON();
-            expect(bounds.width).toBeGreaterThan(0);
-            expect(bounds.height).toBeGreaterThan(0);
-
-            overlay.dispose();
-        });
-
-        test('bottomleft corner resizes both dimensions', () => {
-            const { overlay, container } = setup();
-
-            resizeVia(container, 'bottomleft', { clientX: 80, clientY: 250 });
+            resizeVia(container, corner, point);
 
             const bounds = overlay.toJSON();
             expect(bounds.width).toBeGreaterThan(0);
