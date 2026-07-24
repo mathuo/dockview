@@ -32,12 +32,15 @@ You can register panels through the Dockview [option](/docs/api/dockview/options
 <FrameworkSpecific framework='React'>
 ```tsx
 const components = {
-  component_1: (props: IDockviewPanelProps) => {
+  component_1: (props: IDockviewPanelProps<{ foo: string }>) => {
     const api: DockviewPanelApi  = props.api;
     const groupApi: DockviewGroupPanelApi  = props.group.api;
     const containerApi: DockviewApi  = props.containerApi;
 
-    return <div>{/** logic */}</div>
+    // custom values passed via addPanel({ params: ... }) are read from props.params
+    const foo: string = props.params.foo;
+
+    return <div>{foo}</div>
 
 },
 component_2: (props: IDockviewPanelProps) => {
@@ -65,7 +68,9 @@ class Panel implements IContentRenderer {
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        //
+        // custom values passed via addPanel({ params: ... }) are read from parameters.params
+        const foo = parameters.params.foo;
+        this._element.textContent = foo;
     }
 }
 
