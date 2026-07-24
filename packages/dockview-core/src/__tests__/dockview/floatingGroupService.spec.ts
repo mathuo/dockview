@@ -546,7 +546,7 @@ describe('FloatingGroupService', () => {
                     } as DOMRectReadOnly,
                 },
             ]);
-            expect(gridview.layout.mock.calls.length).toBe(callsAfterFirst);
+            expect(gridview.layout.mock.calls).toHaveLength(callsAfterFirst);
 
             // a genuinely different size lays out again
             capturedCallback!([
