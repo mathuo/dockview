@@ -52,7 +52,6 @@
             "import": "./dist/package/main.esm.mjs",
             "require": "./dist/package/main.cjs.js"
         },
-        "./dist/styles/*": "./dist/styles/*",
         "./dist/*": "./dist/*",
         "./package.json": "./package.json"
     },
@@ -63,7 +62,6 @@
     "files": [
         "dist/package",
         "dist/cjs/**/*.d.ts",
-        "dist/styles",
         "dist/*.js",
         "README.md",
         "LICENCE.md"
