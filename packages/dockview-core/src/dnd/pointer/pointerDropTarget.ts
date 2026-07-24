@@ -15,6 +15,7 @@ import {
     IDropTarget,
     MeasuredValue,
     Position,
+    PositionResolver,
     WillShowOverlayEvent,
 } from '../droptarget';
 import { PointerDragController } from './pointerDragController';
@@ -34,6 +35,12 @@ export interface PointerDropTargetOptions {
     /** Outline element for positioning; falls back to the drop element. */
     getOverlayOutline?: () => HTMLElement | null;
     className?: string;
+    /**
+     * Supply a {@link PositionResolver} that overrides how a pointer location
+     * resolves to a drop {@link Position}. A lazy getter so the source can
+     * change at runtime; `undefined` (default) uses the cursor-quadrant logic.
+     */
+    getPositionResolver?: () => PositionResolver | undefined;
 }
 
 /** Pointer-driven counterpart to `Droptarget` with identical visual output. */
@@ -44,6 +51,7 @@ export class PointerDropTarget
     private _targetElement: HTMLElement | undefined;
     private _overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
+    private _edge = false;
     private _acceptedTargetZonesSet: Set<Position>;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
@@ -107,17 +115,14 @@ export class PointerDropTarget
 
     private _onDragOver(event: PointerDragEvent): void {
         if (this._disabled) {
-            this._removeOverlay();
+            this._clearOwnOverlay();
             return;
         }
 
         const overrideTarget = this.options.getOverrideTarget?.();
 
         if (this._acceptedTargetZonesSet.size === 0) {
-            if (overrideTarget) {
-                return;
-            }
-            this._removeOverlay();
+            this._clearOwnOverlay();
             return;
         }
 
@@ -133,30 +138,50 @@ export class PointerDropTarget
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        const quadrant = this._calculateQuadrant(x, y, width, height);
+        const resolved = this._resolvePosition(
+            x,
+            y,
+            width,
+            height,
+            event.pointerEvent
+        );
 
-        if (quadrant === null) {
-            this._removeOverlay();
+        if (resolved === null) {
+            // The resolver declined this point: render nothing.
+            this._clearOwnOverlay();
             return;
         }
 
+        const quadrant = resolved.position;
+
         if (!this.options.canDisplayOverlay(event.pointerEvent, quadrant)) {
-            if (overrideTarget) {
-                return;
-            }
-            this._removeOverlay();
+            this._clearOwnOverlay();
             return;
         }
 
         const willShow = new WillShowOverlayEvent({
             nativeEvent: event.pointerEvent,
             position: quadrant,
+            edge: resolved.edge,
         });
         this._onWillShowOverlay.fire(willShow);
         if (willShow.defaultPrevented) {
-            this._removeOverlay();
+            this._clearOwnOverlay();
             return;
         }
+
+        // An `edge` cell reports its position but renders nothing. The consumer
+        // (e.g. the layout-edge dock) owns the preview + commit. The anchored
+        // overlay from the previous frame (the inner cell crossed on the way
+        // out) has to go, or it double-highlights alongside the consumer's own
+        // whole-layout-edge preview.
+        if (resolved.edge) {
+            this._clearOwnOverlay();
+            this._state = quadrant;
+            this._edge = true;
+            return;
+        }
+        this._edge = false;
 
         if (overrideTarget) {
             renderAnchoredOverlay({
@@ -207,6 +232,7 @@ export class PointerDropTarget
 
     private _onDropEvent(event: PointerDragEvent): void {
         const state = this._state;
+        const edge = this._edge;
         const overrideTarget = this.options.getOverrideTarget?.();
         this._removeOverlay();
         overrideTarget?.clear();
@@ -214,8 +240,40 @@ export class PointerDropTarget
             this._onDrop.fire({
                 position: state,
                 nativeEvent: event.pointerEvent,
+                edge,
             });
         }
+    }
+
+    /**
+     * Resolve the drop {@link Position}: defer to an injected
+     * {@link PositionResolver} when present, otherwise the built-in
+     * cursor-quadrant logic (unchanged). Shares the resolver with the HTML5
+     * backend.
+     */
+    private _resolvePosition(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        event: DragEvent | PointerEvent
+    ): { position: Position; edge: boolean } | null {
+        const resolver = this.options.getPositionResolver?.();
+        if (resolver) {
+            const result = resolver.resolve({
+                x,
+                y,
+                width,
+                height,
+                zones: this._acceptedTargetZonesSet,
+                event,
+            });
+            return result
+                ? { position: result.position, edge: !!result.edge }
+                : null;
+        }
+        const position = this._calculateQuadrant(x, y, width, height);
+        return position ? { position, edge: false } : null;
     }
 
     private _calculateQuadrant(
@@ -249,7 +307,30 @@ export class PointerDropTarget
         );
     }
 
+    /**
+     * Tear down whatever this target is showing, on any frame it resolves to no
+     * overlay. Two things make this more than `_removeOverlay`:
+     *
+     * - With `dndOverlayMounting: 'absolute'` the overlay lives in an anchor
+     *   container shared by every drop target in the component, and
+     *   `_removeOverlay` only owns the in-place dropzone — so the container
+     *   needs clearing explicitly or the last frame's highlight lingers.
+     * - It must only clear the container when this target actually put
+     *   something there. The root edge target sits over every group and
+     *   declines `center` on each frame in the middle of the layout purely so
+     *   the event falls through; clearing from there would destroy and rebuild
+     *   the group's overlay every frame, killing its move transition.
+     */
+    private _clearOwnOverlay(): void {
+        const owned = this._state !== undefined;
+        this._removeOverlay();
+        if (owned) {
+            this.options.getOverrideTarget?.()?.clear();
+        }
+    }
+
     private _removeOverlay(): void {
+        this._edge = false;
         if (this._targetElement) {
             this._state = undefined;
             this._targetElement.parentElement?.classList.remove(

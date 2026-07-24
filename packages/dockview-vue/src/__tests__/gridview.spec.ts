@@ -277,4 +277,66 @@ describe('GridviewVue components prop resolves without registration', () => {
             api.addPanel({ id: 'bad', component: 'NotRegistered' })
         ).toThrow("Failed to find Vue Component 'NotRegistered'");
     });
+
+    test('changing the components prop at runtime refreshes the map without throwing', async () => {
+        const errors: unknown[] = [];
+
+        wrapper = mount(GridviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Cell: MockGridComponent },
+            },
+            attachTo: document.body,
+            global: {
+                config: {
+                    // the components watcher previously re-called
+                    // getCurrentInstance() during the scheduler flush (returns
+                    // null) and threw; Vue routes that to the app error handler
+                    errorHandler: (err: unknown) => errors.push(err),
+                },
+            },
+        });
+        await flushPromises();
+
+        const Extra = defineComponent({
+            name: 'ExtraComponent',
+            props: ['params', 'api', 'containerApi'],
+            template: '<div class="mock-extra">Extra</div>',
+        });
+
+        // swap in a brand-new components object (new reference) at runtime
+        await wrapper.setProps({
+            components: { Cell: MockGridComponent, Extra },
+        });
+        await flushPromises();
+
+        expect(errors).toEqual([]);
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'extra-1', component: 'Extra' })
+        ).not.toThrow();
+        expect(api.getPanel('extra-1')).toBeDefined();
+    });
+});
+
+test('forwards fallthrough attributes onto the host element (multi-root inheritance regression)', async () => {
+    // The component has two root nodes (host element + <DockviewPortals>), so
+    // Vue cannot auto-inherit fallthrough attributes. inheritAttrs:false plus
+    // v-bind="$attrs" on the host restores it; without them a consumer's
+    // `class`/`style` (e.g. a theme class) would land on nothing (see #1369).
+    const wrapper = mount(GridviewVue, {
+        attrs: { class: 'dockview-theme-test', 'data-example': 'gridview' },
+        attachTo: document.body,
+    });
+    await flushPromises();
+
+    const host = document.querySelector(
+        '.dockview-theme-test'
+    ) as HTMLElement | null;
+    expect(host).not.toBeNull();
+    expect(host!.getAttribute('data-example')).toBe('gridview');
+
+    wrapper.unmount();
 });

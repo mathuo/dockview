@@ -34,10 +34,13 @@ const DEFAULT_VUE_TAB = 'props.defaultTabComponent';
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (
         PROPERTY_KEYS_DOCKVIEW as (keyof DockviewOptions)[]
-    ).reduce((obj, key) => {
-        (obj as any)[key] = props[key];
-        return obj;
-    }, {} as Partial<DockviewOptions>);
+    ).reduce(
+        (obj, key) => {
+            (obj as any)[key] = props[key];
+            return obj;
+        },
+        {} as Partial<DockviewOptions>
+    );
 
     return coreOptions as DockviewOptions;
 }

@@ -848,6 +848,56 @@ describe('dockviewGroupPanelModel', () => {
         expect(contentContainer.item(0)).toBe(panel3.view.content.element);
     });
 
+    test('swapping renderContainer keeps the active panel content mounted', () => {
+        // Regression: swapping the render container on an already-populated
+        // group (e.g. restoring a popout group from JSON, where the popout
+        // window gets its own OverlayRenderContainer) used to leave the active
+        // onlyWhenVisible panel's content detached, so nothing rendered.
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const groupviewContainer = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            groupviewContainer,
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+        const contentContainer = groupviewContainer
+            .getElementsByClassName('dv-content-container')
+            .item(0)!.childNodes;
+
+        const panel1 = new TestPanel('id_1', panelApi);
+        const panel2 = new TestPanel('id_2', panelApi);
+        cut.openPanel(panel1);
+        cut.openPanel(panel2); // panel2 active, its content mounted
+
+        expect(contentContainer).toHaveLength(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+
+        // Swap to a fresh render container (as the popout-restore path does).
+        cut.renderContainer = new OverlayRenderContainer(
+            document.createElement('div'),
+            dockviewComponent
+        );
+
+        // The active panel's content is still mounted, not left detached.
+        expect(contentContainer).toHaveLength(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+    });
+
     test('that should not show drop target is external event', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
@@ -1558,7 +1608,7 @@ describe('dockviewGroupPanelModel', () => {
             });
 
             expect(tabGroup.collapsed).toBe(true);
-            // No transition occurred — chip / tabs render collapsed from the start.
+            // No transition occurred; chip / tabs render collapsed from the start.
             expect(collapseEvents).toHaveLength(0);
         });
 
@@ -2048,10 +2098,10 @@ describe('dockviewGroupPanelModel', () => {
     describe('content drop-target zones (mouse + touch parity)', () => {
         // Regression: when a group's location changes (grid → floating /
         // popout / edge), the content drop target's accepted zones must be
-        // updated on BOTH the HTML5 dropTarget (mouse path) and the
+        // updated on both the HTML5 dropTarget (mouse path) and the
         // pointerDropTarget (touch path). Without the parallel call, touch
         // drops on a non-grid group's content area would land in zones the
-        // HTML5 path forbids — different layout outcomes between input
+        // HTML5 path forbids, giving different layout outcomes between input
         // methods.
         function getContentTargets(group: DockviewGroupPanel): {
             dropTarget: { setTargetZones: jest.Mock };
@@ -2081,21 +2131,18 @@ describe('dockviewGroupPanelModel', () => {
             ['floating', ['top', 'bottom', 'left', 'right', 'center']],
             ['popout', ['top', 'bottom', 'left', 'right', 'center']],
             ['edge', ['center']],
-        ] as const)(
-            'location=%s applies zones to BOTH dropTarget and pointerDropTarget',
-            (locationType, expectedZones) => {
-                const { dropTarget, pointerDropTarget } =
-                    getContentTargets(groupview);
+        ] as const)('location=%s applies zones to BOTH dropTarget and pointerDropTarget', (locationType, expectedZones) => {
+            const { dropTarget, pointerDropTarget } =
+                getContentTargets(groupview);
 
-                groupview.model.location = { type: locationType } as any;
+            groupview.model.location = { type: locationType } as any;
 
-                expect(dropTarget.setTargetZones).toHaveBeenCalledWith(
-                    expectedZones
-                );
-                expect(pointerDropTarget.setTargetZones).toHaveBeenCalledWith(
-                    expectedZones
-                );
-            }
-        );
+            expect(dropTarget.setTargetZones).toHaveBeenCalledWith(
+                expectedZones
+            );
+            expect(pointerDropTarget.setTargetZones).toHaveBeenCalledWith(
+                expectedZones
+            );
+        });
     });
 });

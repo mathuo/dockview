@@ -73,6 +73,11 @@ export class OverlayRenderContainer extends CompositeDisposable {
             destroy: IDisposable;
             element: HTMLElement;
             resize?: () => void;
+            /** Sticky peek state (set via `repositionPanelOverlay`): force the
+             *  overlay visible despite the panel being collapsed, and clip it to
+             *  the peek's reveal window. Preserved across internal resizes. */
+            forceVisible?: boolean;
+            clip?: DOMRect;
         }
     > = {};
 
@@ -111,6 +116,33 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 entry.resize();
             }
         }
+    }
+
+    /**
+     * Reposition a single panel's overlay over its reference container,
+     * optionally forcing it visible even when the panel is not currently
+     * "visible" (e.g. its group is collapsed). Used by the auto-hide peek to
+     * slide an `always`-rendered panel out without reparenting it or mutating
+     * the panel's visibility state. No-op if the panel isn't overlay-rendered.
+     */
+    repositionPanelOverlay(
+        panelId: string,
+        forceVisible = false,
+        clip?: DOMRect
+    ): void {
+        if (this._disposed) {
+            return;
+        }
+        const entry = this.map[panelId];
+        if (!entry) {
+            return;
+        }
+        // Set the sticky peek state, then reposition; `resize()` reads it back
+        // so it survives any concurrent internal resize.
+        entry.forceVisible = forceVisible;
+        entry.clip = clip;
+        this.positionCache.invalidate();
+        entry.resize?.();
     }
 
     detatch(panel: IDockviewPanel): boolean {
@@ -175,9 +207,18 @@ export class OverlayRenderContainer extends CompositeDisposable {
             requestAnimationFrame(() => {
                 this.pendingUpdates.delete(panelId);
 
-                if (this.isDisposed || !this.map[panelId]) {
+                const entry = this.map[panelId];
+                if (this.isDisposed || !entry) {
                     return;
                 }
+                // `forceVisible` / `clip` are sticky per-panel state owned by
+                // the peek (set via `repositionPanelOverlay`). Read them at paint
+                // time so an unrelated `resize()` (visibility / layout) can't
+                // clobber a force-shown, clipped peek panel back to hidden. A
+                // peeked panel's `isVisible` is false (its group is collapsed),
+                // so without the sticky force it would render nothing.
+                const forceVisible = entry.forceVisible ?? false;
+                const clip = entry.clip;
 
                 const box = this.positionCache.getPosition(
                     referenceContainer.element
@@ -201,12 +242,52 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 // leave a hidden panel visually visible at a stale position,
                 // because onDidDimensionsChange skips non-visible panels and
                 // never recomputes their box on subsequent resizes.
-                if (panel.api.isVisible) {
+                if (panel.api.isVisible || forceVisible) {
                     focusContainer.style.visibility = '';
                     focusContainer.style.pointerEvents = '';
                 } else {
                     focusContainer.style.visibility = 'hidden';
                     focusContainer.style.pointerEvents = 'none';
+                }
+                // When force-shown for an auto-hide peek, lift the overlay above
+                // the peek's own (opaque) backdrop so the content is visible.
+                // For a floating panel the stacking is owned by
+                // `correctLayerPosition()` (tracks the window's aria-level and
+                // lifts the overlay above the floating window); leave it alone
+                // here so we don't clobber it back to the default and drop the
+                // content behind the window. Only reset to the default for a
+                // plain grid-docked overlay.
+                if (forceVisible) {
+                    focusContainer.style.zIndex = '1000';
+                } else if (panel.api.location.type !== 'floating') {
+                    focusContainer.style.zIndex = '';
+                }
+
+                // Clip to the peek's reveal window so an `always` panel emerges
+                // from the strip's inner edge as the container slides, rather
+                // than appearing on the dock side of it. `box` is in page
+                // coordinates (`getDomNodePagePosition`) but `clip` is a
+                // viewport rect, so shift it by the scroll offset before taking
+                // the inset (otherwise the clip is wrong in a scrolled document).
+                if (clip) {
+                    const view = this.element.ownerDocument.defaultView;
+                    const sx = view?.scrollX ?? 0;
+                    const sy = view?.scrollY ?? 0;
+                    const top = clip.top + sy;
+                    const left = clip.left + sx;
+                    const insetTop = Math.max(0, top - box.top);
+                    const insetLeft = Math.max(0, left - box.left);
+                    const insetRight = Math.max(
+                        0,
+                        box.left + width - (clip.right + sx)
+                    );
+                    const insetBottom = Math.max(
+                        0,
+                        box.top + height - (clip.bottom + sy)
+                    );
+                    focusContainer.style.clipPath = `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px)`;
+                } else {
+                    focusContainer.style.clipPath = '';
                 }
 
                 toggleClass(

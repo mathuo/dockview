@@ -1,12 +1,12 @@
 ---
-title: Floating Groups
-description: How to create and manage floating groups in Dockview — groups that float freely over the layout.
+title: Floating groups
+description: "How to create and manage floating groups in Dockview: groups that float freely over the layout."
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes floating groups.
+Floating groups sit above the grid in a free-floating, draggable container instead of being docked into it, useful for tool palettes, inspectors, or any panel you want to keep visible over the rest of the layout.
 
 :::info
 Floating groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
@@ -15,38 +15,52 @@ Floating groups **cannot** be maximized. Calling maximize function on groups in 
 Dockview has built-in support for floating groups. Each floating container hosts its own nested layout, so you can dock multiple groups
 together inside a single floating container, and you can have as many floating containers as needed.
 
+<CodeRunner id="dockview/floating-groups" />
+
 ## Options
 
 The following properties can be set to configure the behaviours of floating groups.
 
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['floatingGroupBounds', 'disableFloatingGroups']}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['floatingGroupBounds', 'disableFloatingGroups']}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['floatingGroupBounds', 'disableFloatingGroups']}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['floatingGroupBounds', 'disableFloatingGroups']}
+    />
 </FrameworkSpecific>
 
 You can control the bounding box of floating groups through the optional `floatingGroupBounds` options:
 
--   `boundedWithinViewport` will force the entire floating group to be bounded within the docks viewport.
--   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
--   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
+- `boundedWithinViewport` will force the entire floating group to be bounded within the dock's viewport.
+- `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appear within the dock's viewport
+- If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
 
 ### Drag handle
 
 `floatingGroupDragHandle` selects which element moves a floating group when dragged:
 
--   `'titlebar'` (default): a dedicated, blank drag-handle bar is rendered above the group's tab bar. Dragging it moves the floating window; shift+drag (mouse) or long-press (touch) redocks the group back into the grid. Style it with the `--dv-floating-titlebar-*` theme variables.
--   `'tabbar'`: the legacy behaviour — the empty space in the tab bar (the "void container") doubles as the move handle, with no dedicated bar rendered.
+- `'titlebar'` (default): a dedicated, blank drag-handle bar is rendered above the group's tab bar. Dragging it moves the floating window; shift+drag (mouse) or long-press (touch) redocks the group back into the grid. Style it with the `--dv-floating-titlebar-*` theme variables.
+- `'tabbar'`: the legacy behaviour, where the empty space in the tab bar (the "void container") doubles as the move handle, with no dedicated bar rendered.
 
 ```ts
 const api = createDockview(element, {
@@ -56,7 +70,7 @@ const api = createDockview(element, {
 
 ### Customising drag behaviour
 
-`transformFloatingGroupDrag` lets you adjust a floating group's position while it is being dragged — for snapping to a grid, aligning to other floating groups, or constraining a group to a region. It runs on every pointer-move frame with the proposed top-left (before dockview's container clamp) and returns an adjusted top-left, or nothing to leave it unchanged. It affects moving only — resizing is unaffected.
+`transformFloatingGroupDrag` lets you adjust a floating group's position while it is being dragged, for snapping to a grid, aligning to other floating groups, or constraining a group to a region. It runs on every pointer-move frame with the proposed top-left (before Dockview's container clamp) and returns an adjusted top-left, or nothing to leave it unchanged. It affects moving only; resizing is unaffected.
 
 ```ts
 const api = createDockview(element, {
@@ -73,7 +87,6 @@ const api = createDockview(element, {
 
 `context.others` holds the bounds of the other floating groups (relative to the same container), snapshotted at drag start, so you can align the dragged group against its siblings.
 
-
 ## API
 
 The following properties can be used to create floating groups
@@ -81,39 +94,53 @@ The following properties can be used to create floating groups
 <DocRef declaration="DockviewApi" methods={['addFloatingGroup']} />
 
 :::info
-`addFloatingGroup` only accepts existing panels and groups. See [Addding Panels](/docs/core/panels/add) on how to firstly add panels.
+`addFloatingGroup` only accepts existing panels and groups. See [Adding panels](/docs/core/panels/add) on how to firstly add panels.
 :::
 
+Floating groups can be programmatically added through the Dockview `api` method `api.addFloatingGroup(...)`.
 
-Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)`.
+## Panel and group API
 
-## Panel and Group API
-
-<DocRef declaration="DockviewPanelApi" methods={['location', 'onDidLocationChange']} />
+<DocRef
+    declaration="DockviewPanelApi"
+    methods={['location', 'onDidLocationChange']}
+/>
 
 You can check whether a group is floating via the `group.api.location` property. See examples for full code.
 
+## Working with floating groups
 
-## Working with Floating Groups
+#### Float an existing tab by holding `shift` whilst interacting with the tab
 
-<h4>Float an existing tab by holding `shift` whilst interacting with the tab</h4>
-
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_add.svg')} alt="Diagram showing how to float a tab by holding shift while interacting with it" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '200px' }}
+        src={useBaseUrl('/img/float_add.svg')}
+        alt="Diagram showing how to float a tab by holding shift while interacting with it"
+    />
 </div>
 
-<h4>Move a floating tab by holding `shift` whilst moving the cursor or dragging the empty header space</h4>
+#### Move a floating tab by holding `shift` whilst moving the cursor or dragging the empty header space
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_move.svg')} alt="Diagram showing how to move a floating tab by holding shift while moving the cursor" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '200px' }}
+        src={useBaseUrl('/img/float_move.svg')}
+        alt="Diagram showing how to move a floating tab by holding shift while moving the cursor"
+    />
 </div>
 
-<h4>Move an entire floating group by holding `shift` whilst dragging the empty header space</h4>
+#### Move an entire floating group by holding `shift` whilst dragging the empty header space
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_group.svg')} alt="Diagram showing how to move an entire floating group by holding shift while dragging the header" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '200px' }}
+        src={useBaseUrl('/img/float_group.svg')}
+        alt="Diagram showing how to move an entire floating group by holding shift while dragging the header"
+    />
 </div>
 
-## Live Example
+## See also
 
-<CodeRunner id="dockview/floating-groups"/>
+- [Popout windows](/docs/core/groups/popoutGroups): move a group into a separate browser window
+- [Maximized groups](/docs/core/groups/maximizedGroups): expand a group to fill the viewport

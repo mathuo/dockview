@@ -5,6 +5,140 @@
     overflow: auto;
     scrollbar-width: thin; // firefox
 
+    /**
+     * Multi-row (wrapping) tabs. Inert until the `MultiRowTabsModule` toggles
+     * `.dv-tabs-container--wrap` on this element (`overflow.mode: 'wrap'`):
+     * tabs wrap onto multiple rows instead of clipping into the dropdown, and
+     * the strip grows to fit (the header grows via the `:has()` rule in
+     * tabsContainer.scss; the free header-aware content-sizing seam then shrinks
+     * the content area to match). Restricted to horizontal headers in v1.
+     */
+    &.dv-tabs-container--wrap:not(.dv-tabs-container-vertical) {
+        flex-wrap: wrap;
+        height: auto;
+        overflow: visible;
+        // Pack wrapped rows from the top so a partial last row doesn't spread.
+        align-content: flex-start;
+
+        // Single-row height comes from the container filling the header
+        // (`height: 100%`); once the container is `height: auto` for wrapping,
+        // each flex line collapses to the tab's content height, leaving a gap
+        // below the tabs. Give each wrapped tab the base row height so every
+        // row matches the single-row header height (no gap, and the header
+        // grows in whole-row increments).
+        .dv-tab {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
+
+        // `overflow.maxRows` cap. The MultiRowTabsModule adds
+        // `.dv-tabs-container--wrap-capped` and sets `--dv-max-tab-rows` to the
+        // cap: clip the strip to that many rows so the header stops growing,
+        // while the surplus rows (still laid out below, hence measurable by the
+        // controller) are routed into the overflow dropdown. Uncapped wrap keeps
+        // `overflow: visible` above and grows unbounded.
+        &.dv-tabs-container--wrap-capped {
+            max-height: calc(
+                var(--dv-tabs-and-actions-container-height) *
+                    var(--dv-max-tab-rows)
+            );
+            overflow: hidden;
+        }
+
+        // Discrete drop indicator for 2-D cross-row reorder (the 1-D gap
+        // animation is suppressed in wrap). A bar on the leading/trailing edge
+        // of the tab the drop would land before/after.
+        .dv-tab--reorder-before::after,
+        .dv-tab--reorder-after::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+        .dv-tab--reorder-before::after {
+            left: 0;
+        }
+        .dv-tab--reorder-after::after {
+            right: 0;
+        }
+    }
+
+    /**
+     * Multi-column (wrapping) tabs for a vertical (edge-group) header: the
+     * mirror of the horizontal rule above with the axes swapped. The main axis
+     * is vertical (bounded by the header height, so overflowing tabs wrap) and
+     * the cross axis is horizontal (grows into additional columns). The header
+     * grows in width via the `:has()` rule in tabsContainer.scss.
+     *
+     * Column flow direction under `writing-mode: vertical-rl` differs
+     * between left and right header positions; this needs visual verification
+     * in a real browser (jsdom lays out neither writing-mode nor flex-wrap).
+     */
+    &.dv-tabs-container--wrap.dv-tabs-container-vertical {
+        flex-wrap: wrap;
+        width: auto;
+        height: 100%;
+        max-height: 100%;
+        overflow: visible;
+        // Pack wrapped columns from the start edge so a partial last column
+        // doesn't spread.
+        align-content: flex-start;
+
+        // Give each wrapped tab the base column width so every column matches
+        // the single-column header thickness and the header grows in whole-
+        // column increments (mirror of the per-row height rule above).
+        //
+        // Also pin every tab to one uniform height: `--dv-wrap-vertical-tab-height`
+        // is the tallest tab's natural height, measured live by the
+        // `MultiRowTabsModule`. A vertical tab's natural height tracks its
+        // (rotated) title length, so a column fits only a few tabs and a tiny
+        // per-tab height difference flips how many fit, ragged-ing the grid into
+        // a staircase (see the variable's doc in options.ts). One shared height
+        // makes every column hold the same count, so the columns line up,
+        // mirroring the horizontal rule that pins tabs to the fixed row height.
+        // Falls back to auto (natural per-tab height) when the module hasn't set
+        // the variable, so core-only wrap is unchanged.
+        .dv-tab {
+            width: var(--dv-tabs-and-actions-container-height);
+            height: var(--dv-wrap-vertical-tab-height, auto);
+        }
+
+        // `overflow.maxRows` cap, reused as a max-column cap for vertical: clip
+        // the strip to that many columns so the header stops growing, while the
+        // surplus columns (still laid out, hence measurable by the controller)
+        // route into the overflow dropdown.
+        &.dv-tabs-container--wrap-capped {
+            max-width: calc(
+                var(--dv-tabs-and-actions-container-height) *
+                    var(--dv-max-tab-rows)
+            );
+            overflow: hidden;
+        }
+
+        // Discrete drop indicator for 2-D cross-column reorder: a bar on the
+        // leading/trailing (top/bottom) edge of the target tab.
+        .dv-tab--reorder-before::after,
+        .dv-tab--reorder-after::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+        .dv-tab--reorder-before::after {
+            top: 0;
+        }
+        .dv-tab--reorder-after::after {
+            bottom: 0;
+        }
+    }
+
     /* GPU optimizations for smooth scrolling */
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);
@@ -158,6 +292,184 @@
     }
 }
 
+// Pinned tabs (PinnedTabs module). Presentation only: the classes are inert
+// unless a panel is pinned (nothing pins panels without the module), so this is
+// a no-op for the default free layout. `--pinned` marks a pinned tab and shows
+// a leading pin glyph (a real inline SVG injected by the tab, `.dv-tab-pin`);
+// `--pinned-compact` (opt-in) additionally hides the title + close button,
+// Chrome-style, leaving just the glyph.
+.dv-tab.dv-tab--pinned {
+    // Only lay the tab out as a flex row when a glyph was actually injected
+    // (default renderer). A custom tab renderer gets the class but keeps its
+    // own layout.
+    &:has(.dv-tab-pin) {
+        display: flex;
+        align-items: center;
+    }
+
+    .dv-tab-pin {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-right: 4px;
+        opacity: 0.7;
+        // Decorative indicator; clicks/drags belong to the tab beneath it.
+        pointer-events: none;
+
+        .dv-svg {
+            width: 11px;
+            height: 11px;
+        }
+    }
+
+    // Let the title shrink (ellipsis) beside the glyph rather than overflow.
+    .dv-default-tab {
+        min-width: 0;
+    }
+
+    // Pinned tabs have no close button (Chrome / VS-Code style); pinning
+    // protects the tab from an accidental close. Close via the context menu or
+    // the keyboard, or unpin first.
+    .dv-default-tab-action {
+        display: none;
+    }
+}
+
+.dv-tab.dv-tab--pinned-compact {
+    // Icon-only: the default renderer additionally hides its title; a custom
+    // tab renderer receives the class and styles itself.
+    .dv-default-tab-content {
+        display: none;
+    }
+
+    .dv-tab-pin {
+        margin-right: 0;
+    }
+}
+
+// Sticky-on-scroll pinned tabs (PinnedTabs `mode: 'inline'`,
+// `stickyScroll !== false`). The module wires this via the `setPinnedSticky`
+// seam: each pinned tab gets this class plus a per-tab `--dv-pinned-sticky-left`
+// (the cumulative width of the pinned tabs before it), so the pinned block stays
+// frozen to the left edge as the strip scrolls horizontally while unpinned tabs
+// slide underneath. Inert unless the class is present (nothing sets it without
+// the module), so the default layout is unchanged. Tabs already carry an opaque
+// active/inactive background, so scrolling tabs don't show through. Scoped to
+// the horizontal, non-wrapping strip; sticky-left has no meaning in a vertical
+// header or a wrapped (no horizontal scroll) layout.
+.dv-tabs-container:not(.dv-tabs-container--wrap):not(
+        .dv-tabs-container-vertical
+    )
+    > .dv-tab.dv-tab--pinned-sticky {
+    position: sticky;
+    left: var(--dv-pinned-sticky-left, 0);
+    // Stack above the unpinned tabs scrolling beneath the frozen pinned block.
+    z-index: 2;
+}
+
+// Pinned tabs, second-row mode (`mode: 'separate-row'`). The pinned row is
+// mounted into the header by the module via the `setPinnedRow` seam; the header
+// wraps it onto its own full-width line above the main strip and grows to fit.
+// Double class = higher specificity than the base
+// `.dv-tabs-and-actions-container { height: var(...) }`, so `height: auto` wins
+// regardless of stylesheet order and the header can grow to two rows.
+.dv-tabs-and-actions-container.dv-tabs-and-actions-container--pinned-row {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    align-content: flex-start;
+
+    .dv-pinned-row {
+        flex: 0 0 100%;
+        order: -1;
+    }
+
+    // Pinned tabs live in the pinned row; hide their (still-present) copies in
+    // the main strip.
+    .dv-tab.dv-tab--pinned {
+        display: none;
+    }
+}
+
+.dv-pinned-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    padding: 2px 4px;
+    background-color: var(--dv-tabs-and-actions-container-background-color);
+    border-bottom: 1px solid var(--dv-tab-divider-color);
+}
+
+.dv-pinned-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--dv-tab-font-size);
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);
+    color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+    &.dv-pinned-tab--active {
+        background-color: var(
+            --dv-activegroup-visiblepanel-tab-background-color
+        );
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+
+    .dv-pinned-tab-label {
+        max-width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .dv-pinned-tab-unpin {
+        flex-shrink: 0;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    // The tab being dragged for a reorder.
+    &.dv-pinned-tab--dragging {
+        opacity: 0.5;
+    }
+
+    // Drop indicator: a bar on the side the dragged tab would land, mirroring
+    // the main strip's wrap-reorder indicator.
+    &.dv-pinned-tab--drop-before,
+    &.dv-pinned-tab--drop-after {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+    }
+
+    &.dv-pinned-tab--drop-before::after {
+        left: 0;
+    }
+
+    &.dv-pinned-tab--drop-after::after {
+        right: 0;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .dv-tab {
         transition: none !important;
@@ -244,6 +556,20 @@
 .dv-tab-group-underline {
     position: absolute;
     bottom: 0;
+    opacity: var(--dv-tab-group-line-opacity);
+    pointer-events: none;
+    z-index: 10;
+}
+
+// Continuation marker for multi-row (wrapped) tab groups: a small accent pip
+// drawn at the leading edge of each wrapped row a group spans beyond its
+// first, echoing the group chip so the group reads as one on every row.
+// Positioned by JS (absolute → outside the flex-wrap flow, like the underline).
+.dv-tab-group-chip-continuation {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     opacity: var(--dv-tab-group-line-opacity);
     pointer-events: none;
     z-index: 10;
@@ -394,7 +720,64 @@
         background-color: var(--dv-tab-divider-color);
     }
 
+    // The "Pinned" section header (pinned tabs that clipped out of the strip).
+    // Reuses the group-header layout but is a static label, not a click target.
+    .dv-tabs-overflow-pinned-header {
+        cursor: default;
+
+        &:hover {
+            background-color: transparent;
+        }
+
+        .dv-tabs-overflow-pinned-icon {
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+            opacity: 0.7;
+
+            .dv-svg {
+                width: 11px;
+                height: 11px;
+            }
+        }
+    }
+
     .dv-tab.dv-tab--grouped {
         padding-left: 16px;
+    }
+}
+
+/*
+ * Advanced overflow popover (AdvancedOverflowModule): the same container as the
+ * free list, upgraded in place with a search input, a scrollable listbox, and a
+ * keyboard-highlighted active row. Styles live in core so the module ships no
+ * CSS; they are inert unless the module renders this body.
+ */
+.dv-tabs-overflow-container.dv-tabs-overflow-advanced {
+    min-width: 220px;
+
+    .dv-tabs-overflow-search {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 6px 8px;
+        border: none;
+        border-bottom: 1px solid var(--dv-tab-divider-color);
+        outline: none;
+        font-size: inherit;
+        font-family: inherit;
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+        background-color: var(--dv-group-view-background-color);
+    }
+
+    .dv-tabs-overflow-list {
+        display: flex;
+        flex-direction: column;
+        outline: none;
+    }
+
+    .dv-tab.dv-tabs-overflow-option--focused {
+        outline: 1px solid var(--dv-tab-divider-color);
+        outline-offset: -1px;
+        background-color: var(--dv-icon-hover-background-color);
     }
 }

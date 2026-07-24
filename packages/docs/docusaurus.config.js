@@ -2,7 +2,7 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const { themes } = require('prism-react-renderer');
-const lightCodeTheme = themes.oneLight;
+const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.oneDark;
 
 // dracula
@@ -37,7 +37,7 @@ const config = {
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
-    favicon: 'img/dockview_logo.ico',
+    favicon: 'img/brand/dockview-favicon.svg',
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
@@ -51,6 +51,10 @@ const config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
+    // Serve both the docs-local `static` directory and the repository root
+    // `static` directory. Shared assets referenced from package READMEs live in
+    // the root `static/` so their links stay resilient to docs restructuring.
+    staticDirectories: ['static', path.resolve(__dirname, '../../static')],
     stylesheets: [
         {
             href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
@@ -62,6 +66,31 @@ const config = {
     ],
     plugins: [
         'docusaurus-plugin-sass',
+        [
+            '@docusaurus/plugin-client-redirects',
+            {
+                // Pages consolidated during the v8 docs restructure. Keep these
+                // so existing bookmarks and inbound links don't 404.
+                redirects: [
+                    {
+                        from: '/docs/core/groups/resizing',
+                        to: '/docs/core/panels/resizing',
+                    },
+                    {
+                        from: '/docs/core/groups/locked',
+                        to: '/docs/core/locked',
+                    },
+                    {
+                        from: '/docs/core/groups/hiddenHeader',
+                        to: '/docs/core/groups/controls',
+                    },
+                    {
+                        from: '/docs/other/tabview',
+                        to: '/docs/core/dnd/disable',
+                    },
+                ],
+            },
+        ],
         (context, options) => {
             return {
                 name: 'custom-webpack',
@@ -91,6 +120,14 @@ const config = {
                                         __dirname,
                                         '../dockview/src'
                                     ),
+                                    // Without this, dockview-enterprise resolves to
+                                    // its built dist/, so editing module source
+                                    // (e.g. auto-hide edge groups) does nothing
+                                    // until a rebuild + dev-server restart.
+                                    'dockview-enterprise$': path.join(
+                                        __dirname,
+                                        '../dockview-enterprise/src'
+                                    ),
                                 }),
                                 react: path.join(
                                     __dirname,
@@ -109,6 +146,10 @@ const config = {
             };
         },
     ],
+    // Consent-gated analytics: this module shows the cookie banner and only
+    // loads Google Analytics after the visitor opts in. Shared with the
+    // enterprise app so one choice covers the whole dockview.dev domain.
+    clientModules: [require.resolve('./src/consent.js')],
     presets: [
         [
             'classic',
@@ -136,16 +177,49 @@ const config = {
                 theme: {
                     customCss: require.resolve('./src/css/custom.scss'),
                 },
-                gtag: process.env.CI
-                    ? {
-                          trackingID: 'G-KXGC1C9ZHC',
-                      }
-                    : undefined,
+                // Google Analytics is now loaded by src/consent.js, and only
+                // after the visitor accepts analytics cookies. The built-in
+                // fire-on-load gtag plugin is intentionally not used, so GA is
+                // not loaded before consent (PECR, shared privacy policy).
             }),
         ],
     ],
 
     headTags: [
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/svg+xml',
+                href: '/img/brand/dockview-favicon.svg',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/png',
+                sizes: '32x32',
+                href: '/img/brand/favicon-32.png',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/png',
+                sizes: '16x16',
+                href: '/img/brand/favicon-16.png',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'apple-touch-icon',
+                sizes: '180x180',
+                href: '/img/brand/apple-touch-icon-180.png',
+            },
+        },
         {
             tagName: 'script',
             attributes: {
@@ -188,7 +262,7 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
-            image: 'img/splashscreenv2.png',
+            image: 'img/brand/og-image-1200x630.png',
             metadata: [
                 {
                     name: 'keywords',
@@ -241,8 +315,13 @@ const config = {
             navbar: {
                 title: 'Dockview',
                 logo: {
-                    alt: 'Dockview Logo',
-                    src: 'img/dockview_logo.svg',
+                    alt: 'Dockview logo',
+                    // Single constant-colour mark (teal/blue/rose/purple) that
+                    // reads on light, cream and navy alike, so the same file is
+                    // used in both themes. srcDark is set explicitly so
+                    // Docusaurus doesn't hide the (light-only) logo in dark mode.
+                    src: 'img/brand/dockview-mark.svg',
+                    srcDark: 'img/brand/dockview-mark.svg',
                 },
                 items: [
                     {
@@ -274,6 +353,14 @@ const config = {
                     },
                     { to: '/demo', label: 'Demo', position: 'right' },
                     {
+                        // The in-site licensing / edition-comparison page. Its
+                        // "Purchase a licence" CTA links out to the separate
+                        // marketing deployment at /enterprise.
+                        to: '/docs/overview/licence',
+                        label: 'Licensing',
+                        position: 'right',
+                    },
+                    {
                         href: 'https://github.com/mathuo/dockview',
                         position: 'right',
                         className: 'header-github-link',
@@ -282,7 +369,7 @@ const config = {
                 ],
             },
             footer: {
-                style: 'dark',
+                style: 'light',
                 links: [
                     {
                         title: 'Documentation',
@@ -303,10 +390,31 @@ const config = {
                             {
                                 label: 'Sitemap',
                                 href: 'pathname:///sitemap.xml',
+                                target: '_self',
+                            },
+                            {
+                                label: 'Licensing',
+                                to: '/docs/overview/licence',
                             },
                             {
                                 label: 'Contact us',
-                                to: '/contact-us',
+                                to: '/contact',
+                            },
+                            {
+                                // /enterprise is the separate worker deployment,
+                                // not a Docusaurus route, so use pathname:// to
+                                // keep the broken-link checker from validating it
+                                // (same as the sitemap link above).
+                                label: 'Privacy policy',
+                                href: 'pathname:///enterprise/privacy',
+                                target: '_self',
+                            },
+                            {
+                                // Opens the cookie-consent preferences modal
+                                // (vanilla-cookieconsent auto-binds the data-cc
+                                // attribute), letting visitors change or
+                                // withdraw analytics consent at any time.
+                                html: '<button type="button" class="footer__link-item" data-cc="show-preferencesModal" style="background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left">Cookie settings</button>',
                             },
                         ],
                     },
@@ -324,7 +432,14 @@ const config = {
                         ],
                     },
                 ],
-                copyright: `Copyright © ${new Date().getFullYear()} Dockview, Inc. Built with Docusaurus.`,
+                // Registered name is "Dockview Ltd" (Companies House no.
+                // 17326398), not "Dockview, Inc." The second line is the
+                // statutory trading disclosure (registered name, number, place
+                // of registration, registered office) the Companies Act 2006 /
+                // Names and Trading Disclosures Regulations 2015 require on the
+                // website. Keep it in step with LICENSOR_DISCLOSURE in the
+                // dockview-licencing repo (src/lib/legal.ts).
+                copyright: `Copyright © ${new Date().getFullYear()} Dockview Ltd<br /><span style="opacity:0.7;font-size:0.85em">Dockview Ltd, registered in England and Wales (no. 17326398). Registered office: 8 Weald Close, Bromley, England, BR2 8PD.</span>`,
             },
             prism: {
                 theme: lightCodeTheme,

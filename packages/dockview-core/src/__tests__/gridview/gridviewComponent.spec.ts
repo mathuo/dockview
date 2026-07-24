@@ -3001,4 +3001,367 @@ describe('gridview', () => {
         // The main test is that we got this far without errors
         expect(true).toBeTruthy();
     });
+
+    function createGridview(
+        orientation: Orientation = Orientation.VERTICAL,
+        proportionalLayout = false
+    ): GridviewComponent {
+        return new GridviewComponent(container, {
+            proportionalLayout,
+            orientation,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestGridview(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+    }
+
+    test('orientation getter reflects the constructor value', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL);
+        expect(gridview.orientation).toBe(Orientation.HORIZONTAL);
+    });
+
+    test('orientation setter updates the underlying gridview', () => {
+        const gridview = createGridview(Orientation.VERTICAL);
+        gridview.layout(800, 400);
+
+        expect(gridview.orientation).toBe(Orientation.VERTICAL);
+
+        gridview.orientation = Orientation.HORIZONTAL;
+
+        expect(gridview.orientation).toBe(Orientation.HORIZONTAL);
+    });
+
+    test('deserializer getter/setter round-trips the value', () => {
+        const gridview = createGridview();
+
+        expect(gridview.deserializer).toBeUndefined();
+
+        const deserializer = {
+            fromJSON: jest.fn(),
+        };
+
+        gridview.deserializer = deserializer;
+
+        expect(gridview.deserializer).toBe(deserializer);
+
+        gridview.deserializer = undefined;
+
+        expect(gridview.deserializer).toBeUndefined();
+    });
+
+    test('options getter exposes the provided options', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+
+        expect(gridview.options.orientation).toBe(Orientation.HORIZONTAL);
+        expect(gridview.options.proportionalLayout).toBe(true);
+    });
+
+    test('updateOptions changes the orientation', () => {
+        const gridview = createGridview(Orientation.VERTICAL);
+        gridview.layout(800, 400);
+
+        expect(gridview.orientation).toBe(Orientation.VERTICAL);
+
+        gridview.updateOptions({ orientation: Orientation.HORIZONTAL });
+
+        expect(gridview.orientation).toBe(Orientation.HORIZONTAL);
+        expect(gridview.options.orientation).toBe(Orientation.HORIZONTAL);
+    });
+
+    test('updateOptions with an unchanged orientation is a no-op for orientation', () => {
+        const gridview = createGridview(Orientation.VERTICAL);
+        gridview.layout(800, 400);
+
+        gridview.updateOptions({ orientation: Orientation.VERTICAL });
+
+        expect(gridview.orientation).toBe(Orientation.VERTICAL);
+    });
+
+    test('setActive makes the requested panel active and deactivates the others', () => {
+        const gridview = createGridview();
+        gridview.layout(800, 400);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        // panel2 was added last, so it is active
+        expect(panel2.api.isActive).toBeTruthy();
+
+        gridview.setActive(panel1 as GridviewPanel);
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+    });
+
+    test('focus does not throw when a panel is active', () => {
+        const gridview = createGridview();
+        gridview.layout(800, 400);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        const spy = jest.spyOn(panel1 as GridviewPanel, 'focus');
+
+        expect(() => gridview.focus()).not.toThrow();
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('focus does not throw when there is no active panel', () => {
+        const gridview = createGridview();
+        gridview.layout(800, 400);
+
+        expect(() => gridview.focus()).not.toThrow();
+    });
+
+    test('a panel becomes active when its api fires a focus event', () => {
+        const gridview = createGridview();
+        gridview.layout(800, 400);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        // panel2 is active (added last)
+        expect(panel2.api.isActive).toBeTruthy();
+
+        // simulate panel1 gaining focus
+        panel1.api._onDidChangeFocus.fire({ isFocused: true });
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+    });
+
+    test('a focus event with isFocused=false does not change the active panel', () => {
+        const gridview = createGridview();
+        gridview.layout(800, 400);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(panel2.api.isActive).toBeTruthy();
+
+        panel1.api._onDidChangeFocus.fire({ isFocused: false });
+
+        // no change - panel2 remains active
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel1.api.isActive).toBeFalsy();
+    });
+
+    test('movePanel repositions a panel relative to a reference', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({ id: 'panel1', component: 'default' });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+        const panel3 = gridview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel2', direction: 'right' },
+        });
+
+        expect(gridview.size).toBe(3);
+
+        gridview.movePanel(panel3 as GridviewPanel, {
+            direction: 'left',
+            reference: 'panel1',
+        });
+
+        // all three panels still present after the move
+        expect(gridview.size).toBe(3);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
+        expect(gridview.getPanel('panel2')).toBeTruthy();
+        expect(gridview.getPanel('panel3')).toBeTruthy();
+    });
+
+    test('movePanel throws when the reference group does not exist', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(() =>
+            gridview.movePanel(panel1 as GridviewPanel, {
+                direction: 'right',
+                reference: 'does_not_exist',
+            })
+        ).toThrow('reference group does_not_exist does not exist');
+
+        // The panel must NOT have been removed by the failed move: validation
+        // runs before the panel is taken out of the grid.
+        expect(gridview.size).toBe(1);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
+    });
+
+    test('movePanel throws when the direction resolves to center', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({ id: 'panel1', component: 'default' });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        expect(() =>
+            gridview.movePanel(panel2 as GridviewPanel, {
+                direction: 'within',
+                reference: 'panel1',
+            })
+        ).toThrow('center not supported as an option');
+
+        // Both panels survive the rejected move.
+        expect(gridview.size).toBe(2);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
+        expect(gridview.getPanel('panel2')).toBeTruthy();
+    });
+
+    test('addPanel throws when the reference panel does not exist', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        expect(() =>
+            gridview.addPanel({
+                id: 'panel1',
+                component: 'default',
+                position: {
+                    referencePanel: 'does_not_exist',
+                    direction: 'right',
+                },
+            })
+        ).toThrow('reference group does_not_exist does not exist');
+    });
+
+    test('addPanel throws when the position direction resolves to center', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({ id: 'panel1', component: 'default' });
+
+        expect(() =>
+            gridview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: 'panel1', direction: 'within' },
+            })
+        ).toThrow('center not supported as an option');
+    });
+
+    test('addPanel honours an explicit location', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({ id: 'panel1', component: 'default' });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            location: [0],
+        });
+
+        expect(gridview.size).toBe(2);
+        expect(panel2.api.isActive).toBeTruthy();
+    });
+
+    test('moveGroup swaps two siblings within the same parent', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        // panel1 and panel2 are siblings under the root branch - moving
+        // panel2 to the right of panel1 is a swap within the same parent
+        expect(() =>
+            gridview.moveGroup(panel1 as GridviewPanel, 'panel2', 'right')
+        ).not.toThrow();
+
+        expect(gridview.size).toBe(2);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
+        expect(gridview.getPanel('panel2')).toBeTruthy();
+    });
+
+    test('moveGroup relocates a group into a different parent', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+        const panel3 = gridview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel2', direction: 'below' },
+        });
+
+        // panel3 lives in a nested branch alongside panel2; move it up
+        // against panel1 which lives in the root branch (different parent)
+        expect(() =>
+            gridview.moveGroup(panel1 as GridviewPanel, panel3.id, 'above')
+        ).not.toThrow();
+
+        expect(gridview.size).toBe(3);
+        expect(gridview.getPanel('panel3')).toBeTruthy();
+    });
+
+    test('moveGroup throws for an unknown source group', () => {
+        const gridview = createGridview(Orientation.HORIZONTAL, true);
+        gridview.layout(1000, 1000);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(() =>
+            gridview.moveGroup(
+                panel1 as GridviewPanel,
+                'does_not_exist',
+                'right'
+            )
+        ).toThrow('invalid operation');
+    });
 });

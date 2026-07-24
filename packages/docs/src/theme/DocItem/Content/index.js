@@ -5,6 +5,7 @@ import { useDoc } from '@docusaurus/plugin-content-docs/client';
 import Heading from '@theme/Heading';
 import MDXContent from '@theme/MDXContent';
 import { FrameworkSelector } from '@site/src/components/frameworkSpecific';
+import { EnterpriseBadge } from '@site/src/components/ui/enterprise/enterpriseBadge';
 /**
  Title can be declared inside md content or declared through
  front matter and added manually. To make both cases consistent,
@@ -26,6 +27,9 @@ function useSyntheticTitle() {
 }
 export default function DocItemContent({ children }) {
     const syntheticTitle = useSyntheticTitle();
+    const { frontMatter } = useDoc();
+    const isEnterprise = Boolean(frontMatter.enterprise);
+    const showFrameworkSelector = !frontMatter.hide_framework_selector;
     return (
         <div className={clsx(ThemeClassNames.docs.docMarkdown, 'markdown')}>
             {syntheticTitle && (
@@ -38,8 +42,13 @@ export default function DocItemContent({ children }) {
                                     justifyContent: 'space-between',
                                 }}
                             >
-                                <div>{syntheticTitle}</div>
-                                <FrameworkSelector />
+                                <div>
+                                    {syntheticTitle}
+                                    {isEnterprise && (
+                                        <EnterpriseBadge variant="title" />
+                                    )}
+                                </div>
+                                {showFrameworkSelector && <FrameworkSelector />}
                             </div>
                         }
                     </Heading>

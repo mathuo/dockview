@@ -1,0 +1,83 @@
+---
+id: enterprise-setup
+title: Enterprise setup
+sidebar_position: 5
+description: How to install dockview-enterprise and apply a licence key.
+---
+
+The enterprise features ship in a separate package, `dockview-enterprise`, and
+are unlocked with a licence key. This page covers installing the package and
+applying your key. For what is included, see
+[Licensing](/docs/overview/licence).
+
+## Install
+
+`dockview-enterprise` is a drop-in superset of the free `dockview` package: it
+re-exports the whole `dockview` API and adds the enterprise features. Importing
+it registers those features for every dockview instance in your app.
+
+### JavaScript
+
+Install `dockview-enterprise` **instead of** `dockview` (not alongside it), and
+import from it wherever you would have imported from `dockview`:
+
+```sh
+npm install dockview-enterprise
+```
+
+The stylesheet is unchanged; the styles live in the core package that
+`dockview-enterprise` re-exports:
+
+```css
+@import 'dockview/dist/styles/dockview.css';
+```
+
+### React, Vue, or Angular
+
+Keep installing and importing your components from the framework binding
+(`dockview-react`, `dockview-vue`, or `dockview-angular`), and add
+`dockview-enterprise` next to it:
+
+```sh
+npm install dockview-enterprise
+```
+
+Then add a one-line side-effect import once, anywhere that runs at start-up
+(your entry point is a good place), to activate the enterprise features:
+
+```ts
+import 'dockview-enterprise';
+```
+
+## Apply your licence key
+
+Set your key once, before creating any dockview instance:
+
+```ts
+import { LicenseManager } from 'dockview-enterprise';
+
+LicenseManager.setLicenseKey('your-license-key');
+```
+
+That is the whole setup. With the package imported, the enterprise options become
+available on every `DockviewComponent`.
+
+You are free to evaluate the enterprise features locally without a key, where
+Dockview shows a watermark. A licence is required to deploy to production.
+
+## What the expiry date means
+
+**Any version of Dockview published on or before your key's expiry date keeps
+working with that key forever.** The check uses the release date of the build you
+are running, not today's date, so a deployed application never starts
+watermarking itself.
+
+The date limits which new versions you get, not how long your app runs.
+Upgrading past it shows the watermark; staying on a covered version does not.
+
+Validation is offline: Dockview makes no network requests to check a key.
+
+## Getting a key
+
+[Contact us](/contact) for a free trial licence, or see
+[Licensing](/docs/overview/licence) for plans and to buy.

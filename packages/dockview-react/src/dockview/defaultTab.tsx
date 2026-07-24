@@ -1,5 +1,5 @@
 import React from 'react';
-import { CloseButton } from '../svg';
+import { CloseButton, PinButton } from '../svg';
 import { DockviewPanelApi, IDockviewPanelHeaderProps } from 'dockview';
 
 function useTitle(api: DockviewPanelApi): string | undefined {
@@ -23,6 +23,28 @@ function useTitle(api: DockviewPanelApi): string | undefined {
     return title;
 }
 
+function useIsPinned(api: DockviewPanelApi): boolean {
+    const [isPinned, setIsPinned] = React.useState<boolean>(api.isPinned);
+
+    React.useEffect(() => {
+        const disposable = api.onDidChangePinned((event) => {
+            setIsPinned(event.isPinned);
+        });
+
+        // Guard against the pinned state changing before this effect ran (cf.
+        // the title race in `useTitle`).
+        if (isPinned !== api.isPinned) {
+            setIsPinned(api.isPinned);
+        }
+
+        return () => {
+            disposable.dispose();
+        };
+    }, [api]);
+
+    return isPinned;
+}
+
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
     React.HtmlHTMLAttributes<HTMLDivElement> & {
         hideClose?: boolean;
@@ -44,6 +66,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
     ...rest
 }) => {
     const title = useTitle(api);
+    const isPinned = useIsPinned(api);
 
     const isMiddleMouseButton = React.useRef<boolean>(false);
 
@@ -74,7 +97,11 @@ export const DockviewDefaultTab: React.FunctionComponent<
 
     const _onPointerUp = React.useCallback(
         (event: React.PointerEvent<HTMLDivElement>) => {
-            if (isMiddleMouseButton && event.button === 1 && !hideClose) {
+            if (
+                isMiddleMouseButton.current &&
+                event.button === 1 &&
+                !hideClose
+            ) {
                 isMiddleMouseButton.current = false;
                 onClose(event);
             }
@@ -101,6 +128,17 @@ export const DockviewDefaultTab: React.FunctionComponent<
             onPointerLeave={_onPointerLeave}
             className="dv-default-tab"
         >
+            {isPinned && (
+                // Leading pin glyph. Mirrors the core vanilla tab's injected
+                // indicator (`.dv-tab-pin`), which core suppresses for custom
+                // `tabComponent`s like this one. The `dv-tab--pinned` /
+                // `dv-tab--pinned-compact` classes on the outer `.dv-tab`
+                // container (applied by core regardless of renderer) drive the
+                // glyph styling, close-button hiding, and compact title hiding.
+                <div className="dv-tab-pin">
+                    <PinButton />
+                </div>
+            )}
             <span className="dv-default-tab-content">{title}</span>
             {!hideClose && (
                 <div

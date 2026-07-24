@@ -1,4 +1,6 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { AllModules } from '../../dockview/allModules';
+import { EdgeGroupModule } from '../../dockview/edgeGroupService';
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
@@ -298,6 +300,44 @@ describe('dockviewComponent', () => {
             // even though disableDnd is not set.
             expect(tab.draggable).toBe(false);
             expect(voidContainer.draggable).toBe(false);
+        });
+
+        test('group.model.getPanelForTab maps a tab element to its panel', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            dockview.layout(500, 500);
+            const p1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+            const group = p1.group;
+
+            const tabEls = Array.from(
+                group.element.querySelectorAll('.dv-tab')
+            ) as HTMLElement[];
+            expect(tabEls).toHaveLength(2);
+
+            // each tab element resolves to a distinct panel
+            const r1 = group.model.getPanelForTab(tabEls[0]);
+            const r2 = group.model.getPanelForTab(tabEls[1]);
+            expect(new Set([r1?.id, r2?.id])).toEqual(
+                new Set(['panel1', 'panel2'])
+            );
+
+            // a descendant of a tab resolves to the same panel as the tab
+            const inner = (tabEls[0].querySelector('*') ??
+                tabEls[0]) as HTMLElement;
+            expect(group.model.getPanelForTab(inner)?.id).toBe(r1?.id);
+
+            // a non-tab element (the void container) resolves to undefined
+            const voidEl = group.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+            expect(group.model.getPanelForTab(voidEl)).toBeUndefined();
         });
 
         test('disableDnd overrides dndStrategy', () => {
@@ -920,23 +960,23 @@ describe('dockviewComponent', () => {
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
         expect(dockview.activeGroup!.model.indexOf(panel3!)).toBe(1);
 
-        dockview.moveToPrevious({ includePanel: true });
+        dockview.activatePrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel1);
 
-        dockview.moveToNext({ includePanel: true });
+        dockview.activateNext({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
 
-        dockview.moveToPrevious({ includePanel: false });
+        dockview.activatePrevious({ includePanel: false });
         expect(dockview.activeGroup).toBe(group1);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel4);
 
-        dockview.moveToPrevious({ includePanel: true });
+        dockview.activatePrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group1);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel2);
 
-        dockview.moveToNext({ includePanel: false });
+        dockview.activateNext({ includePanel: false });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
     });
@@ -1113,7 +1153,7 @@ describe('dockviewComponent', () => {
         sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
 
         // Create a second group to be the destination by moving panel1 out
-        // and then moving it back — use moveGroupOrPanel to ensure a
+        // and then moving it back, using moveGroupOrPanel to ensure a
         // separate group exists
         dockview.moveGroupOrPanel({
             from: { groupId: sourceGroup.id, panelId: 'panel3' },
@@ -1632,7 +1672,7 @@ describe('dockviewComponent', () => {
         fireEvent.dragStart(chip);
         expect(getPanelData()?.tabGroupId).toBe(monitoring.id);
 
-        // The drop resolves via moveGroupOrPanel — the same path the
+        // The drop resolves via moveGroupOrPanel, the same path the
         // real drag flow ends up calling. This detaches the chip from
         // the DOM (source tab group becomes empty).
         dockview.moveGroupOrPanel({
@@ -1647,7 +1687,7 @@ describe('dockviewComponent', () => {
         // Without the fix, panelTransfer keeps the chip-drag payload
         // (with tabGroupId) and any subsequent dragover/canDisplayOverlay
         // call that reads it before the next dragstart's setData runs
-        // would see stale data — including a stale tabGroupId pointing
+        // would see stale data, including a stale tabGroupId pointing
         // at a tab group that has just been recreated under a new id.
         expect(getPanelData()).toBeUndefined();
 
@@ -2030,6 +2070,42 @@ describe('dockviewComponent', () => {
     });
 
     describe('serialization', () => {
+        test('reuseExistingPanels replaces panel params rather than merging', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+                params: { a: 1, b: 2 },
+            });
+
+            const state = dockview.toJSON();
+            // the saved state drops `b`, keeping only `a`
+            (state.panels['panel1'] as any).params = { a: 9 };
+
+            dockview.fromJSON(state, { reuseExistingPanels: true });
+
+            // reuse must restore exactly the saved params (no stale `b: 2`),
+            // matching the non-reuse deserialization path
+            expect(dockview.getGroupPanel('panel1')!.params).toEqual({ a: 9 });
+
+            dockview.dispose();
+        });
+
         test('reuseExistingPanels true', () => {
             const parts: PanelContentPartTest[] = [];
 
@@ -5309,8 +5385,8 @@ describe('dockviewComponent', () => {
             dockview.overlayRenderContainer.element
         );
 
-        // Host must NOT live inside `.dv-dockview` — that element has
-        // `contain: layout` which forms a stacking context that would trap
+        // Host must not live inside `.dv-dockview`, which has
+        // `contain: layout` and forms a stacking context that would trap
         // floating z-indexes below shell-level render overlays.
         expect(dockview.element.contains(overlay)).toBe(false);
     });
@@ -6297,6 +6373,108 @@ describe('dockviewComponent', () => {
                 dockview.dispose();
             });
 
+            test('DV-43: a non-anchor group in a multi-group popout resolves the popout window popup service, not the main one', async () => {
+                window.open = () => setupMockWindow();
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                // drag panel2's group into the popout → 2-group popout, anchor
+                // is panel1's group
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const mainPopupService = (dockview as any).popupService;
+                const anchorService = dockview.getPopupServiceForGroup(
+                    panel1.group
+                );
+                const memberService = dockview.getPopupServiceForGroup(
+                    panel2.group
+                );
+
+                // the anchor resolves to the popout window's own popup service
+                expect(anchorService).not.toBe(mainPopupService);
+                // and the non-anchor member shares that same service rather than
+                // falling back to the main window's (the DV-43 bug)
+                expect(memberService).toBe(anchorService);
+                expect(memberService).not.toBe(mainPopupService);
+
+                dockview.dispose();
+            });
+
+            test('DV-47: promoting a new anchor re-keys per-window popup-service resolution to the survivor', async () => {
+                const mockWindow = setupMockWindow();
+                window.open = () => mockWindow;
+
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const mainPopupService = (dockview as any).popupService;
+                const popoutService = dockview.getPopupServiceForGroup(
+                    panel1.group
+                );
+                expect(popoutService).not.toBe(mainPopupService);
+
+                // move the ORIGINAL anchor back to the grid → panel2 is promoted
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel1.group.id },
+                    to: { group: panel3.group, position: 'right' },
+                });
+                expect(panel1.api.location.type).toBe('grid');
+                expect(panel2.api.location.type).toBe('popout');
+
+                // the departed group no longer resolves to the popout
+                // service; it uses the main window again
+                expect(dockview.getPopupServiceForGroup(panel1.group)).toBe(
+                    mainPopupService
+                );
+                // the promoted anchor still resolves to the same popout service
+                expect(dockview.getPopupServiceForGroup(panel2.group)).toBe(
+                    popoutService
+                );
+
+                // the entry's anchor was reassigned to the survivor
+                const entry = (
+                    dockview as any
+                )._popoutWindowService.findByGroup(panel2.group);
+                expect(entry.popoutGroup).toBe(panel2.group);
+
+                dockview.dispose();
+            });
+
             test('closing a multi-group popout whose anchor came from a floating group docks all members to the grid (no split)', async () => {
                 const mockWindow = setupMockWindow();
                 window.open = () => mockWindow;
@@ -6313,7 +6491,7 @@ describe('dockviewComponent', () => {
                     component: 'default',
                     floating: true,
                 });
-                // panel3 must be placed explicitly in the grid — a position-less
+                // panel3 must be placed explicitly in the grid; a position-less
                 // add would land in the active (floating) group.
                 const panel3 = dockview.addPanel({
                     id: 'panel_3',
@@ -6394,7 +6572,7 @@ describe('dockviewComponent', () => {
                 const dockview = make();
                 dockview.layout(1000, 500);
 
-                // A frozen layout in the shape dockview emitted BEFORE nested
+                // A frozen layout in the shape dockview emitted before nested
                 // multi-group windows existed: floating/popout groups use the
                 // legacy `data` field and no `grid`. Hand-authored (not produced
                 // by the current serializer) so it guards old -> new read
@@ -7778,7 +7956,7 @@ describe('dockviewComponent', () => {
                     },
                 });
 
-                // Dispose BEFORE the popout-restoration timer has had a chance
+                // Dispose before the popout-restoration timer has had a chance
                 // to fire. This simulates the React StrictMode mount -> dispose
                 // -> remount sequence that triggers issue #851.
                 expect(openSpy).not.toHaveBeenCalled();
@@ -7787,7 +7965,7 @@ describe('dockviewComponent', () => {
                 // Advance any timers and microtasks. With the fix in place the
                 // queued popout restoration is cancelled in dispose() and the
                 // guard inside the timeout body short-circuits any survivors,
-                // so window.open MUST NOT be called.
+                // so window.open must not be called.
                 jest.runAllTimers();
                 await Promise.resolve();
                 jest.runAllTimers();
@@ -8121,7 +8299,7 @@ describe('dockviewComponent', () => {
             await dockview.addPopoutGroup(panel2);
             expect(panel2.api.location.type).toBe('popout');
 
-            // Drop the panel back onto the right edge of panel_3's group —
+            // Drop the panel back onto the right edge of panel_3's group,
             // a neighbor following the original slot. Pre-fix this placed the
             // new group after panel_4 instead of between panel_3 and panel_4.
             panel2.api.moveTo({
@@ -8189,7 +8367,7 @@ describe('dockviewComponent', () => {
             await dockview.addPopoutGroup(panel2);
             expect(panel2.api.location.type).toBe('popout');
 
-            // Drop on the far right edge — pre-fix this threw "Invalid index"
+            // Drop on the far right edge. Pre-fix this threw "Invalid index"
             // because the stale target index pointed past the end of the grid
             // after the empty reference group was cascade-removed.
             expect(() =>
@@ -8548,12 +8726,12 @@ describe('dockviewComponent', () => {
 
             expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
 
-            // addPopoutGroup creates a new group for the popout window —
+            // addPopoutGroup creates a new group for the popout window, so
             // panel1's group reference now points at it
             const popoutGroup = panel1.api.group;
             expect(popoutGroup).not.toBe(dockedGroup);
 
-            // The popout group has a dedicated popupService — required so
+            // The popout group has a dedicated popupService, required so
             // its context menus render in the popout window, not the main one
             const popoutService = dockview.getPopupServiceForGroup(popoutGroup);
             expect(popoutService).not.toBe(dockview.popupService);
@@ -8861,7 +9039,7 @@ describe('dockviewComponent', () => {
             jest.advanceTimersByTime(500);
             await dockview.popoutRestorationPromise;
 
-            // blocked popout content is not lost — it falls back into the grid
+            // blocked popout content is not lost; it falls back into the grid
             expect(dockview.panels.map((p) => p.id).sort()).toEqual([
                 'p1',
                 'p2',
@@ -9011,7 +9189,7 @@ describe('dockviewComponent', () => {
                     dockview.fromJSON(emptyLayout as any);
                 }).not.toThrow();
 
-                // Drain any timers — none should still be in flight, but if
+                // Drain any timers. None should still be in flight, but if
                 // any survive they must not call window.open or throw.
                 jest.runAllTimers();
                 await dockview.popoutRestorationPromise;
@@ -9021,7 +9199,7 @@ describe('dockviewComponent', () => {
                 expect(dockview.groups).toHaveLength(0);
                 expect(dockview.panels).toHaveLength(0);
 
-                // The component should still be usable — loading a fresh
+                // The component should still be usable: loading a fresh
                 // layout after the sequence must succeed.
                 expect(() => {
                     dockview.fromJSON(popoutLayout as any);
@@ -9273,7 +9451,7 @@ describe('dockviewComponent', () => {
             jest.runAllTimers();
             expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
-            // remove an empty edge group — fires only _onDidRemoveGroup (no
+            // remove an empty edge group: fires only _onDidRemoveGroup (no
             // panel events). Without _onDidRemoveGroup in the composition
             // this would not fire.
             dockview.removeEdgeGroup('left');
@@ -10752,7 +10930,7 @@ describe('dockviewComponent', () => {
 
             // The fix schedules updateAllPositions on the next animation
             // frame via debouncedUpdateAllPositions(). Without the
-            // _onDidMovePanel listener this assertion fails — the overlay
+            // _onDidMovePanel listener this assertion fails; the overlay
             // would only reposition on the next external resize.
             await new Promise((resolve) => requestAnimationFrame(resolve));
             expect(updateSpy).toHaveBeenCalled();
@@ -11130,7 +11308,7 @@ describe('dockviewComponent', () => {
             const state = dockview.toJSON();
             dockview.fromJSON(state);
 
-            // After restore, the active panel should NOT be in the collapsed group
+            // After restore, the active panel should not be in the collapsed group
             const restoredGroup = dockview.api.panels[0].group;
             const activeId = restoredGroup.activePanel?.id;
 
@@ -11181,7 +11359,7 @@ describe('dockviewComponent', () => {
             const state = dockview.toJSON();
             dockview.fromJSON(state);
 
-            // All panels are in collapsed groups — no active panel,
+            // All panels are in collapsed groups, so no active panel and the
             // watermark should be shown
             const restoredGroup = dockview.api.panels[0].group;
             const restored = dockview.api.getTabGroups({
@@ -11436,6 +11614,98 @@ describe('dockviewComponent', () => {
             );
 
             expect(finalSize).toBe(initialSize);
+
+            dv.dispose();
+        });
+
+        test('edge group size constraints survive a toJSON/fromJSON round-trip on a fresh component', () => {
+            const c1 = document.createElement('div');
+            const dv = new DockviewComponent(c1, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dv.layout(1000, 800);
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                minimumSize: 150,
+                maximumSize: 400,
+            });
+
+            const state = dv.toJSON();
+            dv.dispose();
+
+            // a fresh component that has not called addEdgeGroup; fromJSON must
+            // auto-create the edge group with the serialized constraints
+            const c2 = document.createElement('div');
+            const fresh = new DockviewComponent(c2, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            fresh.layout(1000, 800);
+            fresh.fromJSON(state);
+
+            const view = (fresh as any)._shellManager._rightView;
+            expect(view).toBeDefined();
+            expect(view.configuredMaximumSize).toBe(400);
+            expect(view.configuredMinimumSize).toBe(150);
+
+            fresh.dispose();
+        });
+
+        test('an expanded-but-hidden edge group serializes its cached size, not 0', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dv.layout(1000, 800);
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                initialSize: 250,
+                minimumSize: 100,
+            });
+            dv.addPanel({
+                id: 'right-p1',
+                component: 'default',
+                position: { referenceGroup: 'right-group' },
+            });
+            dv.getEdgeGroup('right')!.expand();
+
+            // hide the expanded edge group; getViewSize now reports 0
+            dv.setEdgeGroupVisible('right', false);
+
+            const json = dv.toJSON();
+            expect(json.edgeGroups!.right!.visible).toBe(false);
+            // the fix: serialize the cached visible size rather than 0, so
+            // re-showing restores the prior width instead of snapping to min
+            expect(json.edgeGroups!.right!.size).toBeGreaterThan(100);
 
             dv.dispose();
         });
@@ -11762,7 +12032,7 @@ describe('dockviewComponent', () => {
 
             expect(edgeGroupApi.location.type).toBe('edge');
 
-            // attempt to float the edge group — should be a no-op
+            // attempt to float the edge group; should be a no-op
             dv.addFloatingGroup(edgeGroup);
 
             // group should still be an edge group, not floating
@@ -11781,7 +12051,7 @@ describe('dockviewComponent', () => {
 
             expect(edgeGroupApi.location.type).toBe('edge');
 
-            // attempt to popout the edge group — should return false
+            // attempt to popout the edge group; should return false
             const result = await dv.addPopoutGroup(edgeGroup);
 
             expect(result).toBe(false);
@@ -11913,6 +12183,329 @@ describe('dockviewComponent', () => {
             expect(dv.getEdgeGroup('left')).toBeDefined();
             dv.dispose();
         });
+
+        describe('per-group auto-hide (Feature A)', () => {
+            test('isEdgeGroupAutoHide resolves the global option by default', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    autoHideEdgeGroups: true,
+                });
+                const group = dv.addEdgeGroup('left', { id: 'left-group' });
+                const panel = dv.getEdgeGroupPanel('left')!;
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(true);
+                void group;
+                dv.dispose();
+            });
+
+            test('per-group autoHide flag overrides the global option', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    autoHideEdgeGroups: false,
+                });
+                dv.addEdgeGroup('left', { id: 'left-group', autoHide: true });
+                dv.addEdgeGroup('right', { id: 'right-group' });
+
+                const left = dv.getEdgeGroupPanel('left')!;
+                const right = dv.getEdgeGroupPanel('right')!;
+                // static + auto-hiding co-exist in one layout
+                expect(dv.isEdgeGroupAutoHide(left)).toBe(true);
+                expect(dv.isEdgeGroupAutoHide(right)).toBe(false);
+                dv.dispose();
+            });
+
+            test('setEdgeGroupAutoHide fires onDidEdgeGroupAutoHideChange', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left']);
+                const panel = dv.getEdgeGroupPanel('left')!;
+
+                const fired: string[] = [];
+                dv.onDidEdgeGroupAutoHideChange((g) => fired.push(g.id));
+
+                panel.api.setAutoHide(true);
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(true);
+                expect(fired).toEqual(['left-group']);
+
+                panel.api.setAutoHide(undefined); // clear → inherit global (off)
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(false);
+                dv.dispose();
+            });
+        });
+
+        describe('drag-revealed zero-footprint edges (Feature B)', () => {
+            function flush(): Promise<void> {
+                return new Promise((r) => setTimeout(r));
+            }
+
+            test('revealEdgeGroupWithData creates an auto-reveal edge and moves the panel in', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                const fromGroupId = panel.group.id;
+
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: fromGroupId,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left');
+                expect(edge).toBeDefined();
+                expect(edge!.location.type).toBe('edge');
+                // a newly revealed edge group is created collapsed (the drop
+                // adds a tab to its strip rather than popping it open)
+                expect(edge!.isCollapsed()).toBe(true);
+                const edgePanel = dv.getEdgeGroupPanel('left')!;
+                expect(edgePanel.panels.map((p) => p.id)).toContain('p1');
+                dv.dispose();
+            });
+
+            test('an emptied auto-reveal edge tears down to zero footprint', async () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+                expect(dv.getEdgeGroup('left')).toBeDefined();
+
+                // close the only panel → deferred teardown
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                await flush();
+
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.dispose();
+            });
+
+            test('an emptied static edge collapses to a strip (not torn down)', async () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left']);
+                dv.layout(1000, 1000);
+
+                dv.addPanel({
+                    id: 'p1',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                await flush();
+
+                const edge = dv.getEdgeGroup('left');
+                expect(edge).toBeDefined();
+                expect(edge!.isCollapsed()).toBe(true);
+                dv.dispose();
+            });
+
+            test('revealing into an existing edge fills it without changing its toggled state', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group', collapsed: true },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left')!;
+                // collapsed state is left as-is (still collapsed), the panel is
+                // just added to the strip's tabs
+                expect(edge.isCollapsed()).toBe(true);
+                expect(
+                    dv.getEdgeGroupPanel('left')!.panels.map((p) => p.id)
+                ).toContain('p1');
+                dv.dispose();
+            });
+
+            test('revealing into an expanded edge leaves it expanded', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group' },
+                });
+                dv.layout(1000, 1000);
+                // seed a panel so the edge is non-empty and expanded
+                dv.addPanel({
+                    id: 'seed',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+                expect(dv.getEdgeGroup('left')!.isCollapsed()).toBe(false);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left')!;
+                expect(edge.isCollapsed()).toBe(false);
+                expect(
+                    dv.getEdgeGroupPanel('left')!.panels.map((p) => p.id)
+                ).toContain('p1');
+                dv.dispose();
+            });
+
+            test('toJSON records the autoReveal/autoHide flags and they round-trip', async () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData(
+                    'left',
+                    { groupId: panel.group.id, panelId: 'p1' },
+                    { autoHide: true }
+                );
+
+                const json = dv.toJSON();
+                expect(json.edgeGroups?.left?.autoReveal).toBe(true);
+                expect(json.edgeGroups?.left?.autoHide).toBe(true);
+
+                // Round-trip into a fresh component; the restored edge must
+                // still tear down (autoReveal) when emptied.
+                const c2 = document.createElement('div');
+                const dv2 = new DockviewComponent(c2, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv2.layout(1000, 1000);
+                dv2.fromJSON(json);
+
+                const restored = dv2.getEdgeGroupPanel('left')!;
+                expect(dv2.isEdgeGroupAutoHide(restored)).toBe(true);
+                restored.panels[0].api.close();
+                await flush();
+                expect(dv2.getEdgeGroup('left')).toBeUndefined();
+
+                dv.dispose();
+                dv2.dispose();
+            });
+
+            test('revealing into an existing edge with autoHide fires the change event', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group' },
+                });
+                dv.layout(1000, 1000);
+                dv.addPanel({
+                    id: 'seed',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+
+                const fired: string[] = [];
+                dv.onDidEdgeGroupAutoHideChange((g) => fired.push(g.id));
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData(
+                    'left',
+                    { groupId: panel.group.id, panelId: 'p1' },
+                    { autoHide: true }
+                );
+
+                // the reuse path must fire the event so a listener (the
+                // auto-hide controller) can reconcile the group's chrome
+                expect(fired).toContain('left-group');
+                expect(
+                    dv.isEdgeGroupAutoHide(dv.getEdgeGroupPanel('left')!)
+                ).toBe(true);
+                dv.dispose();
+            });
+
+            test('an emptied auto-reveal edge is not serialized before its teardown microtask', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+                // empty it, then serialize synchronously (before the deferred
+                // teardown runs). The transient empty auto-reveal edge must not
+                // be persisted, or it would restore as an edge that never tears
+                // itself down.
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                const json = dv.toJSON();
+                expect(json.edgeGroups?.left).toBeUndefined();
+                dv.dispose();
+            });
+
+            test('revealEdgeGroupWithData is a no-op without the EdgeGroup module', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    // internal seam: register a subset (see moduleRemovability.spec)
+                    modules: AllModules.filter((m) => m !== EdgeGroupModule),
+                } as never);
+                dv.layout(1000, 1000);
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                expect(() =>
+                    dv.revealEdgeGroupWithData('left', {
+                        groupId: panel.group.id,
+                        panelId: 'p1',
+                    })
+                ).not.toThrow();
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.dispose();
+            });
+        });
     });
 
     test('regression: HeaderActions renderer disposed when group removed during a move (movingLock leak)', () => {
@@ -11992,7 +12585,7 @@ describe('dockviewComponent', () => {
     });
 
     test('issue #914: api.setTitle reflected by createTabRenderer output', () => {
-        // Regression test for #914 — the header overflow dropdown lazily
+        // Regression test for #914: the header overflow dropdown lazily
         // builds a fresh tab renderer via panel.view.createTabRenderer(...)
         // each time it opens. Prior to the fix that renderer was initialised
         // with a snapshot of the panel's init params, so a title updated via
@@ -12011,5 +12604,182 @@ describe('dockviewComponent', () => {
         // DefaultTab renders the title into a child div with textContent.
         expect(overflowTab.element.textContent).toContain('renamed');
         expect(overflowTab.element.textContent).not.toContain('original');
+    });
+});
+
+describe('group header direction change signal (DV-14 unblocker)', () => {
+    function createDockview(): DockviewComponent {
+        const dv = new DockviewComponent(document.createElement('div'), {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+        dv.layout(1000, 1000);
+        dv.addPanel({ id: 'panel1', component: 'default' });
+        return dv;
+    }
+
+    test('fires on a horizontal→vertical flip (top→left)', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left');
+
+        expect(events).toEqual([{ direction: 'vertical', position: 'left' }]);
+
+        dv.dispose();
+    });
+
+    test('fires on a vertical→horizontal flip (left→top)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('top');
+
+        expect(events).toEqual([{ direction: 'horizontal', position: 'top' }]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a same-axis move (top→bottom)', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('bottom');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a same-axis vertical move (left→right)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('right');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('does not fire on a redundant set (left→left)', () => {
+        const dv = createDockview();
+        dv.groups[0].api.setHeaderPosition('left');
+
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left');
+
+        expect(events).toEqual([]);
+
+        dv.dispose();
+    });
+
+    test('fires once per flip across a top→left→top cycle', () => {
+        const dv = createDockview();
+        const events: unknown[] = [];
+        dv.groups[0].api.onDidHeaderDirectionChange((e) => events.push(e));
+
+        dv.groups[0].api.setHeaderPosition('left'); // horizontal→vertical
+        dv.groups[0].api.setHeaderPosition('right'); // vertical→vertical (no fire)
+        dv.groups[0].api.setHeaderPosition('top'); // vertical→horizontal
+
+        expect(events).toEqual([
+            { direction: 'vertical', position: 'left' },
+            { direction: 'horizontal', position: 'top' },
+        ]);
+
+        dv.dispose();
+    });
+
+    test('fromJSON with malformed input does not destroy the existing layout', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        expect(dockview.panels).toHaveLength(2);
+
+        // an object with no `grid` is malformed; fromJSON must reject it
+        // *before* clearing the live layout
+        expect(() => dockview.fromJSON({} as any)).toThrow();
+
+        // the pre-existing layout must survive the failed load
+        expect(dockview.panels).toHaveLength(2);
+        expect(dockview.getGroupPanel('panel1')).toBeTruthy();
+        expect(dockview.getGroupPanel('panel2')).toBeTruthy();
+
+        dockview.dispose();
+    });
+
+    test('fromJSON degrades gracefully when a group references a missing panel id', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const serialized = dockview.toJSON();
+
+        // corrupt the state: the group still references 'panel2' in its views
+        // but its panel state is absent from the panels map
+        delete (serialized.panels as any)['panel2'];
+
+        // must not throw on the missing panel; the valid panel still loads
+        expect(() => dockview.fromJSON(serialized)).not.toThrow();
+
+        expect(dockview.getGroupPanel('panel1')).toBeTruthy();
+        expect(dockview.getGroupPanel('panel2')).toBeFalsy();
+
+        dockview.dispose();
     });
 });

@@ -3,42 +3,70 @@ import * as React from 'react';
 import { GridActions } from './gridActions';
 import { PanelActions } from './panelActions';
 import { GroupActions } from './groupActions';
+import { SB } from './sidebarTheme';
+import { Card, Switch, Btn } from './sidebarKit';
 
-const Section = (props: { title: string; children: React.ReactNode }) => (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <div
-            style={{
-                padding: '8px 16px 4px',
-                fontSize: '11px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: 'rgba(255,255,255,0.4)',
-                fontWeight: 600,
-            }}
-        >
-            {props.title}
-        </div>
+const Kbd = (props: { children: React.ReactNode }) => (
+    <kbd
+        style={{
+            display: 'inline-block',
+            padding: '1px 6px',
+            fontSize: 10,
+            fontFamily: SB.mono,
+            lineHeight: '16px',
+            border: `1px solid ${SB.border}`,
+            borderBottomWidth: 2,
+            borderRadius: 4,
+            background: SB.surface,
+            color: SB.muted,
+            whiteSpace: 'nowrap',
+        }}
+    >
         {props.children}
-    </div>
+    </kbd>
 );
 
-const toggleBtn = (active: boolean): React.CSSProperties => ({
-    padding: '4px 10px',
-    fontSize: 11,
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    background: active
-        ? 'rgba(72,100,220,0.25)'
-        : 'rgba(255,255,255,0.04)',
-    borderColor: active
-        ? 'rgba(72,100,220,0.5)'
-        : 'rgba(255,255,255,0.12)',
-    color: active ? 'white' : 'rgba(255,255,255,0.7)',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 4,
-});
+// Read-only reference. Mirrors the enabled `keyboardNavigation` bindings:
+// KeyboardNavigation (nav) + KeyboardDocking (move). Keep in sync with
+// DEFAULT_KEYMAP in dockview-enterprise if the defaults change.
+const SHORTCUTS: { label: string; keys: string[] }[] = [
+    { label: 'Focus next / previous group', keys: ['F6', '⇧ F6'] },
+    { label: 'Focus group by direction', keys: ['Ctrl ⇧ ←↑↓→'] },
+    { label: 'Next / previous tab in group', keys: ['Ctrl ]', 'Ctrl ['] },
+    { label: 'Focus the tab strip', keys: ['Ctrl ⇧ \\'] },
+    { label: 'Move panel: arm', keys: ['Ctrl M'] },
+    { label: '…then pick target / edge', keys: ['←↑↓→'] },
+    { label: '…tab into group (centre)', keys: ['Space', 'C'] },
+    { label: '…commit / cancel', keys: ['Enter', 'Esc'] },
+    { label: '…float instead of dock', keys: ['Ctrl ⇧ F'] },
+];
+
+const KeyboardShortcuts = () => (
+    <div style={{ padding: '2px 0' }}>
+        {SHORTCUTS.map((row) => (
+            <div
+                key={row.label}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '4px 0',
+                    fontSize: 11.5,
+                    color: SB.text,
+                    fontFamily: SB.ui,
+                }}
+            >
+                <span>{row.label}</span>
+                <span style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                    {row.keys.map((k) => (
+                        <Kbd key={k}>{k}</Kbd>
+                    ))}
+                </span>
+            </div>
+        ))}
+    </div>
+);
 
 export const ControlsContent = (props: {
     api?: DockviewApi;
@@ -50,6 +78,10 @@ export const ControlsContent = (props: {
     toggleCustomWatermark: () => void;
     hasCustomGhost: boolean;
     toggleCustomGhost: () => void;
+    dndGuide: boolean;
+    onToggleDndGuide: () => void;
+    smartGuides: boolean;
+    onToggleSmartGuides: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -58,105 +90,79 @@ export const ControlsContent = (props: {
 }) => {
     return (
         <>
-            <Section title="Grid">
+            <Card title="Grid" icon="grid_view" defaultOpen>
                 <GridActions api={props.api} />
-            </Section>
+            </Card>
 
             {props.api && props.activePanel && (
-                <Section title="Active Panel">
+                <Card title="Active Panel" icon="web_asset" defaultOpen>
                     <PanelActions
                         api={props.api}
                         panels={[props.activePanel]}
                         activePanel={props.activePanel}
                     />
-                </Section>
+                </Card>
             )}
 
             {props.api && props.activeGroup && (
-                <Section title="Active Group">
+                <Card title="Active Group" icon="space_dashboard" defaultOpen>
                     <GroupActions
                         api={props.api}
                         groups={[props.activeGroup]}
                         activeGroup={props.activeGroup}
                     />
-                </Section>
+                </Card>
             )}
 
-            <Section title="View">
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 6,
-                        padding: '6px 16px 8px',
-                        flexWrap: 'wrap',
-                    }}
-                >
-                    <button
-                        onClick={props.onToggleDebug}
-                        style={toggleBtn(props.debug)}
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            engineering
-                        </span>
-                        <span>Debug</span>
-                    </button>
-                    <button
-                        onClick={props.onToggleShowLogs}
-                        style={toggleBtn(props.showLogs)}
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            terminal
-                        </span>
-                        <span>Events Log</span>
-                    </button>
-                    <button
-                        onClick={props.toggleCustomWatermark}
-                        style={toggleBtn(props.hasCustomWatermark)}
-                        title="Use a custom watermark component (visible when no grid groups are present)"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            branding_watermark
-                        </span>
-                        <span>Custom watermark</span>
-                    </button>
-                    <button
-                        onClick={props.toggleCustomGhost}
-                        style={toggleBtn(props.hasCustomGhost)}
-                        title="Replace the default 'Multiple Panels (N)' group drag ghost with a custom component"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            drag_indicator
-                        </span>
-                        <span>Custom Drag Ghost</span>
-                    </button>
-                    {props.showLogs && (
-                        <button
-                            onClick={props.onClearLogs}
-                            style={toggleBtn(false)}
-                        >
-                            <span
-                                className="material-symbols-outlined"
-                                style={{ fontSize: 14 }}
-                            >
-                                undo
-                            </span>
-                            <span>Clear</span>
-                        </button>
-                    )}
-                </div>
-            </Section>
+            <Card title="View" icon="visibility" defaultOpen>
+                <Switch
+                    label="Debug overlay"
+                    icon="engineering"
+                    checked={props.debug}
+                    onChange={props.onToggleDebug}
+                />
+                <Switch
+                    label="Events log"
+                    icon="terminal"
+                    checked={props.showLogs}
+                    onChange={props.onToggleShowLogs}
+                />
+                <Switch
+                    label="Custom watermark"
+                    icon="branding_watermark"
+                    checked={props.hasCustomWatermark}
+                    onChange={props.toggleCustomWatermark}
+                />
+                <Switch
+                    label="Custom drag ghost"
+                    icon="drag_indicator"
+                    checked={props.hasCustomGhost}
+                    onChange={props.toggleCustomGhost}
+                />
+                <Switch
+                    label="Drop guide compass"
+                    icon="explore"
+                    checked={props.dndGuide}
+                    onChange={props.onToggleDndGuide}
+                />
+                <Switch
+                    label="Smart guides"
+                    icon="straighten"
+                    checked={props.smartGuides}
+                    onChange={props.onToggleSmartGuides}
+                />
+                {props.showLogs && (
+                    <div style={{ paddingTop: 6 }}>
+                        <Btn onClick={props.onClearLogs} icon="undo">
+                            Clear log
+                        </Btn>
+                    </div>
+                )}
+            </Card>
+
+            <Card title="Keyboard shortcuts" icon="keyboard">
+                <KeyboardShortcuts />
+            </Card>
         </>
     );
 };

@@ -439,8 +439,8 @@ describe('voidContainer', () => {
                 clientX: 0,
                 clientY: 0,
             });
-            // Move within the pre-arm window — for a floating group this
-            // must NOT promote to a redock (the overlay's move-the-float
+            // Move within the pre-arm window. For a floating group this
+            // must not promote to a redock (the overlay's move-the-float
             // drag owns this gesture).
             jest.advanceTimersByTime(100);
             fireEvent.pointerMove(window, {
@@ -530,36 +530,36 @@ describe('voidContainer', () => {
             );
         });
 
-        test.each([true, 'no-drop-target' as const])(
-            'does not display a drop overlay when locked=%p, even for same-accessor drags',
-            (lockedValue) => {
-                const { cut, groupView } = setup(lockedValue);
+        test.each([
+            true,
+            'no-drop-target' as const,
+        ])('does not display a drop overlay when locked=%p, even for same-accessor drags', (lockedValue) => {
+            const { cut, groupView } = setup(lockedValue);
 
-                LocalSelectionTransfer.getInstance().setData(
-                    [
-                        new PanelTransfer(
-                            'testcomponentid',
-                            'anothergroupid',
-                            'panel1'
-                        ),
-                    ],
-                    PanelTransfer.prototype
-                );
+            LocalSelectionTransfer.getInstance().setData(
+                [
+                    new PanelTransfer(
+                        'testcomponentid',
+                        'anothergroupid',
+                        'panel1'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
 
-                fireEvent.dragEnter(cut.element);
-                fireEvent.dragOver(cut.element);
+            fireEvent.dragEnter(cut.element);
+            fireEvent.dragOver(cut.element);
 
-                expect(
-                    cut.element.parentElement?.getElementsByClassName(
-                        'dv-drop-target-dropzone'
-                    ).length ?? 0
-                ).toBe(0);
-                // short-circuited before consulting the group model
-                expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
+            expect(
+                cut.element.parentElement?.getElementsByClassName(
+                    'dv-drop-target-dropzone'
+                ).length ?? 0
+            ).toBe(0);
+            // short-circuited before consulting the group model
+            expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
 
-                cut.dispose();
-            }
-        );
+            cut.dispose();
+        });
 
         test('still displays a drop overlay for same-accessor drags when not locked', () => {
             const { cut } = setup(false);
@@ -616,8 +616,8 @@ describe('voidContainer', () => {
                 doSetGroupActive: jest.fn(),
                 // The custom-ghost resolution lives in the AdvancedDnD module
                 // (covered by its own tests). Here we stub the host's ghost
-                // builder — exactly what DockviewComponent provides to
-                // VoidContainer — to verify VoidContainer drives the lifecycle.
+                // builder (exactly what DockviewComponent provides to
+                // VoidContainer) to verify VoidContainer drives the lifecycle.
                 buildGroupDragGhost: (g: any) => {
                     const r = factory(g);
                     r.init({ group: g, api: fakeApi });

@@ -10,7 +10,16 @@ import {
     GetTabGroupChipContextMenuItemsParams,
     DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
+// Registers the enterprise modules (edge groups, tab-group chips, context menu,
+// …) + sets the docs licence. The docs load this module directly (not
+// index.tsx), so both must happen here or the mobile demo loses enterprise
+// features / shows the "Unlicensed" watermark on a mobile-only load.
+import { LicenseManager } from 'dockview-enterprise';
 import * as React from 'react';
+
+LicenseManager.setLicenseKey(
+    '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
+);
 
 const FloatMenuItem = ({
     panel,
@@ -81,7 +90,9 @@ const WatchlistPanel: React.FC<IDockviewPanelProps> = () => {
                             borderBottom: '1px solid rgba(128,128,128,0.18)',
                         }}
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                        >
                             <span style={{ fontWeight: 600 }}>{t.symbol}</span>
                             <span style={{ fontSize: 11, opacity: 0.6 }}>
                                 {t.name}
@@ -126,11 +137,13 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
         }
         return pts;
     }, []);
-    const path = points.map((p, i) =>
-        i === 0
-            ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}`
-            : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`
-    ).join(' ');
+    const path = points
+        .map((p, i) =>
+            i === 0
+                ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}`
+                : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`
+        )
+        .join(' ');
 
     return (
         <div style={panelStyle}>
@@ -142,12 +155,7 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
                 preserveAspectRatio="none"
                 style={{ width: '100%', height: 180 }}
             >
-                <path
-                    d={path}
-                    fill="none"
-                    stroke="#3da45e"
-                    strokeWidth={1.5}
-                />
+                <path d={path} fill="none" stroke="#3da45e" strokeWidth={1.5} />
             </svg>
             <div
                 style={{
@@ -180,11 +188,11 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
 };
 
 const ORDERS = [
-    { side: 'BUY', symbol: 'AAPL', qty: 50, price: 192.10, status: 'Filled' },
-    { side: 'SELL', symbol: 'TSLA', qty: 25, price: 250.30, status: 'Filled' },
-    { side: 'BUY', symbol: 'NVDA', qty: 10, price: 480.50, status: 'Open' },
-    { side: 'SELL', symbol: 'MSFT', qty: 30, price: 414.00, status: 'Open' },
-    { side: 'BUY', symbol: 'GOOG', qty: 40, price: 137.60, status: 'Cancelled' },
+    { side: 'BUY', symbol: 'AAPL', qty: 50, price: 192.1, status: 'Filled' },
+    { side: 'SELL', symbol: 'TSLA', qty: 25, price: 250.3, status: 'Filled' },
+    { side: 'BUY', symbol: 'NVDA', qty: 10, price: 480.5, status: 'Open' },
+    { side: 'SELL', symbol: 'MSFT', qty: 30, price: 414.0, status: 'Open' },
+    { side: 'BUY', symbol: 'GOOG', qty: 40, price: 137.6, status: 'Cancelled' },
 ];
 
 const OrdersPanel: React.FC<IDockviewPanelProps> = () => {
@@ -202,7 +210,9 @@ const OrdersPanel: React.FC<IDockviewPanelProps> = () => {
                             borderBottom: '1px solid rgba(128,128,128,0.18)',
                         }}
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                        >
                             <span
                                 style={{
                                     fontWeight: 600,
@@ -305,7 +315,13 @@ const PositionsPanel: React.FC<IDockviewPanelProps> = () => {
                     >
                         <div>
                             <span style={{ fontWeight: 600 }}>{p.symbol}</span>
-                            <span style={{ marginLeft: 8, opacity: 0.6, fontSize: 11 }}>
+                            <span
+                                style={{
+                                    marginLeft: 8,
+                                    opacity: 0.6,
+                                    fontSize: 11,
+                                }}
+                            >
                                 {p.qty} sh
                             </span>
                         </div>
@@ -317,8 +333,7 @@ const PositionsPanel: React.FC<IDockviewPanelProps> = () => {
                                     color: up ? '#3da45e' : '#d8403a',
                                 }}
                             >
-                                {up ? '+' : ''}
-                                ${fmt(p.pnl, 0)}
+                                {up ? '+' : ''}${fmt(p.pnl, 0)}
                             </div>
                         </div>
                     </div>
@@ -362,7 +377,14 @@ const NewsPanel: React.FC<IDockviewPanelProps> = () => {
                         borderBottom: '1px solid rgba(128,128,128,0.18)',
                     }}
                 >
-                    <div style={{ display: 'flex', gap: 8, fontSize: 11, opacity: 0.6 }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            gap: 8,
+                            fontSize: 11,
+                            opacity: 0.6,
+                        }}
+                    >
                         <span>{n.time}</span>
                         <span>·</span>
                         <span>{n.source}</span>
@@ -435,6 +457,7 @@ const components = {
 
 export interface AppProps {
     theme?: DockviewTheme;
+    onReady?: () => void;
 }
 
 const App: React.FC<AppProps> = (props) => {
@@ -444,7 +467,7 @@ const App: React.FC<AppProps> = (props) => {
         const api = event.api;
         setApi(api);
 
-        // Create the left edge group empty here — panels added later, AFTER
+        // Create the left edge group empty here; panels are added later, after
         // the main area is populated. Adding panels with
         // `position: { referenceGroup }` marks the target as the active
         // group, so populating the edge first causes subsequent
@@ -457,7 +480,7 @@ const App: React.FC<AppProps> = (props) => {
             collapsed: true,
         });
 
-        // Primary dockview — top group is a 4-tab tab group with the
+        // Primary dockview: the top group is a 4-tab tab group with the
         // trading panels, bottom group is a standalone News panel. The mix
         // demonstrates both a tab group and a single-panel group in the
         // primary area. Portrait phones have far more height than width, so
@@ -499,7 +522,7 @@ const App: React.FC<AppProps> = (props) => {
         });
 
         // Sub-group Orders + Positions into a "Trades" coloured tab group
-        // inside the primary top group — demonstrates the tab-group feature
+        // inside the primary top group, demonstrating the tab-group feature
         // alongside the standalone Watchlist / Chart tabs.
         const tradingGroupId = api.getPanel('watchlist')!.api.group.id;
         const tradesTabGroup = api.createTabGroup({
@@ -518,7 +541,7 @@ const App: React.FC<AppProps> = (props) => {
             panelId: 'positions',
         });
 
-        // Populate the edge group LAST (mirrors the desktop demo's order)
+        // Populate the edge group last (mirrors the desktop demo's order)
         // so the active-group side-effect of `addPanel({referenceGroup})`
         // doesn't pull the main panels into the edge.
         api.addPanel({
@@ -535,6 +558,8 @@ const App: React.FC<AppProps> = (props) => {
         });
 
         api.getPanel('watchlist')?.api.setActive();
+
+        props.onReady?.();
     };
 
     const getTabContextMenuItems = React.useCallback(
@@ -543,6 +568,9 @@ const App: React.FC<AppProps> = (props) => {
                 | 'close'
                 | 'closeOthers'
                 | 'closeAll'
+                | 'closeLeft'
+                | 'closeRight'
+                | 'maximize'
                 | 'separator'
                 | { component: React.FC<IContextMenuItemComponentProps> }
                 | { label: string; action: () => void }
@@ -550,6 +578,10 @@ const App: React.FC<AppProps> = (props) => {
                 'close',
                 'closeOthers',
                 'closeAll',
+                'closeLeft',
+                'closeRight',
+                'separator',
+                'maximize',
                 'separator',
                 { component: FloatMenuItem },
             ];
@@ -617,9 +649,11 @@ const App: React.FC<AppProps> = (props) => {
             const items: (
                 | 'colorPicker'
                 | 'rename'
+                | 'collapse'
+                | 'close'
                 | 'separator'
                 | { label: string; action: () => void }
-            )[] = ['rename', 'colorPicker'];
+            )[] = ['rename', 'colorPicker', 'collapse', 'close'];
 
             if (api) {
                 items.push(
@@ -629,12 +663,6 @@ const App: React.FC<AppProps> = (props) => {
                         action: () => api.addFloatingGroup(group),
                     },
                     'separator',
-                    {
-                        label: tabGroup.collapsed
-                            ? 'Expand group'
-                            : 'Collapse group',
-                        action: () => tabGroup.toggle(),
-                    },
                     {
                         label: 'Dissolve group',
                         action: () =>
@@ -651,14 +679,28 @@ const App: React.FC<AppProps> = (props) => {
         [api]
     );
 
+    // Fill wrapper: the docs load this module directly (not index.tsx, which
+    // wraps it in a height:100% div), so give DockviewReact a sized parent or it
+    // collapses to a ~100px intrinsic height. `height: 0` + `flexGrow: 1` (as the
+    // desktop demo does) gives a *definite* height so DockviewReact's own
+    // `height:100%` root resolves instead of collapsing inside a flex parent.
     return (
-        <DockviewReact
-            components={components}
-            onReady={onReady}
-            getTabContextMenuItems={getTabContextMenuItems}
-            getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
-            theme={props.theme ?? themeAbyss}
-        />
+        <div
+            style={{
+                flexGrow: 1,
+                height: 0,
+                minHeight: 0,
+                display: 'flex',
+            }}
+        >
+            <DockviewReact
+                components={components}
+                onReady={onReady}
+                getTabContextMenuItems={getTabContextMenuItems}
+                getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
+                theme={props.theme ?? themeAbyss}
+            />
+        </div>
     );
 };
 

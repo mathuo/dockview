@@ -178,6 +178,113 @@ describe('paneviewComponent', () => {
         paneview.dispose();
     });
 
+    test('re-expanding a collapsed pane restores its prior size, not the container width', () => {
+        const disposables = new CompositeDisposable();
+
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        // a wide-ish, tall container: the cross-axis (width) is 300 while there
+        // is plenty of main-axis (height) room
+        paneview.layout(300, 900);
+
+        const panel1 = paneview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'Panel 1',
+            isExpanded: true,
+        });
+        const panel2 = paneview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Panel 2',
+            isExpanded: true,
+        });
+        paneview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            title: 'Panel 3',
+            isExpanded: true,
+        });
+
+        let panel2Dimensions: PanelDimensionChangeEvent | undefined;
+        disposables.addDisposables(
+            panel2.api.onDidDimensionsChange((event) => {
+                panel2Dimensions = event;
+            })
+        );
+
+        // give panel2 a specific expanded height
+        panel2.api.setSize({ size: 150 });
+        expect(panel2Dimensions?.height).toBe(150);
+
+        // collapse then re-expand it
+        panel2.api.setExpanded(false);
+        panel2.api.setExpanded(true);
+
+        // it must return to its cached ~150 height, not jump to the 300px
+        // cross-axis container width (which would squeeze its siblings)
+        expect(panel2Dimensions?.height).toBe(150);
+
+        disposables.dispose();
+        paneview.dispose();
+    });
+
+    test('a hidden pane round-trips hidden at its cached size, not size 0', () => {
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        paneview.layout(300, 600);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'Panel 1',
+            isExpanded: true,
+        });
+        const panel2 = paneview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Panel 2',
+            isExpanded: true,
+        });
+
+        // hide panel2: getViewSize now reports 0, but its real size is cached
+        paneview.setVisible(panel2, false);
+
+        const json = paneview.toJSON();
+        const v2 = json.views.find((v) => v.data.id === 'panel2')!;
+        expect(v2.visible).toBe(false);
+        expect(v2.size).toBeGreaterThan(0);
+
+        // round-trip: the pane must reload hidden at its cached size
+        paneview.fromJSON(json);
+        paneview.layout(300, 600);
+
+        const json2 = paneview.toJSON();
+        const v2b = json2.views.find((v) => v.data.id === 'panel2')!;
+        expect(v2b.visible).toBe(false);
+        expect(v2b.size).toBeGreaterThan(0);
+
+        paneview.dispose();
+    });
+
     test('serialization', () => {
         const paneview = new PaneviewComponent(container, {
             createComponent: (options) => {
@@ -560,6 +667,27 @@ describe('paneviewComponent', () => {
         });
 
         expect(paneview.disableResizing).toBeTruthy();
+    });
+
+    test('that disableAutoResizing can be toggled via updateOptions', () => {
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        expect(paneview.disableResizing).toBeFalsy();
+
+        paneview.updateOptions({ disableAutoResizing: true });
+        expect(paneview.disableResizing).toBeTruthy();
+
+        paneview.updateOptions({ disableAutoResizing: false });
+        expect(paneview.disableResizing).toBeFalsy();
     });
 
     test('that setVisible toggles visiblity', () => {

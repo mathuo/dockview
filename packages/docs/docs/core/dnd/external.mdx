@@ -1,18 +1,19 @@
 ---
-title: 'External Dnd Events'
+title: 'External drag and drop events'
 sidebar_position: 3
 description: How to intercept and respond to external drag and drop events entering the Dockview layout.
 ---
 
-External Dnd events can be intercepted through a number of utilities.
+External drag and drop events can be intercepted through a number of utilities.
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-<DocRef declaration="DockviewApi"
-  methods={['onDidDrop', 'onUnhandledDragOver']}
+<DocRef
+    declaration="DockviewApi"
+    methods={['onDidDrop', 'onUnhandledDragOver']}
 />
 
-## Intercepting Drag Events
+## Intercepting drag events
 
 You can intercept drag events to attach your own metadata using the `onWillDragPanel` and `onWillDragGroup` api methods.
 
@@ -27,10 +28,17 @@ Narrow before reading `DragEvent`-only fields like `dataTransfer`:
 ```ts
 api.onWillDragPanel((event) => {
     if (!(event.nativeEvent instanceof DragEvent)) {
-        return; // touch / pen drag — no DataTransfer
+        return; // touch / pen drag, no DataTransfer
     }
     event.nativeEvent.dataTransfer?.setData('text/plain', '...');
 });
 ```
 
-Touch and pen drags cannot bridge to external HTML5 drop zones, so skipping them here is the intended behaviour — the drag still works inside dockview.
+Touch and pen drags cannot bridge to external HTML5 drop zones, so skipping them here is the intended behaviour; the drag still works inside Dockview.
+
+## See also
+
+- [Drag and drop](/docs/core/dnd/dragAndDrop): the drag events and hooks these utilities build on.
+- [Third-party libraries](/docs/core/dnd/thirdParty): using other drag and drop libraries inside a panel.
+- [Drag and drop strategy](/docs/core/dnd/strategy): why `nativeEvent` can be a `PointerEvent`, and the touch / pen backend.
+- [Disable drag and drop](/docs/core/dnd/disable): turn drag and drop off entirely.

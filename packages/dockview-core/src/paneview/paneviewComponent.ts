@@ -40,6 +40,9 @@ export interface SerializedPaneviewPanel {
     };
     size: number;
     expanded?: boolean;
+    /** Absent/true = visible; false = the pane was hidden via setVisible and
+     *  `size` holds its cached pre-hide size. */
+    visible?: boolean;
 }
 
 export interface SerializedPaneview {
@@ -251,7 +254,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._classNames.setClassNames(options.className ?? '');
         }
 
-        if ('disableResizing' in options) {
+        if ('disableAutoResizing' in options) {
             this.disableResizing = options.disableAutoResizing ?? false;
         }
 
@@ -351,14 +354,23 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         const views: SerializedPaneviewPanel[] = this.paneview
             .getPanes()
             .map((view, i) => {
-                const size = this.paneview.getViewSize(i);
+                // A pane hidden via setVisible(false) reports getViewSize 0;
+                // its real (pre-hide) size lives in the cached visible size.
+                // Serialize that plus a `visible: false` flag so it round-trips
+                // hidden at its prior size rather than visible at size 0.
+                const cachedVisibleSize =
+                    this.paneview.getViewCachedVisibleSize(i);
+                const hidden = typeof cachedVisibleSize === 'number';
                 return {
-                    size,
+                    size: hidden
+                        ? cachedVisibleSize
+                        : this.paneview.getViewSize(i),
                     data: view.toJSON(),
                     minimumSize: minimum(view.minimumBodySize),
                     maximumSize: maximum(view.maximumBodySize),
                     headerSize: view.headerSize,
                     expanded: view.isExpanded(),
+                    ...(hidden ? { visible: false } : {}),
                 };
             });
 
@@ -440,7 +452,11 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                         this._onDidAddView.fire(panel);
                     }, 0);
 
-                    return { size: view.size, view: panel };
+                    return {
+                        size: view.size,
+                        view: panel,
+                        visible: view.visible,
+                    };
                 }),
             },
         });

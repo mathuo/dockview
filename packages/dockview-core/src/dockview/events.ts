@@ -45,6 +45,18 @@ export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
         return this.event.position;
     }
 
+    /** The resolved cell was marked `edge` (an outer "dock to the whole layout"
+     *  cell). See {@link DroptargetEvent.edge}. */
+    get edge(): boolean {
+        return this.event.edge;
+    }
+
+    /** The resolved cell docks as a dedicated edge group (display hint). See
+     *  {@link PositionResolverResult.edgeGroup}. */
+    get edgeGroup(): boolean {
+        return this.event.edgeGroup;
+    }
+
     get defaultPrevented(): boolean {
         return this.event.defaultPrevented;
     }

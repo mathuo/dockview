@@ -34,6 +34,89 @@
     }
 }
 
+// Auto-hide edge group "peek": the active panel slid out over the content. The
+// backdrop, the peeked content, and the Pin header are three separate sibling
+// overlays (the `always` render overlay can't be nested), layered by z-index.
+.dv-edge-peek {
+    background-color: var(--dv-group-view-background-color);
+    border: 1px solid var(--dv-separator-border);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+
+    // the reparented content container fills the backdrop
+    > * {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
+}
+
+// Drag-reveal edge indicator: a thin accent line hugging the content-area edge
+// in the direction a new edge group would dock. A line (not a fill) so it reads
+// differently from the split overlay; the colour is the theme's drag-over accent
+// so it matches the rest of the drop styling. Geometry (edge + extent) is set
+// inline by the auto-edge-group module.
+.dv-auto-edge-band {
+    position: absolute;
+    pointer-events: none;
+    z-index: var(--dv-overlay-z-index, 999);
+    background-color: var(--dv-edge-dock-indicator-color);
+    box-shadow: 0 0 6px var(--dv-edge-dock-indicator-color);
+}
+
+// The title bar is a sibling overlay so it can sit above an `always` panel's
+// render overlay. It occupies the top band of the peek (the content is inset
+// below it), with the panel title to the left and pin + close to the right.
+.dv-edge-peek-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 4px 0 8px;
+    box-sizing: border-box;
+    background-color: var(--dv-group-view-background-color);
+    border: 1px solid var(--dv-separator-border);
+    border-bottom: none;
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    font-size: 12px;
+
+    // Behave like the tab close icon: borderless, monotone, with a hover
+    // background highlight. Nesting keeps the two-class selector (specificity
+    // 0,2,0) winning over broad app `button {}` rules (e.g. `.app button`,
+    // 0,1,1) that would otherwise paint a border/outline on the chrome icons.
+    .dv-edge-peek-pin,
+    .dv-edge-peek-close {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        cursor: pointer;
+        border: none;
+        padding: 4px;
+        color: inherit;
+        background: transparent;
+        outline: none;
+
+        &:hover {
+            border-radius: 2px;
+            background-color: var(--dv-icon-hover-background-color);
+        }
+
+        // Keyboard-only focus ring (suppressed on mouse click).
+        &:focus-visible {
+            border-radius: 2px;
+            outline: 1px solid var(--dv-tab-divider-color);
+            outline-offset: -1px;
+        }
+    }
+}
+
+.dv-edge-peek-title {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 // A floating window hosts its own gridview as the overlay content; it must
 // fill the resize container so its size tracks the overlay box.
 .dv-resize-container > .dv-grid-view {
@@ -84,7 +167,7 @@
 
     // The container is the backdrop behind its content. A single floating group
     // hides it entirely, but a nested floating layout exposes the gaps/sashes
-    // between groups — without a fill those gaps would be transparent. Mirror
+    // between groups, and without a fill those gaps would be transparent. Mirror
     // the docked backdrop (the dockview root uses --dv-group-view-background-color).
     background-color: var(--dv-group-view-background-color);
 
@@ -263,4 +346,30 @@
             right: -12px;
         }
     }
+}
+
+// Smart Guides: alignment lines + dock/merge drop-preview painted in the
+// floating container while a float is dragged. The module positions + sizes
+// these inline; only the theming lives here (override the CSS vars to restyle).
+.dv-smart-guides {
+    pointer-events: none;
+    // The guide layer mounts in `.dv-floating-overlay-host` (z-index: auto, no
+    // stacking context), so it competes directly with the shell-level render
+    // overlays. `always`/force-visible panel content carries an inline z-index
+    // (1000, or `--dv-overlay-z-index` + aria-level) and would otherwise paint
+    // over the alignment lines. Lift the guides clear of that whole band.
+    z-index: calc(var(--dv-overlay-z-index, 999) + 100);
+}
+
+.dv-smart-guide {
+    background-color: var(--dv-smart-guides-color, #1f9cf0);
+}
+
+.dv-smart-guide-preview {
+    box-sizing: border-box;
+    background-color: var(
+        --dv-smart-guides-preview-color,
+        rgba(31, 156, 240, 0.18)
+    );
+    border: 1px solid var(--dv-smart-guides-color, #1f9cf0);
 }

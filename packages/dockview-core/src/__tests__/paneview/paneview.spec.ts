@@ -105,6 +105,47 @@ describe('paneview', () => {
         disposable.dispose();
     });
 
+    test('reordering a pane does not leak its expansion-state listener', () => {
+        const paneview = new Paneview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        const makePanel = (id: string) =>
+            new TestPanel({
+                id,
+                component: 'component',
+                headerComponent: 'headerComponent',
+                orientation: Orientation.VERTICAL,
+                isExpanded: true,
+                isHeaderVisible: true,
+                headerSize: 22,
+                minimumBodySize: 0,
+                maximumBodySize: Number.MAX_SAFE_INTEGER,
+            });
+
+        const view1 = makePanel('id1');
+        const view2 = makePanel('id2');
+
+        paneview.addPane(view1);
+        paneview.addPane(view2);
+
+        // reorder view1 a few times; each move must not leak a listener
+        paneview.moveView(0, 1);
+        paneview.moveView(1, 0);
+        paneview.moveView(0, 1);
+
+        let changes = 0;
+        const disposable = paneview.onDidChange(() => changes++);
+
+        // a single expansion toggle should fire exactly one change event, not
+        // one-per-leaked-listener (N + 1)
+        view1.setExpanded(false);
+        expect(changes).toBe(1);
+
+        disposable.dispose();
+        paneview.dispose();
+    });
+
     test('dispose of paneview', () => {
         expect(container.childNodes).toHaveLength(0);
 

@@ -1,33 +1,33 @@
 ---
-title: Registering Panels
+title: Registering panels
 sidebar_position: 0
 description: How to register panel components with Dockview so they can be instantiated by name.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
+Before a panel can be added it must be registered, so Dockview can instantiate it by name. Components are registered through the `components` option and referenced by their key when you call `addPanel`.
 
-This section describes how to register a panel.
+You can register panels through the Dockview [option](/docs/api/dockview/options) `components`.
 
-You can register panels through the dock  [option](/docs/api/dockview/options) `components`.
-
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['components']} />
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['components']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['components']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['components']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['components']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="DockviewAngularOptions" methods={['components']} />
 </FrameworkSpecific>
 
-
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['createComponent']} />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['createComponent']}
+    />
 </FrameworkSpecific>
-
 
 <FrameworkSpecific framework='React'>
 ```tsx
@@ -38,14 +38,16 @@ const components = {
     const containerApi: DockviewApi  = props.containerApi;
 
     return <div>{/** logic */}</div>
-  },
-  component_2: (props: IDockviewPanelProps) => {
-    return <div>{/** logic */}</div>
-  }
+
+},
+component_2: (props: IDockviewPanelProps) => {
+return <div>{/* * logic */}</div>
+}
 }
 
 return <DockviewReact components={components}/>
-```
+
+````
 </FrameworkSpecific>
 
 
@@ -76,14 +78,14 @@ const api = createDockview(parentElement, {
         }
     },
 });
-```
-</FrameworkSpecific>
+````
 
+</FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
 
 Pass your panel components directly to `<DockviewVue>` via the `components`
-prop. This is the recommended pattern and works with `<script setup>` — no
+prop. This is the recommended pattern and works with `<script setup>`; no
 global `app.component(...)` registration is required.
 
 ```vue
@@ -106,9 +108,10 @@ function onReady(event: DockviewReadyEvent) {
 </template>
 ```
 
-Legacy Options-API style is still supported — components registered on any
+Legacy Options-API style is still supported; components registered on any
 ancestor via `components: { ... }` (or globally via `app.component(...)`) are
 resolved by name as before.
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -120,7 +123,7 @@ updated in place when you call `panel.api.updateParameters(...)`. `api`,
 ```tsx
 @Component({
     selector: 'panel-component-1',
-    template: `<div>Panel Content 1 — {{ params?.myCustomKey }}</div>`
+    template: `<div>Panel Content 1: {{ params?.myCustomKey }}</div>`,
 })
 export class PanelComponent1 {
     @Input() params: { myCustomKey?: string };
@@ -130,8 +133,8 @@ export class PanelComponent1 {
 }
 
 @Component({
-    selector: 'panel-component-2', 
-    template: `<div>Panel Content 2</div>`
+    selector: 'panel-component-2',
+    template: `<div>Panel Content 2</div>`,
 })
 export class PanelComponent2 {
     @Input() params: Record<string, unknown>;
@@ -141,35 +144,33 @@ export class PanelComponent2 {
 @Component({
     selector: 'app-root',
     template: `
-        <dv-dockview 
-            [components]="components"
-            (ready)="onReady($event)">
+        <dv-dockview [components]="components" (ready)="onReady($event)">
         </dv-dockview>
-    `
+    `,
 })
 export class AppComponent {
     components = {
-        'component_1': PanelComponent1,
-        'component_2': PanelComponent2,
+        component_1: PanelComponent1,
+        component_2: PanelComponent2,
     };
 
     onReady(event: DockviewReadyEvent) {
         event.api.addPanel({
             id: 'panel_1',
-            component: 'component_1'
+            component: 'component_1',
         });
 
         event.api.addPanel({
             id: 'panel_2',
-            component: 'component_2'
+            component: 'component_2',
         });
     }
 }
 ```
-</FrameworkSpecific>
 
+</FrameworkSpecific>
 
 Each panel has an [api](/docs/api/dockview/panelApi) which is used to control specific
 features on that individual panel.
-The panel also has access the [group api](/docs/api/dockview/groupApi) and the container
+The panel also has access to the [group api](/docs/api/dockview/groupApi) and the container
 [api](/docs/api/dockview/overview).

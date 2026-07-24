@@ -163,14 +163,17 @@ export class Emitter<T> implements IDisposable {
 
     public fire(e: T): void {
         if (this._pauseTokens.size > 0) {
-            // while paused, the event is dropped entirely — `_last` is not
+            // while paused, the event is dropped entirely: `_last` is not
             // updated, so replay subscribers won't see values fired during a pause
             return;
         }
         if (this.options?.replay) {
             this._last = e;
         }
-        for (const listener of this._listeners) {
+        // iterate over a snapshot so that a listener disposing its own (or a
+        // sibling's) subscription during dispatch doesn't cause the live array
+        // to shift underneath the loop and skip the following listener
+        for (const listener of this._listeners.slice()) {
             listener.callback(e);
         }
     }
@@ -187,18 +190,24 @@ export class Emitter<T> implements IDisposable {
 
             if (this._listeners.length > 0) {
                 if (Emitter.ENABLE_TRACKING) {
+                    // Defer the leak check AND the clear to a microtask: this
+                    // lets listeners disposed out-of-order later in the same
+                    // execution block remove themselves from `_listeners` first,
+                    // so they aren't falsely reported. Clearing synchronously
+                    // here (as before) left the microtask iterating an empty
+                    // array, so the leak warning never fired.
                     queueMicrotask(() => {
-                        // don't check until stack of execution is completed to allow for out-of-order disposals within the same execution block
                         for (const listener of this._listeners) {
                             console.warn(
                                 'dockview: stacktrace',
                                 listener.stacktrace?.print()
                             );
                         }
+                        this._listeners = [];
                     });
+                } else {
+                    this._listeners = [];
                 }
-
-                this._listeners = [];
             }
 
             if (Emitter.ENABLE_TRACKING && this._event) {

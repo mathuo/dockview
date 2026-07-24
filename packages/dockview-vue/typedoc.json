@@ -1,6 +1,11 @@
 {
     "$schema": "https://typedoc.org/schema.json",
     "extends": ["../../typedoc.base.json"],
-    "entryPoints": ["src/dockview/types.ts"],
-    "tsconfig":"tsconfig.typedoc.json"
+    "entryPoints": [
+        "src/dockview/types.ts",
+        "src/gridview/types.ts",
+        "src/paneview/types.ts",
+        "src/splitview/types.ts"
+    ],
+    "tsconfig": "tsconfig.typedoc.json"
 }

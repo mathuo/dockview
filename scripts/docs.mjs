@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync, readdirSync } from 'fs';
 import { ReflectionKind } from 'typedoc';
 
 /**
@@ -46,7 +46,7 @@ const SKIP_DOC = ['Event'];
 
 console.log('running docs');
 
-const forceBuild = true
+const forceBuild = true;
 
 if (forceBuild || !existsSync(TYPEDOC_OUTPUT_FILE)) {
     execSync(
@@ -63,18 +63,27 @@ if (forceBuild || !existsSync(TYPEDOC_OUTPUT_FILE)) {
 
 const content = JSON.parse(readFileSync(TYPEDOC_OUTPUT_FILE));
 
-const dockviewCore = content.children.find(
-    (child) => child.name === 'dockview-core'
-);
-const dockview = content.children.find((child) => child.name === 'dockview');
-const dockviewVue = content.children.find((child) => child.name === 'dockview-vue');
+// Iterate over every documented package (dockview, dockview-core,
+// dockview-react, dockview-vue, dockview-angular, ...) rather than a hard-coded
+// subset, so packages added to typedoc.json entryPoints are picked up
+// automatically. Declarations are name-keyed downstream, so re-exported
+// duplicates (e.g. DockviewApi via both `dockview` and `dockview-core`) simply
+// overwrite each other harmlessly.
+//
+// A package with multiple typedoc entryPoints (e.g. dockview-vue exposing
+// dockview/gridview/paneview/splitview types) nests its declarations one level
+// deeper inside per-file Module reflections; recurse through those so we always
+// arrive at the concrete declarations regardless of entryPoint count.
+function flattenModules(children) {
+    return (children ?? []).flatMap((child) =>
+        child.kind === ReflectionKind.Module
+            ? flattenModules(child.children)
+            : [child]
+    );
+}
 
-
-const declarations = [dockviewCore, dockview, dockviewVue]
-    .flatMap(
-        (item) => item.children
-        // .filter((child) => DOCUMENT_LIST.includes(child.name))
-    )
+const declarations = content.children
+    .flatMap((pkg) => flattenModules(pkg.children))
     .filter(Boolean);
 
 function parseTypeArguments(args) {
@@ -180,10 +189,10 @@ function parseComplexType(obj) {
                 values: obj.elements.map(parseComplexType),
             };
         case 'namedTupleMember':
-          return {
-            type: obj.type,
-            values: parseComplexType(obj.element),
-          };
+            return {
+                type: obj.type,
+                values: parseComplexType(obj.element),
+            };
         case 'typeOperator':
             return {
                 type: obj.type,
@@ -587,76 +596,312 @@ function createDocument(declarations) {
     const documentation = {};
 
     function parseDeclaration(declaration) {
-      const { children, name, extendedTypes } = declaration;
+        const { children, name, extendedTypes } = declaration;
 
-      /**
-       * 4: Namespace
-       * 8: Enum
-       * 64: Function
-       * 128: Class
-       * 256: Interface
-       * 2097152: TypeAlias
-       */
+        /**
+         * 4: Namespace
+         * 8: Enum
+         * 64: Function
+         * 128: Class
+         * 256: Interface
+         * 2097152: TypeAlias
+         */
 
-      const metadata = parseDeclarationMetadata(declaration);
+        const metadata = parseDeclarationMetadata(declaration);
 
-      documentation[name] = {
-          ...metadata,
-          name,
-          children: [],
-          extends: []
-      };
+        documentation[name] = {
+            ...metadata,
+            name,
+            children: [],
+            extends: [],
+        };
 
-      if (!children) {
-          documentation[name] = {
-              ...parse(declaration),
-          };
-          // documentation[name].metadata = parse(declaration);
-      }
-
-      if (children) {
-          for (const child of children) {
-              try {
-                  const { flags } = child;
-
-                  if (flags.isPrivate) {
-                      continue;
-                  }
-
-                  const output = parse(child);
-
-                  if (output) {
-                      output.pieces = Array.from(new Set(output.pieces))
-                          .filter(Boolean)
-                          .sort();
-                      delete output.pieces;
-                      // delete output.comment;
-
-                      documentation[name].children.push(output);
-                  }
-              } catch (err) {
-                  console.error('error', err, JSON.stringify(child, null, 4));
-                  process.exit(-1);
-              }
-          }
-      }
-
-      if(extendedTypes) {
-        for(const extendedType of extendedTypes) {
-          if(extendedType.package && extendedType.package.startsWith("dockview")) {
-            documentation[name].extends.push(extendedType.name);
-          }
+        if (!children) {
+            documentation[name] = {
+                ...parse(declaration),
+            };
+            // documentation[name].metadata = parse(declaration);
         }
 
-      }
+        if (children) {
+            for (const child of children) {
+                try {
+                    const { flags } = child;
+
+                    if (flags.isPrivate) {
+                        continue;
+                    }
+
+                    const output = parse(child);
+
+                    if (output) {
+                        output.pieces = Array.from(new Set(output.pieces))
+                            .filter(Boolean)
+                            .sort();
+                        delete output.pieces;
+                        // delete output.comment;
+
+                        documentation[name].children.push(output);
+                    }
+                } catch (err) {
+                    console.error('error', err, JSON.stringify(child, null, 4));
+                    process.exit(-1);
+                }
+            }
+        }
+
+        if (extendedTypes) {
+            for (const extendedType of extendedTypes) {
+                if (
+                    extendedType.package &&
+                    extendedType.package.startsWith('dockview')
+                ) {
+                    (documentation[name].extends ??= []).push(
+                        extendedType.name
+                    );
+                }
+            }
+        }
     }
 
     for (const declaration of declarations) {
-      parseDeclaration(declaration);
+        parseDeclaration(declaration);
     }
 
     return documentation;
 }
 
 const documentation = createDocument(declarations);
-writeFileSync(API_OUTPUT_FILE, JSON.stringify(documentation, null, 4));
+
+/**
+ * #region trimming the client payload
+ *
+ * The full `documentation` object contains every exported declaration across
+ * the documented packages. The docs website only renders the declarations
+ * referenced by a `<DocRef declaration="..." />` plus whatever those
+ * transitively reference, so emitting the full set bloats the JSON that gets
+ * bundled into the client. Below we:
+ *   1. discover the "root" declarations referenced by the .mdx docs,
+ *   2. walk their transitive dockview type references to a fixed point,
+ *   3. emit only the reachable subset,
+ *   4. strip the pre-rendered `code` strings (the client regenerates these from
+ *      the structured data via `codify`, so they are dead weight).
+ */
+
+// Collect the names of dockview-owned types referenced by a TypeDescriptor.
+// Mirrors the client's `firstLevelTypes` (packages/docs/.../reference/types.ts).
+function collectTypeReferences(value, out) {
+    if (!value) {
+        return;
+    }
+    switch (value.type) {
+        case 'array':
+            collectTypeReferences(value.value, out);
+            break;
+        case 'literal':
+        case 'intrinsic':
+        case 'predicate':
+            break;
+        case 'or':
+        case 'intersection':
+            (value.values ?? []).forEach((v) => collectTypeReferences(v, out));
+            break;
+        case 'reference':
+            if (
+                typeof value.source === 'string' &&
+                value.source.startsWith('dockview') &&
+                !value.refersToTypeParameter
+            ) {
+                out.add(value.value);
+            }
+            (value.typeArguments ?? []).forEach((v) =>
+                collectTypeReferences(v, out)
+            );
+            break;
+        case 'reflection':
+            collectNodeReferences(value.value, out);
+            break;
+        case 'tuple':
+            (value.value ?? []).forEach((v) => collectTypeReferences(v, out));
+            break;
+        case 'namedTupleMember':
+            collectTypeReferences(value.values, out);
+            break;
+        case 'typeOperator':
+            collectTypeReferences(value.value, out);
+            break;
+        case 'indexedAccess':
+            collectTypeReferences(value.objectType, out);
+            collectTypeReferences(value.indexType, out);
+            break;
+        default:
+            break;
+    }
+}
+
+// Collect references reachable from a TypeSystem node (property, method, ...).
+// Mirrors the client's `firstLevel`.
+function collectNodeReferences(value, out) {
+    if (!value) {
+        return;
+    }
+    switch (value.kind) {
+        case 'property':
+        case 'parameter':
+            collectTypeReferences(value.type, out);
+            break;
+        case 'accessor':
+            collectTypeReferences(value.value?.returnType, out);
+            break;
+        case 'method':
+            (value.signature ?? []).forEach((s) =>
+                collectNodeReferences(s, out)
+            );
+            break;
+        case 'function':
+            collectNodeReferences(value.signature, out);
+            break;
+        case 'typeLiteral':
+            (value.properties ?? []).forEach((p) =>
+                collectNodeReferences(p, out)
+            );
+            (value.signatures ?? []).forEach((s) =>
+                collectNodeReferences(s, out)
+            );
+            break;
+        case 'callSignature':
+            collectTypeReferences(value.returnType, out);
+            (value.typeParameters ?? []).forEach((tp) =>
+                collectTypeReferences(tp.extends, out)
+            );
+            (value.parameters ?? []).forEach((p) =>
+                collectNodeReferences(p, out)
+            );
+            break;
+        case 'getSignature':
+            collectTypeReferences(value.returnType, out);
+            break;
+        case 'typeAlias':
+            collectTypeReferences(value.type, out);
+            (value.typeParameters ?? []).forEach((tp) =>
+                collectTypeReferences(tp.extends, out)
+            );
+            break;
+        case 'interface':
+        case 'class':
+            (value.children ?? []).forEach((c) =>
+                collectNodeReferences(c, out)
+            );
+            break;
+        default:
+            break;
+    }
+}
+
+function collectDeclarationReferences(entry, out) {
+    if (!entry) {
+        return;
+    }
+    // classes/interfaces link through to the types they extend
+    (entry.extends ?? []).forEach((name) => out.add(name));
+    (entry.children ?? []).forEach((child) =>
+        collectNodeReferences(child, out)
+    );
+    // declarations without children (type aliases, functions, ...) carry their
+    // shape on the entry itself
+    collectNodeReferences(entry, out);
+}
+
+// Find every declaration referenced by a `<DocRef declaration="..." />`.
+function findReferencedDeclarations() {
+    const DOCS_DIR = './packages/docs/docs';
+    const roots = new Set();
+    const pattern = /declaration=["']([^"']+)["']/g;
+
+    const walk = (dir) => {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+            const fullPath = `${dir}/${entry.name}`;
+            if (entry.isDirectory()) {
+                walk(fullPath);
+            } else if (
+                entry.name.endsWith('.mdx') ||
+                entry.name.endsWith('.md')
+            ) {
+                const content = readFileSync(fullPath, 'utf-8');
+                for (const match of content.matchAll(pattern)) {
+                    roots.add(match[1]);
+                }
+            }
+        }
+    };
+
+    if (existsSync(DOCS_DIR)) {
+        walk(DOCS_DIR);
+    }
+
+    return roots;
+}
+
+function computeReachable(documentation, roots) {
+    const reachable = new Set();
+    const queue = [...roots].filter((name) => documentation[name]);
+
+    while (queue.length > 0) {
+        const name = queue.pop();
+        if (reachable.has(name)) {
+            continue;
+        }
+        reachable.add(name);
+
+        const references = new Set();
+        collectDeclarationReferences(documentation[name], references);
+
+        for (const reference of references) {
+            if (documentation[reference] && !reachable.has(reference)) {
+                queue.push(reference);
+            }
+        }
+    }
+
+    return reachable;
+}
+
+// The pre-rendered `code` strings are only used during generation; the client
+// regenerates code from the structured data, so drop them from the payload.
+function stripGeneratedCode(value) {
+    if (Array.isArray(value)) {
+        value.forEach(stripGeneratedCode);
+        return;
+    }
+    if (value && typeof value === 'object') {
+        delete value.code;
+        for (const key of Object.keys(value)) {
+            stripGeneratedCode(value[key]);
+        }
+    }
+}
+
+const roots = findReferencedDeclarations();
+const reachable = computeReachable(documentation, roots);
+
+const trimmed = {};
+for (const name of Object.keys(documentation)) {
+    if (reachable.has(name)) {
+        trimmed[name] = documentation[name];
+    }
+}
+
+stripGeneratedCode(trimmed);
+
+const missingRoots = [...roots].filter((name) => !documentation[name]);
+if (missingRoots.length > 0) {
+    console.warn(
+        `warning: ${missingRoots.length} referenced declaration(s) not found in typedoc output: ${missingRoots.join(', ')}`
+    );
+}
+
+console.log(
+    `emitting ${Object.keys(trimmed).length}/${Object.keys(documentation).length} declarations (${roots.size} roots)`
+);
+
+writeFileSync(API_OUTPUT_FILE, JSON.stringify(trimmed));

@@ -1,18 +1,39 @@
 ---
-title: Locked
-description: How to lock the entire Dockview layout to prevent resizing and drag-and-drop interactions.
+title: Locking
+description: How to lock the whole Dockview layout, or an individual group, to prevent resizing and drag-and-drop interactions.
+sidebar_position: 10
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-import { DocRef } from '@site/src/components/ui/reference/docRef';
+Dockview can be locked at two levels: the whole layout, or an individual group. Locking prevents users from rearranging the layout while leaving the API free to make programmatic changes.
 
-This section describes how to lock the dock to prevent movement.
+## Locking the layout
+
+Locking the whole component prevents users from resizing groups with the drag handles between them. Combine it with disabling drag and drop for a fully static, read-only layout.
 
 :::info
-You may want to combine this with `disableDnd={true}` to provide a locked grid with no dnd funtionality. See [Disable Dnd](/docs/core/dnd/disable) for more.
+You may want to combine this with `disableDnd={true}` to provide a locked grid with no drag and drop functionality. See [Disable drag and drop](/docs/core/dnd/disable) for more.
 :::
 
-Locking the component prevent the resizing of components using the drag handles between panels.
+## Locking a group
 
-<CodeRunner id='dockview/locked'/>
+Locking an individual group prevents users from dragging new panels into it, while leaving the rest of the layout fully interactive. You can still add panels to a locked group programmatically through the API.
+
+```tsx
+panel.group.locked = true;
+
+// Or
+
+panel.group.locked = 'no-drop-target';
+```
+
+Use `true` to keep the drop zones at the top, right, bottom and left of the group. Use `'no-drop-target'` to disable all drop zones. To get a better understanding of what this means, try dragging the panels in the example below onto the locked groups.
+
+<CodeRunner id="dockview/locked" />
+
+## See also
+
+- [Disable drag and drop](/docs/core/dnd/disable): turn off drag and drop per panel, group, or the whole layout
+- [Managing groups](/docs/core/groups/add): create, remove, and clear groups
+- [Move group](/docs/core/groups/move): reposition a group within the layout

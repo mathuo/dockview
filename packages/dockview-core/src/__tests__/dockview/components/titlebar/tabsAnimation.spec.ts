@@ -7,6 +7,18 @@ import { ITabRenderer } from '../../../../dockview/types';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import * as dataTransfer from '../../../../dnd/dataTransfer';
+
+// SWC compiles ESM named exports as getter-only, so `jest.spyOn` cannot
+// redefine them. Mock the module instead: `getPanelData` defaults to the real
+// implementation (re-armed in `beforeEach`) and individual tests override it
+// via `.mockReturnValue(...)`.
+const actualDataTransfer = jest.requireActual<typeof dataTransfer>(
+    '../../../../dnd/dataTransfer'
+);
+jest.mock('../../../../dnd/dataTransfer', () => ({
+    ...jest.requireActual('../../../../dnd/dataTransfer'),
+    getPanelData: jest.fn(),
+}));
 import { TabAnimation } from '../../../../dockview/options';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
 import { TabGroup } from '../../../../dockview/tabGroup';
@@ -48,10 +60,7 @@ function createMockPanel(id: string): IDockviewPanel {
 }
 
 function createTabs(
-    options: {
-        tabAnimation?: TabAnimation;
-        disableDnd?: boolean;
-    } = {}
+    options: { tabAnimation?: TabAnimation; disableDnd?: boolean } = {}
 ): { tabs: Tabs; accessor: DockviewComponent; group: DockviewGroupPanel } {
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor',
@@ -105,6 +114,9 @@ describe('tabs - animation', () => {
     let rAFCallbacks: FrameRequestCallback[];
 
     beforeEach(() => {
+        const getPanelData = dataTransfer.getPanelData as jest.Mock;
+        getPanelData.mockReset();
+        getPanelData.mockImplementation(actualDataTransfer.getPanelData);
         rAFCallbacks = [];
         jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
             rAFCallbacks.push(cb);
@@ -357,7 +369,7 @@ describe('tabs - animation', () => {
             // runFlipAnimation (which queues a rAF that triggers the
             // transition). The browser then fires `dragend` synchronously
             // on the source element, which bubbles to _tabsList where the
-            // resetDragAnimation listener runs *before* the rAF — if that
+            // resetDragAnimation listener runs *before* the rAF. If that
             // listener clears the transforms, FLIP never animates.
             const { tabs } = createTabs({ tabAnimation: 'smooth' });
             tabs.openPanel(createMockPanel('panel-a'), 0);
@@ -379,7 +391,7 @@ describe('tabs - animation', () => {
                 elements[1].classList.contains('dv-tab--shifting')
             ).toBeTruthy();
 
-            // Fire the post-drop dragend — must NOT clobber the FLIP.
+            // Fire the post-drop dragend. It must not clobber the FLIP.
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragEnd(tabsList);
 
@@ -694,9 +706,9 @@ describe('tabs - animation', () => {
         });
 
         test('dragging a group chip just before another group keeps insertion index outside the group (issue #1264)', () => {
-            // Regression: dragging a chip onto the LEFT of a standalone tab
+            // Regression: dragging a chip onto the left of a standalone tab
             // T, when a chip group sits immediately to T's right, must drop
-            // *before* T — not between T and the adjacent chip.
+            // *before* T, not between T and the adjacent chip.
             //
             // Layout: [T][A1][A2] with chip "groupA" covering A1+A2.
             // Drag external chip B; cursor on T's far left → insertionIndex
@@ -760,7 +772,7 @@ describe('tabs - animation', () => {
 
         test('dragging a group chip never targets another group', () => {
             // Regression: dragging a group chip between two tabs of another
-            // group should NOT set targetTabGroupId — groups cannot be
+            // group must not set targetTabGroupId, because groups cannot be
             // dropped inside other groups.
             //
             // Layout: [Feature chip][A][B][Monitoring chip][C]
@@ -1004,15 +1016,13 @@ describe('tabs - animation', () => {
             mockTabRect(elements[1], { left: 80, width: 80 });
 
             // Mock getPanelData to return an external group's panel
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'external-panel'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'external-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
@@ -1022,8 +1032,6 @@ describe('tabs - animation', () => {
             expect(state.sourceTabId).toBe('external-panel');
             expect(state.sourceIndex).toBe(-1);
             expect(state.tabPositions.size).toBe(2);
-
-            spy.mockRestore();
         });
 
         test('external dragover does not initialize state when tabAnimation is default', () => {
@@ -1031,22 +1039,18 @@ describe('tabs - animation', () => {
             const panel = createMockPanel('panel-a');
             tabs.openPanel(panel, 0);
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'external-panel'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'external-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
 
             expect(getAnimState(tabs)).toBeNull();
-
-            spy.mockRestore();
         });
 
         test('external dragover uses average tab width for gap', () => {
@@ -1087,15 +1091,13 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'external-panel'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'external-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
@@ -1107,8 +1109,6 @@ describe('tabs - animation', () => {
 
             // External drag: state should be fully cleared (not just insertionIndex)
             expect(getAnimState(tabs)).toBeNull();
-
-            spy.mockRestore();
         });
 
         test('dragleave clears dropTargetContainer overlay for external drags', () => {
@@ -1126,15 +1126,13 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'external-panel'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'external-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
@@ -1148,8 +1146,6 @@ describe('tabs - animation', () => {
             // in the main dockview when the drag returns to the source edge group
             expect(clearMock).toHaveBeenCalledTimes(1);
             expect(getAnimState(tabs)).toBeNull();
-
-            spy.mockRestore();
         });
 
         test('intra-group dragover clears dropTargetContainer overlay (panel→tab)', () => {
@@ -1204,15 +1200,13 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             mockTabRect(elements[0], { left: 0, width: 80 });
 
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'external-panel'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'external-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
@@ -1220,10 +1214,8 @@ describe('tabs - animation', () => {
             // _animState set with sourceIndex === -1 (external drag)
             expect(getAnimState(tabs)?.sourceIndex).toBe(-1);
 
-            // Must NOT clear — cross-group animation depends on the overlay persisting
+            // Must not clear, because cross-group animation depends on the overlay persisting
             expect(clearMock).not.toHaveBeenCalled();
-
-            spy.mockRestore();
         });
 
         test('same-group dragover does not trigger external detection', () => {
@@ -1232,23 +1224,19 @@ describe('tabs - animation', () => {
             tabs.openPanel(panelA, 0);
 
             // Mock getPanelData to return same group
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'test-group',
-                        'panel-a'
-                    )
-                );
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'test-group',
+                    'panel-a'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
 
-            // Should NOT initialize _animState (same group)
+            // Should not initialize _animState (same group)
             expect(getAnimState(tabs)).toBeNull();
-
-            spy.mockRestore();
         });
 
         test('cross-group FLIP animates newly inserted tab with slide-in', () => {
@@ -1267,7 +1255,7 @@ describe('tabs - animation', () => {
             const firstPositions = new Map<string, DOMRect>();
             firstPositions.set('panel-a', makeDOMRect(0, 0, 80, 30));
             firstPositions.set('panel-b', makeDOMRect(80, 0, 80, 30));
-            // panel-c is the newly inserted tab — NOT in firstPositions
+            // panel-c is the newly inserted tab, so it's not in firstPositions
 
             // "Last" positions (after new tab inserted at index 2)
             mockTabRect(elements[0], { left: 0, width: 80 });
@@ -1377,7 +1365,7 @@ describe('tabs - animation', () => {
             });
             tabsList.dispatchEvent(dragLeaveEvent);
 
-            // State should NOT be reset since relatedTarget is a child
+            // State should not be reset since relatedTarget is a child
             expect(elements[1].style.marginLeft).toBe('80px');
             expect(getAnimState(tabs).currentInsertionIndex).toBe(1);
 
@@ -1546,7 +1534,7 @@ describe('tabs - animation', () => {
 
             triggerChipDragStart(tabs, tabGroup, chip);
 
-            // Drag over — cursor past panel-b midpoint
+            // Drag over with the cursor past panel-b midpoint
             // dragLeftEdge = 200 - cursorOffset, should place insertion after panel-b
             (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
@@ -1624,7 +1612,7 @@ describe('tabs - animation', () => {
             const moveGroupOrPanelMock = jest.fn();
             (accessor as any).moveGroupOrPanel = moveGroupOrPanelMock;
 
-            // The tab group does NOT exist in this group (simulate cross-group)
+            // The tab group does not exist in this group (simulate cross-group)
             (group.model as any).getTabGroups = () => [];
 
             // Set up PanelTransfer so _commitGroupMove reads it
@@ -1670,7 +1658,7 @@ describe('tabs - animation', () => {
             const moveGroupOrPanelMock = jest.fn();
             (accessor as any).moveGroupOrPanel = moveGroupOrPanelMock;
 
-            // The tab group does NOT exist in this group
+            // The tab group does not exist in this group
             (group.model as any).getTabGroups = () => [];
 
             const transfer = dataTransfer.LocalSelectionTransfer.getInstance();
@@ -1734,8 +1722,8 @@ describe('tabs - animation', () => {
             const { tabs, accessor, group, tabGroup, chip, elements } =
                 setupChipDrag('smooth', ['panel-x', 'panel-y', 'panel-z']);
 
-            // The drop target (this tabs instance) has its own tabs but NOT
-            // the dragged tab group — the group lives in another dockview
+            // The drop target (this tabs instance) has its own tabs but not
+            // the dragged tab group; that group lives in another dockview
             // group. Simulate the cross-group condition.
             (group.model as any).getTabGroups = () => [];
             (accessor as any).moveGroupOrPanel = jest.fn();
@@ -1775,7 +1763,7 @@ describe('tabs - animation', () => {
             );
             expect(gappedTab).toBeDefined();
 
-            // Drop on the destination — cross-group path runs here.
+            // Drop on the destination, where the cross-group path runs.
             fireEvent.drop(tabsList);
 
             // After the drop, no destination tab should retain a non-zero
@@ -1846,7 +1834,7 @@ describe('tabs - animation', () => {
                 );
                 panelOrder.splice(insertAt, 0, ...groupPanels);
 
-                // Rebuild tabs container in the new order — same dance the
+                // Rebuild tabs container in the new order, the same dance the
                 // real model performs.
                 for (const id of [...panelOrder]) {
                     tabs.delete(id);
@@ -1860,7 +1848,7 @@ describe('tabs - animation', () => {
                     mockTabRect(newEls[i], { left: i * 80, width: 80 });
                 }
                 // Skip the actual updateTabGroups DOM dance (chip
-                // repositioning) — not needed for the residual-margin
+                // repositioning); it's not needed for the residual-margin
                 // assertion.
             };
 
@@ -1888,7 +1876,7 @@ describe('tabs - animation', () => {
             tabsList.dispatchEvent(evt);
 
             // After the drop completes, no tab should carry inline margin
-            // left/right or a dv-tab--shifting class — anything else would
+            // left/right or a dv-tab--shifting class; anything else would
             // be visible as residual spacing.
             const afterEls = getTabElements(tabs);
             for (const el of afterEls) {
@@ -1929,17 +1917,15 @@ describe('tabs - animation', () => {
                 sourceGroupPanelIds: new Set(),
             };
 
-            // Mock getPanelData to return a DIFFERENT tab group from another group
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        null,
-                        'new-tg'
-                    )
-                );
+            // Mock getPanelData to return a different tab group from another group
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    null,
+                    'new-tg'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
@@ -1952,8 +1938,6 @@ describe('tabs - animation', () => {
             // Since it was cleared and re-initialized for the external drag,
             // sourceIndex should be -1 (external)
             expect(state.sourceIndex).toBe(-1);
-
-            spy.mockRestore();
         });
 
         test('dragover keeps _animState when same tab group is being dragged', () => {
@@ -1974,29 +1958,25 @@ describe('tabs - animation', () => {
             };
             (tabs as any)._animState = originalState;
 
-            // Same tab group id — not stale
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        null,
-                        'tg-1'
-                    )
-                );
+            // Same tab group id, so not stale
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    null,
+                    'tg-1'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
 
-            // _animState should NOT have been cleared (same tab group)
+            // _animState should not have been cleared (same tab group)
             const state = getAnimState(tabs);
             expect(state).not.toBeNull();
             // currentInsertionIndex might be updated by handleDragOver but
             // the key check is the state wasn't thrown away and re-created
             // (sourceTabGroupId should still be 'tg-1')
-
-            spy.mockRestore();
         });
 
         test('dragover on tab list is handled for chip drags in default animation mode', () => {
@@ -2010,25 +1990,21 @@ describe('tabs - animation', () => {
             // Provide getPanel so the external drag path doesn't throw
             (accessor as any).getPanel = jest.fn().mockReturnValue(undefined);
 
-            // Chip drag (has tabGroupId) should NOT be skipped in default mode
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        null,
-                        'tg-1'
-                    )
-                );
+            // Chip drag (has tabGroupId) should not be skipped in default mode
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    null,
+                    'tg-1'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
 
             // Should initialize _animState for the chip drag even in default mode
             expect(getAnimState(tabs)).not.toBeNull();
-
-            spy.mockRestore();
         });
 
         test('dragover on tab list is skipped for regular tab drags in default animation mode', () => {
@@ -2036,24 +2012,20 @@ describe('tabs - animation', () => {
             const panelA = createMockPanel('panel-a');
             tabs.openPanel(panelA, 0);
 
-            // Regular tab drag (no tabGroupId) — should be skipped in default mode
-            const spy = jest
-                .spyOn(dataTransfer, 'getPanelData')
-                .mockReturnValue(
-                    new dataTransfer.PanelTransfer(
-                        'test-accessor',
-                        'other-group',
-                        'some-panel'
-                    )
-                );
+            // Regular tab drag (no tabGroupId): should be skipped in default mode
+            (dataTransfer.getPanelData as jest.Mock).mockReturnValue(
+                new dataTransfer.PanelTransfer(
+                    'test-accessor',
+                    'other-group',
+                    'some-panel'
+                )
+            );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
             fireEvent.dragOver(tabsList);
 
-            // Should NOT initialize _animState (default mode, non-chip drag)
+            // Should not initialize _animState (default mode, non-chip drag)
             expect(getAnimState(tabs)).toBeNull();
-
-            spy.mockRestore();
         });
     });
 
@@ -2118,7 +2090,7 @@ describe('tabs - animation', () => {
 
         test('HTML5 tab drag in smooth mode DOES initialise _animState (sanity)', () => {
             // Counter-test: ensures the gate doesn't accidentally suppress
-            // the HTML5 path that the cleanup listeners DO support.
+            // the HTML5 path that the cleanup listeners do support.
             const { tabs } = createTabs({ tabAnimation: 'smooth' });
             tabs.openPanel(createMockPanel('a'), 0);
             tabs.openPanel(createMockPanel('b'), 1);
@@ -2133,9 +2105,60 @@ describe('tabs - animation', () => {
 
         // Pointer chip drag cleanup used to live in a Tabs-level
         // `_chipDragCleanup` field disposed from this controller
-        // subscription. That state is gone — the manager's pointer drag
+        // subscription. That state is gone; the manager's pointer drag
         // source now owns the iframe shield + panelTransfer cleanup via
         // its internal MutableDisposables, fired by the controller's own
         // teardown when the drag ends.
+
+        test('pointer/touch smooth reorder commits on a single-row header', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+
+            const tabAEl = (tabs as any)._tabs[0].value.element as HTMLElement;
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+
+            // start a pointer/touch drag on tab 'a' → initialises _animState
+            (tabs as any)._tabs[0].value._onDragStart.fire(
+                new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                    clientX: 0,
+                    clientY: 0,
+                })
+            );
+            // the drag has settled on insertion index 2 (after 'b')
+            (tabs as any)._animState.currentInsertionIndex = 2;
+
+            // the pointer is released inside the tab strip (single-row, no wrap)
+            jest.spyOn(document, 'elementFromPoint').mockReturnValue(tabsList);
+
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            // end the pointer drag over the strip via the controller
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: tabAEl,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                    clientX: 100,
+                    clientY: 10,
+                })
+            );
+
+            // single-row smooth mode must commit the reorder (previously it had
+            // no pointer commit path, so the tab snapped back and no drop fired)
+            expect(drops).toHaveLength(1);
+            expect(drops[0].index).toBe(1);
+        });
     });
 });

@@ -54,3 +54,46 @@
         }
     }
 }
+
+// Drop Guide ("compass"): the aim-at-a-cell cross painted over a group's
+// content while dragging. The module positions + sizes the cells inline; only
+// the theming lives here (override the CSS vars to restyle).
+.dv-drop-guide {
+    z-index: 1001;
+}
+
+.dv-drop-guide-cell {
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1px solid var(--dv-drop-guide-color, #1f9cf0);
+    background-color: var(--dv-drop-guide-cell-color, rgba(31, 156, 240, 0.25));
+}
+
+.dv-drop-guide-cell-edge {
+    // Outer "dock to the whole layout" cells read distinct from the inner ring.
+    border-style: dashed;
+    background-color: var(
+        --dv-drop-guide-edge-cell-color,
+        rgba(31, 156, 240, 0.12)
+    );
+}
+
+.dv-drop-guide-cell-active {
+    // The cell the cursor is aiming at; the hover feedback, especially for the
+    // outer cells (the drop target draws no overlay for them).
+    background-color: var(
+        --dv-drop-guide-active-cell-color,
+        rgba(31, 156, 240, 0.5)
+    );
+    border-style: solid;
+}
+
+.dv-drop-guide-edge-preview {
+    // The whole-layout-edge region an outer cell docks into. Reuses the real
+    // drop-overlay theme variables so it reads identically to any other drop
+    // preview; sits beneath the compass cross (z below `.dv-drop-guide`).
+    z-index: 1000;
+    box-sizing: border-box;
+    background-color: var(--dv-drag-over-background-color);
+    border: var(--dv-drag-over-border);
+}

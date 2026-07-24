@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>dockview e2e fixture</title>
+        <style>
+            html,
+            body,
+            #app {
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+            .dv-test-panel {
+                height: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <!-- Built stylesheet so layout-sensitive behaviour (overlay host
+             positioning, edge-group peek) matches real usage. -->
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+
+        <!-- Built UMD bundles. `dockview` (self-contained — bundles core in)
+             exposes the global `dockview`; `dockview-enterprise` externalizes it
+             and, when it loads, self-registers its feature modules + the license
+             check into that same core registry. -->
+        <script src="/packages/dockview/dist/dockview.js"></script>
+        <script src="/packages/dockview-enterprise/dist/dockview-enterprise.js"></script>
+
+        <script>
+            (function () {
+                const lib = window['dockview'];
+
+                // The enterprise feature modules (incl. keyboard docking + the
+                // license check) self-register when dockview-enterprise.js loads
+                // above, so no explicit registerModules call is needed here.
+                // Set a valid (far-future) key so the license check doesn't
+                // watermark the harness (localhost is no longer suppressed).
+                window['dockview-enterprise'].LicenseManager.setLicenseKey(
+                    '[KeyId:TEST]_[Company:Tests]_[Plan:team]_[AppName:Tests]_[Email:test@test]_[ValidFrom:01_Jan_2020]_[ValidUntil:01_Jan_2999]__8d12a26c8376cc3b'
+                );
+
+                const el = document.getElementById('app');
+                const params = new URLSearchParams(location.search);
+                // Opt-in multi-row (wrapping) tabs via `?overflow=wrap` so the
+                // wrap behaviour is exercised without affecting other specs.
+                // `?maxRows=N` caps the header at N rows (surplus spills to the
+                // dropdown).
+                const maxRowsParam = params.get('maxRows');
+                // `?overflow=advanced` enables the AdvancedOverflowModule
+                // (searchable / MRU overflow dropdown) so the advanced popover
+                // can be exercised; other specs are unaffected.
+                const overflow =
+                    params.get('overflow') === 'wrap'
+                        ? {
+                              mode: 'wrap',
+                              ...(maxRowsParam
+                                  ? { maxRows: Number(maxRowsParam) }
+                                  : {}),
+                          }
+                        : params.get('overflow') === 'advanced'
+                          ? { search: true, mru: true }
+                          : undefined;
+                // `?smooth=1` turns on the smooth tab reorder animation (needed
+                // to exercise the 2-D cross-row wrap reorder path).
+                // `?theme=<name>` selects an exported theme by its `lib.theme*`
+                // export name (e.g. `abyssSpaced` -> `lib.themeAbyssSpaced`) so
+                // the spaced-theme wrap layout can be exercised; inert (core
+                // default) when absent so other specs are unaffected.
+                const themeParam = params.get('theme');
+                const themeExport =
+                    themeParam &&
+                    lib[
+                        'theme' +
+                            themeParam.charAt(0).toUpperCase() +
+                            themeParam.slice(1)
+                    ];
+                const theme =
+                    params.get('smooth') === '1'
+                        ? { ...lib.themeAbyss, tabAnimation: 'smooth' }
+                        : themeExport || undefined;
+                // `?pinned=separate-row` exercises the two-row pinned layout;
+                // `?compact=1` opts into icon-only pinned tabs.
+                const pinnedMode =
+                    params.get('pinned') === 'separate-row'
+                        ? 'separate-row'
+                        : 'inline';
+                // `?resolver=left` (or any Position) installs a custom
+                // `dropPositionResolver` that always returns that position,
+                // overriding the pointer-quadrant / compass resolution — inert
+                // unless the param is present so other DnD specs are unaffected.
+                const resolverPosition = params.get('resolver');
+                const dropPositionResolver = resolverPosition
+                    ? { resolve: () => ({ position: resolverPosition }) }
+                    : undefined;
+                // `?pinmenu=1` adds the built-in `'pin'` tab context-menu item so
+                // the pin/unpin flow can be driven from the menu without changing
+                // the item count the base context-menu spec asserts.
+                const pinMenu = params.get('pinmenu') === '1';
+                // `?pinautoinject=1` exercises the module auto-injecting the
+                // built-in Pin/Unpin item even though the app returns none. Off
+                // by default (`contextMenuItem: false`) so the base context-menu
+                // spec keeps seeing exactly its app-supplied items.
+                const pinAutoInject = params.get('pinautoinject') === '1';
+                // Handle to the inner dockview mounted by the 'nested-dockview'
+                // panel (set in createComponent), so the #1495 nested-edge-group
+                // spec can read/serialize the inner edge group.
+                let nestedHandle = null;
+                const dockview = new lib.DockviewComponent(el, {
+                    keyboardNavigation: true,
+                    overflow,
+                    theme,
+                    // Pinned tabs — inert until a panel is pinned. `separate-row`
+                    // mounts the pinned second row (real-browser geometry).
+                    pinnedTabs: {
+                        enabled: true,
+                        mode: pinnedMode,
+                        compact: params.get('compact') === '1',
+                        contextMenuItem: pinAutoInject,
+                    },
+                    // Record layout history so the harness can exercise undo/redo
+                    // (incl. async popout re-open).
+                    layoutHistory: { enabled: true },
+                    // Smart Guides — alignment + snapping for floating groups.
+                    // Float-only here so the harness geometry is deterministic
+                    // (container-edge snapping is covered by unit tests).
+                    smartGuides: {
+                        snapDistance: 12,
+                        snapTargets: { container: false },
+                    },
+                    // Enable auto-hide edge groups (collapsed-strip peek).
+                    autoHideEdgeGroups: true,
+                    // A served (not about:blank) target avoids a 404 when the
+                    // popout window navigates before dockview injects content.
+                    popoutUrl: '/e2e/fixtures/popout.html',
+                    // Drop Guide ("compass") + pointer DnD so a panel drag is
+                    // drivable in the harness. Inert unless a drag occurs.
+                    // `?dnd=html5` swaps in the native HTML5 backend (needed to
+                    // exercise the pinned row's pin-by-drag-in path, which reads
+                    // the drag payload the main strip's HTML5 source populates).
+                    dndGuide: true,
+                    dndStrategy:
+                        params.get('dnd') === 'html5' ? 'html5' : 'pointer',
+                    // Custom drop-position resolver (opt-in via `?resolver=`),
+                    // which takes precedence over the compass at the same seam.
+                    dropPositionResolver,
+                    // Tab context menu (ContextMenuModule) — inert until a tab
+                    // is right-clicked. Safe to set globally: no other spec
+                    // right-clicks a tab.
+                    getTabContextMenuItems: () =>
+                        pinMenu
+                            ? ['pin', 'separator', 'close']
+                            : ['close', 'closeOthers', 'closeAll'],
+                    // Tab-group chip context menu (TabGroupChipsModule) — inert
+                    // until a chip is right-clicked, which only the tab-group
+                    // chip spec does.
+                    getTabGroupChipContextMenuItems: () => [
+                        'rename',
+                        'separator',
+                        { label: 'Custom Action', action: () => {} },
+                    ],
+                    createComponent: (options) => {
+                        // A panel that hosts its own (nested) dockview with a
+                        // right edge group — drives the #1495 scenario where the
+                        // host panel uses the default `onlyWhenVisible` renderer,
+                        // so switching the outer tab detaches this content and
+                        // fires a 0x0 resize inside the nested dockview.
+                        if (options.name === 'nested-dockview') {
+                            const element = document.createElement('div');
+                            element.className = 'dv-nested-host';
+                            element.style.width = '100%';
+                            element.style.height = '100%';
+                            let inner = null;
+                            let edgeAdded = false;
+                            return {
+                                element,
+                                init() {
+                                    inner = new lib.DockviewComponent(element, {
+                                        createComponent: (o) => {
+                                            const e =
+                                                document.createElement('div');
+                                            e.className = 'dv-test-panel';
+                                            e.textContent = o.id;
+                                            return {
+                                                element: e,
+                                                init() {},
+                                                dispose() {},
+                                            };
+                                        },
+                                    });
+                                    inner.addPanel({
+                                        id: 'inner-main',
+                                        component: 'default',
+                                    });
+                                    nestedHandle = inner;
+                                },
+                                // Forward the host content-area size to the inner
+                                // dockview (as a real embedding app would). Add
+                                // the edge group only once the inner dockview has
+                                // a real size, so it lands at its configured
+                                // 300px rather than being distributed to minimum.
+                                layout(width, height) {
+                                    if (!inner) return;
+                                    inner.layout(width, height);
+                                    if (!edgeAdded && width > 0 && height > 0) {
+                                        edgeAdded = true;
+                                        inner.addEdgeGroup('right', {
+                                            id: 'inner-edge',
+                                            initialSize: 300,
+                                        });
+                                        inner.addPanel({
+                                            id: 'inner-edge-panel',
+                                            component: 'default',
+                                            position: {
+                                                referenceGroup: 'inner-edge',
+                                                direction: 'within',
+                                            },
+                                        });
+                                    }
+                                },
+                                dispose() {
+                                    if (inner) inner.dispose();
+                                    inner = null;
+                                    nestedHandle = null;
+                                },
+                            };
+                        }
+
+                        const element = document.createElement('div');
+                        element.className = 'dv-test-panel';
+                        element.tabIndex = 0;
+                        // Render the panel id so tests can identify which panel
+                        // (e.g. "beta") is showing in the popped-out window.
+                        element.textContent = options.id;
+                        return {
+                            element,
+                            init() {},
+                            // Record the content-area dimensions the group hands
+                            // each panel so the content-sizing seam (group box
+                            // minus header) is observable to the harness.
+                            layout(width, height) {
+                                panelDimensions[options.id] = { width, height };
+                            },
+                            dispose() {},
+                        };
+                    },
+                });
+                dockview.layout(el.clientWidth, el.clientHeight);
+
+                // Test-facing handle.
+                const panels = {};
+                // Last content-area dimensions each panel was laid out with,
+                // keyed by panel id (written by the panel's layout() above).
+                const panelDimensions = {};
+                window.__dv = {
+                    addPanel: (id) => {
+                        panels[id] = dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                        });
+                    },
+                    // Pinned tabs: add `n` panels then pin the given ids.
+                    setupPinned: (ids, pinnedIds) => {
+                        for (const id of ids) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        for (const id of pinnedIds || []) {
+                            panels[id].api.setPinned(true);
+                        }
+                    },
+                    setPinned: (id, pinned) =>
+                        panels[id] && panels[id].api.setPinned(pinned),
+                    isPinned: (id) => panels[id] && panels[id].api.isPinned,
+                    // The content-area dimensions a panel was last laid out
+                    // with — the seam reports the group box minus the header.
+                    panelDimensions: (id) => panelDimensions[id],
+                    // Add `count` long-titled tabs to a single group so the
+                    // strip overflows its width — under `?overflow=wrap` they
+                    // wrap onto multiple rows.
+                    setupWrapTabs: (count) => {
+                        for (let i = 0; i < count; i++) {
+                            const id = `wrap-tab-${i}`;
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: `wrap-tab-long-title-${i}`,
+                            });
+                        }
+                    },
+                    // Change the overflow options at runtime (e.g. raise
+                    // `maxRows`) so the multi-row cap reflow can be exercised.
+                    setOverflow: (overflow) =>
+                        dockview.updateOptions({ overflow }),
+                    // Move the active/first group's header — drives vertical
+                    // (edge-style) headers for the multi-row column-wrap tests.
+                    setHeaderPosition: (position) => {
+                        const g = dockview.activeGroup || dockview.groups[0];
+                        if (g) g.api.setHeaderPosition(position);
+                    },
+                    closePanel: (id) => panels[id] && panels[id].api.close(),
+                    // #1495: a panel hosting a nested dockview that has a right
+                    // edge group. It is the only outer panel, so it stays active
+                    // and its nested dockview lays out to a real size.
+                    setupNestedEdgeGroup: () => {
+                        panels['host'] = dockview.addPanel({
+                            id: 'host',
+                            component: 'nested-dockview',
+                            title: 'host',
+                        });
+                    },
+                    // Hide/show the nested host by toggling display:none on it —
+                    // the inner shell's offsetParent becomes null (while still in
+                    // the document) and its ResizeObserver reports 0x0. This is
+                    // the "host panel becomes hidden" case #1495 is about: a real
+                    // browser fires the 0x0 that the shell's guard must skip.
+                    setNestedHostVisible: (visible) => {
+                        const host = document.querySelector('.dv-nested-host');
+                        if (host) host.style.display = visible ? '' : 'none';
+                    },
+                    // The nested dockview's right edge-group size, as serialized
+                    // (this is the value #1495 reports resetting to the minimum).
+                    nestedEdgeSize: () =>
+                        nestedHandle
+                            ? nestedHandle.toJSON().edgeGroups?.right?.size
+                            : undefined,
+                    // Add a panel, optionally splitting a new group off in a
+                    // direction (records an 'add' mutation for layout history).
+                    addPanelAt: (id, direction) => {
+                        panels[id] = dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                            position: direction ? { direction } : undefined,
+                        });
+                    },
+                    // Maximize/restore a panel's group + read the flag, for the
+                    // layout-history 'maximize' mutation.
+                    maximizeGroup: (id) =>
+                        panels[id] && panels[id].api.maximize(),
+                    isMaximized: (id) =>
+                        !!(panels[id] && panels[id].api.isMaximized()),
+                    // Serialization round-trip (e.g. pinned state persistence).
+                    snapshot: () => dockview.toJSON(),
+                    restore: (state) => dockview.fromJSON(state),
+                    // Tab titles in strip order for the first (or only) group —
+                    // lets a spec assert pinned tabs sort ahead of unpinned.
+                    tabTitles: () =>
+                        Array.from(
+                            document.querySelectorAll(
+                                '.dv-tabs-container .dv-tab'
+                            )
+                        ).map((t) => t.textContent.trim()),
+                    // Create a new panel and move it to the right of the
+                    // popped-out group — the move lands in the popout's own
+                    // gridview, producing a second group (and so a sash) there.
+                    splitIntoPopout: (id) => {
+                        const popoutGroup = dockview.getPopouts()[0].group;
+                        const panel = dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                        });
+                        panel.api.moveTo({
+                            group: popoutGroup,
+                            position: 'right',
+                        });
+                    },
+                    popoutActiveGroup: () =>
+                        dockview.addPopoutGroup(dockview.activeGroup),
+                    groupCount: () => dockview.groups.length,
+                    popoutCount: () => dockview.getPopouts().length,
+                    closeActivePopout: () =>
+                        dockview.getPopouts()[0].group.api.close(),
+                    // Dock the popout window's anchor group back next to a
+                    // grid group — promotes a remaining popout member to anchor
+                    // while the window stays open (drives DV-47).
+                    dockPopoutAnchorNextTo: (targetId) => {
+                        const popoutGroup = dockview.getPopouts()[0].group;
+                        dockview.moveGroupOrPanel({
+                            from: { groupId: popoutGroup.id },
+                            to: {
+                                group: panels[targetId].api.group,
+                                position: 'right',
+                            },
+                        });
+                    },
+                    undo: () => dockview.undo(),
+                    redo: () => dockview.redo(),
+                    canUndo: () => dockview.canUndo,
+                    canRedo: () => dockview.canRedo,
+                    // Subscribe to the Smart Guides snap events so a spec can
+                    // assert the public event API fires on a magnetic snap.
+                    recordSnaps: () => {
+                        window.__snaps = [];
+                        dockview.api.onDidSnapFloat((e) =>
+                            window.__snaps.push({ axes: e.axes })
+                        );
+                    },
+                    snaps: () => window.__snaps || [],
+                    awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    // Two side-by-side groups for Drop Guide: dragging the left
+                    // group's tab over the right group shows the compass.
+                    setupDropGuide: () => {
+                        dockview.addPanel({
+                            id: 'left',
+                            component: 'default',
+                            title: 'left',
+                        });
+                        dockview.addPanel({
+                            id: 'right',
+                            component: 'default',
+                            title: 'right',
+                            position: { direction: 'right' },
+                        });
+                    },
+                    // Keyboard navigation (AccessibilityModule): id of the
+                    // currently-active group so a spec can assert F6/Shift+F6
+                    // moved the active group.
+                    activeGroupId: () => dockview.activeGroup?.id,
+                    // Two side-by-side groups for keyboard navigation — like
+                    // setupDropGuide but with stable ids the spec can compare.
+                    setupTwoGroups: () => {
+                        panels['one'] = dockview.addPanel({
+                            id: 'one',
+                            component: 'default',
+                            title: 'one',
+                        });
+                        panels['two'] = dockview.addPanel({
+                            id: 'two',
+                            component: 'default',
+                            title: 'two',
+                            position: { direction: 'right' },
+                        });
+                        return {
+                            first: panels['one'].group.id,
+                            second: panels['two'].group.id,
+                        };
+                    },
+                    // Tab-group chips: three panels in one group, then a tab
+                    // group (label "Monitoring") containing two of them so a
+                    // `.dv-tab-group-chip` renders in the header. Returns the
+                    // ids the chip spec needs. The chip mounts on a microtask.
+                    setupTabGroupChip: () => {
+                        for (const id of ['red', 'green', 'blue']) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        const groupId = panels['red'].group.id;
+                        const tabGroup = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Monitoring',
+                        });
+                        dockview.api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: tabGroup.id,
+                            panelId: 'red',
+                        });
+                        dockview.api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: tabGroup.id,
+                            panelId: 'green',
+                        });
+                        return { groupId, tabGroupId: tabGroup.id };
+                    },
+                    // Two tab groups (chips) in a single group so one can be
+                    // dragged past the other and back — the within-group move
+                    // that must stay repeatable (#1410). Flat order is
+                    // red,green,blue,yellow so the chips render Feature then
+                    // Monitoring. Returns the ids the spec needs.
+                    setupTwoTabGroupChips: () => {
+                        for (const id of ['red', 'green', 'blue', 'yellow']) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        const groupId = panels['red'].group.id;
+                        const feature = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Feature',
+                        });
+                        const monitoring = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Monitoring',
+                        });
+                        for (const panelId of ['red', 'green']) {
+                            dockview.api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: feature.id,
+                                panelId,
+                            });
+                        }
+                        for (const panelId of ['blue', 'yellow']) {
+                            dockview.api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: monitoring.id,
+                                panelId,
+                            });
+                        }
+                        return {
+                            groupId,
+                            featureId: feature.id,
+                            monitoringId: monitoring.id,
+                        };
+                    },
+                    // DOM order of the tab-group chip labels — reflects the
+                    // relative order of the tab groups in the strip.
+                    chipLabels: () =>
+                        Array.from(
+                            document.querySelectorAll(
+                                '.dv-tab-group-chip-label'
+                            )
+                        ).map((el) => el.textContent),
+                    floatingCount: () => dockview.floatingGroups.length,
+                    // Reload-safe maximize queries: read the live component, not
+                    // the `panels` map (which is empty after a restore into a
+                    // freshly-loaded fixture).
+                    hasMaximizedGroup: () => dockview.hasMaximizedGroup(),
+                    maximizedGroupId: () => {
+                        const g = dockview.groups.find((g) =>
+                            g.api.isMaximized()
+                        );
+                        return g ? g.id : null;
+                    },
+                    // Two groups side by side; returns their ids. Like
+                    // setupTwoGroups but named for the maximize round-trip.
+                    setupTwoGroupsMaximizeFirst: () => {
+                        const a = dockview.addPanel({
+                            id: 'a',
+                            component: 'default',
+                            title: 'a',
+                        });
+                        dockview.addPanel({
+                            id: 'b',
+                            component: 'default',
+                            title: 'b',
+                            position: { direction: 'right' },
+                        });
+                        a.api.maximize();
+                        return a.group.id;
+                    },
+                    // Lock/unlock a panel's group (boolean or
+                    // 'no-drop-target') for locked-group DnD tests.
+                    setGroupLocked: (id, value) =>
+                        panels[id] && (panels[id].group.api.locked = value),
+                    // Apply size constraints to a panel's group (e.g.
+                    // { maximumWidth } / { minimumWidth }) for sash-resize tests.
+                    setGroupConstraints: (id, constraints) =>
+                        panels[id] &&
+                        panels[id].group.api.setConstraints(constraints),
+                    // A docked `main` panel plus a `floater` pulled out into a
+                    // floating group at a fixed box — for floating-group
+                    // lifecycle + serialization tests.
+                    setupFloating: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const floater = dockview.addPanel({
+                            id: 'floater',
+                            component: 'default',
+                            title: 'floater',
+                        });
+                        dockview.addFloatingGroup(floater, {
+                            x: 150,
+                            y: 100,
+                            width: 240,
+                            height: 180,
+                        });
+                    },
+                    // Like setupFloating but the floated panel uses the
+                    // `always` renderer, so its content lives in the overlay
+                    // render container and is positioned/stacked over the
+                    // floating window. Exercises the render-overlay z-index path
+                    // (float via the same `_doAddFloatingGroup` the "Float tab"
+                    // context-menu action uses).
+                    setupFloatingAlways: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const floater = dockview.addPanel({
+                            id: 'floater',
+                            component: 'default',
+                            title: 'floater',
+                            renderer: 'always',
+                        });
+                        dockview.addFloatingGroup(floater, {
+                            x: 150,
+                            y: 100,
+                            width: 240,
+                            height: 180,
+                        });
+                    },
+                    peekEdge: (position, on) =>
+                        dockview.api.peekEdgeGroup(position, on),
+                    // Two floating groups for Smart Guides: a target float on
+                    // the left (left edge ~120) and a draggable float to its
+                    // right. Dragging the right one near x=120 should snap +
+                    // draw a guide.
+                    setupSmartGuides: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const target = dockview.addPanel({
+                            id: 'target',
+                            component: 'default',
+                            title: 'target',
+                        });
+                        dockview.addFloatingGroup(target, {
+                            x: 120,
+                            y: 80,
+                            width: 200,
+                            height: 160,
+                        });
+                        const mover = dockview.addPanel({
+                            id: 'mover',
+                            component: 'default',
+                            title: 'mover',
+                        });
+                        dockview.addFloatingGroup(mover, {
+                            x: 450,
+                            y: 300,
+                            width: 200,
+                            height: 160,
+                        });
+                    },
+                    // Auto-hide edge: a center panel + a collapsed left edge
+                    // group with one panel, for peek tests. Pass renderer
+                    // 'always' to exercise the render-overlay (z-index) path.
+                    setupAutoHideEdge: (renderer) => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        dockview.addPanel({
+                            id: 'sidebar',
+                            component: 'default',
+                            title: 'Sidebar',
+                            renderer: renderer || undefined,
+                            position: {
+                                referenceGroup: 'edge-left',
+                                direction: 'within',
+                            },
+                        });
+                        dockview.autoHideEdgeGroup('left');
+                    },
+                    // Two `always`-rendered panels in one edge group, for the
+                    // peek tab-switch test (each renders its own overlay).
+                    setupAutoHideEdgeMulti: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        for (const [id, title] of [
+                            ['a', 'Alpha'],
+                            ['b', 'Bravo'],
+                        ]) {
+                            dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title,
+                                renderer: 'always',
+                                position: {
+                                    referenceGroup: 'edge-left',
+                                    direction: 'within',
+                                },
+                            });
+                        }
+                        dockview.autoHideEdgeGroup('left');
+                    },
+                    // Drag-revealed edges: enable `dockToEdgeGroups` (and turn the
+                    // compass off so its own resolver drives edge routing), then
+                    // two side-by-side groups so a tab can be dragged to the edge.
+                    setupAutoEdgeGroups: () => {
+                        dockview.api.updateOptions({
+                            dockToEdgeGroups: true,
+                            dndGuide: false,
+                            autoHideEdgeGroups: false,
+                        });
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addPanel({
+                            id: 'side',
+                            component: 'default',
+                            title: 'side',
+                            position: { direction: 'right' },
+                        });
+                    },
+                    // Same as setupAutoEdgeGroups but with the drop-guide compass
+                    // ALSO on, to prove the two compose (edge → edge group, the
+                    // compass rings → split / grid-edge).
+                    setupAutoEdgeGroupsWithCompass: () => {
+                        dockview.api.updateOptions({
+                            dockToEdgeGroups: true,
+                            dndGuide: true,
+                            autoHideEdgeGroups: false,
+                        });
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addPanel({
+                            id: 'side',
+                            component: 'default',
+                            title: 'side',
+                            position: { direction: 'right' },
+                        });
+                    },
+                    edgeGroupExists: (pos) => !!dockview.getEdgeGroup(pos),
+                    edgeGroupCollapsed: (pos) => {
+                        const g = dockview.getEdgeGroup(pos);
+                        return g ? g.isCollapsed() : null;
+                    },
+                    edgeGroupPanelIds: (pos) => {
+                        const g = dockview.getEdgeGroupPanel(pos);
+                        return g ? g.panels.map((p) => p.id) : [];
+                    },
+                };
+                window.__ready = true;
+            })();
+        </script>
+    </body>
+</html>

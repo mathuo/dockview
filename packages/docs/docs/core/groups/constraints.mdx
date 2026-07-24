@@ -3,15 +3,22 @@ title: Constraints
 description: How to set minimum and maximum size constraints on groups in Dockview.
 ---
 
-import { DocRef } from '@site/src/components/ui/reference/docRef'
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Constraints set minimum and maximum pixel sizes on a group, stopping it from being resized beyond those bounds. They apply to groups only, and are not saved with the layout.
 
 :::warning
 Constraints come with several caveats. They are not serialized with layouts and can only be applied to groups.
 :::
 
-<DocRef declaration="DockviewGroupPanelApi" methods={['setConstraints', 'onDidConstraintsChange']} />
+<CodeRunner id="dockview/constraints" />
 
-## Live Example
+<DocRef
+    declaration="DockviewGroupPanelApi"
+    methods={['setConstraints', 'onDidConstraintsChange']}
+/>
 
-<CodeRunner id="dockview/constraints"/>
+## See also
 
+- [Resizing](/docs/core/panels/resizing): set a panel or group's exact height and width programmatically
+- [Sizing and layout](/docs/core/sizing): control initial and proportional sizing

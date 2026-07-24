@@ -54,10 +54,8 @@ function createGroupControlElement(
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
-export interface ReactContextMenuItemConfig extends Omit<
-    ContextMenuItemConfig,
-    'component'
-> {
+export interface ReactContextMenuItemConfig
+    extends Omit<ContextMenuItemConfig, 'component'> {
     component?: React.FunctionComponent<IContextMenuItemComponentProps>;
 }
 
@@ -96,12 +94,15 @@ export interface IDockviewReactProps extends DockviewOptions {
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
-    const coreOptions = PROPERTY_KEYS_DOCKVIEW.reduce((obj, key) => {
-        if (key in props) {
-            obj[key] = props[key] as any;
-        }
-        return obj;
-    }, {} as Partial<DockviewComponentOptions>);
+    const coreOptions = PROPERTY_KEYS_DOCKVIEW.reduce(
+        (obj, key) => {
+            if (key in props) {
+                obj[key] = props[key] as any;
+            }
+            return obj;
+        },
+        {} as Partial<DockviewComponentOptions>
+    );
 
     return coreOptions as DockviewOptions;
 }
@@ -145,7 +146,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
 
-            const frameworkTabComponents = props.tabComponents ?? {};
+            const frameworkTabComponents = { ...props.tabComponents };
 
             if (props.defaultTabComponent) {
                 frameworkTabComponents[DEFAULT_REACT_TAB] =
@@ -346,7 +347,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
 
-            const frameworkTabComponents = props.tabComponents ?? {};
+            const frameworkTabComponents = { ...props.tabComponents };
 
             if (props.defaultTabComponent) {
                 frameworkTabComponents[DEFAULT_REACT_TAB] =

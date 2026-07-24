@@ -12,15 +12,16 @@ export default defineConfig({
         include: ['src/__tests__/**/*.spec.ts'],
         alias: {
             dockview: resolve(__dirname, '../dockview/src/index.ts'),
-            'dockview-core': resolve(__dirname, '../dockview-core/src/index.ts'),
-            'dockview-modules': resolve(
+            'dockview-core': resolve(
                 __dirname,
-                '../dockview-modules/src/index.ts'
+                '../dockview-core/src/index.ts'
+            ),
+            'dockview-enterprise': resolve(
+                __dirname,
+                '../dockview-enterprise/src/index.ts'
             ),
         },
-        setupFiles: [
-            'src/__tests__/__mocks__/resizeObserver.vitest.ts',
-        ],
+        setupFiles: ['src/__tests__/__mocks__/resizeObserver.vitest.ts'],
     },
 
     build: {
@@ -29,9 +30,16 @@ export default defineConfig({
             // src/indext.ts is where we have exported the component(s)
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'dockview-vue',
-            // the name of the output files when the build is run
-            fileName: (format) => `dockview-vue.${format}.js`,
-            formats: ['es', 'umd', 'cjs'],
+            // The package is `"type": "module"`, so the ESM output keeps `.js`
+            // (interpreted as ESM) while the UMD/require output gets `.cjs` so
+            // Node resolves it as CommonJS. A plain `.umd.js` would be read as
+            // ESM and fail for `require()` consumers.
+            fileName: (format) =>
+                `dockview-vue.${format}.${format === 'es' ? 'js' : 'cjs'}`,
+            // `es` (module/import) + `umd` (main/require) are the only formats
+            // referenced by package.json exports; a `cjs` build would be dead
+            // output.
+            formats: ['es', 'umd'],
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled

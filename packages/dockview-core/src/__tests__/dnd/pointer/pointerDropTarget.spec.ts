@@ -211,4 +211,59 @@ describe('PointerDropTarget', () => {
         target.dispose();
         document.body.removeChild(element);
     });
+
+    function mountedElement(): HTMLElement {
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+        jest.spyOn(element, 'offsetWidth', 'get').mockReturnValue(100);
+        jest.spyOn(element, 'offsetHeight', 'get').mockReturnValue(40);
+        jest.spyOn(element, 'getBoundingClientRect').mockReturnValue({
+            top: 0,
+            left: 0,
+            right: 100,
+            bottom: 40,
+            width: 100,
+            height: 40,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        });
+        return element;
+    }
+
+    test('positionResolver overrides the default quadrant', () => {
+        const element = mountedElement();
+        const target = new PointerDropTarget(element, {
+            acceptedTargetZones: ['left', 'right', 'center'],
+            canDisplayOverlay: () => true,
+            // 10,20 would be 'left' by default, but the resolver forces 'right'.
+            getPositionResolver: () => ({
+                resolve: () => ({ position: 'right' }),
+            }),
+        });
+
+        (target as any)._onDragOver(makeDragEvent(10, 20));
+        expect(target.state).toBe('right');
+
+        target.dispose();
+        document.body.removeChild(element);
+    });
+
+    test('a null positionResolver result shows no overlay', () => {
+        const element = mountedElement();
+        const target = new PointerDropTarget(element, {
+            acceptedTargetZones: ['left', 'right', 'center'],
+            canDisplayOverlay: () => true,
+            getPositionResolver: () => ({ resolve: () => null }),
+        });
+
+        (target as any)._onDragOver(makeDragEvent(10, 20));
+        expect(
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
+        expect(target.state).toBeUndefined();
+
+        target.dispose();
+        document.body.removeChild(element);
+    });
 });

@@ -142,6 +142,10 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return this.splitview.getViewSize(index);
     }
 
+    getViewCachedVisibleSize(index: number): number | undefined {
+        return this.splitview.getViewCachedVisibleSize(index);
+    }
+
     public getPanes(): PaneviewPanel[] {
         return this.splitview.getViews();
     }
@@ -167,6 +171,12 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         }
 
         const view = this.removePane(from, { skipDispose: true });
+
+        // `skipDispose` keeps the pane alive but also leaves its old
+        // expansion-state listener attached; dispose that listener here since
+        // the addPane below installs a fresh one, otherwise every move orphans
+        // a live subscription and duplicates the layout-change events.
+        view.disposable.dispose();
 
         this.skipAnimation = true;
         try {

@@ -1,18 +1,24 @@
 ---
-title: Loading State
+title: Loading state
 description: How to restore a previously saved Dockview layout from a serialized state object.
+sidebar_position: 2
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section described loading a dock layout.
+This section describes loading a dock layout.
 
-<DocRef declaration="DockviewApi" methods={['fromJSON', 'onDidLayoutFromJSON']} />
+<DocRef
+    declaration="DockviewApi"
+    methods={['fromJSON', 'onDidLayoutFromJSON']}
+/>
 
-## Load A Layout
+<CodeRunner id="dockview/layout" />
 
-To load a layout you should a pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout the dock will throw an Error and the dock will reset gracefully ready
+## Load a layout
+
+To load a layout you should pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout Dockview will throw an error and reset gracefully, ready
 for another attempt with a valid object.
 
 You could load a previously saved layout from local storage for example.
@@ -37,10 +43,12 @@ const onReady = (event: DockviewReadyEvent) => {
     if (!success) {
         // perhaps load a default layout?
     }
+
 };
 
 return <DockviewComponent onReady={onReady}/>;
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -72,7 +80,8 @@ function onReady(event: DockviewReadyEvent) {
 <template>
     <dockview-vue @ready="onReady" />
 </template>
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -81,12 +90,12 @@ import { Component } from '@angular/core';
 import type { DockviewReadyEvent } from 'dockview-angular';
 
 @Component({
-    selector: 'app-root',
-    template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
+selector: 'app-root',
+template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
 })
 export class AppComponent {
-    onReady(event: DockviewReadyEvent) {
-        let success = false;
+onReady(event: DockviewReadyEvent) {
+let success = false;
 
         const mySerializedLayout = localStorage.getItem('my_layout');
 
@@ -104,8 +113,10 @@ export class AppComponent {
             // perhaps load a default layout?
         }
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -131,11 +142,11 @@ if (mySerializedLayout) {
 if (!success) {
     // perhaps load a default layout?
 }
-```
+````
+
 </FrameworkSpecific>
 
-# Live Example
+## See also
 
-<CodeRunner id="dockview/layout"/>
-
-
+- [Saving state](/docs/core/state/save): serialize the current layout with `toJSON`.
+- [Layout history](/docs/core/state/history): undo and redo layout changes without reloading from JSON.

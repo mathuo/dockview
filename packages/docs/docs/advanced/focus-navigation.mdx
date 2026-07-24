@@ -1,0 +1,69 @@
+---
+title: Focus navigation
+description: Framework-agnostic DockviewApi methods for moving focus between panels and groups programmatically.
+sidebar_position: 2
+---
+
+`DockviewApi` exposes a small set of framework-agnostic methods for moving
+focus between panels and groups programmatically. They work in every framework
+binding, useful for wiring up your own keyboard shortcut handlers. The rebindable keymap and keyboard docking are a separate,
+enterprise feature covered in [Keyboard Navigation](/docs/advanced/keyboard).
+
+## Programmatic focus navigation
+
+The two core methods are `activateNext` and `activatePrevious`:
+
+```ts
+// Move focus to the next panel or group
+api.activateNext({ includePanel: true });
+
+// Move focus to the previous panel or group
+api.activatePrevious({ includePanel: true });
+```
+
+:::info Renamed in v8
+These methods were previously called `moveToNext` / `moveToPrevious`. The old
+names still work as deprecated aliases but will be removed in a future major
+release; the new names make it clear they advance the active panel/group
+(focus) rather than relocating a panel.
+:::
+
+Both accept an optional `options` object:
+
+| Option         | Type                 | Description                                                                                                  |
+| -------------- | -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `includePanel` | `boolean`            | If `true`, cycles through individual panels within groups. If `false` (default), cycles through groups only. |
+| `group`        | `DockviewGroupPanel` | Scope navigation to start from a specific group.                                                             |
+
+```ts
+// Cycle only through groups (not individual panels within them)
+api.activateNext();
+
+// Cycle through all panels across all groups
+api.activateNext({ includePanel: true });
+```
+
+## Spatial navigation
+
+`activateNext` / `activatePrevious` cycle through groups in list order. To navigate by _visual_ direction instead, `adjacentGroupInDirection` returns the nearest grid group to the left, right, above, or below a given group (by comparing their centre points). Floating and popout groups are ignored, and it returns `undefined` when there is no group in that direction.
+
+```ts
+const left = api.adjacentGroupInDirection(api.activeGroup, 'left');
+if (left) {
+    left.focus();
+}
+```
+
+Each group also exposes its rendered geometry, relative to the top-left of the Dockview root, via `group.api.boundingBox` (`undefined` for popout groups). Combined with `api.groups`, this lets you build a custom spatial map or overview:
+
+```ts
+const layout = api.groups.map((group) => ({
+    group,
+    box: group.api.boundingBox,
+}));
+```
+
+## See also
+
+- [Keyboard](/docs/advanced/keyboard): the rebindable keymap and keyboard-driven docking built on top of these primitives
+- [Accessibility](/docs/advanced/accessibility): the ARIA semantics and within-strip keyboard navigation Dockview ships by default

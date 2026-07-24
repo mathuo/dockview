@@ -2,7 +2,7 @@
  * A single entry in the tab-group color palette.
  *
  * `id` is the value stored on `ITabGroup.color` and serialized in
- * `SerializedTabGroup.color`. `value` is any CSS color expression — a hex
+ * `SerializedTabGroup.color`. `value` is any CSS color expression: a hex
  * literal, an rgb()/hsl()/oklch() function, or a `var(...)` reference.
  *
  * The default palette ships with `var(--dv-tab-group-color-${id})` values so

@@ -5,10 +5,10 @@ import { DropTargetTargetModel } from '../../../dnd/droptarget';
 /**
  * Verifies the anchor-container ("override target") rendering path that
  * floating groups, popout groups, and the layout root rely on. The path
- * doesn't append a dropzone to the drop element — instead it renders into
+ * doesn't append a dropzone to the drop element. Instead it renders into
  * an external anchor container's overlay.
  */
-describe('PointerDropTarget — anchor / override target path', () => {
+describe('PointerDropTarget: anchor / override target path', () => {
     afterEach(() => {
         PointerDragController.getInstance().cancel();
     });
@@ -88,10 +88,124 @@ describe('PointerDropTarget — anchor / override target path', () => {
             dropEl.getElementsByClassName('dv-drop-target-dropzone')
         ).toHaveLength(0);
         // The anchor overlay should have been positioned (any non-empty
-        // dimensions are fine — we just want to confirm the anchor path ran).
+        // dimensions are fine; this confirms the anchor path ran).
         expect(overlay.style.width).not.toBe('');
         expect(overlay.style.height).not.toBe('');
         expect(target.state).toBe('right');
+
+        target.dispose();
+        document.body.removeChild(dropEl);
+    });
+
+    test('a resolver that declines clears the anchor overlay', () => {
+        // The anchored overlay lives in a container the drop target does not
+        // own, so a null resolution must clear it explicitly — otherwise the
+        // previous frame's highlight lingers while the cursor sits in a dead
+        // zone (e.g. a corner of the drop-guide compass).
+        const dropEl = document.createElement('div');
+        document.body.appendChild(dropEl);
+        jest.spyOn(dropEl, 'offsetWidth', 'get').mockReturnValue(200);
+        jest.spyOn(dropEl, 'offsetHeight', 'get').mockReturnValue(100);
+        jest.spyOn(dropEl, 'getBoundingClientRect').mockReturnValue({
+            top: 0,
+            left: 0,
+            right: 200,
+            bottom: 100,
+            width: 200,
+            height: 100,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        });
+
+        const { targetModel, clear } = makeAnchorTarget();
+
+        let position: 'center' | null = 'center';
+        const target = new PointerDropTarget(dropEl, {
+            acceptedTargetZones: ['left', 'right', 'center'],
+            canDisplayOverlay: () => true,
+            getOverrideTarget: () => targetModel,
+            getPositionResolver: () => ({
+                resolve: () => (position ? { position } : null),
+            }),
+        });
+
+        const dragEvent = {
+            clientX: 100,
+            clientY: 50,
+            pointerEvent: new PointerEvent('pointermove', {
+                clientX: 100,
+                clientY: 50,
+                pointerId: 1,
+                pointerType: 'touch',
+            }),
+        };
+
+        (target as any)._onDragOver(dragEvent);
+        expect(target.state).toBe('center');
+        expect(clear).not.toHaveBeenCalled();
+
+        position = null;
+        (target as any)._onDragOver(dragEvent);
+        expect(target.state).toBeUndefined();
+        expect(clear).toHaveBeenCalled();
+
+        target.dispose();
+        document.body.removeChild(dropEl);
+    });
+
+    test('an edge cell clears the anchor overlay', () => {
+        // The target renders nothing for an edge cell, so the anchored overlay
+        // from the previous (inner cell) frame must go — otherwise it
+        // double-highlights alongside the layout-edge preview.
+        const dropEl = document.createElement('div');
+        document.body.appendChild(dropEl);
+        jest.spyOn(dropEl, 'offsetWidth', 'get').mockReturnValue(200);
+        jest.spyOn(dropEl, 'offsetHeight', 'get').mockReturnValue(100);
+        jest.spyOn(dropEl, 'getBoundingClientRect').mockReturnValue({
+            top: 0,
+            left: 0,
+            right: 200,
+            bottom: 100,
+            width: 200,
+            height: 100,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        });
+
+        const { targetModel, clear } = makeAnchorTarget();
+
+        let edge = false;
+        const target = new PointerDropTarget(dropEl, {
+            acceptedTargetZones: ['left', 'right', 'center'],
+            canDisplayOverlay: () => true,
+            getOverrideTarget: () => targetModel,
+            getPositionResolver: () => ({
+                resolve: () => ({ position: 'left', edge }),
+            }),
+        });
+
+        const dragEvent = {
+            clientX: 100,
+            clientY: 50,
+            pointerEvent: new PointerEvent('pointermove', {
+                clientX: 100,
+                clientY: 50,
+                pointerId: 1,
+                pointerType: 'touch',
+            }),
+        };
+
+        (target as any)._onDragOver(dragEvent);
+        expect(target.state).toBe('left');
+        expect(clear).not.toHaveBeenCalled();
+
+        edge = true;
+        (target as any)._onDragOver(dragEvent);
+        expect(clear).toHaveBeenCalled();
+        // still latched for the consumer to commit
+        expect(target.state).toBe('left');
 
         target.dispose();
         document.body.removeChild(dropEl);

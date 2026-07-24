@@ -70,3 +70,32 @@
         color: var(--dv-activegroup-visiblepanel-tab-color);
     }
 }
+
+// Visible on-screen hint shown while a keyboard-docking move (Ctrl+M) is armed.
+// Mirrors the screen-reader narration so sighted keyboard users get the same
+// "arrows / Enter / Escape" guidance. Purely visual (the element is
+// aria-hidden; the LiveRegion speaks the same text). Restyle or hide via this
+// class.
+.dv-keyboard-docking-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    z-index: 100;
+    max-width: 90%;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    background-color: var(
+        --dv-context-menu-background-color,
+        var(--dv-group-view-background-color)
+    );
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    border: 1px solid var(--dv-tab-divider-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}

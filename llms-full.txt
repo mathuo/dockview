@@ -223,7 +223,7 @@ The `DockviewApi` (available via the `onReady` event) provides:
 - `removeGroup(group)` — Remove a group
 - `getPanel(id)` — Get panel by ID
 - `getGroup(id)` — Get group by ID
-- `moveToNext()` / `moveToPrevious()` — Navigate between panels
+- `activateNext()` / `activatePrevious()` — Navigate between panels (formerly `moveToNext` / `moveToPrevious`, now deprecated aliases)
 - `addFloatingGroup(panel, options)` — Create a floating group
 - `addEdgeGroup(options)` — Pin a group to a layout edge
 - `createTabGroup(options)` — Create a tab group for visual organization

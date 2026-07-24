@@ -17,7 +17,7 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * Spatial group navigation — `adjacentGroupInDirection` and the
+ * Spatial group navigation: `adjacentGroupInDirection` and the
  * `group.api.boundingBox` geometry accessor. DOM rects are zero in jsdom, so
  * each group's rect is mocked to lay out a deterministic grid.
  */

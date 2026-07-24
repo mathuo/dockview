@@ -25,16 +25,15 @@ bridge, hooks. All documentation, READMEs, and examples point at this package fo
 
 ## Build
 
-- `build:cjs` - TypeScript compilation to CommonJS
-- `build:esm` - TypeScript compilation to ESM
+- `build:cjs` - Type declarations via `tsc` (`emitDeclarationOnly` → `dist/cjs/**/*.d.ts`); runtime JS ships as the rolldown bundles
 - `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
-- `build` - All three above in sequence
-- `build:bundle` - Rollup UMD bundle (self-contained for CDN; externalizes `react` and `react-dom`)
+- `build` - `build:cjs` + `build:css`
+- `build:bundle` - rolldown bundles: the CJS/ESM package entries (`dist/package`) and the UMD/CDN bundle (self-contained for CDN; externalizes `react` and `react-dom`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
 
-- `test` - Jest with ts-jest, jsdom environment
+- `test` - Jest with `@swc/jest`, jsdom environment
 - Uses `moduleNameMapper` to resolve `dockview` and `dockview-core` from source
 - Config: `jest.config.ts` (project name: `dockview-react`)
 

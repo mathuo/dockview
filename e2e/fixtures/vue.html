@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>dockview-vue e2e fixture</title>
+        <style>
+            html,
+            body,
+            #app {
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+            /* DockviewVue is a multi-root (fragment) component, so a `style`/
+               `class` attribute can't fall through to its host `<div ref="el">`.
+               `<DockviewVue>` is the only element child the root renders, so size
+               it here — otherwise `api.layout(clientWidth, clientHeight)` sees 0
+               and nothing renders. */
+            #app > div {
+                height: 100%;
+                width: 100%;
+            }
+            .vue-panel {
+                height: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+            }
+        </style>
+
+        <!-- Built stylesheet so layout-sensitive behaviour (content sizing,
+             popout window geometry) matches real usage — as index.html does. -->
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <!-- Globals loaded in dependency order. The dockview-vue UMD externalizes
+             its deps and references the `Vue` and `dockview` globals (see the
+             `globals` map in packages/dockview-vue/vite.config.ts — it never
+             references a standalone `dockview-core` global because the self-
+             contained `dockview` bundle already provides the core). So:
+               1. vue.global.js  -> window.Vue          (FULL build: the template
+                                                          compiler is included, so
+                                                          inline `template:` strings
+                                                          work with no SFC step)
+               2. dockview.js     -> window.dockview      (bundles dockview-core in)
+               3. dockview-vue.umd.cjs -> window['dockview-vue'] (exposes DockviewVue)
+             Load order matters: the UMD throws on a missing global otherwise. -->
+        <script src="/node_modules/vue/dist/vue.global.js"></script>
+        <script src="/packages/dockview/dist/dockview.js"></script>
+        <script src="/packages/dockview-vue/dist/dockview-vue.umd.cjs"></script>
+
+        <script>
+            (function () {
+                const {
+                    createApp,
+                    ref,
+                    onMounted,
+                    onUnmounted,
+                    onActivated,
+                    onDeactivated,
+                    watchEffect,
+                    provide,
+                    inject,
+                } = window.Vue;
+                const { DockviewVue } = window['dockview-vue'];
+
+                // Shared, per-panel lifecycle-counter + persisted-state registry
+                // keyed by panel id. The panel components write into it; the
+                // `window.__vue` handle reads it back for assertions. It lives in
+                // the MAIN window's JS realm, so it stays readable even while a
+                // panel's DOM is teleported into a popout window.
+                const lifecycle = {};
+                function record(pid) {
+                    return (lifecycle[pid] ||= {
+                        mounted: 0,
+                        unmounted: 0,
+                        activated: 0,
+                        deactivated: 0,
+                        count: 0,
+                        text: '',
+                        injected: null,
+                    });
+                }
+
+                // Token a panel resolves through `inject` — provided by Root,
+                // above the DockviewVue host. Reaching it from a teleported panel
+                // proves live component-tree ancestry (the other half of #1369).
+                const SHARED_TOKEN = 'shared-token';
+
+                // Inner panel content. Wrapped by `<keep-alive>` in PanelWrapper
+                // below so switching the active panel DEACTIVATES/REACTIVATES this
+                // component (state cached) instead of unmounting/remounting it.
+                // Holds a mutable, in-panel piece of state (`count` + a text
+                // `<input>`) whose survival across a switch/popout proves caching.
+                const InnerPanel = {
+                    name: 'InnerPanel',
+                    props: ['pid'],
+                    setup(props) {
+                        const rec = record(props.pid);
+                        const count = ref(rec.count);
+                        const text = ref(rec.text);
+                        // Resolved through the Vue component tree, across the
+                        // <Teleport> boundary, from Root's `provide`.
+                        const injected = inject(SHARED_TOKEN, 'not-injected');
+                        rec.injected = injected;
+                        // Imperative setters so a test can seed state without
+                        // depending on the panel currently being in the DOM.
+                        rec.setCount = (v) => {
+                            count.value = v;
+                        };
+                        rec.setText = (v) => {
+                            text.value = v;
+                        };
+                        onMounted(() => {
+                            rec.mounted++;
+                        });
+                        onUnmounted(() => {
+                            rec.unmounted++;
+                        });
+                        onActivated(() => {
+                            rec.activated++;
+                        });
+                        onDeactivated(() => {
+                            rec.deactivated++;
+                        });
+                        // Mirror live state into the shared record so the handle
+                        // can read it regardless of which window holds the DOM.
+                        watchEffect(() => {
+                            rec.count = count.value;
+                            rec.text = text.value;
+                        });
+                        return { pid: props.pid, count, text, injected };
+                    },
+                    template: `
+                        <div class="vue-panel" :data-pid="pid">
+                            <span class="pid">{{ pid }}</span>
+                            <span class="count">{{ count }}</span>
+                            <span class="injected">{{ injected }}</span>
+                            <input class="field" v-model="text" />
+                            <button class="inc" @click="count++">inc</button>
+                        </div>`,
+                };
+
+                // The component registered with dockview. It is teleported into
+                // dockview's DOM by <DockviewPortals>, which keeps it a true
+                // descendant of <DockviewVue> in the Vue component tree — the
+                // ancestry (PR #1380 / issue #1369) that lets `<keep-alive>` reach
+                // the panel. It drives that keep-alive off the panel's visibility:
+                // the default `onlyWhenVisible` render mode hides inactive panels,
+                // so an inactive panel is CACHED here, not destroyed.
+                const PanelWrapper = {
+                    name: 'PanelWrapper',
+                    components: { InnerPanel },
+                    props: ['params'],
+                    setup(props) {
+                        const api = props.params.api;
+                        const visible = ref(api.isVisible);
+                        const disposable = api.onDidVisibilityChange((e) => {
+                            visible.value = e.isVisible;
+                        });
+                        onUnmounted(() => disposable.dispose());
+                        return { visible, pid: api.id };
+                    },
+                    template: `
+                        <keep-alive>
+                            <InnerPanel v-if="visible" :key="pid" :pid="pid" />
+                        </keep-alive>`,
+                };
+
+                let dvApi = null;
+                const panels = {};
+
+                const Root = {
+                    name: 'Root',
+                    components: { DockviewVue },
+                    setup() {
+                        // Provide a value above the host so a teleported panel
+                        // can `inject` it (proves live tree ancestry).
+                        provide(SHARED_TOKEN, 'from-root');
+                        return {
+                            components: { panel: PanelWrapper },
+                            onReady: (event) => {
+                                dvApi = event.api;
+                                // Signal readiness only once the api exists
+                                // (the `ready` event fires async, after mount).
+                                window.__ready = true;
+                            },
+                        };
+                    },
+                    // `onlyWhenVisible` is the default render mode — the natural
+                    // keep-alive scenario (one active panel rendered at a time).
+                    template: `
+                        <DockviewVue
+                            :components="components"
+                            :popout-url="'/e2e/fixtures/popout.html'"
+                            @ready="onReady"
+                        />`,
+                };
+
+                createApp(Root).mount('#app');
+
+                // Test-facing handle (kept separate from the vanilla `__dv` so the
+                // shared index.html fixture other specs depend on is untouched).
+                window.__vue = {
+                    addPanel: (id, opts) => {
+                        panels[id] = dvApi.addPanel({
+                            id,
+                            component: 'panel',
+                            title: id,
+                            inactive: !!(opts && opts.inactive),
+                        });
+                    },
+                    setActive: (id) => panels[id] && panels[id].api.setActive(),
+                    activePanelId: () =>
+                        dvApi.activeGroup?.activePanel?.id ?? null,
+                    // Seed in-panel state imperatively (works even while the
+                    // panel is deactivated/hidden).
+                    setState: (id, count, text) => {
+                        const r = lifecycle[id];
+                        if (!r) return;
+                        if (count != null && r.setCount) r.setCount(count);
+                        if (text != null && r.setText) r.setText(text);
+                    },
+                    // Per-panel keep-alive lifecycle counters.
+                    counters: (id) => {
+                        const r = record(id);
+                        return {
+                            mounted: r.mounted,
+                            unmounted: r.unmounted,
+                            activated: r.activated,
+                            deactivated: r.deactivated,
+                        };
+                    },
+                    // Persisted in-panel state (readable from the main window
+                    // even while the DOM is in a popout).
+                    state: (id) => {
+                        const r = record(id);
+                        return { count: r.count, text: r.text };
+                    },
+                    // Value a panel resolved via `inject`.
+                    injected: (id) => record(id).injected,
+                    popoutActiveGroup: () =>
+                        dvApi.addPopoutGroup(dvApi.activeGroup),
+                    // Add a fresh panel and move it to the right of the current
+                    // popout group, so the popout window hosts a second group.
+                    splitIntoPopout: (id) => {
+                        const popoutGroup = dvApi.getPopouts()[0].group;
+                        panels[id] = dvApi.addPanel({
+                            id,
+                            component: 'panel',
+                            title: id,
+                        });
+                        panels[id].api.moveTo({
+                            group: popoutGroup,
+                            position: 'right',
+                        });
+                    },
+                    closePopout: () => dvApi.getPopouts()[0].group.api.close(),
+                    popoutCount: () => dvApi.getPopouts().length,
+                    groupCount: () => dvApi.groups.length,
+                };
+            })();
+        </script>
+    </body>
+</html>

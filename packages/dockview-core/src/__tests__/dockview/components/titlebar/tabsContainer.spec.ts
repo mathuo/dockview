@@ -11,6 +11,7 @@ import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewPanelApi } from '../../../../api/dockviewPanelApi';
+import { Emitter } from '../../../../events';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -218,75 +219,69 @@ describe('tabsContainer', () => {
         ).toHaveLength(1);
     });
 
-    test.each([true, 'no-drop-target' as const])(
-        'that dropping over the empty space does not render a drop target when group is locked=%p (regression #990)',
-        (lockedValue) => {
-            const accessor = fromPartial<DockviewComponent>({
-                withOrigin: (_origin: any, fn: () => any) => fn(),
-                id: 'testcomponentid',
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                options: {},
-                onDidOptionsChange: jest
-                    .fn()
-                    .mockReturnValue({ dispose: jest.fn() }),
-            });
+    test.each([
+        true,
+        'no-drop-target' as const,
+    ])('that dropping over the empty space does not render a drop target when group is locked=%p (regression #990)', (lockedValue) => {
+        const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
+            id: 'testcomponentid',
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+        });
 
-            const groupView = fromPartial<DockviewGroupPanelModel>({
-                canDisplayOverlay: jest.fn(),
-            });
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
 
-            const groupPanel = fromPartial<DockviewGroupPanel>({
-                id: 'testgroupid',
-                model: groupView,
-                panels: [],
-                api: fromPartial<DockviewGroupPanel['api']>({
-                    locked: lockedValue,
-                }),
-            });
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
+            panels: [],
+            api: fromPartial<DockviewGroupPanel['api']>({
+                locked: lockedValue,
+            }),
+        });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+        const cut = new TabsContainer(accessor, groupPanel);
 
-            cut.openPanel(new TestPanel('panel1', jest.fn() as any));
-            cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
 
-            const emptySpace = cut.element
-                .getElementsByClassName('dv-void-container')
-                .item(0) as HTMLElement;
+        const emptySpace = cut.element
+            .getElementsByClassName('dv-void-container')
+            .item(0) as HTMLElement;
 
-            if (!emptySpace!) {
-                fail('element not found');
-            }
-
-            jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
-                () => 100
-            );
-            jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
-                () => 100
-            );
-
-            // simulate an internal same-accessor drag (the buggy path):
-            // the void container previously short-circuited to `return true`
-            // for same-accessor drags regardless of the group's locked state.
-            LocalSelectionTransfer.getInstance().setData(
-                [
-                    new PanelTransfer(
-                        'testcomponentid',
-                        'anothergroupid',
-                        'panel1'
-                    ),
-                ],
-                PanelTransfer.prototype
-            );
-
-            fireEvent.dragEnter(emptySpace!);
-            fireEvent.dragOver(emptySpace!);
-
-            expect(
-                cut.element.getElementsByClassName('dv-drop-target-dropzone')
-            ).toHaveLength(0);
+        if (!emptySpace!) {
+            fail('element not found');
         }
-    );
+
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
+            () => 100
+        );
+
+        // simulate an internal same-accessor drag (the buggy path):
+        // the void container previously short-circuited to `return true`
+        // for same-accessor drags regardless of the group's locked state.
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel1')],
+            PanelTransfer.prototype
+        );
+
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
+
+        expect(
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
+    });
 
     test('that dropping the first tab should render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
@@ -1180,6 +1175,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 
@@ -1322,6 +1318,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 
@@ -1454,6 +1451,7 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({
                 tabs: ['test-panel'],
                 tabGroups: [],
+                pinnedTabs: [],
                 reset: false,
             });
 
@@ -1545,5 +1543,648 @@ describe('tabsContainer', () => {
                 'dv-right-actions-container-vertical'
             )
         ).toBeFalsy();
+    });
+
+    describe('additional coverage', () => {
+        const makeAccessor = (
+            overrides: Partial<DockviewComponent> = {}
+        ): DockviewComponent =>
+            fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                doSetGroupActive: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                ...overrides,
+            });
+
+        const makeGroup = (
+            overrides: Partial<DockviewGroupPanel> = {}
+        ): DockviewGroupPanel =>
+            fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
+                api: fromPartial<DockviewGroupPanel['api']>({
+                    locked: false,
+                }),
+                ...overrides,
+            });
+
+        const makeOverflowMockTabs = (tabs: any[]): any => ({
+            tabs,
+            onDrop: jest.fn(),
+            onTabDragStart: jest.fn(),
+            onWillShowOverlay: jest.fn(),
+            onOverflowTabsChange: jest.fn(),
+            size: tabs.length,
+            panels: tabs.map((t) => t.panel.id),
+            isActive: jest.fn(),
+            indexOf: jest.fn(),
+            delete: jest.fn(),
+            setActivePanel: jest.fn(),
+            openPanel: jest.fn(),
+            showTabsOverflowControl: true,
+            updateDragAndDropState: jest.fn(),
+            element: document.createElement('div'),
+            dispose: jest.fn(),
+        });
+
+        const makeOverflowPanel = (
+            id: string,
+            isActive = false
+        ): IDockviewPanel =>
+            fromPartial<IDockviewPanel>({
+                id,
+                api: {
+                    isActive,
+                    setActive: jest.fn(),
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: document.createElement('div'),
+                    }),
+                },
+            });
+
+        test('delegates simple methods and getters to the underlying tabs', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            const listEl = document.createElement('div');
+            const sentinelPanel = fromPartial<IDockviewPanel>({ id: 'sp' });
+
+            const mockTabs = {
+                ...makeOverflowMockTabs([]),
+                isActive: jest.fn().mockReturnValue(true),
+                indexOf: jest.fn().mockReturnValue(3),
+                getTabId: jest.fn().mockReturnValue('the-tab-id'),
+                getPanelForTab: jest.fn().mockReturnValue(sentinelPanel),
+                focusActiveTab: jest.fn(),
+                setActivePanel: jest.fn(),
+                setOverflowExclude: jest.fn(),
+                setForcedOverflow: jest.fn(),
+                setPinnedSticky: jest.fn(),
+                refreshOverflow: jest.fn(),
+                updateTabGroups: jest.fn(),
+                refreshTabGroupAccent: jest.fn(),
+                delete: jest.fn(),
+                size: 2,
+                panels: ['a', 'b'],
+                tabsListElement: listEl,
+            };
+            (cut as any).tabs = mockTabs;
+
+            const tab = {} as any;
+            expect(cut.isActive(tab)).toBe(true);
+            expect(mockTabs.isActive).toHaveBeenCalledWith(tab);
+
+            expect(cut.indexOf('panel')).toBe(3);
+            expect(mockTabs.indexOf).toHaveBeenCalledWith('panel');
+
+            expect(cut.getTabId('panel')).toBe('the-tab-id');
+            expect(mockTabs.getTabId).toHaveBeenCalledWith('panel');
+
+            const el = document.createElement('div');
+            expect(cut.getPanelForTab(el)).toBe(sentinelPanel);
+            expect(mockTabs.getPanelForTab).toHaveBeenCalledWith(el);
+
+            cut.focusActiveTab();
+            expect(mockTabs.focusActiveTab).toHaveBeenCalledTimes(1);
+
+            const activePanel = fromPartial<IDockviewPanel>({ id: 'x' });
+            cut.setActivePanel(activePanel);
+            expect(mockTabs.setActivePanel).toHaveBeenCalledWith(activePanel);
+
+            const excludeFn = (_: string) => true;
+            cut.setOverflowExclude(excludeFn);
+            expect(mockTabs.setOverflowExclude).toHaveBeenCalledWith(excludeFn);
+
+            const forcedFn = (_: string) => true;
+            cut.setForcedOverflow(forcedFn);
+            expect(mockTabs.setForcedOverflow).toHaveBeenCalledWith(forcedFn);
+
+            cut.setPinnedSticky(true);
+            expect(mockTabs.setPinnedSticky).toHaveBeenCalledWith(true);
+
+            cut.refreshOverflow();
+            expect(mockTabs.refreshOverflow).toHaveBeenCalledTimes(1);
+
+            cut.updateTabGroups();
+            expect(mockTabs.updateTabGroups).toHaveBeenCalledTimes(1);
+
+            cut.refreshTabGroupAccent();
+            expect(mockTabs.refreshTabGroupAccent).toHaveBeenCalledTimes(1);
+
+            cut.delete('panel');
+            expect(mockTabs.delete).toHaveBeenCalledWith('panel');
+
+            expect(cut.size).toBe(2);
+            expect(cut.panels).toEqual(['a', 'b']);
+            expect(cut.tabsListElement).toBe(listEl);
+
+            // setActive is a documented noop
+            expect(() => cut.setActive(true)).not.toThrow();
+        });
+
+        test('show/hide/hidden control the element display style', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            cut.hide();
+            expect(cut.element.style.display).toBe('none');
+
+            // show() only clears display when not hidden
+            cut.show();
+            expect(cut.element.style.display).toBe('');
+
+            cut.hidden = true;
+            expect(cut.hidden).toBe(true);
+            expect(cut.element.style.display).toBe('none');
+
+            // show() is a noop while hidden
+            cut.show();
+            expect(cut.element.style.display).toBe('none');
+
+            cut.hidden = false;
+            expect(cut.hidden).toBe(false);
+            expect(cut.element.style.display).toBe('');
+        });
+
+        test('drop index resolver defaults to identity and can be overridden', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            // identity by default
+            expect(cut.resolveDropIndex('panel', 4)).toBe(4);
+
+            const resolver = jest.fn().mockReturnValue(9);
+            cut.setDropIndexResolver(resolver);
+            expect(cut.resolveDropIndex('panel', 4)).toBe(9);
+            expect(resolver).toHaveBeenCalledWith('panel', 4);
+        });
+
+        test('setPinnedRow mounts, replaces and removes the pinned row', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            const row = document.createElement('div');
+            cut.setPinnedRow(row);
+            expect(cut.element.firstChild).toBe(row);
+            expect(row.classList.contains('dv-pinned-row')).toBe(true);
+            expect(
+                cut.element.classList.contains(
+                    'dv-tabs-and-actions-container--pinned-row'
+                )
+            ).toBe(true);
+
+            // setting the same row again is a noop
+            cut.setPinnedRow(row);
+            expect(cut.element.firstChild).toBe(row);
+
+            const row2 = document.createElement('div');
+            cut.setPinnedRow(row2);
+            expect(cut.element.contains(row)).toBe(false);
+            expect(cut.element.firstChild).toBe(row2);
+
+            cut.setPinnedRow(undefined);
+            expect(cut.element.contains(row2)).toBe(false);
+            expect(
+                cut.element.classList.contains(
+                    'dv-tabs-and-actions-container--pinned-row'
+                )
+            ).toBe(false);
+        });
+
+        test('re-emits drop, overlay, tab-drag and group-drag events', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+            const group = (cut as any).group as DockviewGroupPanel;
+
+            const dropEvents: any[] = [];
+            cut.onDrop((e) => dropEvents.push(e));
+            (cut as any).tabs._onDrop.fire({ event: {} as any, index: 5 });
+            expect(dropEvents).toHaveLength(1);
+            expect(dropEvents[0].index).toBe(5);
+
+            const overlayEvents: any[] = [];
+            cut.onWillShowOverlay((e) => overlayEvents.push(e));
+            (cut as any).tabs._onWillShowOverlay.fire({} as any);
+            expect(overlayEvents).toHaveLength(1);
+
+            const tabDragEvents: any[] = [];
+            cut.onTabDragStart((e) => tabDragEvents.push(e));
+            (cut as any).tabs._onTabDragStart.fire({
+                nativeEvent: {} as any,
+                panel: {} as any,
+            });
+            expect(tabDragEvents).toHaveLength(1);
+
+            const groupDragEvents: any[] = [];
+            cut.onGroupDragStart((e) => groupDragEvents.push(e));
+            const dragEvent = {} as any;
+            (cut as any).voidContainer._onDragStart.fire(dragEvent);
+            expect(groupDragEvents).toHaveLength(1);
+            expect(groupDragEvents[0].group).toBe(group);
+            expect(groupDragEvents[0].nativeEvent).toBe(dragEvent);
+
+            const voidDropEvents: any[] = [];
+            cut.onDrop((e) => voidDropEvents.push(e));
+            (cut as any).voidContainer._onDrop.fire({
+                nativeEvent: {} as any,
+            });
+            // no active group drag -> re-emits with the tabs size as index
+            expect(voidDropEvents).toHaveLength(1);
+            expect(voidDropEvents[0].index).toBe((cut as any).tabs.size);
+        });
+
+        test('overflow-tabs change from tabs builds the dropdown', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            (cut as any).tabs._onOverflowTabsChange.fire({
+                tabs: ['a', 'b'],
+                tabGroups: [],
+                pinnedTabs: [],
+                reset: false,
+            });
+
+            const root = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            expect(root).toBeTruthy();
+        });
+
+        test('option changes toggle the overflow control on the tabs', () => {
+            const optionsChange = new Emitter<void>();
+            const options: any = { disableTabsOverflowList: false };
+            const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                doSetGroupActive: jest.fn(),
+                options,
+                onDidOptionsChange: optionsChange.event,
+            });
+
+            const cut = new TabsContainer(accessor, makeGroup());
+            const mockTabs = { showTabsOverflowControl: true };
+            (cut as any).tabs = mockTabs;
+
+            options.disableTabsOverflowList = true;
+            optionsChange.fire();
+            expect(mockTabs.showTabsOverflowControl).toBe(false);
+
+            options.disableTabsOverflowList = false;
+            optionsChange.fire();
+            expect(mockTabs.showTabsOverflowControl).toBe(true);
+
+            optionsChange.dispose();
+        });
+
+        test('dragleave on left actions/void container updates tab drag state', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            const mockTabs = {
+                clearExternalAnimState: jest.fn(),
+                setExternalInsertionIndex: jest.fn(),
+            };
+            (cut as any).tabs = mockTabs;
+
+            const leftActions = cut.element.querySelector(
+                '.dv-left-actions-container'
+            ) as HTMLElement;
+            const voidEl = cut.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+
+            const dragLeaveWith = (
+                target: HTMLElement,
+                relatedTarget: EventTarget | null
+            ): void => {
+                const evt = new Event('dragleave', { bubbles: true });
+                Object.defineProperty(evt, 'relatedTarget', {
+                    value: relatedTarget,
+                    configurable: true,
+                });
+                fireEvent(target, evt);
+            };
+
+            // Leaving the header entirely from the left actions clears state.
+            dragLeaveWith(leftActions, null);
+            expect(mockTabs.clearExternalAnimState).toHaveBeenCalledTimes(1);
+
+            // Leaving into the left actions container itself does nothing.
+            mockTabs.clearExternalAnimState.mockClear();
+            dragLeaveWith(leftActions, leftActions);
+            expect(mockTabs.clearExternalAnimState).not.toHaveBeenCalled();
+
+            // Leaving the void container for the header entirely clears state.
+            dragLeaveWith(voidEl, document.createElement('div'));
+            expect(mockTabs.clearExternalAnimState).toHaveBeenCalledTimes(1);
+
+            // Leaving the void container for another header part keeps state.
+            dragLeaveWith(voidEl, leftActions);
+            expect(mockTabs.setExternalInsertionIndex).toHaveBeenCalledWith(
+                null
+            );
+        });
+
+        test('void container pointerdown is ignored when default is prevented', () => {
+            const accessor = makeAccessor({
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+                options: { disableFloatingGroups: false },
+            });
+            const cut = new TabsContainer(
+                accessor,
+                makeGroup({
+                    api: fromPartial<DockviewGroupPanel['api']>({
+                        location: { type: 'grid' } as any,
+                    }),
+                })
+            );
+
+            const voidEl = cut.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+
+            const evt = new KeyboardEvent('pointerdown', {
+                shiftKey: true,
+                cancelable: true,
+                bubbles: true,
+            });
+            evt.preventDefault();
+            fireEvent(voidEl, evt);
+
+            expect(accessor.addFloatingGroup).not.toHaveBeenCalled();
+        });
+
+        test('toggleDropdown updates count in place and disposes on reset', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+
+            (cut as any).toggleDropdown({
+                tabs: ['a', 'b'],
+                tabGroups: [],
+                pinnedTabs: [],
+                reset: false,
+            });
+            const root = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            ) as HTMLElement;
+            expect(root).toBeTruthy();
+            expect(root.querySelector('span')?.textContent).toBe('2');
+
+            // second call reuses the same root and updates the count
+            (cut as any).toggleDropdown({
+                tabs: ['a', 'b', 'c'],
+                tabGroups: [],
+                pinnedTabs: [],
+                reset: false,
+            });
+            expect(
+                cut.element.querySelector('.dv-tabs-overflow-dropdown-root')
+            ).toBe(root);
+            expect(root.querySelector('span')?.textContent).toBe('3');
+
+            // reset tears the dropdown down
+            (cut as any).toggleDropdown({
+                tabs: [],
+                tabGroups: [],
+                pinnedTabs: [],
+                reset: true,
+            });
+            expect(
+                cut.element.querySelector('.dv-tabs-overflow-dropdown-root')
+            ).toBeNull();
+        });
+
+        test('dropdown root swallows pointerdown', () => {
+            const cut = new TabsContainer(makeAccessor(), makeGroup());
+            (cut as any).toggleDropdown({
+                tabs: ['a'],
+                tabGroups: [],
+                pinnedTabs: [],
+                reset: false,
+            });
+            const root = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            ) as HTMLElement;
+
+            const evt = new KeyboardEvent('pointerdown', {
+                cancelable: true,
+                bubbles: true,
+            });
+            const spy = jest.spyOn(evt, 'preventDefault');
+            fireEvent(root, evt);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        test('overflow render context builders (advanced overflow path)', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            let capturedContext: any;
+            const accessor = makeAccessor({
+                getPopupServiceForGroup: () => mockPopupService as any,
+                advancedOverflowService: {
+                    renderOverflow: (args: any) => {
+                        capturedContext = args.context;
+                    },
+                } as any,
+            });
+
+            const expand = jest.fn();
+            const tabGroup = {
+                id: 'tg1',
+                label: 'Group One',
+                color: 'blue',
+                collapsed: true,
+                panelIds: ['panel-a'],
+                expand,
+            };
+
+            const mockSetActive = jest.fn();
+            const mockPanel = fromPartial<IDockviewPanel>({
+                id: 'panel-a',
+                api: {
+                    isActive: false,
+                    setActive: mockSetActive,
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: document.createElement('div'),
+                    }),
+                },
+            });
+
+            const mockTab = {
+                panel: mockPanel,
+                element: { scrollIntoView: jest.fn() },
+            };
+
+            const group = makeGroup({
+                panels: [mockPanel],
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [tabGroup] as any,
+                }),
+            });
+
+            const cut = new TabsContainer(accessor, group);
+            (cut as any).tabs = makeOverflowMockTabs([mockTab]);
+
+            (cut as any).toggleDropdown({
+                tabs: ['panel-a'],
+                tabGroups: ['tg1'],
+                pinnedTabs: [],
+                reset: false,
+            });
+
+            const trigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            fireEvent.click(trigger!);
+
+            expect(capturedContext).toBeTruthy();
+
+            // overflowGroupIdForPanel resolves overflow-group membership
+            expect(capturedContext.overflowGroupIdForPanel('panel-a')).toBe(
+                'tg1'
+            );
+            expect(
+                capturedContext.overflowGroupIdForPanel('unknown')
+            ).toBeUndefined();
+
+            // buildGroupHeader for an overflow group
+            const header = capturedContext.buildGroupHeader('tg1');
+            expect(header).toBeTruthy();
+            expect(
+                header.querySelector('.dv-tabs-overflow-group-label')
+                    ?.textContent
+            ).toBe('Group One');
+            // collapsed group renders a count badge
+            expect(
+                header.querySelector('.dv-tabs-overflow-group-collapsed-badge')
+                    ?.textContent
+            ).toBe('1');
+            // a non-overflow group returns undefined
+            expect(
+                capturedContext.buildGroupHeader('does-not-exist')
+            ).toBeUndefined();
+
+            // clicking a group header closes the popup, expands and activates
+            fireEvent.click(header);
+            expect(mockPopupService.close).toHaveBeenCalled();
+            expect(expand).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
+
+            // pinned header
+            const pinnedHeader = capturedContext.buildPinnedHeader();
+            expect(
+                pinnedHeader.querySelector('.dv-tabs-overflow-group-label')
+                    ?.textContent
+            ).toBe('Pinned');
+
+            // buildRow for a grouped panel
+            const row = capturedContext.buildRow('panel-a');
+            expect(row).toBeTruthy();
+            expect(row.element.classList.contains('dv-tab')).toBe(true);
+            expect(row.element.classList.contains('dv-tab--grouped')).toBe(
+                true
+            );
+            expect(row.panel).toBe(mockPanel);
+            // an unknown panel has no row
+            expect(capturedContext.buildRow('missing')).toBeUndefined();
+
+            // activating via the row handle
+            expand.mockClear();
+            mockSetActive.mockClear();
+            row.activate();
+            expect(mockPopupService.close).toHaveBeenCalled();
+            expect(expand).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
+
+            // clicking the row wrapper activates the tab too
+            mockSetActive.mockClear();
+            fireEvent.click(row.element);
+            expect(mockSetActive).toHaveBeenCalled();
+
+            // open/close/focusTrigger route through the popup service
+            const body = document.createElement('div');
+            capturedContext.open(body);
+            expect(mockPopupService.openPopover).toHaveBeenCalledWith(
+                body,
+                expect.anything()
+            );
+            mockPopupService.close.mockClear();
+            capturedContext.close();
+            expect(mockPopupService.close).toHaveBeenCalled();
+            expect(() => capturedContext.focusTrigger()).not.toThrow();
+        });
+
+        test('free overflow list renders pinned section and group headers', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            const accessor = makeAccessor({
+                getPopupServiceForGroup: () => mockPopupService as any,
+                // no advancedOverflowService -> free render path
+            });
+
+            const pinnedPanel = makeOverflowPanel('pinned-a');
+            const groupedPanel = makeOverflowPanel('grouped-b');
+
+            const tabGroup = {
+                id: 'tg1',
+                label: 'Group One',
+                color: undefined,
+                collapsed: false,
+                panelIds: ['grouped-b'],
+                expand: jest.fn(),
+            };
+
+            const group = makeGroup({
+                panels: [pinnedPanel, groupedPanel],
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [tabGroup] as any,
+                }),
+            });
+
+            const cut = new TabsContainer(accessor, group);
+            (cut as any).tabs = makeOverflowMockTabs([
+                { panel: pinnedPanel, element: { scrollIntoView: jest.fn() } },
+                { panel: groupedPanel, element: { scrollIntoView: jest.fn() } },
+            ]);
+
+            (cut as any).toggleDropdown({
+                tabs: ['grouped-b'],
+                tabGroups: ['tg1'],
+                pinnedTabs: ['pinned-a'],
+                reset: false,
+            });
+
+            const trigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            fireEvent.click(trigger!);
+
+            expect(mockPopupService.openPopover).toHaveBeenCalled();
+            const body = mockPopupService.openPopover.mock.calls[0][0];
+
+            // a pinned section header precedes the pinned rows
+            expect(
+                body.querySelector('.dv-tabs-overflow-pinned-header')
+            ).toBeTruthy();
+            // an overflow group header precedes its member tab
+            expect(
+                body.querySelector(
+                    '.dv-tabs-overflow-group-header:not(.dv-tabs-overflow-pinned-header)'
+                )
+            ).toBeTruthy();
+            // pinned row + grouped row
+            expect(body.querySelectorAll('.dv-tab')).toHaveLength(2);
+        });
     });
 });

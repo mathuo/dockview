@@ -12,13 +12,13 @@ export interface ActiveDrag {
 }
 
 /**
- * Singleton — only one pointer-driven drag active at a time.
+ * Only one pointer-driven drag can be active at a time.
  *
  * State is shared across every Dockview instance on the page. Targets
  * from instance B receive hit-tests from drags originating in instance A;
  * that's intentional for cross-instance drops since `LocalSelectionTransfer`
  * is also process-wide. The corollary is that every Tabs subscriber to
- * `onDragMove` fires for every pointer drag globally — each subscriber
+ * `onDragMove` fires for every pointer drag globally; each subscriber
  * hit-tests against its own DOM, so this is O(N) per pointermove where N
  * is the number of registered listeners across all instances.
  */
@@ -37,6 +37,9 @@ export class PointerDragController extends CompositeDisposable {
         IPointerDropTargetHandle
     >();
     private _active: ActiveDrag | undefined;
+    /** The most recent pointer event of the active drag, used to build the
+     * drag-end event when a drag is cancelled (which carries no event). */
+    private _lastPointerEvent: PointerEvent | undefined;
     private _currentTarget: IPointerDropTargetHandle | undefined;
     private _dataDisposable: IDisposable | undefined;
     private _ghost: PointerGhost | undefined;
@@ -102,7 +105,7 @@ export class PointerDragController extends CompositeDisposable {
 
         const { pointerEvent, source } = args;
 
-        // Call `getData()` before mutating controller state — a throw
+        // Call `getData()` before mutating controller state. A throw
         // here would otherwise leave `_active` populated with no window
         // listeners installed, blocking every subsequent drag.
         const dataDisposable = args.getData();
@@ -113,6 +116,7 @@ export class PointerDragController extends CompositeDisposable {
             startY: pointerEvent.clientY,
             source,
         };
+        this._lastPointerEvent = pointerEvent;
         this._onDragMoveCallback = args.onDragMove;
         this._onDragEndCallback = args.onDragEnd;
         this._dataDisposable = dataDisposable;
@@ -131,7 +135,7 @@ export class PointerDragController extends CompositeDisposable {
         };
         this._onDragStart.fire(startEvent);
 
-        // Source's owning window — popout drags fire on their own window,
+        // Source's owning window; popout drags fire on their own window,
         // not the main one.
         const targetWindow: Window =
             source.ownerDocument?.defaultView ?? globalThis.window;
@@ -174,10 +178,28 @@ export class PointerDragController extends CompositeDisposable {
         if (!this._active) {
             return;
         }
+        // Capture before teardown clears them.
+        const onEnd = this._onDragEndCallback;
+        const lastEvent = this._lastPointerEvent;
+
         this._currentTarget?.handleDragLeave();
         this._teardown();
         this._dataDisposable?.dispose();
         this._dataDisposable = undefined;
+
+        // Fire the drag-end (dropped=false) so consumers reset, mirroring
+        // `_handleEnd`. Without this, a cancelled drag (e.g. a second touch
+        // preempting the first via `beginDrag`) never notifies the tab-reorder
+        // consumer, leaving its smooth-reorder transforms stuck.
+        if (lastEvent) {
+            const dragEvent: PointerDragEvent = {
+                clientX: lastEvent.clientX,
+                clientY: lastEvent.clientY,
+                pointerEvent: lastEvent,
+            };
+            onEnd?.(dragEvent, false);
+            this._onDragEnd.fire(dragEvent);
+        }
     }
 
     private _findTargetUnder(
@@ -203,6 +225,7 @@ export class PointerDragController extends CompositeDisposable {
     }
 
     private _handleMove(e: PointerEvent): void {
+        this._lastPointerEvent = e;
         this._ghost?.update(e.clientX, e.clientY);
 
         const dragEvent: PointerDragEvent = {
@@ -255,6 +278,7 @@ export class PointerDragController extends CompositeDisposable {
     private _teardown(): void {
         this._currentTarget = undefined;
         this._active = undefined;
+        this._lastPointerEvent = undefined;
         this._onDragMoveCallback = undefined;
         this._onDragEndCallback = undefined;
         this._ghost?.dispose();

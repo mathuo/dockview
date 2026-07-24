@@ -8,9 +8,8 @@ import { IDockviewPanel } from './dockviewPanel';
 import { DockviewHeaderPosition } from './options';
 import { ITabGroup } from './tabGroup';
 
-export interface IGroupPanelBaseProps<
-    T extends { [index: string]: any } = any,
-> extends PanelParameters<T> {
+export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
+    extends PanelParameters<T> {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
 }

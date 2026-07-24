@@ -90,10 +90,11 @@ export interface DockviewGroupChangeEvent {
 /**
  * Payload for the group-level `onDidActivePanelChange`. Extends
  * {@link DockviewGroupChangeEvent} with the {@link DockviewOrigin} so it mirrors
- * the component-level `DockviewActivePanelChangeEvent` — both report whether the
+ * the component-level `DockviewActivePanelChangeEvent`. Both report whether the
  * change came from a user gesture or an API call.
  */
-export interface DockviewGroupActivePanelChangeEvent extends DockviewGroupChangeEvent {
+export interface DockviewGroupActivePanelChangeEvent
+    extends DockviewGroupChangeEvent {
     readonly origin: DockviewOrigin;
 }
 
@@ -169,6 +170,25 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 export interface IHeader {
     hidden: boolean;
     direction: DockviewHeaderDirection;
+    /** Register a predicate that keeps matching panels out of the overflow
+     *  dropdown (used by the PinnedTabs module). No-op default. */
+    setOverflowExclude(fn: (panelId: string) => boolean): void;
+    /** Register a predicate that forces matching panels into the overflow
+     *  dropdown regardless of horizontal fit (used by the MultiRowTabs module
+     *  for the surplus rows beyond `overflow.maxRows`). No-op default. */
+    setForcedOverflow(fn: (panelId: string) => boolean): void;
+    /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
+     *  changed). */
+    refreshOverflow(): void;
+    /** Enable/disable sticky-on-scroll for pinned tabs (PinnedTabs inline mode):
+     *  pinned tabs freeze to the left edge as the strip scrolls. No-op default. */
+    setPinnedSticky(enabled: boolean): void;
+    /** Register a resolver that clamps/redirects a header drop index (used by
+     *  the PinnedTabs module to enforce the pin boundary). Identity default. */
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
+    /** Mount (or clear, with `undefined`) a second tab row above the main strip
+     *  (PinnedTabs `separate-row` mode). The module owns the element. */
+    setPinnedRow(el: HTMLElement | undefined): void;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -190,6 +210,8 @@ export interface IDockviewGroupPanelModel extends IPanel {
     headerPosition: DockviewHeaderPosition;
     setActive(isActive: boolean): void;
     initialize(): void;
+    relayout(): void;
+    readonly tabsListElement: HTMLElement;
     // state
     isPanelActive: (panel: IDockviewPanel) => boolean;
     indexOf(panel: IDockviewPanel): number;
@@ -244,6 +266,7 @@ export class DockviewGroupPanelModel
     private _isGroupActive = false;
     private _locked: DockviewGroupPanelLocked = false;
     private _headerPosition: DockviewHeaderPosition | undefined;
+    private _headerDirection: DockviewHeaderDirection | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -370,7 +393,7 @@ export class DockviewGroupPanelModel
         return this.contentContainer.element.id;
     }
 
-    /** The group's content drop target — lets keyboard docking preview a drop here. */
+    /** The group's content drop target; lets keyboard docking preview a drop here. */
     get contentDropTarget(): Droptarget {
         return this.contentContainer.dropTarget;
     }
@@ -415,6 +438,19 @@ export class DockviewGroupPanelModel
         return this.tabsContainer;
     }
 
+    /** The scrollable tab list element (`.dv-tabs-container`), exposed for the
+     *  multi-row wrap controller to measure rows / toggle the wrap class. */
+    get tabsListElement(): HTMLElement {
+        return this.tabsContainer.tabsListElement;
+    }
+
+    /** The panel whose tab owns `element` (the tab itself or a descendant of
+     *  it), or `undefined` when the target isn't a tab. The robust inverse of a
+     *  tab→panel lookup, with no positional/DOM-order assumptions. */
+    getPanelForTab(element: Element): IDockviewPanel | undefined {
+        return this.tabsContainer.getPanelForTab(element);
+    }
+
     get isContentFocused(): boolean {
         if (!document.activeElement) {
             return false;
@@ -440,18 +476,35 @@ export class DockviewGroupPanelModel
         );
         addClasses(this.container, `dv-groupview-header-${value}`);
 
-        const direction =
+        const direction: DockviewHeaderDirection =
             value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
+        const previousDirection = this._headerDirection;
+        this._headerDirection = direction;
         this.tabsContainer.direction = direction;
         this.header.direction = direction;
 
         // resize the active panel to fit the new header direction
         // if not, the panel will overflow the tabs container
         if (this._activePanel?.layout) {
-            this._activePanel.layout(this._width, this._height);
+            const { width, height } = this.contentDimensions();
+            this._activePanel.layout(width, height);
         }
 
         this.updateHeaderActions();
+
+        // Signal a genuine horizontal↔vertical flip so features that lay out
+        // per-axis (e.g. multi-row tab wrapping) can react. Fired after the
+        // side effects above, and only on a real axis change, not on the
+        // initial set, nor on a same-axis move (top↔bottom, left↔right).
+        if (
+            previousDirection !== undefined &&
+            previousDirection !== direction
+        ) {
+            this.groupPanel?.api._onDidHeaderDirectionChange.fire({
+                direction,
+                position: value,
+            });
+        }
     }
 
     get location(): DockviewGroupLocation {
@@ -554,11 +607,22 @@ export class DockviewGroupPanelModel
                 const dragData = getPanelData();
                 const draggedPanelId = dragData?.panelId ?? null;
 
+                // Let an injected resolver (PinnedTabs) clamp/redirect the drop
+                // index, e.g. so an unpinned tab cannot land left of a pinned
+                // one. Identity by default; only same-panel header drops carry
+                // a panel id to resolve against.
+                const resolvedIndex = draggedPanelId
+                    ? this.tabsContainer.resolveDropIndex(
+                          draggedPanelId,
+                          event.index
+                      )
+                    : event.index;
+
                 this.handleDropEvent(
                     'header',
                     event.event,
                     'center',
-                    event.index
+                    resolvedIndex
                 );
 
                 // Update tab group membership after the move completes
@@ -594,7 +658,7 @@ export class DockviewGroupPanelModel
                         localIndex
                     );
                 } else if (draggedPanelId && event.targetTabGroupId === null) {
-                    // Dropped outside any group — remove from current group
+                    // Dropped outside any group, so remove it from the current group
                     this.removePanelFromTabGroup(draggedPanelId);
                 }
             }),
@@ -609,14 +673,18 @@ export class DockviewGroupPanelModel
                 this.handleDropEvent(
                     'content',
                     event.nativeEvent,
-                    event.position
+                    event.position,
+                    undefined,
+                    event.edge
                 );
             }),
             this.contentContainer.pointerDropTarget.onDrop((event) => {
                 this.handleDropEvent(
                     'content',
                     event.nativeEvent,
-                    event.position
+                    event.position,
+                    undefined,
+                    event.edge
                 );
             }),
             this.tabsContainer.onWillShowOverlay((event) => {
@@ -789,7 +857,7 @@ export class DockviewGroupPanelModel
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
         if (existingGroup?.id === tabGroupId) {
-            return; // already in this group — no mutation
+            return; // already in this group, nothing to mutate
         }
 
         this._bracketTabGroupMutation(() => {
@@ -1055,7 +1123,7 @@ export class DockviewGroupPanelModel
             // Dispose the external listeners (onDidChange, onDidCollapseChange)
             // we registered on this group. We cannot dispose synchronously
             // here because this method runs inside the onDidDestroy fire
-            // loop — disposing the CompositeDisposable that holds the
+            // loop, and disposing the CompositeDisposable that holds the
             // onDidDestroy subscription would splice listeners mid-iteration.
             // Schedule cleanup on the next microtask instead.
             const tabGroupDisposable = this._tabGroupDisposables.get(
@@ -1107,7 +1175,7 @@ export class DockviewGroupPanelModel
             }
         }
 
-        // All tabs are in collapsed groups — show watermark
+        // All tabs are in collapsed groups, so show the watermark
         this.contentContainer.closePanel();
         this.doSetActivePanel(undefined);
         this.updateContainer();
@@ -1190,6 +1258,17 @@ export class DockviewGroupPanelModel
         this.panels.forEach((panel) => {
             this.rerender(panel);
         });
+
+        // rerender() re-attaches each panel with asActive:false; for the default
+        // onlyWhenVisible renderer that loop leaves the active panel's content
+        // detached. Re-show it so swapping the render container on an
+        // already-populated group (e.g. restoring a popout group from JSON)
+        // keeps the active content mounted.
+        if (this._activePanel) {
+            this.contentContainer.renderPanel(this._activePanel, {
+                asActive: true,
+            });
+        }
     }
 
     get renderContainer(): OverlayRenderContainer {
@@ -1487,11 +1566,45 @@ export class DockviewGroupPanelModel
         this._width = width;
         this._height = height;
 
-        this.contentContainer.layout(this._width, this._height);
+        const { width: contentWidth, height: contentHeight } =
+            this.contentDimensions();
+
+        this.contentContainer.layout(contentWidth, contentHeight);
 
         if (this._activePanel?.layout) {
-            this._activePanel.layout(this._width, this._height);
+            this._activePanel.layout(contentWidth, contentHeight);
         }
+    }
+
+    /**
+     * Re-run the group's layout with its current dimensions. Used to propagate a
+     * header-size change (e.g. a header that grew/shrank without the group box
+     * changing) down to the content + active panel.
+     */
+    public relayout(): void {
+        this.layout(this._width, this._height);
+    }
+
+    /**
+     * The dimensions available to the content/panel: the group box minus the
+     * header along its axis. The header (`dv-tabs-and-actions-container`) is
+     * laid out top/bottom (subtract its height) or left/right (subtract its
+     * width); a hidden header has `display:none` so its `offset*` is 0 and
+     * nothing is subtracted.
+     */
+    private contentDimensions(): { width: number; height: number } {
+        const headerEl = this.tabsContainer.element;
+        const horizontal =
+            this.headerPosition === 'top' || this.headerPosition === 'bottom';
+
+        return {
+            width: horizontal
+                ? this._width
+                : Math.max(0, this._width - headerEl.offsetWidth),
+            height: horizontal
+                ? Math.max(0, this._height - headerEl.offsetHeight)
+                : this._height,
+        };
     }
 
     private _removePanel(
@@ -1612,7 +1725,8 @@ export class DockviewGroupPanelModel
 
             this.contentContainer.openPanel(panel);
 
-            panel.layout(this._width, this._height);
+            const { width, height } = this.contentDimensions();
+            panel.layout(width, height);
 
             this.updateMru(panel);
 
@@ -1696,13 +1810,51 @@ export class DockviewGroupPanelModel
         return firedEvent.isAccepted;
     }
 
+    /**
+     * Whether a content drop at `position` is allowed: the locked rules, the
+     * shift-to-not-drop gesture, the same-component shortcut, then the
+     * `canDisplayOverlay` veto. The single source of truth for the content drop
+     * target (`content.ts`) and the compass cell gating (`canDropOnGroup`).
+     */
+    canDisplayContentOverlay(
+        event: DragEvent | PointerEvent,
+        position: Position
+    ): boolean {
+        if (
+            this.locked === 'no-drop-target' ||
+            (this.locked && position === 'center')
+        ) {
+            return false;
+        }
+
+        const data = getPanelData();
+
+        if (!data && event.shiftKey && this.location.type !== 'floating') {
+            return false;
+        }
+
+        if (data?.viewId === this.accessor.id) {
+            return true;
+        }
+
+        return this.canDisplayOverlay(event, position, 'content');
+    }
+
     private handleDropEvent(
         type: 'header' | 'content',
         event: DragEvent | PointerEvent,
         position: Position,
-        index?: number
+        index?: number,
+        edge?: boolean
     ): void {
         if (this.locked === 'no-drop-target') {
+            return;
+        }
+
+        // An `edge` content drop (a resolver's outer "dock to the layout edge"
+        // cell) docks against the whole layout, not this group.
+        if (type === 'content' && edge) {
+            this.accessor.dockToLayoutEdge(event, position);
             return;
         }
 

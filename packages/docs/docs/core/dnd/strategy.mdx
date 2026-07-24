@@ -1,18 +1,18 @@
 ---
-title: 'Dnd Strategy'
+title: 'Drag and drop strategy'
 sidebar_position: 4
-description: Choose which drag-and-drop backend powers dockview (HTML5, pointer events, or both) and how touch gestures behave.
+description: Choose which drag-and-drop backend powers Dockview (HTML5, pointer events, or both) and how touch gestures behave.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-`dndStrategy` selects which drag-and-drop implementation drives the dock. The default (`'auto'`) covers desktop and touch with no further configuration.
+`dndStrategy` selects which drag-and-drop implementation drives Dockview. The default (`'auto'`) covers desktop and touch with no further configuration.
 
-| Value | Behaviour |
-|---|---|
-| `'auto'` (default) | HTML5 drives mouse drags; pointer events drive touch and pen drags. |
-| `'pointer'` | Pointer events drive every input type. Useful where HTML5 drag-and-drop is unreliable (some Linux browsers, certain Safari versions, embedded webviews). Cross-window HTML5 drag and the native browser drag image are not available in this mode. |
-| `'html5'` | HTML5 drag-and-drop only — touch and pen drags are disabled. |
+| Value              | Behaviour                                                                                                                                                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'auto'` (default) | HTML5 drives mouse drags; pointer events drive touch and pen drags.                                                                                                                                                                                |
+| `'pointer'`        | Pointer events drive every input type. Useful where HTML5 drag-and-drop is unreliable (some Linux browsers, certain Safari versions, embedded webviews). Cross-window HTML5 drag and the native browser drag image are not available in this mode. |
+| `'html5'`          | HTML5 drag-and-drop only; touch and pen drags are disabled.                                                                                                                                                                                       |
 
 `disableDnd: true` overrides every strategy. The strategy can also be changed at runtime via `api.updateOptions({ dndStrategy: ... })`; the change propagates to every existing drag source.
 
@@ -20,26 +20,32 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 Under `'auto'` and `'pointer'`, touch drags use a long-press-then-drag gesture so taps and native scroll still work.
 
-| Gesture | Result |
-|---|---|
-| Tap | `click` fires normally; no drag |
-| Quick horizontal swipe across the tab strip | Browser scrolls natively |
-| Hold ~250 ms, then move | Drag arms; ghost follows the finger |
-| Hold ~500 ms still | Context menu opens; any in-flight drag arm is cancelled |
-| Release without movement | Nothing |
+| Gesture                                     | Result                                                  |
+| ------------------------------------------- | ------------------------------------------------------- |
+| Tap                                         | `click` fires normally; no drag                         |
+| Quick horizontal swipe across the tab strip | Browser scrolls natively                                |
+| Hold ~250 ms, then move                     | Drag arms; ghost follows the finger                     |
+| Hold ~500 ms still                          | Context menu opens; any in-flight drag arm is cancelled |
+| Release without movement                    | Nothing                                                 |
 
 <FrameworkSpecific framework="JavaScript">
-  <DocRef declaration="DockviewComponentOptions" methods={["dndStrategy"]} />
+    <DocRef declaration="DockviewComponentOptions" methods={['dndStrategy']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="React">
-  <DocRef declaration="IDockviewReactProps" methods={["dndStrategy"]}  />
+    <DocRef declaration="IDockviewReactProps" methods={['dndStrategy']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Vue">
-  <DocRef declaration="IDockviewVueProps" methods={["dndStrategy"]}  />
+    <DocRef declaration="IDockviewVueProps" methods={['dndStrategy']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-  <DocRef declaration="IDockviewAngularProps" methods={["dndStrategy"]}  />
+    <DocRef declaration="DockviewAngularOptions" methods={['dndStrategy']} />
 </FrameworkSpecific>
+
+## See also
+
+- [Drag and drop](/docs/core/dnd/dragAndDrop): the drag events and hooks the backend drives.
+- [External drag and drop events](/docs/core/dnd/external): narrowing `nativeEvent` across the two backends.
+- [Disable drag and drop](/docs/core/dnd/disable): `disableDnd` overrides every strategy.

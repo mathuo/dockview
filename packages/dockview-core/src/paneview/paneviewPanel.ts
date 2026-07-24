@@ -31,7 +31,8 @@ export interface PanePanelInitParameter extends PanelInitParameters {
     accessor: PaneviewComponent;
 }
 
-export interface PanePanelComponentInitParameter extends PanePanelInitParameter {
+export interface PanePanelComponentInitParameter
+    extends PanePanelInitParameter {
     api: PaneviewPanelApiImpl;
 }
 
@@ -45,7 +46,8 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
-export interface IPaneviewPanel extends BasePanelViewExported<PaneviewPanelApiImpl> {
+export interface IPaneviewPanel
+    extends BasePanelViewExported<PaneviewPanelApiImpl> {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly minimumBodySize: number;
@@ -74,6 +76,11 @@ export abstract class PaneviewPanel
     private _minimumBodySize: number;
     private _maximumBodySize: number;
     private _isExpanded = false;
+    /**
+     * The pane's main-axis size captured just before it was collapsed, so a
+     * later re-expand can restore that size instead of the cross-axis width.
+     */
+    private _expandedSize: number | undefined;
     protected header?: HTMLElement;
     protected body?: HTMLElement;
     private bodyPart?: IPanePart;
@@ -256,12 +263,21 @@ export abstract class PaneviewPanel
                 this.element.appendChild(this.body);
             }
         } else {
+            // cache the current (expanded) main-axis size before collapsing so
+            // a later re-expand can restore it
+            this._expandedSize = this._size;
             this.animationTimer = setTimeout(() => {
                 this.body?.remove();
             }, 200);
         }
 
-        this._onDidChange.fire(expanded ? { size: this.width } : {});
+        // On re-expand, request the cached expanded main-axis size rather than
+        // `this.width` (the cross-axis dimension, which for a vertical paneview
+        // is the container width and would squeeze siblings). Fall back to the
+        // previous behaviour when the pane has never been collapsed.
+        this._onDidChange.fire(
+            expanded ? { size: this._expandedSize ?? this.width } : {}
+        );
         this._onDidChangeExpansionState.fire(expanded);
     }
 

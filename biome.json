@@ -1,0 +1,77 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 4,
+    "lineWidth": 80
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noSvgWithoutTitle": "warn",
+        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "warn",
+        "noLabelWithoutControl": "warn",
+        "useSemanticElements": "warn",
+        "useAnchorContent": "warn",
+        "useValidAnchor": "warn",
+        "useIframeTitle": "warn",
+        "useButtonType": "warn",
+        "useAltText": "warn"
+      },
+      "complexity": {
+        "useArrowFunction": "warn",
+        "useLiteralKeys": "warn",
+        "useOptionalChain": "warn",
+        "noBannedTypes": "warn"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn",
+        "noUnusedPrivateClassMembers": "warn",
+        "useExhaustiveDependencies": "warn",
+        "noVoidTypeReturn": "warn",
+        "noSwitchDeclarations": "warn"
+      },
+      "style": {
+        "useImportType": "warn",
+        "useExportType": "warn",
+        "noNonNullAssertion": "warn",
+        "useConst": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "useIterableCallbackReturn": "warn",
+        "noConfusingVoidType": "warn",
+        "noDoubleEquals": "warn",
+        "noEmptyInterface": "warn",
+        "noAssignInExpressions": "warn",
+        "noShadowRestrictedNames": "warn"
+      }
+    }
+  },
+  "files": {
+    "includes": [
+      "packages/*/src/**/*.{ts,tsx,js,jsx,vue}",
+      "!**/dist/**",
+      "!packages/docs/**",
+      "!**/__mocks__/**"
+    ]
+  }
+}

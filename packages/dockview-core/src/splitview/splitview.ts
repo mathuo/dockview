@@ -439,7 +439,10 @@ export class Splitview {
                     item.enabled = false;
                 }
 
-                const iframes = disableIframePointEvents();
+                // The sash may live in a popout document; bind the drag to that
+                // document so pointermove/up are heard there, not on the opener.
+                const doc = sash.ownerDocument ?? document;
+                const iframes = disableIframePointEvents(doc);
 
                 const start =
                     this._orientation === Orientation.HORIZONTAL
@@ -542,8 +545,6 @@ export class Splitview {
                     this.distributeEmptySpace();
                     this.layoutViews();
                 };
-
-                const doc = sash.ownerDocument;
 
                 const end = () => {
                     for (const item of this.viewItems) {

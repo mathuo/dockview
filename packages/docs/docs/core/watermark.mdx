@@ -1,27 +1,52 @@
 ---
 title: Watermark
 description: How to customize the empty-state watermark shown when there are no panels in Dockview.
+sidebar_position: 11
 ---
-
-import useBaseUrl from '@docusaurus/useBaseUrl';
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 When there is nothing else to display.
 
-When the dock is empty or a group has no panels (an empty group) you can render some fallback
-content which is refered to as a `watermark`. Both are controlled through the same provided component.
+When Dockview is empty or a group has no panels (an empty group) you can render some fallback
+content which is referred to as a `watermark`. Both are controlled through the same provided component.
 
-## Empty State Behaviour
+<CodeRunner id="dockview/watermark" />
 
-By default, when the dock has no panels it renders a watermark. You can change this with `noPanelsOverlay`:
+## Empty state behaviour
+
+By default, when Dockview has no panels it renders a watermark. You can change this with `noPanelsOverlay`:
 
 - `'watermark'` (default): renders your `watermarkComponent` when empty
 - `'emptyGroup'`: keeps an empty group visible instead
 
-<FrameworkSpecific framework='React'>
-```tsx
-<DockviewReact noPanelsOverlay="emptyGroup" onReady={onReady} components={components} />
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        noPanelsOverlay="emptyGroup"
+        onReady={onReady}
+        components={components}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```html
+<dockview-vue
+    noPanelsOverlay="emptyGroup"
+    :components="components"
+    @ready="onReady">
+</dockview-vue>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview
+    noPanelsOverlay="emptyGroup"
+    [components]="components"
+    (ready)="onReady($event)">
+</dv-dockview>
 ```
 </FrameworkSpecific>
 
@@ -38,24 +63,27 @@ const api = createDockview(element, {
 
 The following properties can be set to configure the watermark component.
 
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['watermarkComponent']} />
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['watermarkComponent']}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['watermarkComponent']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['watermarkComponent']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions"
-  methods={['createWatermarkComponent']}
-  />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['createWatermarkComponent']}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['watermarkComponent']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['watermarkComponent']}
+    />
 </FrameworkSpecific>
-
-## Live Examples
-
-<CodeRunner id="dockview/watermark"/>

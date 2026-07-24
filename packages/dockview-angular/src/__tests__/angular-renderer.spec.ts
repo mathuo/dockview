@@ -151,7 +151,7 @@ describe('AngularRenderer', () => {
     it('should still expose its element after dispose (regression #1220)', () => {
         // Reproduces the disposal-order bug from issue #1220: dockview-core's
         // OverlayRenderContainer reads `panel.view.content.element` while
-        // tearing down its own disposables — by which point the renderer has
+        // tearing down its own disposables, by which point the renderer has
         // already been disposed. Previously the getter threw "Angular
         // renderer not initialized" here.
         const renderer = new AngularRenderer<TestComponent>({

@@ -1,6 +1,6 @@
-import { JestConfigWithTsJest } from 'ts-jest';
+import type { Config } from 'jest';
 
-const config: JestConfigWithTsJest = {
+const config: Config = {
     preset: 'jest-preset-angular',
     roots: ['<rootDir>/packages/dockview-angular'],
     modulePaths: ['<rootDir>/packages/dockview-angular/src'],
@@ -13,14 +13,14 @@ const config: JestConfigWithTsJest = {
         '!<rootDir>/packages/dockview-angular/src/public-api.ts',
     ],
     setupFilesAfterEnv: [
-        '<rootDir>/packages/dockview-angular/src/__tests__/setup-jest.ts'
+        '<rootDir>/packages/dockview-angular/src/__tests__/setup-jest.ts',
     ],
     coveragePathIgnorePatterns: ['/node_modules/'],
     moduleNameMapper: {
         '^dockview$': '<rootDir>/packages/dockview/src/index.ts',
         '^dockview-core$': '<rootDir>/packages/dockview-core/src/index.ts',
-        '^dockview-modules$':
-            '<rootDir>/packages/dockview-modules/src/index.ts',
+        '^dockview-enterprise$':
+            '<rootDir>/packages/dockview-enterprise/src/index.ts',
     },
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview-angular/src/__tests__/__mocks__',
@@ -31,11 +31,9 @@ const config: JestConfigWithTsJest = {
     testEnvironment: 'jsdom',
     testMatch: [
         '<rootDir>/packages/dockview-angular/src/**/*.spec.ts',
-        '<rootDir>/packages/dockview-angular/src/**/*.test.ts'
+        '<rootDir>/packages/dockview-angular/src/**/*.test.ts',
     ],
-    transformIgnorePatterns: [
-        'node_modules/(?!(.*\\.mjs$|@angular|rxjs))'
-    ],
+    transformIgnorePatterns: ['node_modules/(?!(.*\\.mjs$|@angular|rxjs))'],
     transform: {
         '^.+\\.(ts|mjs|js|html)$': [
             'jest-preset-angular',

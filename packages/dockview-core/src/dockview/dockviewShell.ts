@@ -19,31 +19,47 @@ export interface EdgeGroupOptions {
     collapsed?: boolean;
 }
 
+/**
+ * Options accepted by `api.addEdgeGroup`. Extends the shell's geometry options
+ * with per-group presentation flags the component (not the shell) owns.
+ */
+export interface AddEdgeGroupOptions extends EdgeGroupOptions {
+    /**
+     * Opt this edge group in/out of auto-hide (pinnable tool-window) behaviour,
+     * overriding the global `autoHideEdgeGroups` option. Requires the
+     * auto-hide module to have any effect. Leave unset to inherit the global.
+     */
+    autoHide?: boolean;
+    /**
+     * When true, this edge group tears itself down to zero footprint once
+     * emptied (instead of collapsing to a strip). This is the behaviour used
+     * by drag-revealed edges.
+     */
+    autoReveal?: boolean;
+}
+
+export interface SerializedEdgeGroup {
+    size: number;
+    visible: boolean;
+    collapsed?: boolean;
+    group?: unknown;
+    /** Per-group auto-hide override (drag-revealed / co-existence). Absent =
+     *  inherit the global `autoHideEdgeGroups` option. */
+    autoHide?: boolean;
+    /** Per-group "tear down to zero footprint when emptied" flag. */
+    autoReveal?: boolean;
+    /** User-configured geometry constraints (as passed to `addEdgeGroup`), so
+     *  they survive the auto-create fromJSON path. Absent = use the defaults. */
+    minimumSize?: number;
+    maximumSize?: number;
+    collapsedSize?: number;
+}
+
 export interface SerializedEdgeGroups {
-    top?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    bottom?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    left?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    right?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
+    top?: SerializedEdgeGroup;
+    bottom?: SerializedEdgeGroup;
+    left?: SerializedEdgeGroup;
+    right?: SerializedEdgeGroup;
 }
 
 /**
@@ -131,6 +147,22 @@ export class EdgeGroupView implements IView {
 
     get collapsedSize(): number {
         return this._effectiveBaseCollapsed + this._gapAdd;
+    }
+
+    /** The user-configured (pre-gap) geometry constraints, for serialization.
+     *  These are the raw values passed to `addEdgeGroup`, unlike the effective
+     *  `minimumSize`/`maximumSize`/`collapsedSize` getters, which fold in the
+     *  theme gap and collapse-locking. */
+    get configuredMinimumSize(): number | undefined {
+        return this._baseMinimumSize;
+    }
+
+    get configuredMaximumSize(): number {
+        return this._expandedMaximumSize;
+    }
+
+    get configuredCollapsedSize(): number {
+        return this._baseCollapsedSize;
     }
 
     constructor(
@@ -352,7 +384,7 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     addBottomView(view: EdgeGroupView, initialSize: number): void {
-        // Append after center (and any existing bottom — shouldn't happen but safe)
+        // Append after center (and any existing bottom; shouldn't happen but safe)
         const newIndex = this._splitview.length;
         this._splitview.addView(view, initialSize, newIndex);
         this._bottomIndex = newIndex;
@@ -408,6 +440,14 @@ class MiddleColumnView implements IView, IDisposable {
             return this._splitview.getViewSize(index);
         }
         return 0;
+    }
+
+    getViewCachedVisibleSize(position: 'top' | 'bottom'): number | undefined {
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
+        if (index !== undefined) {
+            return this._splitview.getViewCachedVisibleSize(index);
+        }
+        return undefined;
     }
 
     resizeView(position: 'top' | 'bottom', size: number): void {
@@ -845,6 +885,12 @@ export class ShellManager implements IDisposable {
         return this._getView(position)?.isCollapsed ?? false;
     }
 
+    /** The size an edge group expands to (its pre-collapse size), used to size
+     *  the auto-hide peek overlay. */
+    getEdgeGroupExpandedSize(position: EdgeGroupPosition): number {
+        return this._getView(position)?.lastExpandedSize ?? 0;
+    }
+
     private _getView(position: EdgeGroupPosition): EdgeGroupView | undefined {
         switch (position) {
             case 'top':
@@ -861,40 +907,100 @@ export class ShellManager implements IDisposable {
     toJSON(): SerializedEdgeGroups {
         const edgeGroups: SerializedEdgeGroups = {};
 
+        // Persist the user-configured constraints so the auto-create fromJSON
+        // path restores them. Omit unconfigured/Infinity values (Infinity isn't
+        // JSON-representable) so they fall back to defaults on restore.
+        const constraints = (
+            view: EdgeGroupView
+        ): Pick<
+            SerializedEdgeGroup,
+            'minimumSize' | 'maximumSize' | 'collapsedSize'
+        > => ({
+            minimumSize: view.configuredMinimumSize,
+            maximumSize: Number.isFinite(view.configuredMaximumSize)
+                ? view.configuredMaximumSize
+                : undefined,
+            collapsedSize: view.configuredCollapsedSize,
+        });
+
+        // Record the size to restore the group to. An expanded-but-hidden
+        // group reports getViewSize 0, so fall back to its cached visible size
+        // (then lastExpandedSize); otherwise re-showing snaps to minimumSize.
+        const expandedSize = (
+            view: EdgeGroupView,
+            isVisible: boolean,
+            liveSize: number,
+            cachedVisibleSize: number | undefined
+        ): number => {
+            if (view.isCollapsed) {
+                return view.lastExpandedSize;
+            }
+            if (!isVisible) {
+                return cachedVisibleSize ?? view.lastExpandedSize;
+            }
+            return liveSize;
+        };
+
         if (this._leftView && this._leftIndex !== undefined) {
+            const visible = this._outerSplitview.isViewVisible(this._leftIndex);
             edgeGroups.left = {
-                size: this._leftView.isCollapsed
-                    ? this._leftView.lastExpandedSize
-                    : this._outerSplitview.getViewSize(this._leftIndex),
-                visible: this._outerSplitview.isViewVisible(this._leftIndex),
+                size: expandedSize(
+                    this._leftView,
+                    visible,
+                    this._outerSplitview.getViewSize(this._leftIndex),
+                    this._outerSplitview.getViewCachedVisibleSize(
+                        this._leftIndex
+                    )
+                ),
+                visible,
                 collapsed: this._leftView.isCollapsed || undefined,
+                ...constraints(this._leftView),
             };
         }
         if (this._rightView && this._rightIndex !== undefined) {
+            const visible = this._outerSplitview.isViewVisible(
+                this._rightIndex
+            );
             edgeGroups.right = {
-                size: this._rightView.isCollapsed
-                    ? this._rightView.lastExpandedSize
-                    : this._outerSplitview.getViewSize(this._rightIndex),
-                visible: this._outerSplitview.isViewVisible(this._rightIndex),
+                size: expandedSize(
+                    this._rightView,
+                    visible,
+                    this._outerSplitview.getViewSize(this._rightIndex),
+                    this._outerSplitview.getViewCachedVisibleSize(
+                        this._rightIndex
+                    )
+                ),
+                visible,
                 collapsed: this._rightView.isCollapsed || undefined,
+                ...constraints(this._rightView),
             };
         }
         if (this._topView) {
+            const visible = this._middleColumn.isViewVisible('top');
             edgeGroups.top = {
-                size: this._topView.isCollapsed
-                    ? this._topView.lastExpandedSize
-                    : this._middleColumn.getViewSize('top'),
-                visible: this._middleColumn.isViewVisible('top'),
+                size: expandedSize(
+                    this._topView,
+                    visible,
+                    this._middleColumn.getViewSize('top'),
+                    this._middleColumn.getViewCachedVisibleSize('top')
+                ),
+                visible,
                 collapsed: this._topView.isCollapsed || undefined,
+                ...constraints(this._topView),
             };
         }
         if (this._bottomView) {
+            const visible = this._middleColumn.isViewVisible('bottom');
             edgeGroups.bottom = {
-                size: this._bottomView.isCollapsed
-                    ? this._bottomView.lastExpandedSize
-                    : this._middleColumn.getViewSize('bottom'),
-                visible: this._middleColumn.isViewVisible('bottom'),
+                size: expandedSize(
+                    this._bottomView,
+                    visible,
+                    this._middleColumn.getViewSize('bottom'),
+                    this._middleColumn.getViewCachedVisibleSize('bottom')
+                ),
+                visible,
                 collapsed: this._bottomView.isCollapsed || undefined,
+                ...constraints(this._bottomView),
             };
         }
 

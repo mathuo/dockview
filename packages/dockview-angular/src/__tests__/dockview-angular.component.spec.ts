@@ -141,6 +141,34 @@ describe('DockviewAngularComponent', () => {
             expect(updateOptionsSpy).toHaveBeenCalledWith({ [key]: value });
         }
     });
+
+    it('honours a rebound [components] map after init', () => {
+        component.ngOnInit();
+        const api = component.getDockviewApi()!;
+
+        // rebind `components` to a brand-new object that adds a component under
+        // a name absent from the init-time map
+        const initial = component.components;
+        component.components = {
+            ...initial,
+            'added-later': getTestComponents()['test-panel'],
+        };
+        component.ngOnChanges({
+            components: {
+                currentValue: component.components,
+                previousValue: initial,
+                firstChange: false,
+                isFirstChange: () => false,
+            },
+        });
+
+        // the factory must see the new map, so adding a panel with the new
+        // component name resolves instead of throwing "not found in registry"
+        expect(() =>
+            api.addPanel({ id: 'p-added', component: 'added-later' })
+        ).not.toThrow();
+        expect(api.getPanel('p-added')).toBeDefined();
+    });
 });
 
 @Component({

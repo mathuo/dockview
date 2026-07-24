@@ -1,5 +1,6 @@
 import {
     DockviewActivePanelChangeEvent,
+    DockviewPanelPinnedChangeEvent,
     DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChangeEvent,
     DockviewPopoutGroupOptions,
@@ -18,7 +19,12 @@ import {
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
     MovementOptions,
+    SmartGuidesOptions,
 } from '../dockview/options';
+import {
+    DockviewMessages,
+    resolveMessages,
+} from '../dockview/accessibilityMessages';
 import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
@@ -46,6 +52,11 @@ import {
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
 import { Event } from '../events';
+import {
+    LayoutHistoryChangeEvent,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
+} from '../dockview/moduleContracts';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
@@ -70,7 +81,10 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
-import { EdgeGroupPosition, EdgeGroupOptions } from '../dockview/dockviewShell';
+import {
+    EdgeGroupPosition,
+    AddEdgeGroupOptions,
+} from '../dockview/dockviewShell';
 import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
@@ -689,6 +703,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * Fired when a panel is pinned or unpinned (PinnedTabs module). Carries the
+     * panel and its new `isPinned` state.
+     */
+    get onDidPanelPinnedChange(): Event<DockviewPanelPinnedChangeEvent> {
+        return this.component.onDidPanelPinnedChange;
+    }
+
+    /**
      * Invoked when a panel is added. May be called multiple times when moving panels.
      */
     get onDidAddPanel(): Event<IDockviewPanel> {
@@ -741,7 +763,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Fires before each top-level structural layout mutation (add / remove /
      * move / float / popout / maximize / load / clear). Compound operations
      * (e.g. a drag) fire once. Pair with `onDidMutateLayout` to bracket a
-     * change — useful for undo/redo, autosave and dirty-tracking.
+     * change, which is useful for undo/redo, autosave and dirty-tracking.
      */
     get onWillMutateLayout(): Event<DockviewLayoutMutationEvent> {
         return this.component.onWillMutateLayout;
@@ -803,7 +825,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Fires when a popout group is removed — whether the user closed its window
+     * Fires when a popout group is removed, whether the user closed its window
      * or it was docked back programmatically. Symmetric with
      * {@link onDidAddPopoutGroup}; not fired during component disposal.
      */
@@ -878,7 +900,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     /**
      * The nearest grid group in a spatial direction from `group`, comparing
-     * group centre points — e.g. the group visually to the left. Floating and
+     * group centre points, e.g. the group visually to the left. Floating and
      * popout groups are ignored. Returns `undefined` when there is no group in
      * that direction. Pair with `group.api.boundingBox` to build your own
      * spatial navigation.
@@ -905,6 +927,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get activeGroup(): DockviewGroupPanel | undefined {
         return this.component.activeGroup;
+    }
+
+    /**
+     * The resolved accessibility message catalog (the app's `messages`
+     * overrides merged over the English defaults). Used by parts that surface
+     * localisable AT strings, e.g. the default tab's close-button label.
+     */
+    get messages(): DockviewMessages {
+        return resolveMessages(this.component.options.messages);
     }
 
     constructor(private readonly component: IDockviewComponent) {}
@@ -1021,17 +1052,112 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Move the focus progmatically to the next panel or group.
+     * Undo the previous recorded layout mutation. No-op when there is nothing
+     * to undo, when `layoutHistory.enabled` is not set, or when the
+     * LayoutHistory module is absent.
      */
-    moveToNext(options?: MovementOptions): void {
-        this.component.moveToNext(options);
+    undo(): void {
+        this.component.undo();
+    }
+
+    /** Re-apply the next layout mutation undone via {@link undo}. */
+    redo(): void {
+        this.component.redo();
+    }
+
+    /** Whether {@link undo} would do something. Reactive via {@link onDidChangeHistory}. */
+    get canUndo(): boolean {
+        return this.component.canUndo;
+    }
+
+    /** Whether {@link redo} would do something. */
+    get canRedo(): boolean {
+        return this.component.canRedo;
+    }
+
+    /** Drop both undo and redo stacks (e.g. on document switch). */
+    clearHistory(): void {
+        this.component.clearHistory();
+    }
+
+    /** Fires whenever the undo/redo stacks change. */
+    get onDidChangeHistory(): Event<LayoutHistoryChangeEvent> {
+        return this.component.onDidChangeHistory;
     }
 
     /**
-     * Move the focus progmatically to the previous panel or group.
+     * Whether Smart Guides snapping is active (the `smartGuides` option is
+     * present + enabled and the module is registered). Reactive via
+     * {@link setSmartGuidesEnabled}.
+     */
+    get smartGuidesEnabled(): boolean {
+        return this.component.smartGuidesEnabled;
+    }
+
+    /** Toggle Smart Guides snapping at runtime (no-op when the module is absent). */
+    setSmartGuidesEnabled(enabled: boolean): void {
+        this.component.setSmartGuidesEnabled(enabled);
+    }
+
+    /** Merge a partial Smart Guides option override in at runtime. */
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
+        this.component.updateSmartGuidesOptions(options);
+    }
+
+    /** Fires when a dragged floating group commits an alignment snap on drop. */
+    get onDidSnapFloat(): Event<SmartGuidesSnapEvent> {
+        return this.component.onDidSnapFloat;
+    }
+
+    /** Fires when a dragged floating group docks/merges into another on drop. */
+    get onDidSnapTogether(): Event<SmartGuidesSnapTogetherEvent> {
+        return this.component.onDidSnapTogether;
+    }
+
+    /**
+     * Resolves once any in-flight popout-window restoration completes. Popout
+     * windows re-open asynchronously, so after an {@link undo} / {@link redo} (or
+     * {@link fromJSON}) that re-opens a popout, await this to know the window is
+     * ready. Already-resolved when nothing is restoring.
+     */
+    get popoutRestorationPromise(): Promise<void> {
+        return this.component.popoutRestorationPromise;
+    }
+
+    /**
+     * Activate the next panel or group, moving focus programmatically. Pass
+     * `{ includePanel: true }` to step through the panels of the active group
+     * before advancing to the next group.
+     */
+    activateNext(options?: MovementOptions): void {
+        this.component.activateNext(options);
+    }
+
+    /**
+     * Activate the previous panel or group, moving focus programmatically. Pass
+     * `{ includePanel: true }` to step through the panels of the active group
+     * before advancing to the previous group.
+     */
+    activatePrevious(options?: MovementOptions): void {
+        this.component.activatePrevious(options);
+    }
+
+    /**
+     * @deprecated Use {@link DockviewApi.activateNext} instead. Renamed because
+     * this advances the active panel/group (focus), it does not relocate a
+     * panel. Removal planned for a future major release.
+     */
+    moveToNext(options?: MovementOptions): void {
+        this.activateNext(options);
+    }
+
+    /**
+     * @deprecated Use {@link DockviewApi.activatePrevious} instead. Renamed
+     * because this advances the active panel/group (focus), it does not
+     * relocate a panel. Removal planned for a future major release.
      */
     moveToPrevious(options?: MovementOptions): void {
-        this.component.moveToPrevious(options);
+        this.activatePrevious(options);
     }
 
     maximizeGroup(panel: IDockviewPanel): void {
@@ -1068,9 +1194,23 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addEdgeGroup(
         position: EdgeGroupPosition,
-        options: EdgeGroupOptions
+        options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi {
         return this.component.addEdgeGroup(position, options);
+    }
+
+    /**
+     * Reveal (create-or-fill) the edge group at `position` and move the dragged
+     * item described by `data` into it. A newly created edge group tears down to
+     * zero footprint when later emptied. Drives the dock-to-edge groups behind
+     * the `dockToEdgeGroups` option; a no-op if edge groups are unavailable.
+     */
+    revealEdgeGroupWithData(
+        position: EdgeGroupPosition,
+        data: { groupId: string; panelId?: string | null },
+        options?: { autoHide?: boolean }
+    ): void {
+        this.component.revealEdgeGroupWithData(position, data, options);
     }
 
     /**
@@ -1103,6 +1243,28 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     removeEdgeGroup(position: EdgeGroupPosition): void {
         this.component.removeEdgeGroup(position);
+    }
+
+    /**
+     * Pin (expand) the collapsed edge group at `position`. Requires the
+     * auto-hide edge groups module; no-op when it is absent.
+     */
+    pinEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.pinEdgeGroup(position);
+    }
+
+    /** Auto-hide (collapse to a strip) the edge group at `position`. */
+    autoHideEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.autoHideEdgeGroup(position);
+    }
+
+    /**
+     * Peek (slide out as an overlay, without reflowing the grid) or close the
+     * collapsed edge group at `position`. No-op when the auto-hide module is
+     * absent or the group is not collapsed.
+     */
+    peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void {
+        this.component.peekEdgeGroup(position, peek);
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {

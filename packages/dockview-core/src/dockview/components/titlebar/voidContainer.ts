@@ -49,8 +49,8 @@ export class VoidContainer extends CompositeDisposable {
             // Shift+pointerdown marks the event so the group's overlay
             // drag (move-by-floating) sees it was consumed and doesn't
             // fire alongside the HTML5 drag. quasiPreventDefault sets the
-            // marker without calling preventDefault — that would also
-            // block dragstart, which we need to fire.
+            // marker without calling preventDefault; preventDefault would
+            // also block dragstart, which we need to fire.
             addDisposableListener(
                 this._element,
                 'pointerdown',

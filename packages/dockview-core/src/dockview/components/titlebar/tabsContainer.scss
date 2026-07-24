@@ -6,6 +6,28 @@
     height: var(--dv-tabs-and-actions-container-height);
     font-size: var(--dv-tabs-and-actions-container-font-size);
 
+    /**
+     * Multi-row (wrapping) tabs: when the tab list wraps onto multiple rows
+     * (`.dv-tabs-container--wrap`, toggled by the `MultiRowTabsModule`), the
+     * header grows to fit instead of clipping. Inert otherwise: the single-row
+     * fixed height above is unchanged.
+     */
+    &:has(.dv-tabs-container--wrap) {
+        height: auto;
+        min-height: var(--dv-tabs-and-actions-container-height);
+        // Keep the header chrome (prefix / left / right actions, drag void) on
+        // the first row instead of stretching and centering across the full
+        // multi-row height; only the tab list grows downward.
+        align-items: flex-start;
+
+        > .dv-pre-actions-container,
+        > .dv-left-actions-container,
+        > .dv-right-actions-container,
+        > .dv-void-container {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
+    }
+
     &.dv-single-tab.dv-full-width-single-tab {
         .dv-scrollable {
             flex-grow: 1;
@@ -59,5 +81,15 @@
         flex-direction: column;
         height: auto;
         width: var(--dv-tabs-and-actions-container-height);
+    }
+
+    // Vertical header + multi-column (wrapping) tabs: the header grows in WIDTH
+    // (one step per column) instead of the fixed single-column thickness. The
+    // shared bits (min-size, flex-start alignment of the header chrome) come
+    // from the generic `:has(.dv-tabs-container--wrap)` rule above; this only
+    // switches the growth axis from height to width for the vertical case.
+    &.dv-groupview-header-vertical:has(.dv-tabs-container--wrap) {
+        width: auto;
+        min-width: var(--dv-tabs-and-actions-container-height);
     }
 }

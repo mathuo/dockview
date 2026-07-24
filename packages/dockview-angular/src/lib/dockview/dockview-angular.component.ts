@@ -127,15 +127,36 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     )[];
     @Input() tabGroupColors?: DockviewTabGroupColorEntry[];
     @Input() tabGroupAccent?: 'palette' | 'off';
+    // These option keys are in PROPERTY_KEYS_DOCKVIEW but were missing an
+    // @Input(), so bindings like [overflow] raised NG0303 and never reached
+    // dockview-core. Typed via indexed access so they always track the core
+    // option shape.
+    @Input() overflow?: DockviewOptions['overflow'];
+    @Input() pinnedTabs?: DockviewOptions['pinnedTabs'];
+    @Input() smartGuides?: DockviewOptions['smartGuides'];
+    @Input() dndGuide?: DockviewOptions['dndGuide'];
+    @Input() dropPositionResolver?: DockviewOptions['dropPositionResolver'];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
     @Output() willDrop = new EventEmitter<DockviewWillDropEvent>();
 
     private dockviewApi?: DockviewApi;
+    private frameworkComponentFactory?: AngularFrameworkComponentFactory;
     private readonly lifecycleManager = new AngularLifecycleManager();
     private readonly injector = inject(Injector);
     private readonly environmentInjector = inject(EnvironmentInjector);
+
+    /** Inputs that feed the framework component factory (not core options). */
+    private static readonly COMPONENT_MAP_INPUTS = [
+        'components',
+        'tabComponents',
+        'watermarkComponent',
+        'defaultTabComponent',
+        'leftHeaderActionsComponent',
+        'rightHeaderActionsComponent',
+        'prefixHeaderActionsComponent',
+    ] as const;
 
     ngOnInit(): void {
         this.initializeDockview();
@@ -199,6 +220,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
             if (hasChanges) {
                 this.dockviewApi.updateOptions(coreChanges);
+            }
+
+            // Refresh the framework component factory when any component-map
+            // input is rebound, so a new `[components]` (etc.) map is honoured
+            // rather than leaving the factory pinned to the init-time snapshot.
+            const componentMapChanged =
+                DockviewAngularComponent.COMPONENT_MAP_INPUTS.some(
+                    (key) => changes[key] && !changes[key].isFirstChange()
+                );
+            if (componentMapChanged && this.frameworkComponentFactory) {
+                this.frameworkComponentFactory.updateComponents({
+                    components: this.components,
+                    tabComponents: this.tabComponents,
+                    watermarkComponent: this.watermarkComponent,
+                    headerActionsComponents:
+                        this.buildHeaderActionsComponents(),
+                    defaultTabComponent: this.defaultTabComponent,
+                });
             }
         }
     }
@@ -264,7 +303,10 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         return coreOptions as DockviewOptions;
     }
 
-    private createFrameworkOptions(): DockviewFrameworkOptions {
+    private buildHeaderActionsComponents(): Record<
+        string,
+        Type<any> | TemplateRef<any>
+    > {
         const headerActionsComponents: Record<
             string,
             Type<any> | TemplateRef<any>
@@ -279,6 +321,11 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             headerActionsComponents['prefix'] =
                 this.prefixHeaderActionsComponent;
         }
+        return headerActionsComponents;
+    }
+
+    private createFrameworkOptions(): DockviewFrameworkOptions {
+        const headerActionsComponents = this.buildHeaderActionsComponents();
 
         const componentFactory = new AngularFrameworkComponentFactory(
             this.components,
@@ -289,6 +336,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             headerActionsComponents,
             this.defaultTabComponent
         );
+        this.frameworkComponentFactory = componentFactory;
 
         return {
             createComponent: (options) => {

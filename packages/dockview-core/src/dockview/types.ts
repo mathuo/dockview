@@ -11,7 +11,8 @@ export interface HeaderPartInitParameters {
 }
 
 export interface GroupPanelPartInitParameters
-    extends PanelInitParameters, HeaderPartInitParameters {
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
 }
@@ -28,10 +29,8 @@ type RendererMethodOptionalList =
     | 'toJSON'
     | 'focus';
 
-export interface IWatermarkRenderer extends Optional<
-    Omit<IPanel, 'id' | 'init'>,
-    RendererMethodOptionalList
-> {
+export interface IWatermarkRenderer
+    extends Optional<Omit<IPanel, 'id' | 'init'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init: (params: WatermarkRendererInitParameters) => void;
 }
@@ -40,18 +39,14 @@ export interface TabPartInitParameters extends GroupPanelPartInitParameters {
     tabLocation: TabLocation;
 }
 
-export interface ITabRenderer extends Optional<
-    Omit<IPanel, 'id'>,
-    RendererMethodOptionalList
-> {
+export interface ITabRenderer
+    extends Optional<Omit<IPanel, 'id'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init(parameters: TabPartInitParameters): void;
 }
 
-export interface IContentRenderer extends Optional<
-    Omit<IPanel, 'id'>,
-    RendererMethodOptionalList
-> {
+export interface IContentRenderer
+    extends Optional<Omit<IPanel, 'id'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
     onShow?(): void;
@@ -63,7 +58,8 @@ export interface IContentRenderer extends Optional<
 // constructors
 
 export interface IGroupPanelInitParameters
-    extends PanelInitParameters, HeaderPartInitParameters {
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
     //
 }
 
@@ -78,4 +74,7 @@ export interface GroupviewPanelState {
     minimumHeight?: number;
     maximumWidth?: number;
     maximumHeight?: number;
+    /** Pinned tab state (PinnedTabs module). Emitted only when `true`; absent
+     *  layouts load unpinned. */
+    pinned?: boolean;
 }

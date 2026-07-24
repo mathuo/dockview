@@ -28,6 +28,21 @@ describe('lifecycle', () => {
         mutableDisposable.dispose();
     });
 
+    test('that MutableDisposable.value exposes the current disposable', () => {
+        const mutableDisposable = new MutableDisposable();
+
+        // nothing set yet
+        expect(mutableDisposable.value).toBeUndefined();
+
+        const disposable = { dispose: () => {} };
+        mutableDisposable.value = disposable;
+        expect(mutableDisposable.value).toBe(disposable);
+
+        // disposing clears it back to "no value"
+        mutableDisposable.dispose();
+        expect(mutableDisposable.value).toBeUndefined();
+    });
+
     test('composite disposable', () => {
         const d1 = {
             dispose: jest.fn(),

@@ -1,23 +1,18 @@
 ---
 title: Security
-description: How Dockview behaves under strict Content Security Policy, Trusted Types, and other browser security primitives.
+description: How to run Dockview under a strict Content Security Policy, plus how the project is scanned and how to report a vulnerability.
+sidebar_position: 12
 ---
 
-# Security
+Dockview runs under a strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) without `'unsafe-inline'` or `'unsafe-eval'`. This page covers the one part of Dockview that a strict policy affects, and how to configure it.
 
-Dockview is designed to work in security-hardened environments: strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API), and same-origin popouts. This page covers what Dockview does at runtime, what you need to allow, and how to configure Dockview so that a strict policy doesn't break popout windows.
+## Where CSP matters
 
-## What Dockview does at runtime
+Only one thing Dockview does interacts with CSP: opening a **popout window**. Dockview reads the parent window's stylesheets and recreates them in the popout's `<head>`, preserving the original cascade order. Stylesheets loaded via an `href` (external CSS files) are recreated as `<link rel="stylesheet">` elements and are subject to your `style-src` source expressions. Stylesheets without an `href` (inline `<style>` or CSSOM-created sheets) are recreated as inline `<style>` elements, which is what needs a nonce.
 
-For the main document Dockview only writes to `element.style` properties (e.g. positioning, sizing), manipulates `classList`, and attaches event listeners via `addEventListener`. None of those are restricted by `style-src` or `script-src`. Dockview does not use `eval`, the `Function` constructor, `setTimeout`/`setInterval` with string arguments, `document.write`, inline event handlers, or any CSS-in-JS runtime.
+Because external sheets are re-attached as `<link>` elements, the popout loads them asynchronously and may render unstyled for a frame before the network (or HTTP cache) resolves the request. For same-origin sheets this is generally invisible (the browser serves them from cache), but expect a brief flash if your CSS is hosted on a slow origin.
 
-The **one** place Dockview needs dynamic styling is when opening a **popout window**: Dockview reads the parent window's stylesheets and recreates them in the popout's `<head>`, preserving the original cascade order. Stylesheets that were loaded via an `href` (i.e. external CSS files) are recreated as `<link rel="stylesheet">` elements; only stylesheet objects without an `href` (inline `<style>` or CSSOM-created sheets) are recreated as inline `<style>` elements. This is the path that interacts with `style-src`.
-
-Because external sheets are re-attached as `<link>` elements, the popout loads them asynchronously and may render unstyled for a frame before the network (or HTTP cache) resolves the request. For same-origin sheets this is generally invisible — the browser serves them from cache — but expect a brief flash if your CSS is hosted on a slow origin.
-
-## Content Security Policy
-
-### Recommended policy
+## Recommended policy
 
 A policy like the following is enough to run Dockview with popouts:
 
@@ -32,12 +27,12 @@ Note that:
 
 - You do **not** need `'unsafe-inline'` in `style-src`.
 - `RANDOM_NONCE` must be regenerated per response. It should be the same nonce that your server-rendered HTML applies to its own `<script>` / `<style>` tags.
-- The nonce only authorises the inline `<style>` elements Dockview injects. Any external CSS files Dockview re-attaches as `<link rel="stylesheet">` in the popout are still subject to your `style-src` **source expressions** — make sure those URLs are covered by `'self'` or an explicit origin in the directive.
+- The nonce only authorises the inline `<style>` elements Dockview injects. The `<link rel="stylesheet">` elements are still matched against your `style-src` **source expressions**, so make sure those URLs are covered by `'self'` or an explicit origin.
 - If your popout is same-origin (the default for `window.open(url)` where `url` is on your origin), the popout document inherits your CSP and nonce, so the same nonce works for both windows.
 
-### Passing the nonce to Dockview
+## Passing the nonce to Dockview
 
-Dockview forwards a `nonce` option to every `<style>` element it creates. The nonce must be valid for the document the `<style>` lands in, which — for popout windows — is **not** the opener document. Because `popout.html` is a separate HTTP response with its own freshly-generated nonce, the parent page's nonce is never valid in the popout's CSP context.
+Dockview forwards a `nonce` option to every `<style>` element it creates. The nonce must be valid for the document the `<style>` lands in, which (for popout windows) is **not** the opener document. Because `popout.html` is a separate HTTP response with its own freshly-generated nonce, the parent page's nonce is never valid in the popout's CSP context.
 
 For this reason `nonce` accepts either a **string** (when the same nonce is known to cover both documents, e.g. during local development with a static policy) or a **function** that is called with the target `Document` so you can read the nonce directly off the popout page.
 
@@ -46,9 +41,7 @@ The recommended setup is to have your `popout.html` emit a `<meta name="csp-nonc
 ```tsx title="React"
 <DockviewReact
     nonce={(doc) =>
-        doc
-            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
-            ?.content
+        doc.querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')?.content
     }
     onReady={onReady}
     components={components}
@@ -69,16 +62,16 @@ import { createDockview } from 'dockview';
 
 const api = createDockview(element, {
     nonce: (doc) =>
-        doc
-            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
-            ?.content,
-    createComponent: (options) => { /* ... */ },
+        doc.querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')?.content,
+    createComponent: (options) => {
+        /* ... */
+    },
 });
 ```
 
 If your popout markup uses a different convention (for example a global like `window.__CSP_NONCE__`), return that from the function instead.
 
-### CSP checklist
+## Checklist
 
 - Add `'nonce-<value>'` to your `style-src` directive on **both** the main page and the popout page.
 - Generate a fresh nonce per response (on both pages).
@@ -88,5 +81,15 @@ If your popout markup uses a different convention (for example a global like `wi
 
 ## Trusted Types
 
-Dockview is also compatible with [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) (`require-trusted-types-for 'script'`). Dockview clears DOM subtrees with `Node.replaceChildren()` rather than `element.innerHTML = ''`, which Trusted Types treats as a sink.
+Dockview is also compatible with [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) (`require-trusted-types-for 'script'`). It writes no HTML strings to the DOM, so no policy or shim is required.
 
+## Project security
+
+- The codebase is statically analysed by [SonarCloud](https://sonarcloud.io/summary/overall?id=mathuo_dockview) for security issues.
+- npm releases are published with [provenance statements](https://docs.npmjs.com/generating-provenance-statements/), so the source commit and workflow run behind a published package can be verified.
+- To report a vulnerability, use [private vulnerability reporting](https://github.com/mathuo/dockview/security/advisories/new) rather than a public issue. The [security policy](https://github.com/mathuo/dockview/blob/master/SECURITY.md) covers supported versions, what is in scope, and response times.
+
+## See also
+
+- [Popout windows](/docs/core/groups/popoutGroups): the main feature affected by CSP and same-origin rules
+- [Security policy](https://github.com/mathuo/dockview/blob/master/SECURITY.md): reporting, supported versions, and scope

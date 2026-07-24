@@ -58,7 +58,7 @@ describe('layout mutation events', () => {
         expect(did).toEqual(['remove']);
     });
 
-    test('a compound move fires once — nested removePanel does not double-fire', () => {
+    test('a compound move fires once: nested removePanel does not double-fire', () => {
         const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
         const p2 = dockview.addPanel({
             id: 'p2',
@@ -73,7 +73,7 @@ describe('layout mutation events', () => {
             to: { group: p1.group, position: 'center' },
         });
 
-        // Exactly one 'move' — the source-group teardown inside the move must
+        // Exactly one 'move': the source-group teardown inside the move must
         // not leak its own transaction (depth counter).
         expect(will).toEqual(['move']);
         expect(did).toEqual(['move']);
@@ -217,7 +217,7 @@ describe('layout mutation events', () => {
         const json = dockview.toJSON();
         dockview.fromJSON(json);
 
-        // Confirms the seam fires on a restorable state — undo/redo via
+        // Confirms the seam fires on a restorable state; undo/redo via
         // fromJSON can put the maximize back.
         expect(dockview.hasMaximizedGroup()).toBe(true);
     });
@@ -343,7 +343,7 @@ describe('layout mutation events', () => {
 
             // Floating p1 brackets one 'float' transaction whose body removes
             // the source group (a nested mutation). The outer api origin must
-            // survive — a nested call must not reset it to 'user'.
+            // survive; a nested call must not reset it to 'user'.
             dockview.api.addFloatingGroup(p1);
             expect(origins).toEqual(['api']);
         });

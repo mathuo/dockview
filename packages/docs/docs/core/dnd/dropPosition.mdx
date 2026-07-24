@@ -1,0 +1,104 @@
+---
+title: Drop position resolver
+sidebar_position: 6
+description: Override where a pointer location maps to a drop position with a pluggable core resolver.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+By default Dockview resolves a drop from the quadrant of the target the cursor happens to be over. The
+`dropPositionResolver` option is a lower-level core seam that lets you replace how a pointer location maps to a
+drop position. It affects the five-way group and whole-layout-edge drop targets (tab and header reorder targets are
+unaffected). When unset, the built-in cursor-quadrant behaviour is used, unchanged.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['dropPositionResolver']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['dropPositionResolver']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['dropPositionResolver']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['dropPositionResolver']}
+    />
+</FrameworkSpecific>
+
+A `PositionResolver` maps the pointer location within a target to a drop `Position`, or `null` for no drop. Both drag
+backends consult the same resolver. It is read live, so it can be swapped at runtime via `api.updateOptions`.
+
+```ts
+export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
+
+/** The pointer location within a drop target, handed to a PositionResolver. */
+export interface PositionResolverArgs {
+    /** Pointer X within the target element (px from its left edge). */
+    readonly x: number;
+    /** Pointer Y within the target element (px from its top edge). */
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+    /** The drop zones this target currently accepts. */
+    readonly zones: ReadonlySet<Position>;
+    /** The originating drag event (HTML5 or pointer backend). */
+    readonly event: DragEvent | PointerEvent;
+}
+
+export interface PositionResolverResult {
+    readonly position: Position;
+    /** Marks an outer / whole-layout-edge cell. */
+    readonly edge?: boolean;
+}
+
+export interface PositionResolver {
+    resolve(args: PositionResolverArgs): PositionResolverResult | null;
+}
+```
+
+```ts
+const api = createDockview(element, {
+    dropPositionResolver: {
+        resolve({ x, y, width, height, zones }) {
+            // dead-centre 40% of the target => tab into the group, otherwise no drop
+            const inCentre =
+                x > width * 0.3 &&
+                x < width * 0.7 &&
+                y > height * 0.3 &&
+                y < height * 0.7;
+
+            if (inCentre && zones.has('center')) {
+                return { position: 'center' };
+            }
+
+            return null;
+        },
+    },
+});
+```
+
+:::info
+The visual aim-at-a-cell overlay is covered in [Drop Guide](/docs/core/dnd/dropGuide). That compass (`dndGuide`)
+installs its own resolver, so enable one or the other: `dndGuide` when you want the built-in aim-at-a-cell affordance,
+`dropPositionResolver` when you want full control over the resolved position.
+:::
+
+## See also
+
+- [Drop overlay](/docs/core/dnd/overlay): shape the overlay that previews the resolved drop zone.
+- [Drop guide](/docs/core/dnd/dropGuide): the aim-at-a-cell compass built on top of this resolver.
+- [Smart guides](/docs/core/dnd/smartGuides): alignment snapping for floating groups.

@@ -7,67 +7,36 @@ import {
 } from './themeBuilder';
 import { ToggleRow } from './toggleRow';
 import { ControlsContent } from './settingsModal';
+import { SB } from './sidebarTheme';
+import {
+    Card,
+    Slider,
+    Field,
+    inputStyle,
+    Btn,
+    IconBtn,
+    IconChip,
+} from './sidebarKit';
 
-const Section = (props: { title: string; children: React.ReactNode }) => (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <div
-            style={{
-                padding: '8px 16px 4px',
-                fontSize: '11px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: 'rgba(255,255,255,0.4)',
-                fontWeight: 600,
-            }}
-        >
-            {props.title}
-        </div>
-        <div style={{ paddingBottom: 8 }}>{props.children}</div>
-    </div>
-);
-
-const SliderRow = (props: {
-    label: string;
-    value: number;
-    min: number;
-    max: number;
-    unit?: string;
-    onChange: (v: number) => void;
+// Collapsible section card. Thin wrapper over the kit `Card` so the many
+// `<Section>` call sites below stay tidy; each maps a subject to an icon chip.
+const Section = (props: {
+    title: string;
+    icon?: string;
+    defaultOpen?: boolean;
+    children: React.ReactNode;
 }) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '4px 16px',
-            minHeight: 30,
-        }}
+    <Card
+        title={props.title}
+        icon={props.icon ?? 'tune'}
+        defaultOpen={props.defaultOpen ?? false}
     >
-        <span style={{ flex: 1, fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-            {props.label}
-        </span>
-        <input
-            type="range"
-            min={props.min}
-            max={props.max}
-            value={props.value}
-            onChange={(e) => props.onChange(Number(e.target.value))}
-            style={{ width: 90 }}
-        />
-        <span
-            style={{
-                width: 36,
-                textAlign: 'right',
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.5)',
-                fontFamily: 'monospace',
-            }}
-        >
-            {props.value}
-            {props.unit ?? ''}
-        </span>
-    </div>
+        {props.children}
+    </Card>
 );
+
+// Numeric slider. The kit `Slider` already matches this call signature.
+const SliderRow = Slider;
 
 const TextRow = (props: {
     label: string;
@@ -96,35 +65,19 @@ const TextRow = (props: {
     const displayed = props.value || computed;
 
     return (
-        <div style={{ padding: '3px 16px 6px' }}>
-            <div
-                style={{
-                    fontSize: 11,
-                    color: 'rgba(255,255,255,0.5)',
-                    marginBottom: 4,
-                }}
-            >
-                {props.label}
-            </div>
+        <Field label={props.label}>
             <input
                 type="text"
+                className="dv-sb-input"
                 value={displayed}
                 onChange={(e) => props.onChange(e.target.value)}
                 placeholder="inherit"
                 style={{
-                    width: '100%',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 3,
-                    padding: '4px 6px',
-                    color: props.value ? 'white' : 'rgba(255,255,255,0.4)',
-                    fontSize: 11,
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    fontFamily: 'monospace',
+                    ...inputStyle,
+                    color: props.value ? SB.text : SB.faint,
                 }}
             />
-        </div>
+        </Field>
     );
 };
 
@@ -159,9 +112,8 @@ const ColorRow = (props: {
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
-                padding: '3px 16px',
-                minHeight: 28,
+                gap: 8,
+                padding: '6px 2px',
             }}
         >
             <input
@@ -175,13 +127,13 @@ const ColorRow = (props: {
                 }
                 onChange={(e) => props.onChange(e.target.value)}
                 style={{
-                    width: 22,
-                    height: 22,
-                    padding: 1,
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: 3,
+                    width: 26,
+                    height: 26,
+                    padding: 2,
+                    border: `1px solid ${SB.border}`,
+                    borderRadius: SB.radiusChip,
                     cursor: 'pointer',
-                    background: 'none',
+                    background: SB.inputBg,
                     flexShrink: 0,
                 }}
                 title="Pick color"
@@ -189,26 +141,23 @@ const ColorRow = (props: {
             <span
                 style={{
                     flex: 1,
-                    fontSize: 11,
-                    color: 'rgba(255,255,255,0.65)',
+                    fontSize: 12,
+                    color: SB.text,
+                    fontFamily: SB.ui,
                 }}
             >
                 {props.label}
             </span>
             <input
                 type="text"
+                className="dv-sb-input"
                 value={props.value || placeholder}
                 onChange={(e) => props.onChange(e.target.value)}
                 style={{
-                    width: 108,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 3,
-                    padding: '3px 6px',
-                    color: props.value ? 'white' : 'rgba(255,255,255,0.4)',
-                    fontSize: 11,
-                    outline: 'none',
-                    fontFamily: 'monospace',
+                    ...inputStyle,
+                    width: 104,
+                    flexShrink: 0,
+                    color: props.value ? SB.text : SB.faint,
                 }}
             />
             {props.value && (
@@ -217,10 +166,10 @@ const ColorRow = (props: {
                     style={{
                         background: 'none',
                         border: 'none',
-                        color: 'rgba(255,255,255,0.35)',
+                        color: SB.faint,
                         cursor: 'pointer',
                         padding: '0 2px',
-                        fontSize: 14,
+                        fontSize: 15,
                         lineHeight: 1,
                         flexShrink: 0,
                     }}
@@ -235,48 +184,57 @@ const ColorRow = (props: {
 
 type SidebarTab = 'theme' | 'controls';
 
+// THEME / CONTROLS as a full-width segmented pill (active segment = accent fill).
 const TabToggle = (props: {
     active: SidebarTab;
     onChange: (tab: SidebarTab) => void;
-}) => {
-    const tabStyle = (tab: SidebarTab): React.CSSProperties => ({
-        flex: 1,
-        padding: '6px 0',
-        fontSize: 11,
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        cursor: 'pointer',
-        background: 'none',
-        border: 'none',
-        borderBottom:
-            props.active === tab
-                ? '2px solid rgba(255,255,255,0.8)'
-                : '2px solid transparent',
-        color:
-            props.active === tab
-                ? 'rgba(255,255,255,0.9)'
-                : 'rgba(255,255,255,0.4)',
-        outline: 'none',
-        transition: 'color 0.15s, border-color 0.15s',
-    });
-
-    return (
+}) => (
+    <div style={{ padding: '10px 12px 4px', flexShrink: 0 }}>
         <div
             style={{
                 display: 'flex',
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                background: SB.surface,
+                border: `1px solid ${SB.border}`,
+                borderRadius: SB.radiusSm,
+                padding: 3,
+                gap: 3,
             }}
         >
-            <button style={tabStyle('theme')} onClick={() => props.onChange('theme')}>
-                Theme
-            </button>
-            <button style={tabStyle('controls')} onClick={() => props.onChange('controls')}>
-                Controls
-            </button>
+            {(
+                [
+                    ['theme', 'Theme'],
+                    ['controls', 'Controls'],
+                ] as [SidebarTab, string][]
+            ).map(([id, label]) => {
+                const active = props.active === id;
+                return (
+                    <button
+                        key={id}
+                        onClick={() => props.onChange(id)}
+                        style={{
+                            flex: 1,
+                            padding: '6px 0',
+                            fontSize: 11.5,
+                            fontWeight: active ? 700 : 600,
+                            fontFamily: SB.ui,
+                            letterSpacing: '0.02em',
+                            border: 'none',
+                            borderRadius: 5,
+                            cursor: 'pointer',
+                            outline: 'none',
+                            background: active ? SB.accent : 'transparent',
+                            color: active ? SB.accentContrast : SB.muted,
+                            boxShadow: active ? SB.glow : 'none',
+                            transition: 'background 0.12s, color 0.12s',
+                        }}
+                    >
+                        {label}
+                    </button>
+                );
+            })}
         </div>
-    );
-};
+    </div>
+);
 
 export const Sidebar = (props: {
     open: boolean;
@@ -298,6 +256,10 @@ export const Sidebar = (props: {
     toggleCustomWatermark: () => void;
     hasCustomGhost: boolean;
     toggleCustomGhost: () => void;
+    dndGuide: boolean;
+    onToggleDndGuide: () => void;
+    smartGuides: boolean;
+    onToggleSmartGuides: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -397,78 +359,77 @@ export const Sidebar = (props: {
 
     return (
         <div
+            className="dv-sb-panel"
             style={{
-                width: '320px',
-                backgroundColor: '#0d1117',
-                borderLeft: '1px solid rgba(255,255,255,0.1)',
+                width: '332px',
+                background: SB.bg,
+                color: SB.text,
+                borderLeft: `1px solid ${SB.border}`,
+                boxShadow: SB.shadowLg,
                 display: 'flex',
                 flexDirection: 'column',
                 flexShrink: 0,
+                fontFamily: SB.ui,
             }}
         >
             {/* Header */}
             <div
                 style={{
-                    padding: '8px 16px',
-                    borderBottom: '1px solid rgba(255,255,255,0.1)',
+                    padding: '11px 12px 11px 14px',
+                    borderBottom: `1px solid ${SB.border}`,
                     display: 'flex',
-                    justifyContent: 'flex-end',
                     alignItems: 'center',
+                    gap: 10,
                     flexShrink: 0,
-                    backgroundColor: '#0d1117',
                 }}
             >
+                <IconChip icon="tune" />
+                <span
+                    style={{
+                        marginRight: 'auto',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        letterSpacing: '-0.01em',
+                        color: SB.heading,
+                    }}
+                >
+                    Controls &amp; Theme
+                </span>
                 {activeTab === 'theme' && (
-                    <button
+                    <Btn
                         onClick={props.onReset}
-                        style={{
-                            background: 'none',
-                            outline: 'none',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                            borderRadius: 4,
-                            color: 'rgba(255,255,255,0.5)',
-                            cursor: 'pointer',
-                            padding: '3px 8px',
-                            fontSize: 11,
-                            marginRight: 'auto',
-                        }}
+                        icon="restart_alt"
                         title="Reset all overrides"
                     >
                         Reset
-                    </button>
+                    </Btn>
                 )}
-                <button
-                    onClick={props.onClose}
-                    style={{
-                        background: 'none',
-                        outline: 'none',
-                        border: 'none',
-                        color: 'rgba(255,255,255,0.6)',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginLeft: activeTab !== 'theme' ? 'auto' : undefined,
-                    }}
-                >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: '18px' }}
-                    >
-                        close
-                    </span>
-                </button>
+                <IconBtn onClick={props.onClose} icon="close" title="Close" />
             </div>
 
             {/* Tab Toggle */}
             <TabToggle active={activeTab} onChange={setActiveTab} />
 
             {/* Scrollable content */}
-            <div style={{ flexGrow: 1, overflowY: 'auto' }}>
+            <div
+                className="dv-trade-scroll"
+                style={{
+                    flexGrow: 1,
+                    overflowY: 'auto',
+                    padding: 12,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 12,
+                }}
+            >
                 {activeTab === 'theme' ? (
                     <>
                         {/* Layout */}
-                        <Section title="Layout">
+                        <Section
+                            title="Layout"
+                            icon="space_dashboard"
+                            defaultOpen
+                        >
                             <SliderRow
                                 label="Gap"
                                 value={props.state.gap}
@@ -515,7 +476,11 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Radius */}
-                        <Section title="Radius">
+                        <Section
+                            title="Radius"
+                            icon="rounded_corner"
+                            defaultOpen
+                        >
                             <SliderRow
                                 label="Border Radius"
                                 value={borderRadius}
@@ -554,25 +519,8 @@ export const Sidebar = (props: {
                             />
                         </Section>
 
-                        {/* Floating Group */}
-                        <Section title="Floating Group">
-                            <TextRow
-                                label="Floating Group Border"
-                                varName="--dv-floating-group-border"
-                                value={css['--dv-floating-group-border'] ?? ''}
-                                containerEl={props.containerEl}
-                                themeKey={props.baseTheme.name}
-                                onChange={(v) =>
-                                    set({
-                                        '--dv-floating-group-border':
-                                            v || undefined,
-                                    })
-                                }
-                            />
-                        </Section>
-
-                        {/* Tabs */}
-                        <Section title="Tabs">
+                        {/* Tabs & Groups */}
+                        <Section title="Tabs & Groups" icon="tab">
                             <ToggleRow
                                 label="Tab Animation"
                                 value={props.state.tabAnimation}
@@ -588,10 +536,6 @@ export const Sidebar = (props: {
                                     })
                                 }
                             />
-                        </Section>
-
-                        {/* Tab Groups */}
-                        <Section title="Tab Groups">
                             <ToggleRow
                                 label="Group Indicator"
                                 value={props.state.tabGroupIndicator}
@@ -610,7 +554,7 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* DnD */}
-                        <Section title="Drag & Drop">
+                        <Section title="Drag & Drop" icon="drag_pan">
                             <ToggleRow
                                 label="DnD Overlay"
                                 value={props.state.dndOverlayMounting}
@@ -677,7 +621,10 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Backgrounds */}
-                        <Section title="Backgrounds">
+                        <Section
+                            title="Backgrounds"
+                            icon="format_color_fill"
+                        >
                             {colorRow(
                                 'Panel background',
                                 '--dv-group-view-background-color'
@@ -694,7 +641,7 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Active Group Tabs */}
-                        <Section title="Active Group Tabs">
+                        <Section title="Active Group Tabs" icon="palette">
                             {colorRow(
                                 'Visible tab bg',
                                 '--dv-activegroup-visiblepanel-tab-background-color'
@@ -714,7 +661,10 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Inactive Group Tabs */}
-                        <Section title="Inactive Group Tabs">
+                        <Section
+                            title="Inactive Group Tabs"
+                            icon="palette"
+                        >
                             {colorRow(
                                 'Visible tab bg',
                                 '--dv-inactivegroup-visiblepanel-tab-background-color'
@@ -734,7 +684,7 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Chrome */}
-                        <Section title="Chrome">
+                        <Section title="Chrome" icon="contrast">
                             {colorRow(
                                 'Tab divider',
                                 '--dv-tab-divider-color'
@@ -755,51 +705,34 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Floating */}
-                        <Section title="Floating">
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 8,
-                                    padding: '4px 16px',
-                                    minHeight: 30,
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        flex: 1,
-                                        fontSize: 11,
-                                        color: 'rgba(255,255,255,0.7)',
-                                    }}
-                                >
-                                    Dragging Opacity
-                                </span>
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={1}
-                                    step={0.05}
-                                    value={draggingOpacity}
-                                    onChange={(e) =>
-                                        set({
-                                            '--dv-floating-group-dragging-opacity':
-                                                e.target.value,
-                                        })
-                                    }
-                                    style={{ width: 90 }}
-                                />
-                                <span
-                                    style={{
-                                        width: 36,
-                                        textAlign: 'right',
-                                        fontSize: 11,
-                                        color: 'rgba(255,255,255,0.5)',
-                                        fontFamily: 'monospace',
-                                    }}
-                                >
-                                    {draggingOpacity.toFixed(2)}
-                                </span>
-                            </div>
+                        <Section title="Floating" icon="flip_to_front">
+                            <Slider
+                                label="Dragging Opacity"
+                                value={draggingOpacity}
+                                min={0}
+                                max={1}
+                                step={0.05}
+                                format={(v) => v.toFixed(2)}
+                                onChange={(v) =>
+                                    set({
+                                        '--dv-floating-group-dragging-opacity':
+                                            String(v),
+                                    })
+                                }
+                            />
+                            <TextRow
+                                label="Group Border"
+                                varName="--dv-floating-group-border"
+                                value={css['--dv-floating-group-border'] ?? ''}
+                                containerEl={props.containerEl}
+                                themeKey={props.baseTheme.name}
+                                onChange={(v) =>
+                                    set({
+                                        '--dv-floating-group-border':
+                                            v || undefined,
+                                    })
+                                }
+                            />
                             <TextRow
                                 label="Box Shadow"
                                 varName="--dv-floating-box-shadow"
@@ -828,35 +761,34 @@ export const Sidebar = (props: {
                         </Section>
 
                         {/* Export */}
-                        <Section title="Export">
-                            <div style={{ padding: '0 16px 8px' }}>
-                                <button
+                        <Section title="Export" icon="code">
+                            <div style={{ padding: '4px 0' }}>
+                                <Btn
                                     onClick={() => setShowExport((v) => !v)}
+                                    icon={
+                                        showExport
+                                            ? 'visibility_off'
+                                            : 'visibility'
+                                    }
                                     style={{
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        borderRadius: 4,
-                                        color: 'rgba(255,255,255,0.7)',
-                                        cursor: 'pointer',
-                                        padding: '4px 10px',
-                                        fontSize: 11,
                                         marginBottom: showExport ? 8 : 0,
                                     }}
                                 >
                                     {showExport ? 'Hide' : 'Show'} code
-                                </button>
+                                </Btn>
                                 {showExport && (
                                     <div>
                                         <pre
+                                            className="dv-trade-scroll"
                                             style={{
-                                                background: 'rgba(0,0,0,0.3)',
-                                                border: '1px solid rgba(255,255,255,0.1)',
-                                                borderRadius: 4,
+                                                background: SB.inputBg,
+                                                border: `1px solid ${SB.border}`,
+                                                borderRadius: SB.radiusSm,
                                                 padding: '8px 10px',
                                                 fontSize: 10.5,
-                                                color: 'rgba(255,255,255,0.7)',
+                                                color: SB.muted,
                                                 overflow: 'auto',
-                                                fontFamily: 'monospace',
+                                                fontFamily: SB.mono,
                                                 whiteSpace: 'pre',
                                                 margin: 0,
                                                 maxHeight: 240,
@@ -864,32 +796,21 @@ export const Sidebar = (props: {
                                         >
                                             {code}
                                         </pre>
-                                        <button
+                                        <Btn
                                             onClick={handleCopy}
+                                            primary={copied}
+                                            icon={
+                                                copied ? 'check' : 'content_copy'
+                                            }
                                             style={{
                                                 marginTop: 6,
-                                                background: copied
-                                                    ? 'rgba(74,222,128,0.15)'
-                                                    : 'rgba(255,255,255,0.05)',
-                                                border: `1px solid ${
-                                                    copied
-                                                        ? 'rgba(74,222,128,0.3)'
-                                                        : 'rgba(255,255,255,0.1)'
-                                                }`,
-                                                borderRadius: 4,
-                                                color: copied
-                                                    ? '#4ade80'
-                                                    : 'rgba(255,255,255,0.7)',
-                                                cursor: 'pointer',
-                                                padding: '4px 10px',
-                                                fontSize: 11,
                                                 width: '100%',
                                             }}
                                         >
                                             {copied
                                                 ? 'Copied!'
                                                 : 'Copy to clipboard'}
-                                        </button>
+                                        </Btn>
                                     </div>
                                 )}
                             </div>
@@ -906,6 +827,10 @@ export const Sidebar = (props: {
                         toggleCustomWatermark={props.toggleCustomWatermark}
                         hasCustomGhost={props.hasCustomGhost}
                         toggleCustomGhost={props.toggleCustomGhost}
+                        dndGuide={props.dndGuide}
+                        onToggleDndGuide={props.onToggleDndGuide}
+                        smartGuides={props.smartGuides}
+                        onToggleSmartGuides={props.onToggleSmartGuides}
                         debug={props.debug}
                         onToggleDebug={props.onToggleDebug}
                         showLogs={props.showLogs}

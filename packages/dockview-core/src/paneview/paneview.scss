@@ -8,7 +8,7 @@
             will-change: transform;
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
-            
+
             transition: transform 0.15s ease-out;
         }
     }
@@ -68,8 +68,8 @@
                 cursor: pointer;
             }
 
-            &:focus,
-            &:focus-within {
+            &:focus-visible,
+            &:has(:focus-visible) {
                 &:before {
                     position: absolute;
                     top: 0;
@@ -94,8 +94,8 @@
             position: relative;
             outline: none;
 
-            &:focus,
-            &:focus-within {
+            &:focus-visible,
+            &:has(:focus-visible) {
                 &:before {
                     position: absolute;
                     top: 0;

@@ -1,75 +1,69 @@
 ---
 title: Quickstart
 sidebar_position: 1
-description: Step-by-step guide to creating your first Dockview layout with panels, groups, and drag & drop.
+description: Step-by-step guide to creating your first Dockview layout with panels, groups, and drag and drop.
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-This guide walks you through creating your first Dockview layout.
+This guide walks you through creating your first Dockview layout. For the full set of CSS-import options and framework details, see [Installation](/docs/overview/installation).
 
-## Step 1: Install
+<CodeRunner id="dockview/basic" height={400} />
 
-<FrameworkSpecific framework='JavaScript'>
+## Install
+
+<FrameworkSpecific framework="JavaScript">
+
 ```sh
 npm install dockview
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='React'>
+<FrameworkSpecific framework="React">
+
 ```sh
 npm install dockview-react
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
+<FrameworkSpecific framework="Vue">
+
 ```sh
 npm install dockview-vue
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
+<FrameworkSpecific framework="Angular">
+
 ```sh
 npm install dockview-angular
 ```
+
 </FrameworkSpecific>
 
-## Step 2: Import the Stylesheet
+## Create your first layout
 
-<FrameworkSpecific framework='JavaScript'>
-```js
-import 'dockview/dist/styles/dockview.css';
-```
-</FrameworkSpecific>
+<FrameworkSpecific framework="JavaScript">
 
-<FrameworkSpecific framework='React'>
-```js
-import 'dockview-react/dist/styles/dockview.css';
-```
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='Vue'>
-```js
-import 'dockview-vue/dist/styles/dockview.css';
-```
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='Angular'>
-```js
-import 'dockview-angular/dist/styles/dockview.css';
-```
-</FrameworkSpecific>
-
-## Step 3: Create Your First Layout
-
-<FrameworkSpecific framework='JavaScript'>
 ```ts
-import { createDockview, themeAbyss, IContentRenderer, GroupPanelPartInitParameters } from 'dockview';
+// don't forget the stylesheet
+import 'dockview/dist/styles/dockview.css';
+import {
+    createDockview,
+    themeAbyss,
+    IContentRenderer,
+    GroupPanelPartInitParameters,
+} from 'dockview';
 
 class MyPanel implements IContentRenderer {
     private readonly _element: HTMLElement;
 
-    get element() { return this._element; }
+    get element() {
+        return this._element;
+    }
 
     constructor() {
         this._element = document.createElement('div');
@@ -86,16 +80,26 @@ const api = createDockview(document.getElementById('app'), {
 });
 
 api.addPanel({ id: 'panel_1', component: 'default', title: 'Panel 1' });
-api.addPanel({ id: 'panel_2', component: 'default', title: 'Panel 2',
-    position: { referencePanel: 'panel_1', direction: 'right' }
+api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    title: 'Panel 2',
+    position: { referencePanel: 'panel_1', direction: 'right' },
 });
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='React'>
+<FrameworkSpecific framework="React">
+
 ```tsx
-import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from 'dockview-react';
+// don't forget the stylesheet
 import 'dockview-react/dist/styles/dockview.css';
+import {
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview-react';
 
 const MyPanel = (props: IDockviewPanelProps) => {
     return <div style={{ padding: 16 }}>{props.api.title}</div>;
@@ -105,9 +109,16 @@ const components = { default: MyPanel };
 
 export default function App() {
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({ id: 'panel_1', component: 'default', title: 'Panel 1' });
-        event.api.addPanel({ id: 'panel_2', component: 'default', title: 'Panel 2',
-            position: { referencePanel: 'panel_1', direction: 'right' }
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            title: 'Panel 1',
+        });
+        event.api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            title: 'Panel 2',
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
     };
 
@@ -121,11 +132,15 @@ export default function App() {
     );
 }
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
+<FrameworkSpecific framework="Vue">
+
 ```vue
 <script setup lang="ts">
+// don't forget the stylesheet
+import 'dockview-vue/dist/styles/dockview.css';
 import {
     DockviewVue,
     type DockviewReadyEvent,
@@ -136,13 +151,20 @@ import { defineComponent, type PropType } from 'vue';
 const MyPanel = defineComponent({
     name: 'MyPanel',
     props: {
-        params: { type: Object as PropType<IDockviewPanelProps>, required: true },
+        params: {
+            type: Object as PropType<IDockviewPanelProps>,
+            required: true,
+        },
     },
     template: `<div style="padding: 16px">{{ params.api.title }}</div>`,
 });
 
 function onReady(event: DockviewReadyEvent) {
-    event.api.addPanel({ id: 'panel_1', component: 'my-panel', title: 'Panel 1' });
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'my-panel',
+        title: 'Panel 1',
+    });
     event.api.addPanel({
         id: 'panel_2',
         component: 'my-panel',
@@ -161,10 +183,14 @@ function onReady(event: DockviewReadyEvent) {
     />
 </template>
 ```
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
+<FrameworkSpecific framework="Angular">
+
 ```ts
+// don't forget the stylesheet (or add it to the "styles" array in angular.json)
+import 'dockview-angular/dist/styles/dockview.css';
 import { Component, Input, NgModule, Type } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { DockviewAngularModule } from 'dockview-angular';
@@ -182,8 +208,9 @@ export class MyPanelComponent {
     template: `
         <dv-dockview
             [components]="components"
-            className="dockview-theme-abyss"
-            (ready)="onReady($event)">
+            class="dockview-theme-abyss"
+            (ready)="onReady($event)"
+        >
         </dv-dockview>
     `,
 })
@@ -191,9 +218,16 @@ export class AppComponent {
     components: Record<string, Type<any>> = { default: MyPanelComponent };
 
     onReady(event: any) {
-        event.api.addPanel({ id: 'panel_1', component: 'default', title: 'Panel 1' });
-        event.api.addPanel({ id: 'panel_2', component: 'default', title: 'Panel 2',
-            position: { referencePanel: 'panel_1', direction: 'right' }
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            title: 'Panel 1',
+        });
+        event.api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            title: 'Panel 2',
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
     }
 }
@@ -205,15 +239,12 @@ export class AppComponent {
 })
 export class AppModule {}
 ```
+
 </FrameworkSpecific>
 
-## Live Example
+## Next steps
 
-<CodeRunner id="dockview/basic" height={400}/>
-
-## Next Steps
-
-- [Core Concepts](/docs/core/overview)
-- [Adding Panels](/docs/core/panels/add)
+- [Core concepts](/docs/core/overview)
+- [Adding panels](/docs/core/panels/add)
 - [Theming](/docs/core/theming)
-- [API Reference](/docs/api/dockview/overview)
+- [API reference](/docs/api/dockview/overview)

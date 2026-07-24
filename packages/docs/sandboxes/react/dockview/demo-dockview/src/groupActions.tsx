@@ -5,29 +5,17 @@ import {
     DockviewHeaderPosition,
 } from 'dockview-react';
 import * as React from 'react';
-
-const iconBtn = (active?: boolean): React.CSSProperties => ({
-    padding: '3px 6px',
-    fontSize: 11,
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    background: active
-        ? 'rgba(72,100,220,0.25)'
-        : 'rgba(255,255,255,0.04)',
-    color: active ? 'white' : 'rgba(255,255,255,0.6)',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-});
+import { SB } from './sidebarTheme';
+import { IconBtn } from './sidebarKit';
 
 const selectStyle: React.CSSProperties = {
-    padding: '3px 4px',
+    padding: '5px 8px',
     fontSize: 11,
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.7)',
+    fontFamily: SB.ui,
+    border: `1px solid ${SB.border}`,
+    borderRadius: SB.radiusSm,
+    background: SB.surface,
+    color: SB.text,
     cursor: 'pointer',
     outline: 'none',
 };
@@ -96,7 +84,7 @@ const GroupAction = (props: {
     }, [group]);
 
     return (
-        <div style={{ padding: '3px 16px' }}>
+        <div style={{ padding: '3px 0' }}>
             <div
                 style={{
                     display: 'flex',
@@ -109,14 +97,15 @@ const GroupAction = (props: {
                     onClick={onClick}
                     style={{
                         flex: 1,
-                        padding: '3px 8px',
-                        fontSize: 11,
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        borderRadius: 4,
-                        background: isActive
-                            ? 'rgba(72,100,220,0.25)'
-                            : 'rgba(255,255,255,0.04)',
-                        color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
+                        padding: '5px 10px',
+                        fontSize: 11.5,
+                        fontWeight: isActive ? 600 : 500,
+                        fontFamily: SB.ui,
+                        border: `1px solid ${isActive ? SB.accent : SB.border}`,
+                        borderRadius: SB.radiusSm,
+                        background: isActive ? SB.accent : SB.surface,
+                        color: isActive ? SB.accentContrast : SB.text,
+                        boxShadow: isActive ? SB.glow : 'none',
                         cursor: 'pointer',
                         textAlign: 'left',
                         overflow: 'hidden',
@@ -126,9 +115,11 @@ const GroupAction = (props: {
                 >
                     {props.groupId}
                 </button>
-                <div style={{ display: 'flex', gap: 2 }}>
-                    <button
-                        style={iconBtn(location?.type === 'floating')}
+                <div style={{ display: 'flex', gap: 3 }}>
+                    <IconBtn
+                        icon="ad_group"
+                        title="Float"
+                        active={location?.type === 'floating'}
                         onClick={() => {
                             if (group) {
                                 props.api.addFloatingGroup(group, {
@@ -140,31 +131,19 @@ const GroupAction = (props: {
                                 });
                             }
                         }}
-                        title="Float"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            ad_group
-                        </span>
-                    </button>
-                    <button
-                        style={iconBtn(location?.type === 'popout')}
+                    />
+                    <IconBtn
+                        icon="open_in_new"
+                        title="Popout"
+                        active={location?.type === 'popout'}
                         onClick={() => {
                             if (group) props.api.addPopoutGroup(group);
                         }}
-                        title="Popout"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            open_in_new
-                        </span>
-                    </button>
-                    <button
-                        style={iconBtn(isMaximized)}
+                    />
+                    <IconBtn
+                        icon="fullscreen"
+                        title="Maximize"
+                        active={isMaximized}
                         onClick={() => {
                             if (group) {
                                 if (group.api.isMaximized()) {
@@ -174,45 +153,23 @@ const GroupAction = (props: {
                                 }
                             }
                         }}
-                        title="Maximize"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            fullscreen
-                        </span>
-                    </button>
-                    <button
-                        style={iconBtn()}
+                    />
+                    <IconBtn
+                        icon={isVisible ? 'visibility' : 'visibility_off'}
+                        title="Toggle visibility"
                         onClick={() => {
                             if (group) {
                                 group.api.setVisible(!group.api.isVisible);
                             }
                         }}
-                        title="Toggle visibility"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            {isVisible ? 'visibility' : 'visibility_off'}
-                        </span>
-                    </button>
-                    <button
-                        style={iconBtn()}
+                    />
+                    <IconBtn
+                        icon="close"
+                        title="Close"
                         onClick={() => {
                             props.api?.getGroup(props.groupId)?.api.close();
                         }}
-                        title="Close"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            close
-                        </span>
-                    </button>
+                    />
                 </div>
             </div>
             <div
@@ -220,19 +177,21 @@ const GroupAction = (props: {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
-                    paddingTop: 4,
+                    paddingTop: 6,
                     paddingBottom: 2,
                 }}
             >
                 <span
                     style={{
-                        fontSize: 11,
-                        color: 'rgba(255,255,255,0.4)',
+                        fontSize: 12,
+                        color: SB.text,
+                        fontFamily: SB.ui,
                     }}
                 >
                     Header
                 </span>
                 <select
+                    className="dv-sb-input"
                     style={selectStyle}
                     value={headerPosition}
                     onChange={(e) => {

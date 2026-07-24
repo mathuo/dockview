@@ -1,22 +1,27 @@
 ---
-title: Move Group
+title: Move group
 sidebar_position: 5
 description: How to move a group to a different position in the Dockview layout programmatically.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how you can move a group.
+Moving a group repositions it within the layout (docking it against another group or panel, or against an absolute edge) through the [Group API](/docs/api/dockview/groupApi)'s `moveTo` method.
 
 ## Methods
 
-<DocRef declaration="DockviewGroupPanelApi" methods={["moveTo"]}/>
+<DocRef declaration="DockviewGroupPanelApi" methods={['moveTo']} />
 
-## Move a Group
+## Move a group
 
-You can move a group through the [Group API](/docs/api/dockview/groupApi) and you can find out how to move a Panel [here](/docs/core/panels/move).
+You can move a group through the [Group API](/docs/api/dockview/groupApi) and you can find out how to move a panel [here](/docs/core/panels/move).
 
 ```ts
 panel.group.api.moveTo({ group, position, index });
 ```
 
+## See also
+
+- [Managing groups](/docs/core/groups/add): create, remove, and clear groups
+- [Group controls](/docs/core/groups/controls): add custom actions to a group header
+- [Locking](/docs/core/locked): block drop interactions on a group or the whole layout

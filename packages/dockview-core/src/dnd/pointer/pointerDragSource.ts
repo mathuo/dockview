@@ -21,7 +21,7 @@ export interface PointerDragSourceOptions {
      * hold for floating-group redock vs docked-group rearrange).
      */
     touchInitiationDelay?: number | (() => number);
-    /** Default 8px. May be a function — see `touchInitiationDelay`. */
+    /** Default 8px. May be a function; see `touchInitiationDelay`. */
     pressTolerance?: number | (() => number);
     /** Default true: mouse defers to HTML5; pointer path handles touch / pen only. */
     touchOnly?: boolean;
@@ -93,8 +93,8 @@ export class PointerDragSource extends CompositeDisposable {
         if (this._disabled) {
             return false;
         }
-        // Pointer-type filter runs before isCancelled — consumer state read
-        // by isCancelled may not be populated for events we'll never handle.
+        // Pointer-type filter runs before isCancelled, because consumer state
+        // read by isCancelled may not be populated for events we'll never handle.
         if (
             this._touchOnly &&
             event.pointerType !== 'touch' &&
@@ -113,7 +113,7 @@ export class PointerDragSource extends CompositeDisposable {
             return;
         }
 
-        // Defensive: a fresh pointerdown supersedes any in-flight tracking.
+        // A fresh pointerdown supersedes any in-flight tracking.
         this._cancelPending();
 
         this._pendingPointerId = event.pointerId;
@@ -151,7 +151,7 @@ export class PointerDragSource extends CompositeDisposable {
                 ? pressToleranceOpt()
                 : pressToleranceOpt) ?? DEFAULT_PRESS_TOLERANCE;
 
-        // Source's owning window — popout drags fire on their own window.
+        // Source's owning window; popout drags fire on their own window.
         const targetWindow: Window =
             this.element.ownerDocument?.defaultView ?? globalThis.window;
 

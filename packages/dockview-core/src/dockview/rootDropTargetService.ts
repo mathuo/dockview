@@ -1,4 +1,4 @@
-import { IDisposable } from '../lifecycle';
+import { Disposable, IDisposable } from '../lifecycle';
 import { Event } from '../events';
 import {
     DroptargetEvent,
@@ -10,7 +10,7 @@ import {
 } from '../dnd/droptarget';
 import { html5Backend, pointerBackend } from '../dnd/backend';
 import { getPanelData } from '../dnd/dataTransfer';
-import { DockviewComponentOptions } from './options';
+import { DockviewComponentOptions, isAnyEdgeGroupEnabled } from './options';
 import { defineModule } from './modules';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
@@ -18,10 +18,47 @@ const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     size: { type: 'pixels', value: 20 },
 };
 
+// The two-band drag-reveal affordance needs room for a distinct outer ("dock as
+// edge group") and inner ("split the grid") sub-band, so the edge activation
+// band widens when it is present. The band is uniform across edges; per-edge
+// gating of the actual dock happens in the affordance's own edge resolver.
+const AUTO_EDGE_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
+    activationSize: { type: 'pixels', value: 32 },
+    size: { type: 'pixels', value: 20 },
+};
+
+/**
+ * `hasEdgeDragReveal` gates the widened band, *not* the `dockToEdgeGroups`
+ * option alone: without the affordance nothing consumes the outer sub-band, so
+ * widening would only enlarge the plain grid-split trigger, a 3.2x bigger
+ * target for the same behaviour the default band already gives.
+ */
+function resolveRootOverlayModel(
+    options: Pick<DockviewComponentOptions, 'dndEdges' | 'dockToEdgeGroups'>,
+    hasEdgeDragReveal: boolean
+): DroptargetOverlayModel {
+    if (typeof options.dndEdges === 'object' && options.dndEdges !== null) {
+        return options.dndEdges;
+    }
+    return hasEdgeDragReveal && isAnyEdgeGroupEnabled(options.dockToEdgeGroups)
+        ? AUTO_EDGE_ROOT_OVERLAY_MODEL
+        : DEFAULT_ROOT_OVERLAY_MODEL;
+}
+
 export interface IRootDropTargetHost {
     readonly id: string;
     readonly element: HTMLElement;
     readonly options: DockviewComponentOptions;
+    /**
+     * Whether the two-band edge drag-reveal affordance is registered.
+     *
+     * Read lazily, never at construction: module services are created in
+     * registration order, and this one is built before any module that could
+     * provide the affordance, so at construction the answer is always `false`,
+     * even when the affordance is on its way. The module's `init` hook
+     * re-applies the options once every service exists.
+     */
+    readonly hasEdgeDragReveal: boolean;
     isGridEmpty(): boolean;
     rootDropTargetOverrideTarget(): DropTargetTargetModel | undefined;
     /**
@@ -47,11 +84,13 @@ export interface IRootDropTargetService extends IDisposable {
 export class RootDropTargetService implements IRootDropTargetService {
     private readonly _html5Target: IDropTarget;
     private readonly _pointerTarget: IDropTarget;
+    private readonly _host: IRootDropTargetHost;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
     readonly onDrop: Event<DroptargetEvent>;
 
     constructor(host: IRootDropTargetHost) {
+        this._host = host;
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
             position: Position
@@ -80,11 +119,13 @@ export class RootDropTargetService implements IRootDropTargetService {
             return host.dispatchUnhandledDragOver(event, position);
         };
 
-        const overlayModel =
-            typeof host.options.dndEdges === 'object' &&
-            host.options.dndEdges !== null
-                ? host.options.dndEdges
-                : DEFAULT_ROOT_OVERLAY_MODEL;
+        // `false`, not `host.hasEdgeDragReveal`: this runs during module
+        // initialisation, where the affordance's service may not exist yet, so
+        // the honest answer here is always "no" (see `hasEdgeDragReveal`'s
+        // contract). Reading the host would look like a live gate while being
+        // incapable of returning anything else. The band this resolves is
+        // provisional; the `init` hook below re-resolves it for real.
+        const overlayModel = resolveRootOverlayModel(host.options, false);
 
         this._html5Target = html5Backend.createDropTarget(host.element, {
             className: 'dv-drop-target-edge',
@@ -92,6 +133,7 @@ export class RootDropTargetService implements IRootDropTargetService {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel,
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
+            getPositionResolver: () => host.options.dropPositionResolver,
         });
 
         this._pointerTarget = pointerBackend.createDropTarget(host.element, {
@@ -100,6 +142,7 @@ export class RootDropTargetService implements IRootDropTargetService {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel,
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
+            getPositionResolver: () => host.options.dropPositionResolver,
         });
 
         this.onWillShowOverlay = Event.any(
@@ -123,17 +166,28 @@ export class RootDropTargetService implements IRootDropTargetService {
                 options.dndEdges === false;
             this._html5Target.disabled = disabled;
             this._pointerTarget.disabled = disabled;
+        }
 
-            if (
-                typeof options.dndEdges === 'object' &&
-                options.dndEdges !== null
-            ) {
-                this._html5Target.setOverlayModel(options.dndEdges);
-                this._pointerTarget.setOverlayModel(options.dndEdges);
-            } else {
-                this._html5Target.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
-                this._pointerTarget.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
-            }
+        // Recompute the overlay band when either the edge overlay model or the
+        // dockToEdgeGroups set (which widens the band for the two sub-bands)
+        // changes. Prefer the incoming partial for a changed key, falling back
+        // to the current host options for the other.
+        if ('dndEdges' in options || 'dockToEdgeGroups' in options) {
+            const model = resolveRootOverlayModel(
+                {
+                    dndEdges:
+                        'dndEdges' in options
+                            ? options.dndEdges
+                            : this._host.options.dndEdges,
+                    dockToEdgeGroups:
+                        'dockToEdgeGroups' in options
+                            ? options.dockToEdgeGroups
+                            : this._host.options.dockToEdgeGroups,
+                },
+                this._host.hasEdgeDragReveal
+            );
+            this._html5Target.setOverlayModel(model);
+            this._pointerTarget.setOverlayModel(model);
         }
     }
 
@@ -150,4 +204,14 @@ export const RootDropTargetModule = defineModule<
     name: 'RootDropTarget',
     serviceKey: 'rootDropTargetService',
     create: (host) => new RootDropTargetService(host),
+    init: (host, service) => {
+        // Re-apply the options now that every module's service exists.
+        // `create` above ran during module initialisation, when
+        // `hasEdgeDragReveal` could not yet be true however the component was
+        // configured, so the band it resolved may be too narrow. Every key of
+        // DockviewOptions is present on the merged object, so this recomputes
+        // unconditionally. Nothing can drag between the two phases.
+        service.setOptions(host.options);
+        return Disposable.NONE;
+    },
 });

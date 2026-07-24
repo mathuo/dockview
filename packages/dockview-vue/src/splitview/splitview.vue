@@ -12,10 +12,13 @@ import type { ISplitviewVueProps, SplitviewVueEvents } from './types';
 function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
     const coreOptions = (
         PROPERTY_KEYS_SPLITVIEW as (keyof SplitviewOptions)[]
-    ).reduce((obj, key) => {
-        (obj as any)[key] = props[key];
-        return obj;
-    }, {} as Partial<SplitviewOptions>);
+    ).reduce(
+        (obj, key) => {
+            (obj as any)[key] = props[key];
+            return obj;
+        },
+        {} as Partial<SplitviewOptions>
+    );
 
     return coreOptions as SplitviewOptions;
 }

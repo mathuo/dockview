@@ -36,6 +36,11 @@
             "inputs": ["default"],
             "cache": true
         },
+        "types:check": {
+            "dependsOn": ["build", "build:bundle"],
+            "inputs": ["production", "^production"],
+            "cache": true
+        },
         "format:check": {
             "inputs": ["default"],
             "cache": true
@@ -44,7 +49,7 @@
     "release": {
         "projects": [
             "dockview-core",
-            "dockview-modules",
+            "dockview-enterprise",
             "dockview",
             "dockview-vue",
             "dockview-react",

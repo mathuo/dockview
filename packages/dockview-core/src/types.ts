@@ -9,6 +9,15 @@ export interface Box {
     width: number;
 }
 
+/** Keyboard modifier state captured from a pointer event (e.g. for snapping
+ *  gates that suspend while a modifier is held). */
+export interface DragModifiers {
+    readonly altKey: boolean;
+    readonly ctrlKey: boolean;
+    readonly metaKey: boolean;
+    readonly shiftKey: boolean;
+}
+
 type TopLeft = { top: number; left: number };
 type TopRight = { top: number; right: number };
 type BottomLeft = { bottom: number; left: number };

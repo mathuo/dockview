@@ -11,7 +11,6 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { Droptarget, IDropTarget, Position } from '../../../dnd/droptarget';
 import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
-import { getPanelData } from '../../../dnd/dataTransfer';
 
 let _contentId = 0;
 /** Stable DOM id so each tab's `aria-controls` can reference its tabpanel. */
@@ -76,41 +75,18 @@ export class ContentContainer
 
         // Resolve the override anchor dynamically: a group can be relocated
         // between roots (grid / floating / popout) after construction, and the
-        // popout anchor in particular lives in another window — a value
+        // popout anchor in particular lives in another window, so a value
         // captured here would mount overlays in the wrong window.
         const getOverrideTarget = () => group.dropTargetContainer?.model;
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
             position: Position
-        ): boolean => {
-            if (
-                this.group.locked === 'no-drop-target' ||
-                (this.group.locked && position === 'center')
-            ) {
-                return false;
-            }
-
-            const data = getPanelData();
-
-            if (
-                !data &&
-                event.shiftKey &&
-                this.group.location.type !== 'floating'
-            ) {
-                return false;
-            }
-
-            if (data?.viewId === this.accessor.id) {
-                return true;
-            }
-
-            return this.group.canDisplayOverlay(event, position, 'content');
-        };
+        ): boolean => this.group.canDisplayContentOverlay(event, position);
 
         // `dropTarget` stays the concrete `Droptarget` (not via the backend
         // factory) because overlayRenderContainer forwards HTML5 drag events
-        // through `dropTarget.dnd` — that field is not part of `IDropTarget`.
+        // through `dropTarget.dnd`, and that field is not part of `IDropTarget`.
         this.dropTarget = new Droptarget(this.element, {
             getOverlayOutline: () => {
                 return accessor.options.theme?.dndPanelOverlay === 'group'
@@ -122,6 +98,7 @@ export class ContentContainer
             canDisplayOverlay,
             getOverrideTarget,
             overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
+            getPositionResolver: () => accessor.getDropPositionResolver?.(),
         });
 
         this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
@@ -135,6 +112,7 @@ export class ContentContainer
             className: 'dv-drop-target-content',
             getOverrideTarget,
             overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
+            getPositionResolver: () => accessor.getDropPositionResolver?.(),
         });
 
         this.addDisposables(

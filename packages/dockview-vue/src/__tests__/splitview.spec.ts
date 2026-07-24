@@ -190,3 +190,23 @@ describe('SplitviewVue components prop resolves without registration', () => {
         ).toThrow("Failed to find Vue Component 'NotRegistered'");
     });
 });
+
+test('forwards fallthrough attributes onto the host element (multi-root inheritance regression)', async () => {
+    // The component has two root nodes (host element + <DockviewPortals>), so
+    // Vue cannot auto-inherit fallthrough attributes. inheritAttrs:false plus
+    // v-bind="$attrs" on the host restores it; without them a consumer's
+    // `class`/`style` (e.g. a theme class) would land on nothing (see #1369).
+    const wrapper = mount(SplitviewVue, {
+        attrs: { class: 'dockview-theme-test', 'data-example': 'splitview' },
+        attachTo: document.body,
+    });
+    await flushPromises();
+
+    const host = document.querySelector(
+        '.dockview-theme-test'
+    ) as HTMLElement | null;
+    expect(host).not.toBeNull();
+    expect(host!.getAttribute('data-example')).toBe('splitview');
+
+    wrapper.unmount();
+});

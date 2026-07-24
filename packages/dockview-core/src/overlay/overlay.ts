@@ -10,7 +10,7 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { clamp } from '../math';
-import { AnchoredBox, Box } from '../types';
+import { AnchoredBox, Box, DragModifiers } from '../types';
 
 /**
  * Context handed to {@link OverlayOptions.transformDragPosition} each
@@ -23,6 +23,8 @@ export interface OverlayDragContext {
     readonly container: { width: number; height: number };
     /** Bounds of the sibling overlays, snapshotted at drag start. */
     readonly others: readonly Box[];
+    /** Modifier-key state from this frame's pointer event. */
+    readonly modifiers: DragModifiers;
 }
 
 class AriaLevelTracker {
@@ -331,7 +333,7 @@ export class Overlay extends CompositeDisposable {
             let hasMoved = false;
             this._dragCancelled = false;
 
-            // Snapshot once per drag — siblings don't move while this one drags.
+            // Snapshot once per drag; siblings don't move while this one drags.
             const siblingBoxes = this.options.transformDragPosition
                 ? (this.options.getSiblingBoxes?.() ?? [])
                 : [];
@@ -346,7 +348,7 @@ export class Overlay extends CompositeDisposable {
                 try {
                     captureTarget.setPointerCapture(pointerId);
                 } catch {
-                    // ignore – non-fatal if the browser refuses capture
+                    // ignore: non-fatal if the browser refuses capture
                 }
             }
 
@@ -374,7 +376,7 @@ export class Overlay extends CompositeDisposable {
                             try {
                                 captureTarget.releasePointerCapture(pointerId);
                             } catch {
-                                // ignore – pointer may already be released
+                                // ignore: pointer may already be released
                             }
                         }
                     },
@@ -427,6 +429,12 @@ export class Overlay extends CompositeDisposable {
                                 height: containerRect.height,
                             },
                             others: siblingBoxes,
+                            modifiers: {
+                                altKey: e.altKey,
+                                ctrlKey: e.ctrlKey,
+                                metaKey: e.metaKey,
+                                shiftKey: e.shiftKey,
+                            },
                         });
                         if (adjusted) {
                             proposedTop = adjusted.top;
@@ -573,7 +581,7 @@ export class Overlay extends CompositeDisposable {
                     try {
                         resizeHandleElement.setPointerCapture(pointerId);
                     } catch {
-                        // ignore – non-fatal if the browser refuses capture
+                        // ignore: non-fatal if the browser refuses capture
                     }
                 }
 
@@ -774,7 +782,7 @@ export class Overlay extends CompositeDisposable {
                                         pointerId
                                     );
                                 } catch {
-                                    // ignore – pointer may already be released
+                                    // ignore: pointer may already be released
                                 }
                             }
                         },

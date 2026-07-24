@@ -7,8 +7,25 @@
     z-index: 9998;
     display: flex;
     align-items: stretch;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border-radius: 999px;
+    /* Brand-tinted glow so the pill reads on both light and dark backgrounds
+       (a flat black shadow disappears in dark mode). */
+    box-shadow:
+        0 6px 18px -4px color-mix(in srgb, var(--ifm-color-primary) 42%, transparent),
+        0 2px 6px rgba(17, 20, 45, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wrapper:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 14px 30px -6px color-mix(in srgb, var(--ifm-color-primary) 55%, transparent),
+        0 4px 10px rgba(17, 20, 45, 0.16);
+}
+
+.wrapper:active {
+    transform: translateY(0);
+    transition-duration: 0.05s;
 }
 
 /* ── Sticky trigger ─────────────────────────────────────────────────────────── */
@@ -25,18 +42,14 @@
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: filter 0.15s;
+    transition: background-color 0.15s ease;
     text-decoration: none;
 }
 
 .trigger:hover {
-    filter: brightness(1.1);
+    background: var(--ifm-color-primary-dark);
     color: #fff;
     text-decoration: none;
-}
-
-.trigger:active {
-    transform: translateY(0);
 }
 
 /* ── Dismiss button ──────────────────────────────────────────────────────────── */
@@ -47,16 +60,23 @@
     justify-content: center;
     width: 44px;
     padding: 0;
-    background: color-mix(in srgb, var(--ifm-color-primary) 80%, black);
+    background: color-mix(in srgb, var(--ifm-color-primary) 78%, black);
     color: #fff;
     border: none;
     border-left: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 0 999px 999px 0;
     cursor: pointer;
-    transition: filter 0.15s;
+    transition: background-color 0.15s ease;
 }
 
 .dismiss:hover {
-    filter: brightness(1.15);
+    background: color-mix(in srgb, var(--ifm-color-primary) 62%, black);
 }
 
+/* ── Keyboard focus ──────────────────────────────────────────────────────────── */
+
+.trigger:focus-visible,
+.dismiss:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 2px;
+}

@@ -37,11 +37,13 @@ const DOCKVIEW_CDN = {
         remote: {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-react': `https://cdn.jsdelivr.net/npm/dockview-react@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-react': `${local}/dockview-react`,
         },
     },
@@ -51,11 +53,13 @@ const DOCKVIEW_CDN = {
             // -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-vue': `${local}/dockview-vue`,
         },
     },
@@ -65,10 +69,12 @@ const DOCKVIEW_CDN = {
             // it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
         },
     },
     angular: {
@@ -77,11 +83,13 @@ const DOCKVIEW_CDN = {
             // dockview -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-angular': `${local}/dockview-angular`,
         },
     },
@@ -93,6 +101,114 @@ const START_FILE = {
     vue: 'app/index.ts',
     angular: 'app/index.ts',
 };
+
+// The `main` file each mapped package resolves to, mirrored from the SystemJS
+// boilerplates in static/example-runner/*/systemjs.config.js. Nothing fails
+// loudly when a boilerplate points at a path the build no longer produces: the
+// browser just 404s (or serves a stale orphan) at runtime. So the paths here
+// must be kept in step with those boilerplates and are asserted below.
+const PACKAGE_MAIN = {
+    'dockview-core': 'dist/package/main.cjs.js',
+    dockview: 'dist/package/main.cjs.js',
+    'dockview-enterprise': 'dist/package/main.cjs.js',
+    'dockview-react': 'dist/package/main.cjs.js',
+    'dockview-vue': 'dist/dockview-vue.es.js',
+    'dockview-angular': 'dist/fesm2022/dockview-angular.mjs',
+};
+
+// Set to bypass the resolution check (e.g. an offline build). Off by default:
+// the whole point of the guard is to fail a docs build that would ship dead
+// example imports.
+const SKIP_MAIN_CHECK = process.env.SKIP_TEMPLATE_MAIN_CHECK === 'true';
+
+// Every package mapped by any framework, deduped.
+function mappedPackages() {
+    const packages = new Set();
+    for (const framework of FRAMEWORKS) {
+        for (const pkg of Object.keys(DOCKVIEW_CDN[framework].remote)) {
+            packages.add(pkg);
+        }
+    }
+    return [...packages];
+}
+
+// Assert every mapped package `main` actually resolves before any template is
+// written. --local checks the file on disk under the package's dist/; remote
+// HEADs the CDN URL and fails on >= 400. The remote check catches both a stale
+// mapping and a docs deploy that runs ahead of the npm publish (either of which
+// would 404 every example that imports the package). Kept cheap: a handful of
+// HEADs, run in parallel, honouring the DOCKVIEW_VERSION override.
+async function assertMainsResolve() {
+    if (SKIP_MAIN_CHECK) {
+        console.warn(
+            '[buildTemplates] SKIP_TEMPLATE_MAIN_CHECK set, skipping package main resolution check'
+        );
+        return;
+    }
+
+    const packages = mappedPackages();
+    const failures = [];
+
+    // Config drift: a package is mapped but has no known main file here.
+    for (const pkg of packages) {
+        if (!PACKAGE_MAIN[pkg]) {
+            failures.push({
+                pkg,
+                where: `missing from PACKAGE_MAIN in ${path.basename(
+                    fileURLToPath(import.meta.url)
+                )}`,
+            });
+        }
+    }
+
+    if (USE_LOCAL_CDN) {
+        for (const pkg of packages) {
+            const rel = PACKAGE_MAIN[pkg];
+            if (!rel) continue;
+            const abs = path.join(__dirname, '..', '..', pkg, rel);
+            if (!fs.existsSync(abs)) {
+                failures.push({ pkg, where: abs });
+            }
+        }
+    } else {
+        await Promise.all(
+            packages.map(async (pkg) => {
+                const rel = PACKAGE_MAIN[pkg];
+                if (!rel) return;
+                const url = `https://cdn.jsdelivr.net/npm/${pkg}@${DOCKVIEW_VERSION}/${rel}`;
+                try {
+                    const res = await fetch(url, { method: 'HEAD' });
+                    if (res.status >= 400) {
+                        failures.push({ pkg, where: url, status: res.status });
+                    }
+                } catch (err) {
+                    failures.push({ pkg, where: url, status: err.message });
+                }
+            })
+        );
+    }
+
+    if (failures.length > 0) {
+        const lines = failures.map((f) => {
+            const status = f.status ? ` (${f.status})` : '';
+            const version = USE_LOCAL_CDN ? 'local' : `@${DOCKVIEW_VERSION}`;
+            return `  - ${f.pkg}${version} -> ${f.where}${status}`;
+        });
+        const hint = USE_LOCAL_CDN
+            ? 'Build the packages first (npm run build && npm run build:bundle in each of dockview-core, dockview, dockview-react, dockview-enterprise).'
+            : 'Check these versions are published to npm. The docs must not deploy ahead of the npm publish, or every example that imports the package 404s. Use DOCKVIEW_VERSION to test a prerelease.';
+        throw new Error(
+            `[buildTemplates] ${failures.length} mapped package main file(s) do not resolve:\n` +
+                `${lines.join('\n')}\n${hint}`
+        );
+    }
+
+    console.log(
+        `[buildTemplates] verified ${packages.length} package main files resolve (${
+            USE_LOCAL_CDN ? 'local disk' : `jsdelivr @${DOCKVIEW_VERSION}`
+        })`
+    );
+}
 
 const template = fs
     .readFileSync(path.join(__dirname, './template.html'))
@@ -118,10 +234,10 @@ const COMPONENTS = ['dockview', 'splitview', 'gridview', 'paneview'];
 const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
 
 const COMPONENT_SELECTORS = {
-    'dockview': '.dv-dockview',
-    'splitview': '.dv-split-view-container',
-    'gridview': '.dv-grid-view',
-    'paneview': '.dv-pane-container'
+    dockview: '.dv-dockview',
+    splitview: '.dv-split-view-container',
+    gridview: '.dv-grid-view',
+    paneview: '.dv-pane-container',
 };
 
 const list = [];
@@ -170,9 +286,7 @@ async function buildTemplates() {
                 const boilerplatePath = `${BOILERPLATE_PATH_PREFIX}${boilerplateName}/`;
 
                 const systemJsMap =
-                    DOCKVIEW_CDN[framework][
-                        USE_LOCAL_CDN ? 'local' : 'remote'
-                    ];
+                    DOCKVIEW_CDN[framework][USE_LOCAL_CDN ? 'local' : 'remote'];
 
                 const html = createIndexHTML({
                     title: `Dockview | ${folder} ${framework}`,
@@ -217,5 +331,16 @@ async function buildTemplates() {
     fs.writeFileSync(path.join(output, 'index.html'), index);
 }
 
-// Run the build
-buildTemplates().catch(console.error);
+// Run the build. Assert the mapped package main files resolve first, then
+// generate the templates. Any failure must exit non-zero so a broken mapping or
+// an unpublished version fails the docs build loudly rather than shipping dead
+// example imports.
+async function run() {
+    await assertMainsResolve();
+    await buildTemplates();
+}
+
+run().catch((err) => {
+    console.error(err);
+    process.exit(1);
+});

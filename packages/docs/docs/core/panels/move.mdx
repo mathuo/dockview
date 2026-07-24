@@ -1,29 +1,34 @@
 ---
-title: Move Panel
+title: Move panel
 sidebar_position: 3
 description: How to move a panel to a different group or position in the Dockview layout.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how you can move a panel to another panel or group.
+A panel can be relocated to a different group and position without being destroyed and re-created. Use `moveTo` on the panel API to reposition it relative to another group and index.
 
 ## Methods
 
-<DocRef declaration="DockviewPanelApi" methods={["moveTo"]}/>
+<DocRef declaration="DockviewPanelApi" methods={['moveTo']} />
 
-## Move a Panel
+## Move a panel
 
-You can move a panel through the [Panel API](/docs/api/dockview/panelApi) and you can find out how to move a Group [here](/docs/core/groups/move).
+You can move a panel through the [Panel API](/docs/api/dockview/panelApi) and you can find out how to move a group [here](/docs/core/groups/move).
 
 ```ts
 panel.api.moveTo({ group, position, index });
 ```
 
-An equivalent method for moving groups is avaliable on the group `api`.
+An equivalent method for moving groups is available on the group `api`.
 
 ```ts
 const group = panel.api.group;
 group.api.moveTo({ group, position });
 ```
 
+## See also
+
+- [Move group](/docs/core/groups/move): move a whole group rather than a single panel.
+- [Adding panels](/docs/core/panels/add): position a panel at creation time with the same `direction` semantics.
+- [Panel API](/docs/api/dockview/panelApi): the panel API surface that exposes `moveTo`.

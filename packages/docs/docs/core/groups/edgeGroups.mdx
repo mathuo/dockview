@@ -1,15 +1,15 @@
 ---
-title: Edge Groups
-description: How to create and manage edge groups in Dockview — groups that are pinned to the edges of the layout, like a VS Code sidebar or panel.
+title: Edge groups
+description: "How to create and manage edge groups in Dockview: groups that are pinned to the edges of the layout, like a VS Code sidebar or panel."
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API — and their state is included in `toJSON` / `fromJSON`.
+Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API, and their state is included in `toJSON` / `fromJSON`.
 
-<CodeRunner id="dockview/edge-groups" height={500}/>
+<CodeRunner id="dockview/edge-groups" height={500} />
 
 :::info
 Edge groups **cannot** be maximized or converted into floating/popout windows. They are structural elements of the layout.
@@ -19,7 +19,7 @@ Edge groups **cannot** be maximized or converted into floating/popout windows. T
 The `dndEdges` prop controls the drag-and-drop overlay that appears when dragging panels to the far edges of the layout. See [Drag and Drop](/docs/core/dnd/dragAndDrop#drag-and-drop) for configuration details.
 :::
 
-## Adding Edge Groups
+## Adding edge groups
 
 Call `addEdgeGroup` in your `onReady` handler (or any time after initialization):
 
@@ -63,11 +63,11 @@ dockview.addEdgeGroup('bottom', {
 
 Calling `addEdgeGroup` for a position that is already registered throws an error.
 
-## Edge Group Options
+## Edge group options
 
-<DocRef declaration="EdgeGroupOptions" />
+<DocRef declaration="AddEdgeGroupOptions" />
 
-## Adding Panels into an Edge Group
+## Adding panels into an edge group
 
 Use `addPanel` with a `position.referenceGroup` pointing at the edge group's `id`:
 
@@ -91,6 +91,7 @@ api.addPanel({
     declaration="DockviewApi"
     methods={[
         'addEdgeGroup',
+        'revealEdgeGroupWithData',
         'getEdgeGroup',
         'setEdgeGroupVisible',
         'isEdgeGroupVisible',
@@ -98,7 +99,7 @@ api.addPanel({
     ]}
 />
 
-## Collapse and Expand
+## Collapse and expand
 
 Edge groups can be collapsed to their header strip and expanded back to their last size programmatically, or by the user clicking the active tab.
 
@@ -123,18 +124,36 @@ The `collapsedSize` (the pixel height/width of the header when collapsed) defaul
 
 Themes that set a custom `edgeGroupCollapsedSize`:
 
-| Theme | `edgeGroupCollapsedSize` |
-| --- | --- |
-| `themeVisualStudio` | `22` |
-| `themeAbyssSpaced` | `44` |
-| `themeGithubLightSpaced` | `44` |
-| All other themes | `35` (default) |
+| Theme                    | `edgeGroupCollapsedSize` |
+| ------------------------ | ------------------------ |
+| `themeVisualStudio`      | `22`                     |
+| `themeAbyssSpaced`       | `44`                     |
+| `themeGithubLightSpaced` | `44`                     |
+| All other themes         | `35` (default)           |
 
 :::tip
 When an edge group loses all of its panels it is automatically collapsed. Adding a new panel to it will expand it again.
 :::
 
-## Custom Header Actions
+Collapsed edge groups can auto-hide and peek back on demand. See [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
+
+## Dock to edge groups
+
+With the `dockToEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar. See [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
+
+## Auto-hide co-existence
+
+Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the per-edge `autoHideEdgeGroups` option for that group.
+
+```ts
+// this edge group auto-hides; others follow the per-edge option
+api.addEdgeGroup('left', { id: 'left-group', autoHide: true });
+
+// toggle at runtime
+api.getEdgeGroup('right')?.setAutoHide(true);
+```
+
+## Custom header actions
 
 The `location` prop in `rightHeaderActionsComponent`, `leftHeaderActionsComponent`, and `prefixHeaderActionsComponent` updates reactively when a group moves. Use it to show controls specific to edge groups.
 
@@ -157,6 +176,7 @@ const MyRightActions = (props: IDockviewHeaderActionsProps) => {
 
     const position = props.location.position; // 'left' | 'right' | 'top' | 'bottom'
     return <button onClick={() => props.api.collapse()}>Collapse {position}</button>;
+
 };
 
 <DockviewReact rightHeaderActionsComponent={MyRightActions} />
@@ -231,3 +251,8 @@ const state = api.toJSON();
 
 api.fromJSON(state); // auto-creates and restores edge groups
 ```
+
+## See also
+
+- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups): turn a collapsed edge group into a pinnable tool window
+- [Group controls](/docs/core/groups/controls): render controls specific to edge groups via the `location` prop

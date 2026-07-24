@@ -21,7 +21,8 @@ import {
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
 
-export interface IDockviewGroupPanel extends IGridviewPanel<DockviewGroupPanelApi> {
+export interface IDockviewGroupPanel
+    extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
     locked: DockviewGroupPanelLocked;
     readonly size: number;
@@ -203,6 +204,14 @@ export class DockviewGroupPanel
     layout(width: number, height: number) {
         super.layout(width, height);
         this.model.layout(width, height);
+    }
+
+    /**
+     * Re-run the group's layout with its current dimensions, propagating a
+     * header-size change down to the content + active panel.
+     */
+    relayout(): void {
+        this.model.relayout();
     }
 
     getComponent(): IFrameworkPart {

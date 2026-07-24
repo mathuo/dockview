@@ -56,7 +56,7 @@ function flushChips(dockview: DockviewComponent): void {
     }
 }
 
-describe('DockviewComponent — tab group accent', () => {
+describe('DockviewComponent: tab group accent', () => {
     test('default palette is the built-in 9 colors', () => {
         const { dockview } = setup();
         expect(dockview.api.tabGroupColors).toEqual(DEFAULT_TAB_GROUP_COLORS);

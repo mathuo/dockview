@@ -28,6 +28,18 @@ export interface PopoutGroupEntry {
     dropTargetContainer: DropTargetAnchorContainer;
     getWindow: () => Window;
     popoutUrl?: string;
+    /**
+     * The window-scoped popup service shared by every group in this popout
+     * window (resolved per-member via {@link IPopoutWindowService.findByGroup}
+     * so overflow/context menus render in the correct window regardless of
+     * which group is the anchor).
+     */
+    popupService: PopupService;
+    /**
+     * Promote a new anchor group after the current one leaves the window,
+     * rebinding anchor-relative state (focus routing) to it.
+     */
+    setAnchorGroup: (group: DockviewGroupPanel) => void;
     disposable: { dispose: () => DockviewGroupPanel | undefined };
 }
 
@@ -55,10 +67,6 @@ export interface IPopoutWindowService extends IDisposable {
         overlayRenderContainer: OverlayRenderContainer
     ): IDisposable | undefined;
 
-    getPopupService(groupId: string): PopupService | undefined;
-    setPopupService(groupId: string, service: PopupService): void;
-    deletePopupService(groupId: string): void;
-
     readonly restorationPromise: Promise<void>;
     scheduleRestoration(
         delayMs: number,
@@ -75,7 +83,6 @@ export interface IPopoutWindowService extends IDisposable {
 export class PopoutWindowService implements IPopoutWindowService {
     private readonly _host: IPopoutWindowHost;
     private readonly _entries: PopoutGroupEntry[] = [];
-    private readonly _popupServices = new Map<string, PopupService>();
     private readonly _restorationCleanups = new Set<() => void>();
     private _restorationPromise: Promise<void> = Promise.resolve();
 
@@ -126,9 +133,9 @@ export class PopoutWindowService implements IPopoutWindowService {
      * The popout window's innerWidth/innerHeight are often 0/stale until it has
      * painted, and the nested gridview lays its children out to the size passed
      * to layout() (a plain group fills via CSS instead). To stop content
-     * rendering into a zero box until a manual resize — and to avoid the race a
-     * fixed number of animation frames had — observe the gridview element with
-     * a ResizeObserver created in the POPOUT window's OWN realm. A parent-realm
+     * rendering into a zero box until a manual resize, and to avoid the race a
+     * fixed number of animation frames had, observe the gridview element with
+     * a ResizeObserver created in the popout window's own realm. A parent-realm
      * observer fires unreliably across the window boundary; a same-realm one
      * fires reliably, including the initial observation once the window is
      * sized.
@@ -179,18 +186,6 @@ export class PopoutWindowService implements IPopoutWindowService {
         });
         observer.observe(gridview.element);
         return { dispose: () => observer.disconnect() };
-    }
-
-    getPopupService(groupId: string): PopupService | undefined {
-        return this._popupServices.get(groupId);
-    }
-
-    setPopupService(groupId: string, service: PopupService): void {
-        this._popupServices.set(groupId, service);
-    }
-
-    deletePopupService(groupId: string): void {
-        this._popupServices.delete(groupId);
     }
 
     scheduleRestoration(

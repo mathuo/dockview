@@ -13,7 +13,7 @@ import { defineModule } from './modules';
 
 /**
  * The narrow surface the {@link LiveRegionService} needs from the host
- * (the `DockviewComponent`) — somewhere to mount the region and the layout
+ * (the `DockviewComponent`): somewhere to mount the region and the layout
  * events to narrate. `onWill/onDidMutateLayout` are used to suppress the
  * bulk-load / clear burst (one transaction, not N panel announcements).
  */
@@ -27,12 +27,16 @@ export interface ILiveRegionHost {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChangeEvent>;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /** Live popout windows + a signal when that set changes, so the service can
+     *  mount a live region inside each popout document and route to it. */
+    getPopoutWindows(): Window[];
+    readonly onDidChangePopouts: Event<void>;
 }
 
 export interface ILiveRegionService extends IDisposable {
     /**
-     * Announce a message to assistive technology via the live region. The
-     * shared sink — the accessibility module writes keyboard-docking
+     * Announce a message to assistive technology via the live region. This
+     * is the shared sink: the accessibility module writes keyboard-docking
      * narration here too, so all announcements use one region.
      */
     announce(message: string, politeness?: 'polite' | 'assertive'): void;
@@ -42,8 +46,13 @@ export interface ILiveRegionService extends IDisposable {
 const isBulk = (kind: DockviewLayoutMutationKind): boolean =>
     kind === 'load' || kind === 'clear';
 
-function createLiveRegion(politeness: 'polite' | 'assertive'): HTMLElement {
-    const el = document.createElement('div');
+type RegionPair = { polite: HTMLElement; assertive: HTMLElement };
+
+function createLiveRegion(
+    doc: Document,
+    politeness: 'polite' | 'assertive'
+): HTMLElement {
+    const el = doc.createElement('div');
     el.className =
         politeness === 'assertive'
             ? 'dv-live-region-assertive'
@@ -84,8 +93,9 @@ export class LiveRegionService
     implements ILiveRegionService
 {
     private readonly _host: ILiveRegionHost;
-    private readonly _polite: HTMLElement;
-    private readonly _assertive: HTMLElement;
+    private readonly _mainWindow: Window;
+    /** One live-region pair per window (main + each popout document). */
+    private readonly _regions = new Map<Window, RegionPair>();
     private _suppressDepth = 0;
     private readonly _locationSubs = new Map<string, IDisposable>();
 
@@ -93,14 +103,24 @@ export class LiveRegionService
         super();
 
         this._host = host;
-        this._polite = createLiveRegion('polite');
-        this._assertive = createLiveRegion('assertive');
-        host.element.appendChild(this._polite);
-        host.element.appendChild(this._assertive);
+        const mainDoc = host.element.ownerDocument;
+        this._mainWindow = mainDoc.defaultView ?? window;
+
+        // The main window's region lives inside the dockview element (existing
+        // behaviour). Popout windows get their own pair in their own document.
+        const mainPair: RegionPair = {
+            polite: createLiveRegion(mainDoc, 'polite'),
+            assertive: createLiveRegion(mainDoc, 'assertive'),
+        };
+        host.element.appendChild(mainPair.polite);
+        host.element.appendChild(mainPair.assertive);
+        this._regions.set(this._mainWindow, mainPair);
+        this._syncPopoutRegions();
 
         this.addDisposables(
-            { dispose: () => this._polite.remove() },
-            { dispose: () => this._assertive.remove() },
+            { dispose: () => this._disposeRegions() },
+            // Mount / unmount a region as popout windows open and close.
+            host.onDidChangePopouts(() => this._syncPopoutRegions()),
             host.onDidAddPanel((panel) => this._announce(panel, 'open')),
             host.onDidRemovePanel((panel) => this._announce(panel, 'close')),
             // Bracket bulk transactions so a fromJSON / clear doesn't announce
@@ -139,6 +159,69 @@ export class LiveRegionService
                 },
             }
         );
+    }
+
+    /** Create a live region in every popout document that lacks one, and remove
+     *  regions for popouts that have closed. The main window's pair is permanent. */
+    private _syncPopoutRegions(): void {
+        const mainDoc = this._host.element.ownerDocument;
+        const desired = new Set<Window>([this._mainWindow]);
+
+        for (const win of this._host.getPopoutWindows()) {
+            // A popout that shares the main document (e.g. the jsdom test mock)
+            // must not get a duplicate region in the same tree.
+            if (win.document === mainDoc) {
+                continue;
+            }
+            desired.add(win);
+            if (this._regions.has(win)) {
+                continue;
+            }
+            const doc = win.document;
+            const mount = doc.body ?? doc.documentElement;
+            const pair: RegionPair = {
+                polite: createLiveRegion(doc, 'polite'),
+                assertive: createLiveRegion(doc, 'assertive'),
+            };
+            mount.appendChild(pair.polite);
+            mount.appendChild(pair.assertive);
+            this._regions.set(win, pair);
+        }
+
+        for (const [win, pair] of this._regions) {
+            if (!desired.has(win)) {
+                pair.polite.remove();
+                pair.assertive.remove();
+                this._regions.delete(win);
+            }
+        }
+    }
+
+    private _disposeRegions(): void {
+        for (const pair of this._regions.values()) {
+            pair.polite.remove();
+            pair.assertive.remove();
+        }
+        this._regions.clear();
+    }
+
+    /** Route announcements to the live region of the window that currently has
+     *  focus, so a screen-reader user in a popout hears them, falling back to
+     *  the main window. */
+    private _focusedRegions(): RegionPair {
+        for (const [win, pair] of this._regions) {
+            if (win === this._mainWindow) {
+                continue;
+            }
+            try {
+                if (win.document.hasFocus()) {
+                    return pair;
+                }
+            } catch {
+                // A closing / cross-origin window can throw on access, so ignore.
+            }
+        }
+        return this._regions.get(this._mainWindow)!;
     }
 
     private _trackLocation(group: DockviewGroupPanel): void {
@@ -184,8 +267,9 @@ export class LiveRegionService
             return;
         }
         // Clearing first forces SRs to re-announce an identical message.
+        const pair = this._focusedRegions();
         const region =
-            politeness === 'assertive' ? this._assertive : this._polite;
+            politeness === 'assertive' ? pair.assertive : pair.polite;
         region.textContent = '';
         region.textContent = message;
     }

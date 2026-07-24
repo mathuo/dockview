@@ -10,7 +10,7 @@ export interface PointerGhostOptions {
     /** Default 0.8. */
     opacity?: number;
     /**
-     * Source element whose `ownerDocument.body` hosts the ghost — pass for
+     * Source element whose `ownerDocument.body` hosts the ghost. Pass it for
      * popout-window drags so the ghost renders in the popout's document.
      */
     owner?: Element;
@@ -52,7 +52,7 @@ export class PointerGhost implements IDisposable {
         if (this._disposed) {
             return;
         }
-        // translate3d composites on the GPU — no layout per pointermove.
+        // translate3d composites on the GPU, so there's no layout on each pointermove.
         this.element.style.transform = `translate3d(${
             clientX - this.offsetX
         }px, ${clientY - this.offsetY}px, 0)`;

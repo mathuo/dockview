@@ -31,9 +31,8 @@ export interface SerializedGridviewComponent {
     activePanel?: string;
 }
 
-export interface AddGridviewComponentOptions<
-    T extends object = Parameters,
-> extends BaseComponentOptions<T> {
+export interface AddGridviewComponentOptions<T extends object = Parameters>
+    extends BaseComponentOptions<T> {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
@@ -294,10 +293,9 @@ export class GridviewComponent
         panel: GridviewPanel,
         options: { direction: Direction; reference: string; size?: number }
     ): void {
-        let relativeLocation: number[];
-
-        const removedPanel = this.gridview.remove(panel) as GridviewPanel;
-
+        // Validate before mutating: resolve the reference group and target
+        // first, so an invalid reference/direction throws while `panel` is
+        // still in the grid rather than leaving it removed and dangling.
         const referenceGroup = this._groups.get(options.reference)?.value;
 
         if (!referenceGroup) {
@@ -309,14 +307,16 @@ export class GridviewComponent
         const target = toTarget(options.direction);
         if (target === 'center') {
             throw new Error(`${target} not supported as an option`);
-        } else {
-            const location = getGridLocation(referenceGroup.element);
-            relativeLocation = getRelativeLocation(
-                this.gridview.orientation,
-                location,
-                target
-            );
         }
+
+        const location = getGridLocation(referenceGroup.element);
+        const relativeLocation = getRelativeLocation(
+            this.gridview.orientation,
+            location,
+            target
+        );
+
+        const removedPanel = this.gridview.remove(panel) as GridviewPanel;
 
         this.doAddGroup(removedPanel, relativeLocation, options.size);
     }

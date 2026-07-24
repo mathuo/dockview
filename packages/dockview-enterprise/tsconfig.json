@@ -1,0 +1,11 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist/cjs",
+        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
+        "rootDir": "src",
+        "emitDeclarationOnly": true
+    },
+    "include": ["src"],
+    "exclude": ["**/node_modules", "src/__tests__"]
+}

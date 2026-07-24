@@ -61,6 +61,10 @@ export class Scrollbar extends CompositeDisposable {
             addDisposableListener(this._scrollbar, 'pointerdown', (event) => {
                 event.preventDefault();
 
+                // Bind the drag to the scrollbar's own document so pointermove/up
+                // are heard when the scrollable lives in a popout window.
+                const doc = this._scrollbar.ownerDocument ?? document;
+
                 toggleClass(this.element, 'dv-scrollable-scrolling', true);
 
                 const originalClient =
@@ -88,8 +92,6 @@ export class Scrollbar extends CompositeDisposable {
                     this._scrollOffset = originalScrollOffset + delta / p;
                     this.calculateScrollbarStyles();
                 };
-
-                const doc = this.element.ownerDocument;
 
                 const onEnd = () => {
                     toggleClass(this.element, 'dv-scrollable-scrolling', false);

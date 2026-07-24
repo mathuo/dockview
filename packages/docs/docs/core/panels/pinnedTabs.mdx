@@ -1,0 +1,164 @@
+---
+title: Pinned tabs
+description: Pin tabs so they render first, never overflow, and resist reordering, modelled on VS Code and Chrome.
+sidebar_position: 11
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Pinned tabs let you mark the tabs that matter so they stay put. Modelled on VS Code and Chrome, a pinned tab:
+
+- **renders first**: pinned tabs always sort ahead of unpinned tabs in their group;
+- **stays reachable**: pinned tabs are excluded from the ordinary overflow dropdown, so they stay visible as the strip fills up. If the pinned block is itself too wide to fit, the clipped pinned tabs surface in their own "Pinned" section at the top of the dropdown rather than becoming unreachable;
+- **resists reordering**: you cannot drag an unpinned tab to the left of a pinned one (the pin boundary is enforced).
+
+The pinned order is stable: pinning appends a tab to the end of the pinned block, and unpinning returns it to the front of the unpinned block.
+
+<CodeRunner id="dockview/pinned-tabs" />
+
+## Enabling pinned tabs
+
+Pinned tabs are dormant until you enable them through the `pinnedTabs` option. With the option unset (or `enabled: false`) pinning is a no-op and the tab strip behaves exactly as it does by default.
+
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['pinnedTabs']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['pinnedTabs']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="DockviewComponentOptions" methods={['pinnedTabs']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="DockviewAngularOptions" methods={['pinnedTabs']} />
+</FrameworkSpecific>
+
+```tsx
+const api = createDockview(element, {
+    pinnedTabs: { enabled: true },
+});
+```
+
+## Options
+
+<DocRef declaration="PinnedTabsOptions" />
+
+- **`enabled`**: the master switch. Leave it unset (or `false`) to keep pinning dormant; the tab strip then behaves identically to the default.
+- **`mode`**: `'inline'` (the default) keeps pinned tabs first within the existing tab strip. `'separate-row'` renders them on their own VS-Code-style row above the main strip; the row collapses when no tab in the group is pinned.
+- **`compact`**: render pinned tabs icon-only (title and close button hidden), like VS Code and Chrome. Defaults to `false` because Dockview's default tab has no favicon, so pinned tabs stay labelled (with a pin glyph) unless you opt in. Best paired with a custom tab renderer that shows an icon.
+- **`togglePinOnCrossBoundaryDrag`**: when `true`, dragging a tab across the pin boundary toggles its pinned state (VS-Code behaviour). Defaults to `false`: dragging across the boundary is clamped back, matching Chrome, where pinning is an explicit action.
+- **`stickyScroll`**: in `'inline'` mode, keep pinned tabs frozen to the left edge when the strip scrolls horizontally (Chrome-style sticky columns), so they stay visible even once the strip is scrolled. Defaults to `true`; set `false` to let pinned tabs scroll away with the rest. Ignored in `'separate-row'` mode, where the pinned row is always visible.
+- **`contextMenuItem`**: add a built-in "Pin"/"Unpin" item to the tab context menu. Defaults to `true`; requires the context menu to be available.
+
+:::info
+`mode: 'separate-row'` renders pinned tabs in a dedicated row. In `'inline'` mode pinned and unpinned tabs share the single strip, with pinned tabs sorted to the front.
+:::
+
+## Pinning by dragging
+
+In `'separate-row'` mode the pinned row is a live drop target, so pinning is a direct
+gesture as well as an API call:
+
+- **Pin**: drag an unpinned tab from the main strip onto the pinned row. It is pinned
+  and placed at the slot where you drop it within the pinned block.
+- **Unpin**: drag a pinned tab out of the row and back into the main strip. The row is
+  the only handle on a pinned tab in this mode, so dragging it into the unpinned area
+  is always treated as a deliberate unpin.
+- **Reorder**: drag a pinned tab within the row to reorder the pinned block; a drop
+  indicator marks where it will land.
+
+In `'inline'` mode the pin boundary is enforced during drags: an unpinned tab cannot
+cross to the left of a pinned one. Set `togglePinOnCrossBoundaryDrag` to let a tab
+dragged across that boundary toggle its pinned state instead.
+
+## Keyboard
+
+With the [keyboard keymap](/docs/advanced/keyboard) enabled, `Ctrl+Shift+Enter` pins
+or unpins the active panel's tab. The binding is rebindable through
+`keyboardNavigation.keymap.togglePin` and is inert unless `pinnedTabs.enabled` is
+`true`.
+
+## Panel API
+
+Pin, unpin and observe a tab programmatically through its panel `api`.
+
+<DocRef
+    declaration="DockviewPanelApi"
+    methods={['isPinned', 'setPinned', 'onDidChangePinned']}
+/>
+
+```tsx
+const api: DockviewPanelApi;
+
+// pin the tab (renders first, excluded from overflow)
+api.setPinned(true);
+
+// unpin the tab
+api.setPinned(false);
+
+// read the current pinned state
+const result: boolean = api.isPinned;
+
+// react to pinned state changes
+api.onDidChangePinned((event) => {
+    console.log(event.isPinned);
+});
+```
+
+You can observe pin changes across the whole component through the container `api`:
+
+<DocRef declaration="DockviewApi" methods={['onDidPanelPinnedChange']} />
+
+```tsx
+const api: DockviewApi;
+
+api.onDidPanelPinnedChange((event) => {
+    console.log(event.panel.id, event.isPinned);
+});
+```
+
+:::warning
+`setPinned` only takes effect when `pinnedTabs.enabled` is `true`. With pinning disabled, `isPinned` always reads `false` and `setPinned` is a no-op.
+:::
+
+## Context menu
+
+When `contextMenuItem` is left enabled (the default) a "Pin"/"Unpin" item is added to the tab context menu, toggling based on the tab's current state. If you build your own tab context menu, you can include the built-in `'pin'` item:
+
+```tsx
+getTabContextMenuItems={({ panel }) => [
+    'pin',
+    'separator',
+    'close',
+    'closeOthers',
+    'closeAll',
+]}
+```
+
+## Serialization
+
+Pinned state round-trips through `toJSON` / `fromJSON`. The `pinned` flag is written only for pinned panels, so existing layouts stay byte-stable, and the pinned-first order is preserved by the serialized panel order.
+
+```tsx
+const state = api.toJSON();
+// ... later
+api.fromJSON(state); // pinned tabs are restored, in their pinned order
+```
+
+:::info
+Layouts saved before pinning was enabled (or restored into a component with `pinnedTabs` disabled) load as a normal, unpinned strip. The `pinned` key is simply ignored when pinning is off.
+:::
+
+## See also
+
+- [Tabs](/docs/core/panels/tabs): custom tab renderers and the tab context menu that hosts the `'pin'` item.
+- [Tab overflow](/docs/core/panels/tabOverflow): the overflow dropdown that pinned tabs are excluded from.
+- [Advanced overflow](/docs/core/panels/advancedOverflow): the dropdown's "Pinned" section when the pinned block itself overflows.
+- [Multi-row tabs](/docs/core/panels/multiRowTabs): an alternative way to keep every tab visible as the strip fills up.
+- [Keyboard navigation](/docs/advanced/keyboard): the `togglePin` binding for pinning from the keyboard.

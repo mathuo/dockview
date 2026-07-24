@@ -35,14 +35,14 @@
         "vue3",
         "composition-api"
     ],
-    "main": "dist/dockview-vue.umd.js",
+    "main": "dist/dockview-vue.umd.cjs",
     "module": "dist/dockview-vue.es.js",
     "types": "dist/types/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/types/index.d.ts",
             "import": "./dist/dockview-vue.es.js",
-            "require": "./dist/dockview-vue.umd.js"
+            "require": "./dist/dockview-vue.umd.cjs"
         },
         "./dist/styles/*": "./dist/styles/*",
         "./package.json": "./package.json"
@@ -57,14 +57,16 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git"
+        "url": "git+https://github.com/mathuo/dockview.git",
+        "directory": "packages/dockview-vue"
     },
     "type": "module",
     "license": "MIT",
     "author": "https://github.com/mathuo",
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENCE.md"
     ],
     "scripts": {
         "build:bundle": "echo 'noop'",
@@ -74,12 +76,13 @@
         "build": "npm run build:js && npm run build:types && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
+        "types:check": "attw --pack . --ignore-rules false-esm internal-resolution-error",
         "test": "vitest run",
         "test:cov": "vitest run --coverage",
-        "lint": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}'",
-        "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}' --fix",
-        "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,vue}'",
-        "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,vue}'"
+        "lint": "biome lint src",
+        "lint:fix": "biome lint --write src",
+        "format": "biome format --write src",
+        "format:check": "biome format src"
     },
     "dependencies": {
         "dockview": "^7.0.4"

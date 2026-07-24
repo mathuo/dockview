@@ -6,7 +6,44 @@
     padding: 0 12px;
     background: var(--ifm-navbar-background-color);
     border-bottom: 1px solid var(--ifm-toc-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
+    z-index: 2;
+}
+
+/* Positioning context for the demo canvas + its loading overlay. */
+.demoBody {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Branded loading overlay. Covers the canvas until the dock reports ready,
+   hiding both the lazy-chunk download and the flash of unstyled content, then
+   fades out to reveal a fully-styled layout. */
+.loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ifm-background-color);
+    z-index: 5;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+}
+
+.loaderHidden {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loader {
+        transition: none;
+    }
 }
 
 .spacer {
@@ -16,16 +53,27 @@
 .backLink {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
     color: var(--ifm-navbar-link-color);
     text-decoration: none;
-    font-size: 0.8em;
-    transition: color 0.15s;
+    transition: opacity 0.15s;
 }
 
 .backLink:hover {
-    color: var(--ifm-navbar-link-hover-color);
+    color: var(--ifm-navbar-link-color);
     text-decoration: none;
+    opacity: 0.8;
+}
+
+.brandMark {
+    display: block;
+    flex-shrink: 0;
+}
+
+.wordmark {
+    font-weight: 600;
+    font-size: 0.95em;
+    letter-spacing: -0.01em;
 }
 
 .divider {
@@ -62,20 +110,28 @@
 .toggleButton {
     display: flex;
     align-items: center;
+    gap: 6px;
     background: var(--ifm-hover-overlay);
     border: 1px solid var(--ifm-toc-border-color);
     color: var(--ifm-navbar-link-color);
     cursor: pointer;
-    padding: 3px 10px;
-    border-radius: 6px;
+    padding: 4px 11px;
+    border-radius: 7px;
     font-size: 0.8em;
+    font-weight: 600;
     line-height: 1.4;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    transition: color 0.15s, background 0.15s, border-color 0.15s,
+        box-shadow 0.15s;
+}
+
+.toggleButton svg {
+    opacity: 0.8;
 }
 
 .toggleButton:hover {
     color: var(--ifm-navbar-link-hover-color);
     border-color: var(--ifm-color-emphasis-400);
+    background: var(--ifm-color-emphasis-200);
 }
 
 .toggleButton:focus-visible {
@@ -83,16 +139,17 @@
     outline-offset: 2px;
 }
 
-.toggleButtonActive {
+.toggleButtonActive,
+.toggleButtonActive:hover {
     background: var(--ifm-color-primary);
     border-color: var(--ifm-color-primary);
-    color: var(--ifm-color-white, #fff);
+    color: #fff;
+    box-shadow: 0 2px 10px
+        color-mix(in srgb, var(--ifm-color-primary) 45%, transparent);
 }
 
-.toggleButtonActive:hover {
-    background: var(--ifm-color-primary-dark, var(--ifm-color-primary));
-    border-color: var(--ifm-color-primary-dark, var(--ifm-color-primary));
-    color: var(--ifm-color-white, #fff);
+.toggleButtonActive svg {
+    opacity: 1;
 }
 
 .tip {

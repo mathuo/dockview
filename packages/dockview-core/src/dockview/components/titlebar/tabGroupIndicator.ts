@@ -1,11 +1,37 @@
 import { IValueDisposable } from '../../../lifecycle';
-import { DockviewHeaderDirection, DockviewHeaderPosition } from '../../options';
+import {
+    DockviewHeaderDirection,
+    DockviewHeaderPosition,
+    OVERFLOW_WRAP_TABS_CLASS,
+} from '../../options';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import {
     resolveTabGroupAccent,
     TabGroupColorPalette,
 } from '../../tabGroupAccent';
+
+/**
+ * Class for the small accent pip drawn at the leading edge of each wrapped
+ * row a tab group spans beyond its first. Echoes the group chip so a
+ * multi-row group reads as one group on every row it occupies.
+ */
+export const TAB_GROUP_CHIP_CONTINUATION_CLASS =
+    'dv-tab-group-chip-continuation';
+
+/** Diameter (px) of a continuation pip; mirrors the CSS size. */
+const CONTINUATION_PIP_SIZE = 8;
+
+/**
+ * A maximal run of a group's tabs on one wrapped line (a row for a horizontal
+ * header, a column for a vertical header), in container-relative coordinates.
+ */
+interface WrappedRun {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+}
 
 export interface TabGroupIndicatorContext {
     readonly tabsList: HTMLElement;
@@ -33,6 +59,12 @@ export interface ITabGroupIndicator {
  */
 abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
     protected readonly _underlines = new Map<string, HTMLElement>();
+    /**
+     * Per-group pool of continuation-marker pips (one per wrapped row the
+     * group spans beyond its first). Absolutely positioned so they sit
+     * outside the flex-wrap flow, exactly like the underline element.
+     */
+    private readonly _continuationMarkers = new Map<string, HTMLElement[]>();
     private _rafId: number | null = null;
 
     get underlines(): ReadonlyMap<string, HTMLElement> {
@@ -82,11 +114,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             }
         }
 
-        // Remove underlines for dissolved groups
+        // Remove underlines (and any continuation markers) for dissolved groups
         for (const [groupId, el] of this._underlines) {
             if (!activeGroupIds.has(groupId)) {
                 el.remove();
                 this._underlines.delete(groupId);
+                this._clearContinuationMarkers(groupId);
             }
         }
     }
@@ -105,6 +138,57 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             el.remove();
         }
         this._underlines.clear();
+        this._clearContinuationMarkers();
+    }
+
+    /**
+     * Grow/shrink a group's continuation-marker pool to `count` pips,
+     * creating/removing DOM nodes as needed, and return the pool.
+     */
+    private _syncContinuationMarkers(
+        groupId: string,
+        count: number
+    ): HTMLElement[] {
+        let pool = this._continuationMarkers.get(groupId);
+        if (!pool) {
+            pool = [];
+            this._continuationMarkers.set(groupId, pool);
+        }
+        while (pool.length < count) {
+            const marker = document.createElement('div');
+            marker.className = TAB_GROUP_CHIP_CONTINUATION_CLASS;
+            this._ctx.tabsList.appendChild(marker);
+            pool.push(marker);
+        }
+        while (pool.length > count) {
+            const marker = pool.pop();
+            marker?.remove();
+        }
+        return pool;
+    }
+
+    /**
+     * Remove continuation markers for a single group, or (when `groupId`
+     * is omitted) for every group. Used when a group dissolves, stops
+     * wrapping, or the indicator is disposed.
+     */
+    private _clearContinuationMarkers(groupId?: string): void {
+        if (groupId === undefined) {
+            for (const [, pool] of this._continuationMarkers) {
+                for (const marker of pool) {
+                    marker.remove();
+                }
+            }
+            this._continuationMarkers.clear();
+            return;
+        }
+        const pool = this._continuationMarkers.get(groupId);
+        if (pool) {
+            for (const marker of pool) {
+                marker.remove();
+            }
+            this._continuationMarkers.delete(groupId);
+        }
     }
 
     /**
@@ -126,6 +210,19 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         const containerRect = this._ctx.tabsList.getBoundingClientRect();
         const tabGroups = this._ctx.getTabGroups();
         const isVertical = this._ctx.getDirection() === 'vertical';
+        // Multi-line wrap (`MultiRowTabsModule`): a group's tabs can span
+        // multiple rows (horizontal header) or columns (vertical header), which
+        // the single-bar model below can't represent. Draw a per-line segment
+        // instead: rows bucketed by top, columns bucketed by left.
+        const wrapped = this._ctx.tabsList.classList.contains(
+            OVERFLOW_WRAP_TABS_CLASS
+        );
+        if (!wrapped) {
+            // Continuation markers only exist while wrapping; a runtime
+            // wrap→no-wrap toggle (or a switch to vertical) must not leave
+            // orphaned pips behind.
+            this._clearContinuationMarkers();
+        }
         const containerCrossSize = isVertical
             ? containerRect.width
             : containerRect.height;
@@ -145,6 +242,17 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             }
 
             underline.style.display = '';
+
+            if (wrapped) {
+                this._positionWrappedUnderline(
+                    underline,
+                    tg,
+                    containerRect,
+                    tabMap,
+                    isVertical
+                );
+                continue;
+            }
 
             const chipEl = this._ctx.getChipElement(tg.id);
 
@@ -246,15 +354,17 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             if (isVertical) {
                 underline.style.top = `${startEdge}px`;
                 underline.style.height = `${Math.max(0, span)}px`;
-                // Clear horizontal properties
+                // Clear horizontal properties (incl. any wrap-mode overrides)
                 underline.style.left = '';
                 underline.style.width = '';
+                underline.style.bottom = '';
             } else {
                 underline.style.left = `${startEdge}px`;
                 underline.style.width = `${Math.max(0, span)}px`;
-                // Clear vertical properties
+                // Clear vertical properties (incl. any wrap-mode overrides)
                 underline.style.top = '';
                 underline.style.height = '';
+                underline.style.bottom = '';
             }
 
             this.applyShape(
@@ -268,6 +378,257 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                 isVertical
             );
         }
+    }
+
+    /**
+     * Position a group's underline across a multi-line (wrapped) tab strip. The
+     * single-bar model can't span lines, so the element is sized to cover the
+     * group's line span and an SVG draws one straight segment per line-run of
+     * the group's tabs: a horizontal segment per row (horizontal header) or a
+     * vertical segment per column (vertical header). Tabs are bucketed into
+     * runs by their cross-axis offset: `top` for rows, `left` for columns.
+     * (The active-tab wrap-around bump is omitted in wrap; the per-line lines
+     * still convey membership.)
+     */
+    private _positionWrappedUnderline(
+        underline: HTMLElement,
+        tg: ITabGroup,
+        containerRect: DOMRect,
+        tabMap: Map<string, IValueDisposable<Tab>>,
+        isVertical: boolean
+    ): void {
+        const t = 2; // line thickness
+        const color = resolveTabGroupAccent(
+            tg.color,
+            this._ctx.getColorPalette()
+        );
+        if (color === undefined) {
+            underline.style.display = 'none';
+            this._clearContinuationMarkers(tg.id);
+            return;
+        }
+
+        const { runs, firstRun } = this._computeWrappedRuns(
+            tg,
+            containerRect,
+            tabMap,
+            isVertical
+        );
+
+        if (runs.length === 0) {
+            underline.style.display = 'none';
+            this._clearContinuationMarkers(tg.id);
+            return;
+        }
+
+        this._positionContinuationMarkers(
+            tg.id,
+            runs,
+            firstRun,
+            color,
+            isVertical
+        );
+
+        const minLeft = Math.min(...runs.map((r) => r.left));
+        const maxRight = Math.max(...runs.map((r) => r.right));
+        const minTop = Math.min(...runs.map((r) => r.top));
+        const maxBottom = Math.max(...runs.map((r) => r.bottom));
+
+        // Element covers the group's bounding box: the SVG inside draws the
+        // per-line segments. Cross-axis origin is offset (top for rows, left
+        // for columns); the main axis fills the container.
+        const width = isVertical
+            ? Math.max(0, maxRight - minLeft)
+            : containerRect.width;
+        const height = isVertical
+            ? containerRect.height
+            : Math.max(0, maxBottom - minTop);
+        underline.style.left = isVertical ? `${minLeft}px` : '0px';
+        underline.style.top = isVertical ? '0px' : `${minTop}px`;
+        underline.style.bottom = 'auto';
+        underline.style.width = `${width}px`;
+        underline.style.height = `${height}px`;
+        // The `none` indicator paints the underline element itself; clear any
+        // background left over from a non-wrap render so it doesn't show as a
+        // block behind the per-line SVG segments after a runtime wrap toggle.
+        underline.style.backgroundColor = '';
+
+        const { svg, path } = this.ensureSvgPath(underline);
+        svg.setAttribute('width', String(width));
+        svg.setAttribute('height', String(height));
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', String(t));
+
+        // `inverted` puts the line on the header-facing edge for the flipped
+        // positions: the top of each row for a bottom header, the right of each
+        // column for a right header.
+        const headerPosition = this._ctx.getHeaderPosition();
+        const inverted = isVertical
+            ? headerPosition === 'right'
+            : headerPosition === 'bottom';
+
+        path.setAttribute(
+            'd',
+            this._wrappedPathData(
+                runs,
+                isVertical,
+                inverted,
+                minLeft,
+                minTop,
+                t
+            )
+        );
+    }
+
+    /**
+     * Bucket a group's visible tabs into line-runs by their cross-axis offset
+     * (rows by `top`, columns by `left`), with a 2px sub-pixel tolerance.
+     * `firstRun` is the run holding the group's first tab (the chip's line),
+     * tracked by reference so it is correct regardless of axis or header side (a
+     * `vertical-rl` first column is right-most, not left-most).
+     */
+    private _computeWrappedRuns(
+        tg: ITabGroup,
+        containerRect: DOMRect,
+        tabMap: Map<string, IValueDisposable<Tab>>,
+        isVertical: boolean
+    ): { runs: WrappedRun[]; firstRun: WrappedRun | undefined } {
+        const runs: WrappedRun[] = [];
+        let firstRun: WrappedRun | undefined;
+        for (const pid of tg.panelIds) {
+            const te = tabMap.get(pid);
+            if (!te) {
+                continue;
+            }
+            const r = te.value.element.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) {
+                continue; // hidden / collapsed
+            }
+            const top = r.top - containerRect.top;
+            const bottom = r.bottom - containerRect.top;
+            const left = r.left - containerRect.left;
+            const right = r.right - containerRect.left;
+            const key = isVertical ? left : top;
+            let run = runs.find(
+                (x) => Math.abs((isVertical ? x.left : x.top) - key) <= 2
+            );
+            if (run) {
+                run.top = Math.min(run.top, top);
+                run.bottom = Math.max(run.bottom, bottom);
+                run.left = Math.min(run.left, left);
+                run.right = Math.max(run.right, right);
+            } else {
+                run = { top, bottom, left, right };
+                runs.push(run);
+            }
+            firstRun ??= run;
+        }
+        return { runs, firstRun };
+    }
+
+    /**
+     * Build the SVG `path` data for a group's per-line underline segments: a
+     * horizontal segment along each row's edge (`svg-y` offset by `minTop`) or a
+     * vertical segment down each column's leading edge (`svg-x` offset by
+     * `minLeft`). `inverted` moves the line to the header-facing edge.
+     */
+    private _wrappedPathData(
+        runs: readonly WrappedRun[],
+        isVertical: boolean,
+        inverted: boolean,
+        minLeft: number,
+        minTop: number,
+        t: number
+    ): string {
+        let d = '';
+        for (const run of runs) {
+            if (isVertical) {
+                const x = inverted
+                    ? run.right - minLeft - t / 2
+                    : run.left - minLeft + t / 2;
+                d += `M ${x},${run.top} L ${x},${run.bottom} `;
+            } else {
+                const y = inverted
+                    ? run.top - minTop + t / 2
+                    : run.bottom - minTop - t / 2;
+                d += `M ${run.left},${y} L ${run.right},${y} `;
+            }
+        }
+        return d.trim();
+    }
+
+    /**
+     * Draw a small accent pip at the leading edge of every wrapped line-run a
+     * group spans beyond its first. The group's real chip already marks the
+     * first run; these lightweight markers echo it on the continuation runs so
+     * a group that wraps onto rows/columns 2–3 reads as one group on each line
+     * instead of losing its colour after the first.
+     *
+     * `runs` are the group's line-runs (container-relative geometry) as
+     * bucketed by {@link _positionWrappedUnderline}; `firstRun` is the run that
+     * holds the chip and is skipped. The pip sits at each continuation run's
+     * main-axis start (top of a column, left of a row), centred on the cross
+     * axis.
+     */
+    private _positionContinuationMarkers(
+        groupId: string,
+        runs: readonly WrappedRun[],
+        firstRun: WrappedRun | undefined,
+        color: string,
+        isVertical: boolean
+    ): void {
+        const continuationRuns = runs.filter((run) => run !== firstRun);
+        const markers = this._syncContinuationMarkers(
+            groupId,
+            continuationRuns.length
+        );
+
+        continuationRuns.forEach((run, i) => {
+            const marker = markers[i];
+            marker.style.backgroundColor = color;
+            if (isVertical) {
+                // Column: pip at the top, centred horizontally on the column.
+                const center = (run.left + run.right) / 2;
+                marker.style.left = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+                marker.style.top = `${run.top}px`;
+            } else {
+                // Row: pip at the left, centred vertically on the row.
+                const center = (run.top + run.bottom) / 2;
+                marker.style.left = `${run.left}px`;
+                marker.style.top = `${center - CONTINUATION_PIP_SIZE / 2}px`;
+            }
+        });
+    }
+
+    /**
+     * Ensure the underline element holds a single reusable `<svg><path/></svg>`
+     * (created once, reused across frames) and return them.
+     */
+    protected ensureSvgPath(underline: HTMLElement): {
+        svg: SVGSVGElement;
+        path: SVGPathElement;
+    } {
+        const existing = underline.firstElementChild as SVGSVGElement | null;
+        if (existing?.tagName === 'svg') {
+            return {
+                svg: existing,
+                path: existing.firstElementChild as SVGPathElement,
+            };
+        }
+        underline.replaceChildren();
+        const svg = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg'
+        );
+        svg.style.display = 'block';
+        const path = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+        );
+        path.setAttribute('fill', 'none');
+        svg.appendChild(path);
+        underline.appendChild(svg);
+        return { svg, path };
     }
 }
 
@@ -337,22 +698,7 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         }
 
         // Ensure SVG + path child exists (created once, reused)
-        let svg = underline.firstElementChild as SVGSVGElement | null;
-        let path: SVGPathElement;
-        if (svg?.tagName === 'svg') {
-            path = svg.firstElementChild as SVGPathElement;
-        } else {
-            underline.replaceChildren();
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.style.display = 'block';
-            path = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'path'
-            );
-            path.setAttribute('fill', 'none');
-            svg.appendChild(path);
-            underline.appendChild(svg);
-        }
+        const { svg, path } = this.ensureSvgPath(underline);
 
         path.setAttribute('stroke', color);
         path.setAttribute('stroke-width', String(t));
@@ -471,8 +817,8 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
 }
 
 /**
- * Flat continuous bar indicator — no wrap-around, just a colored line
- * spanning the full tab group width.
+ * Flat continuous bar indicator: a plain colored line spanning the full tab
+ * group width, with no wrap-around.
  */
 export class NoneTabGroupIndicator extends BaseTabGroupIndicator {
     protected applyShape(

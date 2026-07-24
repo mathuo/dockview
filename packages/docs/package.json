@@ -11,7 +11,8 @@
         "docs:version": "docusaurus docs:version",
         "typecheck": "tsc",
         "build-templates": "node scripts/buildTemplates.mjs",
-        "build-templates:local": "node scripts/buildTemplates.mjs --local"
+        "build-templates:local": "node scripts/buildTemplates.mjs --local",
+        "record-clips": "node scripts/record/recordClips.mjs"
     },
     "browserslist": {
         "production": [
@@ -31,18 +32,16 @@
         "@docusaurus/preset-classic": "^3.10.1",
         "@docusaurus/theme-search-algolia": "^3.10.1",
         "@mdx-js/react": "^3.1.1",
-        "@minoru/react-dnd-treeview": "^3.5.3",
         "@radix-ui/react-dropdown-menu": "^2.1.16",
-        "ag-grid-community": "^35.3.0",
-        "ag-grid-react": "^35.3.0",
         "clsx": "^2.1.1",
         "dockview": "^7.0.4",
         "dockview-react": "^7.0.4",
         "prism-react-renderer": "^2.4.1",
-        "react-dnd": "^16.0.1",
-        "source-map-loader": "^5.0.0"
+        "source-map-loader": "^5.0.0",
+        "vanilla-cookieconsent": "^3.1.0"
     },
     "devDependencies": {
+        "@docusaurus/plugin-client-redirects": "^3.10.1",
         "@tsconfig/docusaurus": "^2.0.9",
         "docusaurus-plugin-sass": "^0.2.6"
     }

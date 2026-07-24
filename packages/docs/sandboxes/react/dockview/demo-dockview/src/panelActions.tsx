@@ -1,18 +1,7 @@
 import { DockviewApi, IDockviewPanel } from 'dockview-react';
 import * as React from 'react';
-
-const iconBtn: React.CSSProperties = {
-    padding: '3px 6px',
-    fontSize: 11,
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.6)',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-};
+import { SB } from './sidebarTheme';
+import { IconBtn } from './sidebarKit';
 
 const PanelAction = (props: {
     panels: string[];
@@ -68,7 +57,7 @@ const PanelAction = (props: {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '3px 16px',
+                padding: '4px 0',
                 minHeight: 28,
             }}
         >
@@ -76,14 +65,15 @@ const PanelAction = (props: {
                 onClick={onClick}
                 style={{
                     flex: 1,
-                    padding: '3px 8px',
-                    fontSize: 11,
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: 4,
-                    background: isActive
-                        ? 'rgba(72,100,220,0.25)'
-                        : 'rgba(255,255,255,0.04)',
-                    color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
+                    padding: '5px 10px',
+                    fontSize: 11.5,
+                    fontWeight: isActive ? 600 : 500,
+                    fontFamily: SB.ui,
+                    border: `1px solid ${isActive ? SB.accent : SB.border}`,
+                    borderRadius: SB.radiusSm,
+                    background: isActive ? SB.accent : SB.surface,
+                    color: isActive ? SB.accentContrast : SB.text,
+                    boxShadow: isActive ? SB.glow : 'none',
                     cursor: 'pointer',
                     textAlign: 'left',
                     overflow: 'hidden',
@@ -93,59 +83,36 @@ const PanelAction = (props: {
             >
                 {props.panelId}
             </button>
-            <div style={{ display: 'flex', gap: 2 }}>
-                <button
-                    style={iconBtn}
+            <div style={{ display: 'flex', gap: 3 }}>
+                <IconBtn
+                    icon="ad_group"
+                    title="Float"
                     onClick={() => {
                         const p = props.api.getPanel(props.panelId);
                         if (p) props.api.addFloatingGroup(p);
                     }}
-                    title="Float"
-                >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: 14 }}
-                    >
-                        ad_group
-                    </span>
-                </button>
-                <button
-                    style={iconBtn}
+                />
+                <IconBtn
+                    icon="open_in_new"
+                    title="Popout"
                     onClick={() => {
                         const p = props.api.getPanel(props.panelId);
                         if (p) props.api.addPopoutGroup(p);
                     }}
-                    title="Popout"
-                >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: 14 }}
-                    >
-                        open_in_new
-                    </span>
-                </button>
-                <button
-                    style={iconBtn}
+                />
+                <IconBtn
+                    icon="close"
+                    title="Close"
                     onClick={() => {
                         const p = props.api.getPanel(props.panelId);
                         p?.api.close();
                     }}
-                    title="Close"
-                >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: 14 }}
-                    >
-                        close
-                    </span>
-                </button>
+                />
                 <span
                     className="material-symbols-outlined"
                     style={{
-                        fontSize: 14,
-                        color: visible
-                            ? 'rgba(255,255,255,0.4)'
-                            : 'rgba(255,255,255,0.2)',
+                        fontSize: 16,
+                        color: visible ? SB.muted : SB.faint,
                         display: 'flex',
                         alignItems: 'center',
                         padding: '0 2px',

@@ -42,6 +42,12 @@ export interface ViewComponentConfig<
     onApiCreated?: (api: TApi) => DockviewIDisposable[];
 }
 
+export interface UseViewComponentReturn<TApi> {
+    el: Ref<HTMLElement | null>;
+    instance: Ref<TApi | null>;
+    registry: VueRendererRegistry;
+}
+
 export function useViewComponent<
     TApi extends {
         dispose(): void;
@@ -73,13 +79,13 @@ export function useViewComponent<
     const eventDisposables: DockviewIDisposable[] = [];
 
     /**
-     * Capture the component instance once, synchronously, during setup.
-     * `getCurrentInstance()` only returns a value during setup and lifecycle
-     * hooks — calling it later from an async watch callback returns `null`, so
-     * the reference is resolved here and reused everywhere below.
+     * Capture the component instance synchronously during `setup`. Watcher
+     * callbacks run via Vue's scheduler flush, where `getCurrentInstance()`
+     * returns null, so re-calling it there would throw and silently abort the
+     * update. Cache it once here and reuse it everywhere below.
      */
-    const inst = getCurrentInstance();
-    if (!inst) {
+    const vueInstance = getCurrentInstance();
+    if (!vueInstance) {
         throw new Error(
             `${config.componentName}: getCurrentInstance() returned null`
         );
@@ -115,7 +121,7 @@ export function useViewComponent<
                         name?: string;
                     }) => {
                         const component = findComponent(
-                            inst,
+                            vueInstance,
                             options.name!,
                             (props as any).components
                         );
@@ -123,7 +129,7 @@ export function useViewComponent<
                             options.id,
                             options.name,
                             component! as any,
-                            inst,
+                            vueInstance,
                             registry
                         );
                     },
@@ -140,7 +146,7 @@ export function useViewComponent<
         const frameworkOptions = {
             createComponent(options: { id: string; name?: string }) {
                 const component = findComponent(
-                    inst,
+                    vueInstance,
                     options.name!,
                     (props as any).components
                 );
@@ -148,7 +154,7 @@ export function useViewComponent<
                     options.id,
                     options.name,
                     component! as any,
-                    inst,
+                    vueInstance,
                     registry
                 );
             },

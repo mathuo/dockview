@@ -1,44 +1,72 @@
 ---
 title: 'Overview'
 sidebar_position: 0
-description: Overview of built-in drag and drop capabilities in Dockview — tab reordering, group merging, and edge drop positions.
+description: "Overview of built-in drag and drop capabilities in Dockview: tab reordering, group merging, and edge drop positions."
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-Dockview supports a wide variety of built-in Drag and Drop possibilities.
+Dockview supports a range of built-in drag and drop behaviours.
 
-<h4>Position a tab between two other tabs</h4>
+#### Position a tab between two other tabs
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_tab.svg')} alt="Diagram showing a tab being positioned between two existing tabs" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '50px' }}
+        src={useBaseUrl('/img/add_to_tab.svg')}
+        alt="Diagram showing a tab being positioned between two existing tabs"
+    />
 </div>
 
-<h4>Position a tab at the end of a list of tabs</h4>
+#### Position a tab at the end of a list of tabs
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_empty_space.svg')} alt="Diagram showing a tab being positioned at the end of a tab list" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '50px' }}
+        src={useBaseUrl('/img/add_to_empty_space.svg')}
+        alt="Diagram showing a tab being positioned at the end of a tab list"
+    />
 </div>
 
-<h4>Merge one group with another group</h4>
+#### Merge one group with another group
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_group.svg')} alt="Diagram showing one group being merged into another group" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '50px' }}
+        src={useBaseUrl('/img/add_to_group.svg')}
+        alt="Diagram showing one group being merged into another group"
+    />
 </div>
 
-<h4>Move both Tabs and Groups in relation to another group</h4>
+#### Move both tabs and groups in relation to another group
 
-
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '300px' }} src={useBaseUrl('/img/drop_positions.svg')} alt="Diagram showing the available drop positions when moving a tab or group relative to another group" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '300px' }}
+        src={useBaseUrl('/img/drop_positions.svg')}
+        alt="Diagram showing the available drop positions when moving a tab or group relative to another group"
+    />
 </div>
 
-<h4>Move both Tabs and Groups in relation to the container</h4>
+#### Move both tabs and groups in relation to the container
 
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <img style={{ height: '300px' }} src={useBaseUrl('/img/magnet_drop_positions.svg')} alt="Diagram showing the available drop positions when moving a tab or group relative to the container edges" />
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+    <img
+        style={{ height: '300px' }}
+        src={useBaseUrl('/img/magnet_drop_positions.svg')}
+        alt="Diagram showing the available drop positions when moving a tab or group relative to the container edges"
+    />
 </div>
 
 ## Touch and pen input
 
-Mouse drags use the browser's HTML5 drag-and-drop. Touch and pen drags are driven by a pointer-events backend with a long-press-to-drag gesture, so taps and native scroll still work on mobile. The backend is selected automatically and can be overridden — see [Dnd Strategy](./strategy) for the `dndStrategy` option and the full gesture table.
+Mouse drags use the browser's HTML5 drag-and-drop. Touch and pen drags are driven by a pointer-events backend with a long-press-to-drag gesture, so taps and native scroll still work on mobile. The backend is selected automatically and can be overridden. See [Dnd Strategy](./strategy) for the `dndStrategy` option and the full gesture table.
+
+## Advanced drag-and-drop hooks
+
+Dockview exposes advanced drag-and-drop hooks (`onWillDragPanel`, `onWillDragGroup`, `onWillDrop` and `onWillShowOverlay`) for attaching metadata to drags, cancelling a drag, or customising the drop overlay. See [Dnd](./dragAndDrop) and [External Dnd Events](./external) for details.
+
+## Going further
+
+- [Drop Guide](./dropGuide): show a VS Code-style aim-at-a-cell compass while dragging, or override where a drop lands with a pluggable position resolver.
+- [Smart Guides](./smartGuides): alignment snapping and guide overlays for floating groups.

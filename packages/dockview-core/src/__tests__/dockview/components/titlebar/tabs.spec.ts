@@ -725,22 +725,22 @@ describe('tabs', () => {
             return { panel, close };
         }
 
-        test.each(['Delete', 'Backspace'])(
-            'pressing %s on a focused tab closes its panel',
-            (key) => {
-                const { tabs } = createTabsForDropTest();
-                const panels = ['p1', 'p2', 'p3'].map((id) =>
-                    createClosablePanel(id)
-                );
-                panels.forEach(({ panel }) => tabs.openPanel(panel));
+        test.each([
+            'Delete',
+            'Backspace',
+        ])('pressing %s on a focused tab closes its panel', (key) => {
+            const { tabs } = createTabsForDropTest();
+            const panels = ['p1', 'p2', 'p3'].map((id) =>
+                createClosablePanel(id)
+            );
+            panels.forEach(({ panel }) => tabs.openPanel(panel));
 
-                fireEvent.keyDown(getTabElements(tabs)[1], { key });
+            fireEvent.keyDown(getTabElements(tabs)[1], { key });
 
-                expect(panels[1].close).toHaveBeenCalledTimes(1);
-                expect(panels[0].close).not.toHaveBeenCalled();
-                expect(panels[2].close).not.toHaveBeenCalled();
-            }
-        );
+            expect(panels[1].close).toHaveBeenCalledTimes(1);
+            expect(panels[0].close).not.toHaveBeenCalled();
+            expect(panels[2].close).not.toHaveBeenCalled();
+        });
 
         test('ignores the key when focus is not on a tab element', () => {
             const { tabs } = createTabsForDropTest();
@@ -813,6 +813,58 @@ describe('tabs', () => {
             ).toBeFalsy();
             expect(tabsList.classList.contains('dv-horizontal')).toBeTruthy();
             expect(tabsList.classList.contains('dv-vertical')).toBeFalsy();
+        });
+    });
+
+    describe('setActivePanel scroll-into-view', () => {
+        test('scrolls to the active tab offsetLeft, accounting for gaps/margins', () => {
+            const { tabs } = createTabsForDropTest();
+
+            const panels = [
+                createMockPanel('p0'),
+                createMockPanel('p1'),
+                createMockPanel('p2'),
+            ];
+            panels.forEach((p) => tabs.openPanel(p));
+
+            const elements = (tabs as any)._tabs.map(
+                (t: any) => t.value.element as HTMLElement
+            );
+
+            // 25px gaps between tabs (margins / group chips) mean each tab's
+            // real offsetLeft exceeds the running sum of client widths
+            const offsets = [0, 125, 250];
+            elements.forEach((el: HTMLElement, i: number) => {
+                jest.spyOn(el, 'offsetLeft', 'get').mockReturnValue(offsets[i]);
+                jest.spyOn(el, 'offsetWidth', 'get').mockReturnValue(100);
+                jest.spyOn(el, 'clientWidth', 'get').mockReturnValue(100);
+            });
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            jest.spyOn(tabsList, 'clientWidth', 'get').mockReturnValue(150);
+            tabsList.scrollLeft = 0;
+
+            // activating the last (overflowed) tab must scroll to its true
+            // offsetLeft (250), not the accumulated client-width sum (200)
+            tabs.setActivePanel(panels[2]);
+
+            expect(tabsList.scrollLeft).toBe(250);
+        });
+    });
+
+    describe('showTabsOverflowControl', () => {
+        test('disabling at runtime disposes the overflow observer', () => {
+            const { tabs } = createTabsForDropTest();
+
+            // constructed with the control off
+            expect((tabs as any)._observerDisposable.value).toBeUndefined();
+
+            tabs.showTabsOverflowControl = true;
+            expect((tabs as any)._observerDisposable.value).toBeDefined();
+
+            // turning it back off must tear down the observer/scroll listener
+            tabs.showTabsOverflowControl = false;
+            expect((tabs as any)._observerDisposable.value).toBeUndefined();
         });
     });
 });

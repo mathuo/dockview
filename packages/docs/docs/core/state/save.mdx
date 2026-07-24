@@ -1,26 +1,29 @@
 ---
-title: Saving State
+title: Saving state
 description: How to serialize and save the current Dockview layout state for later restoration.
+sidebar_position: 1
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how to serialize a dockview instance.
+This section describes how to serialize a Dockview instance.
+
+<CodeRunner id="dockview/layout" />
 
 <DocRef declaration="DockviewApi" methods={['toJSON', 'onDidLayoutChange']} />
 
-To retrieve the current state of the dock call `toJSON()`.
-You can listen to the event `onDidlayoutChange` to determine when the layout has changed.
+To retrieve the current state of Dockview call `toJSON()`.
+You can listen to the event `onDidLayoutChange` to determine when the layout has changed.
 
 <FrameworkSpecific framework='React'>
 ```tsx
 const [api, setApi] = React.useState<DockviewApi>();
 
 React.useEffect(() => {
-    if (!api) {
-        return;
-    }
+if (!api) {
+return;
+}
 
     const disposable = api.onDidLayoutChange(() => {
         const layout: SerializedDockview = api.toJSON();
@@ -28,14 +31,16 @@ React.useEffect(() => {
     });
 
     return () => disposable.dispose();
+
 }, [api]);
 
 const onReady = (event: DockviewReadyEvent) => {
-    setApi(event.api);
+setApi(event.api);
 };
 
 return <DockviewComponent onReady={onReady} />;
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -63,7 +68,8 @@ onUnmounted(() => {
 <template>
     <dockview-vue @ready="onReady" />
 </template>
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -72,12 +78,12 @@ import { Component, OnDestroy } from '@angular/core';
 import type { DockviewApi, DockviewReadyEvent, SerializedDockview } from 'dockview-angular';
 
 @Component({
-    selector: 'app-root',
-    template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
+selector: 'app-root',
+template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
 })
 export class AppComponent implements OnDestroy {
-    private api: DockviewApi;
-    private layoutDisposable: { dispose(): void };
+private api: DockviewApi;
+private layoutDisposable: { dispose(): void };
 
     onReady(event: DockviewReadyEvent) {
         this.api = event.api;
@@ -90,8 +96,10 @@ export class AppComponent implements OnDestroy {
     ngOnDestroy() {
         this.layoutDisposable?.dispose();
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -106,9 +114,11 @@ const disposable = api.onDidLayoutChange(() => {
 });
 
 // Call disposable.dispose() when tearing down the dock
-```
+````
+
 </FrameworkSpecific>
 
-# Live Example
+## See also
 
-<CodeRunner id="dockview/layout"/>
+- [Loading state](/docs/core/state/load): restore a serialized layout with `fromJSON`.
+- [Layout history](/docs/core/state/history): undo and redo layout changes without a full save and restore.

@@ -1,4 +1,5 @@
 {
-  "$schema": "https://typedoc.org/schema.json",
-  "includeVersion": true
+    "$schema": "https://typedoc.org/schema.json",
+    "includeVersion": true,
+    "skipErrorChecking": true
 }

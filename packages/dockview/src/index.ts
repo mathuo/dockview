@@ -1,16 +1,11 @@
-import { markDockviewPackageLoaded, registerModules } from 'dockview-core';
-import { Modules } from 'dockview-modules';
-
 export * from 'dockview-core';
 
 /**
- * `dockview` is the batteries-included entry point: it re-exports the core API
- * and registers the separable feature modules so every component gets the full
- * feature set out of the box. Consumers who want only the core can depend on
- * `dockview-core` directly.
+ * `dockview` is the recommended free entry point: a thin re-export of
+ * `dockview-core`. The separable enterprise feature modules now live in the
+ * separately-published `dockview-enterprise` package (which depends on and
+ * re-exports `dockview`); install that to opt into them.
+ *
+ * This module has no side effects (it's a pure re-export), so bundlers can
+ * fully tree-shake unused exports out of consumer builds.
  */
-registerModules(Modules);
-
-// Mark the public package as loaded so `dockview-core` doesn't warn about
-// direct usage. Purely drives that developer warning — no functional effect.
-markDockviewPackageLoaded();

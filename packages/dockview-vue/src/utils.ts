@@ -149,8 +149,8 @@ export interface VueMountDisposable {
  * A single component to be teleported by the host's `<DockviewPortals>`.
  *
  * `props` is a {@link ShallowRef} so reassigning it triggers a re-render
- * without Vue deeply proxying the value — the params object carries raw
- * dockview API instances that must NOT be made reactive.
+ * without Vue deeply proxying the value. The params object carries raw
+ * dockview API instances that must not be made reactive.
  */
 export interface VueMountEntry {
     readonly id: number;
@@ -372,7 +372,13 @@ export class VueHeaderActionsRenderer
     }
 
     private updateLocation(location: DockviewGroupLocation): void {
-        this._renderDisposable?.update({ params: { location } });
+        // Send the full enriched props (with the new location applied) rather
+        // than a bare `{ params: { location } }`, which the registry's shallow
+        // top-level merge would use to replace the entire params object and
+        // drop panels/activePanel/group/api/etc. until the next full update.
+        this._renderDisposable?.update({
+            params: { ...this.buildEnrichedProps(), location },
+        });
     }
 }
 
@@ -408,7 +414,10 @@ export class VueTabGroupChipRenderer
         this.element.style.display = 'inline-flex';
     }
 
+    private _api: DockviewApi | undefined;
+
     init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+        this._api = params.api;
         this.mount({
             params: {
                 tabGroup: params.tabGroup,
@@ -418,8 +427,11 @@ export class VueTabGroupChipRenderer
     }
 
     update(params: { tabGroup: ITabGroup }): void {
+        // Re-send `api` alongside the new tabGroup; the registry replaces the
+        // whole params object on update, so a bare `{ tabGroup }` would drop
+        // the api after the first chip update.
         this._renderDisposable?.update({
-            params: { tabGroup: params.tabGroup },
+            params: { tabGroup: params.tabGroup, api: this._api },
         });
     }
 
