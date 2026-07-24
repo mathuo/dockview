@@ -10,7 +10,7 @@
 <p>Zero dependency layout manager supporting tabs, groups, grids and splitviews. Supports React, Vue, Angular and JavaScript</p>
 
 [![npm version](https://img.shields.io/npm/v/dockview)](https://www.npmjs.com/package/dockview)
-[![npm downloads](https://img.shields.io/npm/dm/dockview)](https://www.npmjs.com/package/dockview)
+[![npm downloads](https://img.shields.io/npm/dm/dockview)](https://www.npmjs.com/package/dockview-core)
 [![CI](https://img.shields.io/github/actions/workflow/status/mathuo/dockview/main.yml?branch=master&label=CI)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
 [![Coverage](https://img.shields.io/sonar/coverage/mathuo_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
 [![Quality gate](https://img.shields.io/sonar/quality_gate/mathuo_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
@@ -43,7 +43,7 @@ Please see the website: https://dockview.dev
 ## Packages
 
 | Package                                                                    | Description                                                              | Version                                                                                                               |
-|----------------------------------------------------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | [`dockview`](https://www.npmjs.com/package/dockview)                       | JavaScript, zero dependencies, full feature set out of the box           | [![npm version](https://img.shields.io/npm/v/dockview)](https://www.npmjs.com/package/dockview)                       |
 | [`dockview-react`](https://www.npmjs.com/package/dockview-react)           | React bindings (peer: `react` 16.8–19)                                   | [![npm version](https://img.shields.io/npm/v/dockview-react)](https://www.npmjs.com/package/dockview-react)           |
 | [`dockview-vue`](https://www.npmjs.com/package/dockview-vue)               | Vue 3 bindings (peer: `vue` ≥3.4)                                        | [![npm version](https://img.shields.io/npm/v/dockview-vue)](https://www.npmjs.com/package/dockview-vue)               |
