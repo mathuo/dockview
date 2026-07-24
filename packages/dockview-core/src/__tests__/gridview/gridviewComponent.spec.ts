@@ -3216,6 +3216,11 @@ describe('gridview', () => {
                 reference: 'does_not_exist',
             })
         ).toThrow('reference group does_not_exist does not exist');
+
+        // The panel must NOT have been removed by the failed move: validation
+        // runs before the panel is taken out of the grid.
+        expect(gridview.size).toBe(1);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
     });
 
     test('movePanel throws when the direction resolves to center', () => {
@@ -3235,6 +3240,11 @@ describe('gridview', () => {
                 reference: 'panel1',
             })
         ).toThrow('center not supported as an option');
+
+        // Both panels survive the rejected move.
+        expect(gridview.size).toBe(2);
+        expect(gridview.getPanel('panel1')).toBeTruthy();
+        expect(gridview.getPanel('panel2')).toBeTruthy();
     });
 
     test('addPanel throws when the reference panel does not exist', () => {

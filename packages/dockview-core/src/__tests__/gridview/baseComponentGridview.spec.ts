@@ -631,14 +631,29 @@ describe('baseComponentGridview', () => {
             cut.dispose();
         });
 
-        test('updates disableResizing when the key is present', () => {
+        test('updates disableResizing when disableAutoResizing is provided', () => {
             const cut = createCut();
             expect(cut.disableResizing).toBe(false);
 
-            cut.updateOptions({
-                disableResizing: true,
-                disableAutoResizing: true,
-            } as Partial<BaseGridOptions>);
+            // The real option key is `disableAutoResizing`; providing it must
+            // update `disableResizing` (regression guard: the guard previously
+            // checked a non-existent `disableResizing` key and never fired).
+            cut.updateOptions({ disableAutoResizing: true });
+            expect(cut.disableResizing).toBe(true);
+
+            cut.updateOptions({ disableAutoResizing: false });
+            expect(cut.disableResizing).toBe(false);
+
+            cut.dispose();
+        });
+
+        test('leaves disableResizing unchanged when the option is omitted', () => {
+            const cut = createCut();
+            cut.updateOptions({ disableAutoResizing: true });
+            expect(cut.disableResizing).toBe(true);
+
+            // An unrelated update must not reset it.
+            cut.updateOptions({ orientation: cut.orientation });
             expect(cut.disableResizing).toBe(true);
 
             cut.dispose();
