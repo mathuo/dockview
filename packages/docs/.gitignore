@@ -20,3 +20,7 @@ yarn-debug.log*
 yarn-error.log*
 
 /static/templates
+
+# Generated at build time from the repo-root llms files (see scripts/copyLlms.mjs)
+/static/llms.txt
+/static/llms-full.txt
