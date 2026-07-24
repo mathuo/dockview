@@ -112,6 +112,45 @@ Legacy Options-API style is still supported; components registered on any
 ancestor via `components: { ... }` (or globally via `app.component(...)`) are
 resolved by name as before.
 
+#### Receiving params inside a panel
+
+A panel component receives a single `params` prop of type
+`IDockviewPanelProps`. This is where Dockview passes the panel `api`, the
+`containerApi`, and any custom values you supplied. Your own values live one
+level down, under `params.params`, so a value passed as
+`addPanel({ params: { foo } })` is read as `params.params.foo`.
+
+```vue
+<script setup lang="ts">
+import type { IDockviewPanelProps } from 'dockview-vue';
+
+const { params } = defineProps<{
+    params: IDockviewPanelProps<{ foo: string }>;
+}>();
+</script>
+
+<template>
+    <div>{{ params.params.foo }}</div>
+</template>
+```
+
+Supply the value when you add the panel:
+
+```ts
+event.api.addPanel<{ foo: string }>({
+    id: 'panel_1',
+    component: 'component_1',
+    params: { foo: 'bar' },
+});
+```
+
+Anything you put in `params` is also serialised when the layout is saved to
+JSON, so keep it to simple, static values. For anything richer (store
+instances, callbacks, non-serialisable objects) use Vue's `provide`/`inject`
+instead, or read it from a shared store. See [Update panel](/docs/core/panels/update)
+for how to change these values after a panel has been created and react to the
+change.
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
