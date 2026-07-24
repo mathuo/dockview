@@ -237,10 +237,19 @@ The `DockviewApi` (available via the `onReady` event) provides:
 Built-in themes applied via CSS class on a parent element:
 - `dockview-theme-dark` — Dark theme
 - `dockview-theme-light` — Light theme
-- `dockview-theme-abyss` — Abyss dark theme
-- `dockview-theme-dracula` — Dracula theme
-- `dockview-theme-replit` — Replit-inspired theme
-- `dockview-theme-vs` — VS Code light theme
+- `dockview-theme-vs` — Visual Studio theme
+- `dockview-theme-abyss` — Abyss dark theme (based on VS Code)
+- `dockview-theme-dracula` — Dracula theme (based on VS Code)
+- `dockview-theme-nord` — Nord theme
+- `dockview-theme-catppuccin-mocha` — Catppuccin Mocha theme
+- `dockview-theme-monokai` — Monokai theme
+- `dockview-theme-solarized-light` — Solarized Light theme
+- `dockview-theme-github-dark` — GitHub Dark theme
+- `dockview-theme-github-light` — GitHub Light theme
+
+Most themes also ship a `-spaced` variant (e.g. `dockview-theme-abyss-spaced`, `dockview-theme-nord-spaced`) that adds padding/gaps between groups.
+
+In React/Vue/Angular the theme can alternatively be passed as a theme object (e.g. `themeDark`, `themeAbyss`, `themeNord` exported from the framework package) via the `theme` prop.
 
 Custom themes can be created using CSS custom properties (CSS variables).
 
