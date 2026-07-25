@@ -314,9 +314,17 @@ export class OverlayRenderContainer extends CompositeDisposable {
         const correctLayerPosition = () => {
             if (panel.api.location.type === 'floating') {
                 queueMicrotask(() => {
-                    const floatingGroup = this.accessor.floatingGroups.find(
-                        (group) => group.group === panel.api.group
-                    );
+                    // Resolve by membership, not anchor identity: a floating
+                    // window can host a nested gridview, so a panel split into
+                    // it lives in a non-anchor member group. Matching only the
+                    // anchor (`f.group === panel.api.group`) left such panels
+                    // without the lifted z-index, so an `always`-rendered
+                    // panel's overlay (CSS `dv-render-overlay-float`, one below
+                    // the window) rendered *behind* the floating window.
+                    const floatingGroup =
+                        this.accessor.getFloatingWindowForGroup(
+                            panel.api.group
+                        );
 
                     if (!floatingGroup) {
                         return;

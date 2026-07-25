@@ -223,15 +223,19 @@ describe('overlayRenderContainer', () => {
         element.setAttribute('aria-level', '2');
         const spy = jest.spyOn(element, 'getAttribute');
 
+        const floatingGroup = {
+            group,
+            overlay: {
+                element,
+            },
+        };
         const accessor = fromPartial<DockviewComponent>({
-            floatingGroups: [
-                {
-                    group,
-                    overlay: {
-                        element,
-                    },
-                },
-            ],
+            floatingGroups: [floatingGroup],
+            // The container resolves the floating window by membership (so it
+            // finds nested, non-anchor members too), not by scanning
+            // `floatingGroups` for an anchor match.
+            getFloatingWindowForGroup: (candidate) =>
+                candidate === group ? (floatingGroup as any) : undefined,
         });
 
         const cut = new OverlayRenderContainer(parentContainer, accessor);
