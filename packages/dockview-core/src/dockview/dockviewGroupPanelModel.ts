@@ -1283,6 +1283,23 @@ export class DockviewGroupPanelModel
     }
 
     get dropTargetContainer(): DropTargetAnchorContainer | null {
+        // A floating group can't use an in-place ('relative') drop overlay: the
+        // overlay would be appended inside the floating window's stacking
+        // context (`.dv-resize-container`), which sits *below* the shell-level
+        // render overlay hosting the floating panel's content, so it would be
+        // painted over and never seen. Under 'relative' mounting the root
+        // container is disabled (grid groups render in-place), so route
+        // floating groups through the always-enabled, shell-level floating
+        // container instead. Under 'absolute' mounting the root container is
+        // enabled and already anchors overlays at the shell level, so floating
+        // groups keep sharing it (a single container lets the anchored overlay
+        // slide between grid and floating groups without leaving a stale copy).
+        if (
+            this._location.type === 'floating' &&
+            this.accessor.rootDropTargetContainer.disabled
+        ) {
+            return this.accessor.floatingDropTargetContainer;
+        }
         return (
             this._overwriteDropTargetContainer ??
             this.accessor.rootDropTargetContainer

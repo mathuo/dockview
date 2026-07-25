@@ -12782,4 +12782,108 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
 
         dockview.dispose();
     });
+
+    describe('floating group drop overlays', () => {
+        function createComponent(
+            mounting: 'relative' | 'absolute'
+        ): DockviewComponent {
+            const container = document.createElement('div');
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                theme: {
+                    name: 'test',
+                    className: 'test',
+                    dndOverlayMounting: mounting,
+                },
+            });
+            dockview.layout(1000, 1000);
+            return dockview;
+        }
+
+        test('relative mounting: a floating group anchors its drop overlay at the shell level', () => {
+            const dockview = createComponent('relative');
+
+            // The root container is disabled by 'relative' mounting so grid
+            // groups render their drop overlays in-place.
+            expect(dockview.rootDropTargetContainer.disabled).toBe(true);
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+
+            const floatingGroup = panel2.group;
+            expect(floatingGroup.model.location.type).toBe('floating');
+
+            // A floating group must NOT fall back to an in-place overlay: its
+            // container is the always-enabled, shell-level floating container so
+            // the overlay renders above the floating panel's render overlay.
+            expect(floatingGroup.model.dropTargetContainer).toBe(
+                dockview.floatingDropTargetContainer
+            );
+            expect(dockview.floatingDropTargetContainer.disabled).toBe(false);
+            expect(
+                floatingGroup.model.dropTargetContainer?.model
+            ).toBeDefined();
+
+            dockview.dispose();
+        });
+
+        test('grid groups still use the (disabled) root container under relative mounting', () => {
+            const dockview = createComponent('relative');
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            expect(panel1.group.model.location.type).toBe('grid');
+            expect(panel1.group.model.dropTargetContainer).toBe(
+                dockview.rootDropTargetContainer
+            );
+            // disabled -> the group renders an in-place ('relative') overlay
+            expect(
+                panel1.group.model.dropTargetContainer?.model
+            ).toBeUndefined();
+
+            dockview.dispose();
+        });
+
+        test('absolute mounting: a floating group shares the (enabled) root container', () => {
+            const dockview = createComponent('absolute');
+
+            // Absolute mounting keeps the root container enabled, so grid and
+            // floating groups share it and the anchored overlay can slide
+            // between them without a stale copy being left behind.
+            expect(dockview.rootDropTargetContainer.disabled).toBe(false);
+
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+
+            expect(panel2.group.model.location.type).toBe('floating');
+            expect(panel2.group.model.dropTargetContainer).toBe(
+                dockview.rootDropTargetContainer
+            );
+            expect(panel2.group.model.dropTargetContainer?.model).toBeDefined();
+
+            dockview.dispose();
+        });
+    });
 });

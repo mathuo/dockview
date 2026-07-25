@@ -539,6 +539,18 @@ export class DockviewComponent
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
+    /**
+     * Shell-level anchor container dedicated to floating groups. Unlike
+     * {@link rootDropTargetContainer} it is never disabled by the
+     * `dndOverlayMounting: 'relative'` theme setting: a floating group cannot
+     * use an in-place ('relative') overlay because the overlay would be
+     * appended inside the floating window's stacking context
+     * (`.dv-resize-container`, a lower z-index than the shell-level render
+     * overlay that hosts the floating panel's content) and be painted over.
+     * Routing floating groups through this always-anchored container keeps
+     * their drop overlays visible in both mounting modes.
+     */
+    readonly floatingDropTargetContainer: DropTargetAnchorContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
     readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
@@ -1544,6 +1556,14 @@ export class DockviewComponent
             this._shellManager.element,
             { disabled: true }
         );
+        // Floating groups always anchor their drop overlays at the shell level
+        // (see the field docs): in-place overlays would be trapped beneath the
+        // floating panel's render overlay, so this container stays enabled
+        // regardless of the `dndOverlayMounting` mode.
+        this.floatingDropTargetContainer = new DropTargetAnchorContainer(
+            this._shellManager.element,
+            { disabled: false }
+        );
         this.overlayRenderContainer = new OverlayRenderContainer(
             this._shellManager.element,
             this
@@ -1567,6 +1587,7 @@ export class DockviewComponent
 
         this.addDisposables(
             this.rootDropTargetContainer,
+            this.floatingDropTargetContainer,
             this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
