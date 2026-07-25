@@ -10,6 +10,17 @@ export class DropTargetAnchorContainer extends CompositeDisposable {
 
     private _disabled = false;
 
+    /**
+     * Handle for a deferred {@link DropTargetTargetModel.scheduleClear}. The
+     * HTML5 backend does not clear this container on `dragleave` (that would
+     * churn the shared overlay and kill its slide transition on every crossing
+     * between adjacent targets). Instead it *schedules* a clear, which a
+     * subsequent `getElements` (the next target rendering into this container)
+     * cancels — so the overlay slides between targets, but is torn down when the
+     * drag genuinely leaves to somewhere that doesn't re-render here.
+     */
+    private _pendingClear: ReturnType<typeof setTimeout> | undefined;
+
     get disabled(): boolean {
         return this._disabled;
     }
@@ -22,8 +33,23 @@ export class DropTargetAnchorContainer extends CompositeDisposable {
         this._disabled = value;
 
         if (value) {
-            this.model?.clear();
+            this._clearNow();
         }
+    }
+
+    private _cancelPendingClear(): void {
+        if (this._pendingClear !== undefined) {
+            clearTimeout(this._pendingClear);
+            this._pendingClear = undefined;
+        }
+    }
+
+    private _clearNow(): void {
+        this._cancelPendingClear();
+        if (this._model) {
+            this._model.root.remove();
+        }
+        this._model = undefined;
     }
 
     get model(): DropTargetTargetModel | undefined {
@@ -33,15 +59,26 @@ export class DropTargetAnchorContainer extends CompositeDisposable {
 
         return {
             clear: () => {
-                if (this._model) {
-                    this._model.root.remove();
+                this._clearNow();
+            },
+            scheduleClear: () => {
+                if (this._pendingClear !== undefined || !this._model) {
+                    return;
                 }
-                this._model = undefined;
+                this._pendingClear = setTimeout(() => {
+                    this._pendingClear = undefined;
+                    this._clearNow();
+                }, 0);
             },
             exists: () => {
                 return !!this._model;
             },
             getElements: (event?: DragEvent, outline?: HTMLElement) => {
+                // A render means the overlay is (still) live: cancel any clear
+                // scheduled by the target the cursor just left, so the overlay
+                // slides here instead of being torn down.
+                this._cancelPendingClear();
+
                 const changed = this._outline !== outline;
                 this._outline = outline;
 

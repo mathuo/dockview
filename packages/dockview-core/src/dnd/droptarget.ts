@@ -172,6 +172,15 @@ export interface DropTargetTargetModel {
     };
     exists(): boolean;
     clear(): void;
+    /**
+     * Clear the overlay on the next tick unless a {@link getElements} call (a
+     * target rendering into this container) cancels it first. Used by the HTML5
+     * backend on `dragleave`: clearing immediately would kill the overlay's
+     * slide between adjacent targets, but never clearing leaves the overlay
+     * behind when the drag leaves to somewhere that doesn't re-render here.
+     * Optional so lightweight/mocked target models need not implement it.
+     */
+    scheduleClear?(): void;
 }
 
 export interface DroptargetOptions {
@@ -372,20 +381,25 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 const target = this.options.getOverrideTarget?.();
 
                 if (target) {
-                    // The anchor container owns its own lifecycle — the overlay
-                    // slides to whichever target the cursor reaches next, and
-                    // `drop`/`dragend` tear it down — so don't clear it here.
-                    // HTML5 fires `dragleave` spuriously when crossing between
-                    // child elements, and clearing would churn the container
-                    // (and kill its move transition) on every one.
+                    // Don't clear the shared anchor container immediately: the
+                    // overlay must slide to whichever target the cursor reaches
+                    // next, and HTML5 fires `dragleave` spuriously when crossing
+                    // between a target's own child elements — clearing on every
+                    // one would churn the container and kill its move transition.
                     //
-                    // The latched state must still go: `onDragEnd` commits
+                    // Instead *schedule* a clear: the next target rendering into
+                    // this container (its `getElements`) cancels it, so the
+                    // overlay slides; but if the drag leaves to somewhere that
+                    // doesn't re-render here (dead space, or a target in another
+                    // container), the clear fires and the overlay doesn't linger.
+                    //
+                    // The latched state must still go now: `onDragEnd` commits
                     // `_state` when this is the actual target, so a drag that
                     // leaves the layout and is released outside would otherwise
-                    // drop at the last hovered position. A spurious leave is
-                    // harmless — the next `dragover` frame re-resolves it.
+                    // drop at the last hovered position.
                     this._state = undefined;
                     this._edge = false;
+                    target.scheduleClear?.();
                     return;
                 }
 
