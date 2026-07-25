@@ -323,9 +323,12 @@ describe('smart guides', () => {
     const preview = (): HTMLElement | null =>
         container.querySelector('.dv-smart-guide-preview');
     // Disable alignment (no float/container candidates) so the snapped box is
-    // the raw proposed box, so the snap-together geometry is then exact.
+    // the raw proposed box, so the snap-together geometry is then exact. Merge
+    // is opt-in (Smart Guides is alignment-only by default), so enable it here;
+    // callers can still override via `extra` (see the `snapTogether: false` test).
     const noAlign = (extra: SmartGuidesOptions = {}): SmartGuidesOptions => ({
         snapTargets: { floats: false, container: false },
+        snapTogether: true,
         ...extra,
     });
 
@@ -378,6 +381,24 @@ describe('smart guides', () => {
     test('`snapTogether: false` never suggests or commits a merge', () => {
         const t: Box = { left: 300, top: 100, width: 200, height: 200 };
         make(noAlign({ snapTogether: false }), [
+            { group: targetGroup, box: t },
+        ]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+        expect(preview()?.style.display ?? 'none').toBe('none');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toHaveLength(0);
+    });
+
+    test('does not merge by default: alignment-only unless snapTogether is opted into', () => {
+        // Smart Guides is an alignment tool by default; merging floating groups
+        // is opt-in. With `snapTogether` unset, an edge flush against a target
+        // suggests nothing and commits nothing on drop.
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make({ snapTargets: { floats: false, container: false } }, [
             { group: targetGroup, box: t },
         ]);
 
