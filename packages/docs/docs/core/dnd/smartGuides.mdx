@@ -83,12 +83,21 @@ const api = createDockview(element, {
 
 ### Snap-together (dock / merge)
 
-With `snapTogether` enabled (the default), Smart Guides also detects a **dock or merge intent** while dragging:
+By default Smart Guides is an alignment tool only: it aligns and snaps floating groups but never docks or merges them. Set `snapTogether: true` to opt in, and Smart Guides also detects a **dock or merge intent** while dragging:
 
 - Dragging a floating group flush against another group's opposite edge (with sufficient perpendicular overlap) suggests docking it **beside** the target.
 - Dragging a floating group so its tab strip overlaps another's suggests **merging** the two into a shared tabset (a `center` drop).
 
-A drop preview is shown during the drag, and the dock/merge is committed on drop. Set `snapTogether: false` to keep pure alignment snapping without dock/merge suggestions.
+A drop preview is shown during the drag, and the dock/merge is committed on drop.
+
+```ts
+const api = createDockview(element, {
+    smartGuides: {
+        // Opt in to dock/merge suggestions (off by default)
+        snapTogether: true,
+    },
+});
+```
 
 ### Disabling snapping mid-drag
 

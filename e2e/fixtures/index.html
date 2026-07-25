@@ -132,9 +132,12 @@
                     // Smart Guides — alignment + snapping for floating groups.
                     // Float-only here so the harness geometry is deterministic
                     // (container-edge snapping is covered by unit tests).
+                    // `snapTogether` is opt-in (alignment-only by default); the
+                    // harness enables it to exercise the dock/merge e2e path.
                     smartGuides: {
                         snapDistance: 12,
                         snapTargets: { container: false },
+                        snapTogether: true,
                     },
                     // Enable auto-hide edge groups (collapsed-strip peek).
                     autoHideEdgeGroups: true,

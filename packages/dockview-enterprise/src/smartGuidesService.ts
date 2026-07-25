@@ -46,7 +46,7 @@ function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
         snapDistance: o?.snapDistance ?? 8,
         releaseDistance: o?.releaseDistance ?? 4,
         showGuides: o?.showGuides ?? true,
-        snapTogether: o?.snapTogether ?? true,
+        snapTogether: o?.snapTogether ?? false,
         disableSnapModifier: o?.disableSnapModifier ?? 'alt',
         className: o?.className,
         snapFloats: o?.snapTargets?.floats ?? true,

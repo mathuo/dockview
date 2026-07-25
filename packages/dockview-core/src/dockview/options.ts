@@ -243,7 +243,9 @@ export interface SmartGuidesOptions {
     showGuides?: boolean;
     /** Detect a dock/merge intent when the dragged float comes flush against
      *  another float (edge-adjacency) or overlaps its tab strip (tabset merge),
-     *  and commit it on drop. Default `true`. */
+     *  and commit it on drop. Opt-in: Smart Guides is an alignment-only tool by
+     *  default and never merges floating groups unless this is set. Default
+     *  `false`. */
     snapTogether?: boolean;
     /** Which alignment sources to snap against (floats + container by default). */
     snapTargets?: SmartGuidesSnapTargets;
