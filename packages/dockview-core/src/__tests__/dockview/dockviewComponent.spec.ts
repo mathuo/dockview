@@ -12881,9 +12881,7 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
             expect(panel2.group.model.dropTargetContainer).toBe(
                 dockview.rootDropTargetContainer
             );
-            expect(
-                panel2.group.model.dropTargetContainer?.model
-            ).toBeDefined();
+            expect(panel2.group.model.dropTargetContainer?.model).toBeDefined();
 
             dockview.dispose();
         });
