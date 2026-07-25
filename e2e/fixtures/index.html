@@ -614,6 +614,45 @@
                             height: 180,
                         });
                     },
+                    // Float an `always`-rendered panel, then split a second
+                    // `always`-rendered panel into the LEFT of the floating
+                    // group. The split creates a *non-anchor* member group
+                    // inside the floating window's nested gridview; its content
+                    // must still be lifted above the window (the anchor-only
+                    // z-index lookup used to miss non-anchor members, leaving
+                    // the split panel's content painted behind the window).
+                    setupFloatingSplitAlways: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const floater = dockview.addPanel({
+                            id: 'floater',
+                            component: 'default',
+                            title: 'floater',
+                            renderer: 'always',
+                        });
+                        const splitter = dockview.addPanel({
+                            id: 'splitter',
+                            component: 'default',
+                            title: 'splitter',
+                            renderer: 'always',
+                        });
+                        dockview.addFloatingGroup(floater, {
+                            x: 150,
+                            y: 100,
+                            width: 360,
+                            height: 220,
+                        });
+                        dockview.moveGroupOrPanel({
+                            from: {
+                                groupId: splitter.api.group.id,
+                                panelId: 'splitter',
+                            },
+                            to: { group: floater.api.group, position: 'left' },
+                        });
+                    },
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
                     // Two floating groups for Smart Guides: a target float on

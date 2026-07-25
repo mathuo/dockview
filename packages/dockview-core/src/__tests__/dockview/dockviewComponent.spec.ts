@@ -27,6 +27,10 @@ import {
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
 import { EdgeGroupOptions } from '../../dockview/dockviewShell';
+import {
+    exhaustMicrotaskQueue,
+    exhaustAnimationFrame,
+} from '../__test_utils__/utils';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -12882,6 +12886,215 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
                 dockview.rootDropTargetContainer
             );
             expect(panel2.group.model.dropTargetContainer?.model).toBeDefined();
+
+            dockview.dispose();
+        });
+
+        test('relative mounting: a group split into a floating window (non-anchor member) also uses the floating container', () => {
+            const dockview = createComponent('relative');
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel3);
+            const anchorGroup = panel3.group;
+
+            // Split panel1 into the left of the floating group -> creates a new,
+            // non-anchor member group inside the floating window.
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1Group(dockview).id, panelId: 'panel1' },
+                to: { group: anchorGroup, position: 'left' },
+            });
+
+            const memberGroup = dockview.getGroupPanel('panel1')!.group;
+            expect(memberGroup).not.toBe(anchorGroup);
+            expect(memberGroup.model.location.type).toBe('floating');
+            // The non-anchor member must route through the same always-enabled
+            // floating container so its drop overlay is visible.
+            expect(memberGroup.model.dropTargetContainer).toBe(
+                dockview.floatingDropTargetContainer
+            );
+            expect(memberGroup.model.dropTargetContainer?.model).toBeDefined();
+
+            dockview.dispose();
+        });
+
+        test('relative mounting: a floating group moved back to the grid reverts to the (disabled) root container', () => {
+            const dockview = createComponent('relative');
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+            expect(panel2.group.model.dropTargetContainer).toBe(
+                dockview.floatingDropTargetContainer
+            );
+
+            // Dock the floating group back into the main grid.
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: 'panel2' },
+                to: {
+                    group: dockview.getGroupPanel('panel1')!.group,
+                    position: 'right',
+                },
+            });
+
+            const group = dockview.getGroupPanel('panel2')!.group;
+            expect(group.model.location.type).toBe('grid');
+            // Back in the grid it must use the root container again (in-place
+            // under relative mounting).
+            expect(group.model.dropTargetContainer).toBe(
+                dockview.rootDropTargetContainer
+            );
+            expect(group.model.dropTargetContainer?.model).toBeUndefined();
+
+            dockview.dispose();
+        });
+
+        test('the floating container stays enabled across runtime mounting-mode changes', () => {
+            const dockview = createComponent('relative');
+
+            expect(dockview.floatingDropTargetContainer.disabled).toBe(false);
+
+            dockview.updateOptions({
+                theme: {
+                    name: 'test',
+                    className: 'test',
+                    dndOverlayMounting: 'absolute',
+                },
+            });
+            expect(dockview.floatingDropTargetContainer.disabled).toBe(false);
+            expect(dockview.rootDropTargetContainer.disabled).toBe(false);
+
+            dockview.updateOptions({
+                theme: {
+                    name: 'test',
+                    className: 'test',
+                    dndOverlayMounting: 'relative',
+                },
+            });
+            expect(dockview.floatingDropTargetContainer.disabled).toBe(false);
+            expect(dockview.rootDropTargetContainer.disabled).toBe(true);
+
+            dockview.dispose();
+        });
+
+        function panel1Group(dockview: DockviewComponent) {
+            return dockview.getGroupPanel('panel1')!.group;
+        }
+    });
+
+    describe('floating group always-renderer overlay z-index', () => {
+        function createComponent(): DockviewComponent {
+            const container = document.createElement('div');
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                defaultRenderer: 'always',
+            });
+            dockview.layout(1000, 1000);
+            return dockview;
+        }
+
+        function overlayZIndexFor(
+            dockview: DockviewComponent,
+            panelId: string
+        ): string | undefined {
+            const content =
+                dockview.overlayRenderContainer.element.querySelector(
+                    `.testpanel-${panelId}`
+                );
+            return (content?.parentElement as HTMLElement | undefined)?.style
+                .zIndex;
+        }
+
+        test('getFloatingWindowForGroup resolves a non-anchor member of a floating window', () => {
+            const dockview = createComponent();
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+            const anchorGroup = panel2.group;
+
+            dockview.moveGroupOrPanel({
+                from: {
+                    groupId: dockview.getGroupPanel('panel1')!.group.id,
+                    panelId: 'panel1',
+                },
+                to: { group: anchorGroup, position: 'left' },
+            });
+
+            const memberGroup = dockview.getGroupPanel('panel1')!.group;
+            expect(memberGroup).not.toBe(anchorGroup);
+
+            // Anchor identity lookup would miss the member; membership lookup
+            // must find the same floating window for both.
+            const anchorWindow =
+                dockview.getFloatingWindowForGroup(anchorGroup);
+            const memberWindow =
+                dockview.getFloatingWindowForGroup(memberGroup);
+            expect(anchorWindow).toBeDefined();
+            expect(memberWindow).toBe(anchorWindow);
+
+            dockview.dispose();
+        });
+
+        test("a panel split into a floating group has its 'always' overlay lifted above the window (not left behind it)", async () => {
+            const dockview = createComponent();
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+
+            await exhaustMicrotaskQueue();
+            await exhaustAnimationFrame();
+
+            dockview.moveGroupOrPanel({
+                from: {
+                    groupId: dockview.getGroupPanel('panel1')!.group.id,
+                    panelId: 'panel1',
+                },
+                to: { group: panel2.group, position: 'left' },
+            });
+
+            await exhaustMicrotaskQueue();
+            await exhaustAnimationFrame();
+            await exhaustMicrotaskQueue();
+
+            const memberZ = overlayZIndexFor(dockview, 'panel1');
+            const anchorZ = overlayZIndexFor(dockview, 'panel2');
+
+            // The lifted overlay z-index is `--dv-overlay-z-index + level*2+1`,
+            // which paints above the floating window (`+ level*2`). Before the
+            // fix the member overlay had no inline z-index and fell back to the
+            // CSS `dv-render-overlay-float` value (one *below* the window), so
+            // its content rendered behind the window.
+            expect(memberZ).toMatch(/--dv-overlay-z-index/);
+            expect(memberZ).toEqual(anchorZ);
 
             dockview.dispose();
         });

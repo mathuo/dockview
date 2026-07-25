@@ -800,6 +800,21 @@ export class DockviewComponent
     }
 
     /**
+     * Resolve the floating window hosting `group`, matched by membership so it
+     * finds nested (non-anchor) members too — a floating window can host a
+     * whole nested gridview, not just its anchor group. Returns `undefined`
+     * when the group isn't in any floating window. `floatingGroups` alone only
+     * exposes each window's anchor, so consumers that must act on any member
+     * (e.g. lifting an `always`-rendered panel's overlay above the window)
+     * should use this instead of a `.find(f => f.group === group)`.
+     */
+    getFloatingWindowForGroup(
+        group: DockviewGroupPanel
+    ): DockviewFloatingGroupPanel | undefined {
+        return this._floatingGroupService?.findByGroup(group);
+    }
+
+    /**
      * Boxes of the floating groups other than `exclude`, in coordinates
      * relative to the floating overlay container. Supplied to a
      * `transformFloatingGroupDrag` callback as `context.others` so it can
