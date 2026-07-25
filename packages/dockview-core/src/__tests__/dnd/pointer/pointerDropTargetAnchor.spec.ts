@@ -211,6 +211,64 @@ describe('PointerDropTarget: anchor / override target path', () => {
         document.body.removeChild(dropEl);
     });
 
+    test('drag-leave clears the anchor overlay (pointer mode leaves no stale overlay behind)', () => {
+        // The HTML5 backend intentionally does NOT clear the anchor container on
+        // drag-leave (it relies on drop/dragend, which is why a stale overlay
+        // could survive a cross-container drag — see the shell `dragend` safety
+        // net). The pointer backend has no such gap: it clears the override
+        // target the moment the pointer leaves, so moving off a floating group's
+        // tab onto another group never leaves the floating anchor overlay behind.
+        // This test locks in that difference.
+        const dropEl = document.createElement('div');
+        document.body.appendChild(dropEl);
+        jest.spyOn(dropEl, 'offsetWidth', 'get').mockReturnValue(200);
+        jest.spyOn(dropEl, 'offsetHeight', 'get').mockReturnValue(100);
+        jest.spyOn(dropEl, 'getBoundingClientRect').mockReturnValue({
+            top: 0,
+            left: 0,
+            right: 200,
+            bottom: 100,
+            width: 200,
+            height: 100,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        });
+
+        const { targetModel, clear } = makeAnchorTarget();
+
+        const target = new PointerDropTarget(dropEl, {
+            acceptedTargetZones: ['left', 'right'],
+            canDisplayOverlay: () => true,
+            getOverrideTarget: () => targetModel,
+        });
+
+        const dragEvent = {
+            clientX: 10,
+            clientY: 50,
+            pointerEvent: new PointerEvent('pointermove', {
+                clientX: 10,
+                clientY: 50,
+                pointerId: 1,
+                pointerType: 'touch',
+            }),
+        };
+
+        // Show the anchored overlay, then leave without dropping.
+        (target as any)._onDragOver(dragEvent);
+        expect(target.state).toBe('left');
+        expect(clear).not.toHaveBeenCalled();
+
+        (target as any)._onDragLeave();
+
+        // The container is cleared and no drop position stays latched.
+        expect(clear).toHaveBeenCalled();
+        expect(target.state).toBeUndefined();
+
+        target.dispose();
+        document.body.removeChild(dropEl);
+    });
+
     test('pointerup over a target with an anchor calls clear() and fires onDrop with the latched position', () => {
         const dropEl = document.createElement('div');
         document.body.appendChild(dropEl);
