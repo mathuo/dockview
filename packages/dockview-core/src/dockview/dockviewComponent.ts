@@ -1603,6 +1603,27 @@ export class DockviewComponent
         this.addDisposables(
             this.rootDropTargetContainer,
             this.floatingDropTargetContainer,
+            // Safety net for a stale anchored drop overlay after an HTML5 drag.
+            // `dragend` fires only on the drag *source* element, and each drop
+            // target clears only its own group's container. When a drag shows an
+            // overlay in one shell-level container but ends via a source bound to
+            // a different one — e.g. dragging a grid tab (whose disabled root
+            // container renders in-place) over a floating group's tab (anchored
+            // in `floatingDropTargetContainer`), then releasing over the grid —
+            // nothing clears the first container and its overlay lingers.
+            // `dragend` fires at the end of every HTML5 drag (drop or cancel),
+            // so clearing both shell containers here guarantees no overlay
+            // survives the drag. The pointer backend clears on drag-leave already
+            // and doesn't emit `dragend`, so this is HTML5-only by construction.
+            addDisposableListener(
+                this._shellManager.element,
+                'dragend',
+                () => {
+                    this.rootDropTargetContainer.model?.clear();
+                    this.floatingDropTargetContainer.model?.clear();
+                },
+                true
+            ),
             this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
