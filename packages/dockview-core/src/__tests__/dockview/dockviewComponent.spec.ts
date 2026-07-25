@@ -13099,4 +13099,90 @@ describe('group header direction change signal (DV-14 unblocker)', () => {
             dockview.dispose();
         });
     });
+
+    describe('stale drop overlay cleanup on dragend', () => {
+        function createComponent(
+            mounting: 'relative' | 'absolute'
+        ): DockviewComponent {
+            const container = document.createElement('div');
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+                theme: {
+                    name: 'test',
+                    className: 'test',
+                    dndOverlayMounting: mounting,
+                },
+            });
+            dockview.layout(1000, 1000);
+            return dockview;
+        }
+
+        // Simulate an anchored overlay left behind in a container (as an HTML5
+        // drag would after showing a drop target), then assert `dragend` clears
+        // it. HTML5 `dragend` fires only on the drag source, and each drop
+        // target clears only its own container, so an overlay shown in a
+        // different container than the source's would otherwise linger.
+        test('a dragend clears a lingering overlay in the floating container (relative mounting)', () => {
+            const dockview = createComponent('relative');
+            const shell = (dockview as any)._shellManager
+                .element as HTMLElement;
+
+            // Materialize an overlay in the floating container.
+            dockview.floatingDropTargetContainer.model!.getElements();
+            expect(dockview.floatingDropTargetContainer.model!.exists()).toBe(
+                true
+            );
+
+            fireEvent.dragEnd(shell);
+
+            expect(dockview.floatingDropTargetContainer.model!.exists()).toBe(
+                false
+            );
+
+            dockview.dispose();
+        });
+
+        test('a dragend clears a lingering overlay in the root container (absolute mounting)', () => {
+            const dockview = createComponent('absolute');
+            const shell = (dockview as any)._shellManager
+                .element as HTMLElement;
+
+            dockview.rootDropTargetContainer.model!.getElements();
+            expect(dockview.rootDropTargetContainer.model!.exists()).toBe(true);
+
+            fireEvent.dragEnd(shell);
+
+            expect(dockview.rootDropTargetContainer.model!.exists()).toBe(
+                false
+            );
+
+            dockview.dispose();
+        });
+
+        test('a dragend clears both shell containers at once', () => {
+            const dockview = createComponent('absolute');
+            const shell = (dockview as any)._shellManager
+                .element as HTMLElement;
+
+            dockview.rootDropTargetContainer.model!.getElements();
+            dockview.floatingDropTargetContainer.model!.getElements();
+            expect(dockview.rootDropTargetContainer.model!.exists()).toBe(true);
+            expect(dockview.floatingDropTargetContainer.model!.exists()).toBe(
+                true
+            );
+
+            fireEvent.dragEnd(shell);
+
+            expect(dockview.rootDropTargetContainer.model!.exists()).toBe(
+                false
+            );
+            expect(dockview.floatingDropTargetContainer.model!.exists()).toBe(
+                false
+            );
+
+            dockview.dispose();
+        });
+    });
 });
