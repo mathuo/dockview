@@ -125,7 +125,7 @@ Each edge group's `api` exposes its peek state alongside the existing collapse s
 
 <DocRef
     declaration="DockviewGroupPanelApi"
-    methods={['isPeeking', 'onDidPeekChange']}
+    methods={['isPeeking', 'onDidPeekChange', 'isAutoHide']}
 />
 
 ```ts
@@ -136,6 +136,10 @@ const isPeeking = groupApi?.isPeeking(); // boolean
 groupApi?.onDidPeekChange((event) => {
     console.log('peeking:', event.isPeeking);
 });
+
+// whether this group auto-hides at all: the per-group override set by
+// `setAutoHide`, or the `autoHideEdgeGroups` option for this edge
+const autoHides = groupApi?.isAutoHide(); // boolean
 ```
 
 :::info
