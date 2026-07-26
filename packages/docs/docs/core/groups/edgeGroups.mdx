@@ -143,7 +143,7 @@ With the `dockToEdgeGroups` option an edge takes up **zero space** when empty an
 
 ## Auto-hide co-existence
 
-Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the per-edge `autoHideEdgeGroups` option for that group.
+Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the per-edge `autoHideEdgeGroups` option for that group. `api.isAutoHide()` reads the resolved value back: the per-group override if one is set, otherwise the `autoHideEdgeGroups` option for that edge.
 
 ```ts
 // this edge group auto-hides; others follow the per-edge option
@@ -151,7 +151,12 @@ api.addEdgeGroup('left', { id: 'left-group', autoHide: true });
 
 // toggle at runtime
 api.getEdgeGroup('right')?.setAutoHide(true);
+
+// read the resolved state (per-group override, else the global option)
+const autoHides = api.getEdgeGroup('right')?.isAutoHide(); // boolean
 ```
+
+Turning auto-hide **off** on a group that is currently collapsed leaves a strip with no way to open it: the click-to-peek trigger goes away with auto-hide and the sash is locked at the collapsed size. Call `expand()` alongside `setAutoHide(false)` if the group might be collapsed.
 
 ## Custom header actions
 

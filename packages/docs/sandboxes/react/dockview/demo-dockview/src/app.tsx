@@ -473,6 +473,55 @@ const TabModeMenuItem = ({
     );
 };
 
+/**
+ * Checkable toggle for an edge group's auto-hide mode. `setAutoHide` writes a
+ * per-group override of the global `autoHideEdgeGroups` option and the auto-hide
+ * controller reconciles the group's chrome live, so a single edge can be flipped
+ * between a pinnable tool window and a static docked panel while the dock runs.
+ *
+ * One toggling item rather than an on/off pair: every edge group here starts
+ * auto-hiding, so in a pair the ticked row is the one you'd reach for first and
+ * clicking it would do nothing.
+ */
+const EdgeAutoHideMenuItem = ({
+    group,
+    close,
+}: IContextMenuItemComponentProps) => {
+    const autoHide = group.api.isAutoHide();
+
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                group.api.setAutoHide(!autoHide);
+                if (autoHide) {
+                    // Turning it off: nothing expands a collapsed edge group
+                    // once auto-hide is gone (the strip's click-to-peek goes
+                    // with it and the sash is locked at the collapsed size), so
+                    // open it here rather than leave a dead strip.
+                    group.api.expand();
+                }
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+        >
+            Auto-hide edge
+            {/* Kept mounted (not conditionally rendered) so the reserved space
+                stops the menu width changing as the tick comes and goes. */}
+            <span
+                className="material-symbols-outlined"
+                style={{
+                    fontSize: '14px',
+                    marginLeft: 'auto',
+                    visibility: autoHide ? 'visible' : 'hidden',
+                }}
+            >
+                check
+            </span>
+        </div>
+    );
+};
+
 const colors = [
     'rgba(255,0,0,0.2)',
     'rgba(0,255,0,0.2)',
@@ -835,11 +884,18 @@ const DockviewDemo = (props: {
                     } satisfies TabModeMenuItemProps,
                 })),
                 'separator',
-                // Float / popout are shown here as custom component items (with
-                // icons); the `'float'` and `'popout'` built-in shortcuts do the
-                // same thing without custom rendering.
-                { component: FloatMenuItem },
-                { component: PopoutMenuItem },
+                ...(group.api.location.type === 'edge'
+                    ? // An edge group can't float or pop out, but it can switch
+                      // between a pinnable tool window and a static docked
+                      // panel, so that toggle takes the slot instead.
+                      [{ component: EdgeAutoHideMenuItem }]
+                    : // Float / popout are shown here as custom component items
+                      // (with icons); the `'float'` and `'popout'` built-in
+                      // shortcuts do the same thing without custom rendering.
+                      [
+                          { component: FloatMenuItem },
+                          { component: PopoutMenuItem },
+                      ]),
             ];
 
             if (api) {

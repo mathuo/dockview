@@ -115,6 +115,12 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * non-edge groups or without the auto-hide module.
      */
     setAutoHide(value: boolean | undefined): void;
+    /**
+     * The resolved auto-hide state of this edge group: the per-group override
+     * if one is set, otherwise the global `autoHideEdgeGroups` option for this
+     * edge. Always returns false for non-edge groups.
+     */
+    isAutoHide(): boolean;
 }
 
 export interface DockviewGroupPanelLocationChangeEvent {
@@ -339,6 +345,13 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             return;
         }
         this.accessor.setEdgeGroupAutoHide(this._group, value);
+    }
+
+    isAutoHide(): boolean {
+        if (!this._group) {
+            return false;
+        }
+        return this.accessor.isEdgeGroupAutoHide(this._group);
     }
 
     initialize(group: DockviewGroupPanel): void {

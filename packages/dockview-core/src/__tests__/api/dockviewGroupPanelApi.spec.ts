@@ -721,6 +721,34 @@ describe('DockviewGroupPanelApiImpl', () => {
                 undefined
             );
         });
+
+        test('isAutoHide returns false when not initialized', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                isEdgeGroupAutoHide: jest.fn(),
+            });
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+
+            expect(cut.isAutoHide()).toBe(false);
+            expect(accessor.isEdgeGroupAutoHide).not.toHaveBeenCalled();
+        });
+
+        test('isAutoHide delegates to accessor.isEdgeGroupAutoHide', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                isEdgeGroupAutoHide: jest.fn().mockReturnValue(true),
+            });
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                accessor as unknown as DockviewComponent
+            );
+            const group = fromPartial<DockviewGroupPanel>({});
+            cut.initialize(group);
+
+            expect(cut.isAutoHide()).toBe(true);
+            expect(accessor.isEdgeGroupAutoHide).toHaveBeenCalledWith(group);
+        });
     });
 
     describe('event passthrough', () => {
