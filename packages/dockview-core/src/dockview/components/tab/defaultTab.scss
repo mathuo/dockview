@@ -102,6 +102,14 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            // Reset native <button> defaults: the React renderer emits a
+            // <button> here (for keyboard/AT accessibility) while the vanilla
+            // renderer emits a <div>; these keep both looking identical.
+            border: none;
+            background: none;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
 
             &:hover {
                 border-radius: 2px;
