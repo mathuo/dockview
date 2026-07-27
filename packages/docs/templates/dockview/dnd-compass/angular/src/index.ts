@@ -34,7 +34,7 @@ export class DefaultPanelComponent {
         <div style="height: 100%;">
             <dv-dockview
                 [components]="components"
-                [dndGuide]="true"
+                [dndCompass]="true"
                 className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                 (ready)="onReady($event)"
             >
@@ -51,7 +51,7 @@ export class AppComponent {
         const api: DockviewApi = event.api;
 
         // A small docked layout with panels on every side so that, while
-        // dragging a tab, the drop guide can be seen resolving to each cell.
+        // dragging a tab, the DnD compass can be seen resolving to each cell.
         const panel1 = api.addPanel({
             id: 'panel_1',
             component: 'default',

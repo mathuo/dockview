@@ -134,7 +134,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() overflow?: DockviewOptions['overflow'];
     @Input() pinnedTabs?: DockviewOptions['pinnedTabs'];
     @Input() smartGuides?: DockviewOptions['smartGuides'];
-    @Input() dndGuide?: DockviewOptions['dndGuide'];
+    @Input() dndCompass?: DockviewOptions['dndCompass'];
     @Input() dropPositionResolver?: DockviewOptions['dropPositionResolver'];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();

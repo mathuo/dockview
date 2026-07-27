@@ -100,7 +100,7 @@ import {
     IAutoHideEdgeGroupHost,
     IContextMenuHost,
     IContextMenuService,
-    IDropGuideHost,
+    IDndCompassHost,
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
     IMultiRowTabsHost,
@@ -523,7 +523,7 @@ export class DockviewComponent
         ILiveRegionHost,
         IKeyboardNavigationHost,
         ILayoutHistoryHost,
-        IDropGuideHost,
+        IDndCompassHost,
         ISmartGuidesHost,
         IAutoHideEdgeGroupHost,
         IMultiRowTabsHost
@@ -1016,11 +1016,11 @@ export class DockviewComponent
         return this._moduleRegistry.services.advancedDnDService;
     }
 
-    private get _dropGuideService() {
-        return this._moduleRegistry.services.dropGuideService;
+    private get _dndCompassService() {
+        return this._moduleRegistry.services.dndCompassService;
     }
 
-    /** IDropGuideHost: whether a content drop at `position` on `group` is
+    /** IDndCompassHost: whether a content drop at `position` on `group` is
      *  allowed, for compass cell gating (only legal cells are shown). The same
      *  predicate the content drop target uses, so the compass and the real drop
      *  agree. */
@@ -1032,7 +1032,7 @@ export class DockviewComponent
         return group.model.canDisplayContentOverlay(event, position);
     }
 
-    /** IDropGuideHost: the frame the content drop target measures (mirrors the
+    /** IDndCompassHost: the frame the content drop target measures (mirrors the
      *  `getOverlayOutline` rule in `content.ts`): the whole group when
      *  `dndPanelOverlay === 'group'`, else just the content. The compass paints
      *  in this frame so its cells align with where a drop resolves. */
@@ -1071,7 +1071,7 @@ export class DockviewComponent
         group.model.header.setForcedOverflow(fn);
     }
 
-    /** IDropGuideHost: the layout root (`.dv-dockview`, a positioned element),
+    /** IDndCompassHost: the layout root (`.dv-dockview`, a positioned element),
      *  the surface the outer-cell landing preview is drawn over. */
     getLayoutElement(): HTMLElement {
         return this.gridview.element;
@@ -1079,7 +1079,7 @@ export class DockviewComponent
 
     /**
      * The drop-position resolver installed on the group content drop targets:
-     * the app's `dropPositionResolver` option if set, else the Drop Guide
+     * the app's `dropPositionResolver` option if set, else the DnD compass
      * module's compass resolver (undefined when the compass is disabled). Read
      * live by the content drop targets; undefined ⇒ default cursor-quadrant.
      */
@@ -1087,7 +1087,7 @@ export class DockviewComponent
         if (this.options.dropPositionResolver) {
             return this.options.dropPositionResolver;
         }
-        const compass = this._dropGuideService?.resolver;
+        const compass = this._dndCompassService?.resolver;
         const autoEdge = this._moduleRegistry.services.autoEdgeGroupService;
         // With both the compass and auto edge groups on, compose them: the true
         // outer edge reveals an edge group, everything else (inner split cells,

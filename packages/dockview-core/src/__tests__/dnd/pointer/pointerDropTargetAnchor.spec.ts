@@ -101,7 +101,7 @@ describe('PointerDropTarget: anchor / override target path', () => {
         // The anchored overlay lives in a container the drop target does not
         // own, so a null resolution must clear it explicitly — otherwise the
         // previous frame's highlight lingers while the cursor sits in a dead
-        // zone (e.g. a corner of the drop-guide compass).
+        // zone (e.g. a corner of the DnD compass).
         const dropEl = document.createElement('div');
         document.body.appendChild(dropEl);
         jest.spyOn(dropEl, 'offsetWidth', 'get').mockReturnValue(200);

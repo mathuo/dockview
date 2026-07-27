@@ -2,7 +2,7 @@ import { DockviewModule, registerModules } from 'dockview';
 import { ContextMenuModule } from './contextMenu';
 import { KeyboardNavigationModule } from './keyboardNavigationService';
 import { LayoutHistoryModule } from './layoutHistoryService';
-import { DropGuideModule } from './dropGuideService';
+import { DndCompassModule } from './dndCompassService';
 import { SmartGuidesModule } from './smartGuidesService';
 import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 import { AutoEdgeGroupModule } from './autoEdgeGroupService';
@@ -28,7 +28,7 @@ export {
     LayoutHistoryService,
     LayoutHistoryModule,
 } from './layoutHistoryService';
-export { DropGuideService, DropGuideModule } from './dropGuideService';
+export { DndCompassService, DndCompassModule } from './dndCompassService';
 export { SmartGuidesService, SmartGuidesModule } from './smartGuidesService';
 export {
     AutoHideEdgeGroupService,
@@ -74,7 +74,7 @@ export const Modules: DockviewModule<any>[] = [
     ContextMenuModule,
     KeyboardNavigationModule,
     LayoutHistoryModule,
-    DropGuideModule,
+    DndCompassModule,
     SmartGuidesModule,
     AutoHideEdgeGroupModule,
     AutoEdgeGroupModule,

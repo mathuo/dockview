@@ -78,8 +78,8 @@ export const ControlsContent = (props: {
     toggleCustomWatermark: () => void;
     hasCustomGhost: boolean;
     toggleCustomGhost: () => void;
-    dndGuide: boolean;
-    onToggleDndGuide: () => void;
+    dndCompass: boolean;
+    onToggleDndCompass: () => void;
     smartGuides: boolean;
     onToggleSmartGuides: () => void;
     debug: boolean;
@@ -140,10 +140,10 @@ export const ControlsContent = (props: {
                     onChange={props.toggleCustomGhost}
                 />
                 <Switch
-                    label="Drop guide compass"
+                    label="DnD compass"
                     icon="explore"
-                    checked={props.dndGuide}
-                    onChange={props.onToggleDndGuide}
+                    checked={props.dndCompass}
+                    onChange={props.onToggleDndCompass}
                 />
                 <Switch
                     label="Smart guides"

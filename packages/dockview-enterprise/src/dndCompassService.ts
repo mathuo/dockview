@@ -8,8 +8,8 @@ import {
     PositionResolverArgs,
     PositionResolverResult,
     defineModule,
-    IDropGuideHost,
-    IDropGuideService,
+    IDndCompassHost,
+    IDndCompassService,
     AdvancedDnDModule,
 } from 'dockview';
 
@@ -114,7 +114,7 @@ function listen(
  * The {@link PositionResolver} the host installs at the drop-target seam in
  * place of the cursor-quadrant logic: hit-test the pointer against the compass
  * cells (centred cross), gated by the target's accepted zones intersected with
- * the configured `dndGuide.zones`. A miss (a dead corner) returns `null`. A
+ * the configured `dndCompass.zones`. A miss (a dead corner) returns `null`. A
  * per-cell veto is enforced by the drop target itself (`canDisplayOverlay`).
  */
 class CompassResolver implements PositionResolver {
@@ -227,7 +227,7 @@ class CompassWidget {
 
         const doc = container.ownerDocument;
         const el = doc.createElement('div');
-        el.className = 'dv-drop-guide';
+        el.className = 'dv-dnd-compass';
         el.style.position = 'absolute';
         el.style.left = '0';
         el.style.top = '0';
@@ -268,8 +268,8 @@ class CompassWidget {
         for (const cell of cells) {
             const el = doc.createElement('div');
             el.className =
-                `dv-drop-guide-cell dv-drop-guide-cell-${cell.position}` +
-                (cell.edge ? ' dv-drop-guide-cell-edge' : '');
+                `dv-dnd-compass-cell dv-dnd-compass-cell-${cell.position}` +
+                (cell.edge ? ' dv-dnd-compass-cell-edge' : '');
             el.style.position = 'absolute';
             el.style.left = `${cell.left + dx}px`;
             el.style.top = `${cell.top + dy}px`;
@@ -288,7 +288,7 @@ class CompassWidget {
     setActive(position: Position, edge: boolean): void {
         for (const c of this._cells) {
             c.el.classList.toggle(
-                'dv-drop-guide-cell-active',
+                'dv-dnd-compass-cell-active',
                 c.position === position && c.edge === edge
             );
         }
@@ -297,7 +297,7 @@ class CompassWidget {
     /** Clear the aimed-cell highlight (cursor is over no cell). */
     clearActive(): void {
         for (const c of this._cells) {
-            c.el.classList.remove('dv-drop-guide-cell-active');
+            c.el.classList.remove('dv-dnd-compass-cell-active');
         }
     }
 
@@ -308,20 +308,20 @@ class CompassWidget {
 }
 
 /**
- * Drop Guide ("compass"): a VS Code-style aim-at-a-cell drop overlay for group
+ * DnD compass: a VS Code-style aim-at-a-cell drop overlay for group
  * docking. While a panel/group is dragged over a group, a cross of cells is
  * painted over it and the dragged item snaps to whichever cell the cursor is
  * over (instead of the cursor-quadrant of the target). Drop resolution + commit
  * stay in core: the service installs a {@link CompassResolver} at the drop-target
- * seam and paints the widget. Opt-in via `dndGuide` (default off → unchanged).
+ * seam and paints the widget. Opt-in via `dndCompass` (default off → unchanged).
  *
  * Inner cells split/merge the hovered group; the outer ring (`edge` cells) docks
  * against the whole layout (core routes `edge`-flagged drops to the layout edge).
  * Cells the drop would reject are hidden (per-cell gating).
  */
-export class DropGuideService
+export class DndCompassService
     extends CompositeDisposable
-    implements IDropGuideService
+    implements IDndCompassService
 {
     private readonly _resolver: CompassResolver;
     private _mounted:
@@ -336,7 +336,7 @@ export class DropGuideService
     private _endListeners: CompositeDisposable | undefined;
     private _edgePreview: HTMLElement | undefined;
 
-    constructor(private readonly host: IDropGuideHost) {
+    constructor(private readonly host: IDndCompassHost) {
         super();
 
         this._resolver = new CompassResolver(
@@ -356,25 +356,25 @@ export class DropGuideService
     }
 
     private get _enabled(): boolean {
-        return !!this.host.options.dndGuide;
+        return !!this.host.options.dndCompass;
     }
 
     /** Cells the option restricts the compass to, or `undefined` for all. */
     private _configuredZones(): ReadonlySet<Position> | undefined {
-        const guide = this.host.options.dndGuide;
-        if (guide && typeof guide === 'object' && guide.zones) {
-            return new Set(guide.zones);
+        const compass = this.host.options.dndCompass;
+        if (compass && typeof compass === 'object' && compass.zones) {
+            return new Set(compass.zones);
         }
         return undefined;
     }
 
     /** Whether the outer whole-layout-edge cells are shown (default true). */
     private _edgesEnabled(): boolean {
-        const guide = this.host.options.dndGuide;
-        if (guide && typeof guide === 'object') {
-            return guide.edges !== false;
+        const compass = this.host.options.dndCompass;
+        if (compass && typeof compass === 'object') {
+            return compass.edges !== false;
         }
-        return !!guide;
+        return !!compass;
     }
 
     private _onWillShowOverlay(e: DockviewWillShowOverlayLocationEvent): void {
@@ -468,7 +468,7 @@ export class DropGuideService
         const layout = this.host.getLayoutElement();
         if (!this._edgePreview) {
             const el = layout.ownerDocument.createElement('div');
-            el.className = 'dv-drop-guide-edge-preview';
+            el.className = 'dv-dnd-compass-edge-preview';
             el.style.position = 'absolute';
             el.style.pointerEvents = 'none';
             layout.appendChild(el);
@@ -561,12 +561,13 @@ export class DropGuideService
     }
 }
 
-export const DropGuideModule = defineModule<'dropGuideService', IDropGuideHost>(
-    {
-        name: 'DropGuide',
-        options: ['dndGuide'],
-        serviceKey: 'dropGuideService',
-        dependsOn: [AdvancedDnDModule],
-        create: (host) => new DropGuideService(host),
-    }
-);
+export const DndCompassModule = defineModule<
+    'dndCompassService',
+    IDndCompassHost
+>({
+    name: 'DndCompass',
+    options: ['dndCompass'],
+    serviceKey: 'dndCompassService',
+    dependsOn: [AdvancedDnDModule],
+    create: (host) => new DndCompassService(host),
+});

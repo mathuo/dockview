@@ -24,7 +24,7 @@ import {
     IAutoHideEdgeGroupService,
     IAutoEdgeGroupService,
     IContextMenuService,
-    IDropGuideService,
+    IDndCompassService,
     IKeyboardDockingService,
     ILayoutHistoryService,
     IMultiRowTabsService,
@@ -47,7 +47,7 @@ export interface ServiceCollection {
     keyboardNavigationService?: IKeyboardNavigationService;
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
-    dropGuideService?: IDropGuideService;
+    dndCompassService?: IDndCompassService;
     smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
     autoEdgeGroupService?: IAutoEdgeGroupService;
@@ -136,7 +136,7 @@ export const ENTERPRISE_MODULE_NAMES: ReadonlySet<string> = new Set([
     'AutoEdgeGroup',
     'AutoHideEdgeGroup',
     'ContextMenu',
-    'DropGuide',
+    'DndCompass',
     'KeyboardDocking',
     'KeyboardNavigation',
     'LayoutHistory',

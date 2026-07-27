@@ -42,7 +42,7 @@ const App = defineComponent({
     methods: {
         onReady(event: DockviewReadyEvent) {
             // A small docked layout with panels on every side so that, while
-            // dragging a tab, the drop guide can be seen resolving to each cell.
+            // dragging a tab, the DnD compass can be seen resolving to each cell.
             const panel1 = event.api.addPanel({
                 id: 'panel_1',
                 component: 'default',
@@ -75,7 +75,7 @@ const App = defineComponent({
       <dockview-vue
         style="width:100%;height:100%"
         className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
-        :dndGuide="true"
+        :dndCompass="true"
         @ready="onReady"
       >
       </dockview-vue>`,
