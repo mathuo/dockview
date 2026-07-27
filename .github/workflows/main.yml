@@ -221,6 +221,7 @@ jobs:
                   name: coverage-output
                   path: |
                       coverage/
+                      packages/dockview-vue/coverage/
                       test-report.xml
                   retention-days: 1
 
