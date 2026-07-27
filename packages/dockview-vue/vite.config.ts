@@ -22,6 +22,17 @@ export default defineConfig({
             ),
         },
         setupFiles: ['src/__tests__/__mocks__/resizeObserver.vitest.ts'],
+        coverage: {
+            provider: 'v8',
+            // `lcovonly` feeds SonarCloud; `text-summary` prints a console
+            // recap. The `.info` paths are rewritten to repo-root-relative by
+            // `scripts/fix-lcov-paths.cjs` (run from `test:cov`) so Sonar,
+            // which resolves coverage paths from the repo root, matches them.
+            reporter: ['lcovonly', 'text-summary'],
+            reportsDirectory: './coverage',
+            include: ['src/**'],
+            exclude: ['src/__tests__/**'],
+        },
     },
 
     build: {

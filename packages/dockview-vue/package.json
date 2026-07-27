@@ -78,7 +78,7 @@
         "rebuild": "npm run clean && npm run build",
         "types:check": "attw --pack . --ignore-rules false-esm internal-resolution-error",
         "test": "vitest run",
-        "test:cov": "vitest run --coverage",
+        "test:cov": "vitest run --coverage && node scripts/fix-lcov-paths.cjs",
         "lint": "biome lint src",
         "lint:fix": "biome lint --write src",
         "format": "biome format --write src",
