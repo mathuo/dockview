@@ -321,7 +321,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
     removePanel(panel: PaneviewPanel): void {
         const views = this.panels;
-        const index = views.findIndex((_) => _ === panel);
+        const index = views.indexOf(panel);
         this.paneview.removePane(index);
 
         this.doRemovePanel(panel);

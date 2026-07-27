@@ -63,7 +63,7 @@ export function firstIndex<T>(
 }
 
 export function remove<T>(array: T[], value: T): boolean {
-    const index = array.findIndex((t) => t === value);
+    const index = array.indexOf(value);
 
     if (index > -1) {
         array.splice(index, 1);

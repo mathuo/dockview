@@ -386,7 +386,7 @@ export class Splitview {
 
     public addView(
         view: IView,
-        size: number | Sizing = { type: 'distribute' },
+        size: number | Sizing = Sizing.Distribute,
         index: number = this.viewItems.length,
         skipLayout?: boolean
     ): void {

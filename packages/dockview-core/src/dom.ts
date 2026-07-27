@@ -304,7 +304,7 @@ export function isInDocument(element: Element): boolean {
 }
 
 export function addTestId(element: HTMLElement, id: string): void {
-    element.setAttribute('data-testid', id);
+    element.dataset.testid = id;
 }
 
 /**
@@ -504,9 +504,9 @@ export function onDidWindowResizeEnd(element: Window, cb: () => void) {
 export function shiftAbsoluteElementIntoView(
     element: HTMLElement,
     root: HTMLElement,
-    options: { buffer: number } = { buffer: 10 }
+    options?: { buffer?: number }
 ) {
-    const buffer = options.buffer;
+    const buffer = options?.buffer ?? 10;
     const rect = element.getBoundingClientRect();
     const rootRect = root.getBoundingClientRect();
 

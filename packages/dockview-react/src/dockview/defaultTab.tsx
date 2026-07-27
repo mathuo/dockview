@@ -71,7 +71,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
     const isMiddleMouseButton = React.useRef<boolean>(false);
 
     const onClose = React.useCallback(
-        (event: React.MouseEvent<HTMLSpanElement>) => {
+        (event: React.MouseEvent<HTMLElement>) => {
             event.preventDefault();
 
             if (closeActionOverride) {
@@ -141,13 +141,15 @@ export const DockviewDefaultTab: React.FunctionComponent<
             )}
             <span className="dv-default-tab-content">{title}</span>
             {!hideClose && (
-                <div
+                <button
+                    type="button"
                     className="dv-default-tab-action"
+                    aria-label="Close tab"
                     onPointerDown={onBtnPointerDown}
                     onClick={onClose}
                 >
                     <CloseButton />
-                </div>
+                </button>
             )}
         </div>
     );
