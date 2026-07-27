@@ -161,13 +161,13 @@ export const OPTION_MODULE_RULES: OptionModuleRule[] = [
         when: (o) => o.createContextMenuItemComponent != null,
     },
     {
-        optionKey: 'dndGuide',
-        reason: 'dndGuide',
-        moduleName: 'DropGuide',
-        // Truthiness, not presence: `dndGuide` is `boolean | {...}`, so a
-        // `!= null` test would fire on `dndGuide: false`, billing a user for
+        optionKey: 'dndCompass',
+        reason: 'dndCompass',
+        moduleName: 'DndCompass',
+        // Truthiness, not presence: `dndCompass` is `boolean | {...}`, so a
+        // `!= null` test would fire on `dndCompass: false`, billing a user for
         // turning the compass off.
-        when: (o) => !!o.dndGuide,
+        when: (o) => !!o.dndCompass,
     },
     {
         optionKey: 'keyboardNavigation',

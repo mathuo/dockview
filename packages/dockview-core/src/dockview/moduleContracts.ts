@@ -267,16 +267,16 @@ export interface ILayoutHistoryService extends IDisposable {
     clear(): void;
 }
 
-// --- DropGuide ---
+// --- DndCompass ---
 
 /**
- * The narrow surface the Drop Guide ("compass") service needs from the host
+ * The narrow surface the DnD compass service needs from the host
  * (`DockviewComponent`). The service owns the compass widget + the cell
  * hit-test resolver; the component installs that resolver at the drop-target
  * seam (`dropPositionResolver`) and surfaces the drag-over signal the widget
  * follows. It never re-implements drop resolution or the commit path.
  */
-export interface IDropGuideHost {
+export interface IDndCompassHost {
     readonly options: DockviewComponentOptions;
     /**
      * Fires on each drag-over with the hovered group + native event; the
@@ -306,11 +306,11 @@ export interface IDropGuideHost {
     getLayoutElement(): HTMLElement;
 }
 
-export interface IDropGuideService extends IDisposable {
+export interface IDndCompassService extends IDisposable {
     /**
      * The cell hit-test resolver, installed by the host at the drop-target seam
      * in place of the default cursor-quadrant logic, or `undefined` when the
-     * compass is disabled (`dndGuide` unset), so the default behaviour runs.
+     * compass is disabled (`dndCompass` unset), so the default behaviour runs.
      */
     readonly resolver: PositionResolver | undefined;
 }
@@ -525,7 +525,7 @@ export interface IAutoEdgeGroupService extends IDisposable {
     readonly resolver: PositionResolver | undefined;
     /** Edge-band detection only: an `edge` cell when the pointer is in the outer
      *  band, else `null`. Used to compose with another resolver (e.g. the
-     *  drop-guide compass): the outer edge reveals an edge group and everything
+     *  DnD compass): the outer edge reveals an edge group and everything
      *  else falls through to the other resolver. */
     resolveEdge(args: PositionResolverArgs): PositionResolverResult | null;
 }

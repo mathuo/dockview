@@ -6,7 +6,7 @@ import { test, expect, Page } from '@playwright/test';
  * live element geometry, which jsdom's no-layout DOM can't produce.
  *
  * The compass (content-centre / outer-cell) drops are covered by
- * `drop-guide.spec.ts`; these cover the tab-strip seams it doesn't: reordering
+ * `dnd-compass.spec.ts`; these cover the tab-strip seams it doesn't: reordering
  * within a strip, and merging by dropping onto another group's header.
  */
 test.describe('pointer dnd docking', () => {

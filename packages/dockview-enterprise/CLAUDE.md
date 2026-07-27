@@ -17,7 +17,7 @@ calls `registerModules(Modules)` at import (a side effect — hence
 - `AccessibilityModule` (`accessibilityService.ts`) — keyboard navigation;
   `dependsOn` `AdvancedDnDModule` + `LiveRegionModule` (both in core)
 - `LayoutHistoryModule` (`layoutHistoryService.ts`)
-- `DropGuideModule` (`dropGuideService.ts`) — `dependsOn` `AdvancedDnDModule` (core)
+- `DndCompassModule` (`dndCompassService.ts`) — `dependsOn` `AdvancedDnDModule` (core)
 - `SmartGuidesModule` (`smartGuidesService.ts`) — `dependsOn` `FloatingGroupModule` (core)
 - `AutoHideEdgeGroupModule` (`autoHideEdgeGroupService.ts`) — `dependsOn` `EdgeGroupModule` (core)
 - `AutoEdgeGroupModule` (`autoEdgeGroupService.ts`) — drag-revealed, zero-footprint

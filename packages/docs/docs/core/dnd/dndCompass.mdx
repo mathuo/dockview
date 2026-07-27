@@ -1,5 +1,5 @@
 ---
-title: 'Drop guide'
+title: 'DnD compass'
 sidebar_position: 8
 description: Show a VS Code-style aim-at-a-cell compass while dragging over a group.
 enterprise: true
@@ -9,37 +9,37 @@ sidebar_custom_props:
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-By default Dockview resolves a drop from the quadrant of the target the cursor happens to be over. The **drop guide**
+By default Dockview resolves a drop from the quadrant of the target the cursor happens to be over. The **DnD compass**
 replaces that with an explicit, VS Code-style _compass_: a fixed cross of cells rendered over the group you are dragging
 over. You aim at a cell to choose the drop direction, and only the drops that are actually possible are shown.
 
-<CodeRunner id="dockview/drop-guide" />
+<CodeRunner id="dockview/dnd-compass" />
 
-## Compass drop guide
+## Enabling the compass
 
-Enable the compass with the `dndGuide` option. With it off (the default) the existing cursor-quadrant behaviour is
+Enable the compass with the `dndCompass` option. With it off (the default) the existing cursor-quadrant behaviour is
 unchanged.
 
 <FrameworkSpecific framework="React">
-    <DocRef declaration="IDockviewReactProps" methods={['dndGuide']} />
+    <DocRef declaration="IDockviewReactProps" methods={['dndCompass']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Vue">
-    <DocRef declaration="IDockviewVueProps" methods={['dndGuide']} />
+    <DocRef declaration="IDockviewVueProps" methods={['dndCompass']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="JavaScript">
-    <DocRef declaration="DockviewComponentOptions" methods={['dndGuide']} />
+    <DocRef declaration="DockviewComponentOptions" methods={['dndCompass']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="DockviewAngularOptions" methods={['dndGuide']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['dndCompass']} />
 </FrameworkSpecific>
 
 ```ts
 const api = createDockview(element, {
     // enable the compass with default configuration
-    dndGuide: true,
+    dndCompass: true,
 });
 ```
 
@@ -60,7 +60,7 @@ Pass an object instead of `true` to restrict the guide:
 
 ```ts
 const api = createDockview(element, {
-    dndGuide: {
+    dndCompass: {
         // only offer these inner cells (default: all accepted zones)
         zones: ['center'],
         // include the outer whole-layout-edge cells (default: true)

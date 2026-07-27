@@ -50,7 +50,7 @@ test.describe('locked group', () => {
 
         await dragOntoSecondGroup(page);
         // No compass appears over the locked group…
-        await expect(page.locator('.dv-drop-guide')).toHaveCount(0);
+        await expect(page.locator('.dv-dnd-compass')).toHaveCount(0);
         await page.mouse.up();
 
         // …and the layout is unchanged (no merge).
@@ -71,7 +71,7 @@ test.describe('locked group', () => {
         );
 
         await dragOntoSecondGroup(page);
-        await expect(page.locator('.dv-drop-guide')).toBeVisible();
+        await expect(page.locator('.dv-dnd-compass')).toBeVisible();
         await page.mouse.up();
 
         // The two groups merged into one.

@@ -38,7 +38,7 @@ export class WillShowOverlayEvent
     }
 
     /** See {@link PositionResolverResult.edgeGroup}. A display hint; a consumer
-     *  (e.g. the drop-guide compass) can bow out of this cell. */
+     *  (e.g. the DnD compass) can bow out of this cell. */
     get edgeGroup(): boolean {
         return !!this.options.edgeGroup;
     }
@@ -114,7 +114,7 @@ export interface PositionResolverResult {
     readonly edge?: boolean;
     /**
      * Display hint: this cell docks as a dedicated edge group (not a grid-edge
-     * split). Purely advisory. A co-installed resolver's UI (e.g. the drop-guide
+     * split). Purely advisory. A co-installed resolver's UI (e.g. the DnD
      * compass) can suppress its own overlay for these cells so they don't
      * double-render with the edge-group affordance.
      */

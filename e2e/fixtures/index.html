@@ -144,12 +144,12 @@
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',
-                    // Drop Guide ("compass") + pointer DnD so a panel drag is
+                    // DnD compass + pointer DnD so a panel drag is
                     // drivable in the harness. Inert unless a drag occurs.
                     // `?dnd=html5` swaps in the native HTML5 backend (needed to
                     // exercise the pinned row's pin-by-drag-in path, which reads
                     // the drag payload the main strip's HTML5 source populates).
-                    dndGuide: true,
+                    dndCompass: true,
                     dndStrategy:
                         params.get('dnd') === 'html5' ? 'html5' : 'pointer',
                     // Custom drop-position resolver (opt-in via `?resolver=`),
@@ -414,9 +414,9 @@
                     },
                     snaps: () => window.__snaps || [],
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
-                    // Two side-by-side groups for Drop Guide: dragging the left
+                    // Two side-by-side groups for DnD compass: dragging the left
                     // group's tab over the right group shows the compass.
-                    setupDropGuide: () => {
+                    setupDndCompass: () => {
                         dockview.addPanel({
                             id: 'left',
                             component: 'default',
@@ -434,7 +434,7 @@
                     // moved the active group.
                     activeGroupId: () => dockview.activeGroup?.id,
                     // Two side-by-side groups for keyboard navigation — like
-                    // setupDropGuide but with stable ids the spec can compare.
+                    // setupDndCompass but with stable ids the spec can compare.
                     setupTwoGroups: () => {
                         panels['one'] = dockview.addPanel({
                             id: 'one',
@@ -748,7 +748,7 @@
                     setupAutoEdgeGroups: () => {
                         dockview.api.updateOptions({
                             dockToEdgeGroups: true,
-                            dndGuide: false,
+                            dndCompass: false,
                             autoHideEdgeGroups: false,
                         });
                         dockview.addPanel({
@@ -763,13 +763,13 @@
                             position: { direction: 'right' },
                         });
                     },
-                    // Same as setupAutoEdgeGroups but with the drop-guide compass
+                    // Same as setupAutoEdgeGroups but with the DnD compass
                     // ALSO on, to prove the two compose (edge → edge group, the
                     // compass rings → split / grid-edge).
                     setupAutoEdgeGroupsWithCompass: () => {
                         dockview.api.updateOptions({
                             dockToEdgeGroups: true,
-                            dndGuide: true,
+                            dndCompass: true,
                             autoHideEdgeGroups: false,
                         });
                         dockview.addPanel({

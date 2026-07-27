@@ -14,7 +14,7 @@ const components = {
 
 function loadDefaultLayout(api: DockviewApi) {
     // A small docked layout with panels on every side so that, while dragging
-    // a tab, the aim-at-a-cell drop guide can be seen resolving to each cell.
+    // a tab, the aim-at-a-cell DnD compass can be seen resolving to each cell.
     const panel1 = api.addPanel({
         id: 'panel_1',
         component: 'default',
@@ -56,7 +56,7 @@ export const App = (props: { theme?: string }) => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            dndGuide={true}
+            dndCompass={true}
             className={`${props.theme || 'dockview-theme-abyss'}`}
         />
     );

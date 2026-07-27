@@ -78,15 +78,15 @@ a list mixing built-in string shortcuts (such as the new `'pin'` item) with your
 own label or component items. Return an empty array to suppress the menu for a
 particular tab. See [Context menus](/docs/core/panels/contextMenus).
 
-### Drop guide compass
+### DnD compass
 
-The new [`dndGuide`](/docs/core/dnd/dropGuide) option replaces the
+The new [`dndCompass`](/docs/core/dnd/dndCompass) option replaces the
 cursor-quadrant drop logic with a VS Code-style "compass" that highlights the
 cell you are aiming at while dragging, and previews docking a group to the
 whole-layout edge. For finer control, the new
-[`dropPositionResolver`](/docs/core/dnd/dropGuide) option lets you override how a
+[`dropPositionResolver`](/docs/core/dnd/dndCompass) option lets you override how a
 pointer location maps to a drop position on the group and layout-edge targets.
-See [Drop guide](/docs/core/dnd/dropGuide).
+See [DnD compass](/docs/core/dnd/dndCompass).
 
 ### Smart guides
 
@@ -124,7 +124,7 @@ behave like a VS Code sidebar: an edge with no content takes up **zero space**, 
 drop zone for it appears only **while dragging**, and dropping a panel on the far
 edge **docks an edge group** there. A newly revealed edge is created collapsed,
 and when its last panel leaves it tears down to zero footprint again. It composes
-with the drop guide compass (outer ring docks to the grid edge; the true outer band
+with the DnD compass (outer ring docks to the grid edge; the true outer band
 docks an edge group) and with auto-hide, and can be driven programmatically via
 `api.revealEdgeGroupWithData`. See [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
 

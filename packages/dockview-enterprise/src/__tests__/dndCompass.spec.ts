@@ -5,23 +5,23 @@ import {
     Position,
     PositionResolverArgs,
 } from 'dockview-core';
-import { DropGuideService } from '../dropGuideService';
+import { DndCompassService } from '../dndCompassService';
 
 /**
- * Drop Guide ("compass"). The cell hit-test is pure geometry (container-relative
+ * DnD compass. The cell hit-test is pure geometry (container-relative
  * px) so it's driven directly; the widget + edge-preview + gating lifecycle is
  * driven via a mock `onWillShowOverlay` host signal.
  */
-describe('drop guide', () => {
+describe('DnD compass', () => {
     let overlayEmitter: Emitter<DockviewWillShowOverlayLocationEvent>;
-    let service: DropGuideService;
+    let service: DndCompassService;
     let canDrop: (position: Position) => boolean;
     let dropOverlayEl: (group: DockviewGroupPanel) => HTMLElement | undefined;
     let layoutEl: HTMLElement;
     let gateCalls: Position[];
 
     const make = (
-        dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
+        dndCompass: { zones?: Position[]; edges?: boolean } | boolean | undefined
     ): void => {
         overlayEmitter = new Emitter<DockviewWillShowOverlayLocationEvent>();
         layoutEl = document.createElement('div');
@@ -32,8 +32,8 @@ describe('drop guide', () => {
         dropOverlayEl = (group) =>
             group.element.querySelector<HTMLElement>('.dv-content-container') ??
             undefined;
-        service = new DropGuideService({
-            options: { dndGuide } as any,
+        service = new DndCompassService({
+            options: { dndCompass } as any,
             onWillShowOverlay: overlayEmitter.event,
             canDropOnGroup: (_group, position) => {
                 gateCalls.push(position);
@@ -155,7 +155,7 @@ describe('drop guide', () => {
         });
     });
 
-    test('`dndGuide.zones` restricts which inner cells the compass offers', () => {
+    test('`dndCompass.zones` restricts which inner cells the compass offers', () => {
         make({ zones: ['center'] });
         // left is in the target's zones but excluded by the option
         expect(service.resolver!.resolve(args(58, 50))).toBeNull();
@@ -165,7 +165,7 @@ describe('drop guide', () => {
         });
     });
 
-    test('the resolver is absent when `dndGuide` is unset (default quadrant)', () => {
+    test('the resolver is absent when `dndCompass` is unset (default quadrant)', () => {
         make(undefined);
         expect(service.resolver).toBeUndefined();
     });
@@ -193,17 +193,17 @@ describe('drop guide', () => {
             group,
         } as DockviewWillShowOverlayLocationEvent);
 
-        const guide = content.querySelector('.dv-drop-guide');
-        expect(guide).toBeTruthy();
+        const compass = content.querySelector('.dv-dnd-compass');
+        expect(compass).toBeTruthy();
         // 5 inner cells + 4 outer (edge) cells
-        expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(9);
+        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(9);
         expect(
-            content.querySelectorAll('.dv-drop-guide-cell-edge')
+            content.querySelectorAll('.dv-dnd-compass-cell-edge')
         ).toHaveLength(4);
 
         // the drag ending tears the widget down
         window.dispatchEvent(new Event('pointerup'));
-        expect(content.querySelector('.dv-drop-guide')).toBeNull();
+        expect(content.querySelector('.dv-dnd-compass')).toBeNull();
     });
 
     describe('teardown on leaving the content area', () => {
@@ -235,7 +235,7 @@ describe('drop guide', () => {
                 kind: 'content',
                 group,
             } as DockviewWillShowOverlayLocationEvent);
-            expect(content.querySelector('.dv-drop-guide')).toBeTruthy();
+            expect(content.querySelector('.dv-dnd-compass')).toBeTruthy();
             return { group, content };
         }
 
@@ -251,7 +251,7 @@ describe('drop guide', () => {
             const { content } = mounted();
 
             move(200, 150);
-            expect(content.querySelector('.dv-drop-guide')).toBeTruthy();
+            expect(content.querySelector('.dv-dnd-compass')).toBeTruthy();
         });
 
         test('clears when the cursor moves up into the tab strip', () => {
@@ -260,7 +260,7 @@ describe('drop guide', () => {
 
             // just above the content container — the tab strip
             move(200, 90);
-            expect(content.querySelector('.dv-drop-guide')).toBeNull();
+            expect(content.querySelector('.dv-dnd-compass')).toBeNull();
         });
 
         test('clears when the cursor leaves the group sideways', () => {
@@ -268,7 +268,7 @@ describe('drop guide', () => {
             const { content } = mounted();
 
             move(400, 150);
-            expect(content.querySelector('.dv-drop-guide')).toBeNull();
+            expect(content.querySelector('.dv-dnd-compass')).toBeNull();
         });
     });
 
@@ -301,15 +301,15 @@ describe('drop guide', () => {
             group,
         } as DockviewWillShowOverlayLocationEvent);
 
-        expect(outline.querySelector('.dv-drop-guide')?.parentElement).toBe(
+        expect(outline.querySelector('.dv-dnd-compass')?.parentElement).toBe(
             outline
         );
-        expect(content.querySelector('.dv-drop-guide')).toBeNull();
+        expect(content.querySelector('.dv-dnd-compass')).toBeNull();
 
         // measured frame == mount frame, so the cells need no translation:
         // centre cell at (200/2 - 19), (100/2 - 19)
         const center = outline.querySelector<HTMLElement>(
-            '.dv-drop-guide-cell-center'
+            '.dv-dnd-compass-cell-center'
         )!;
         expect(center.style.left).toBe('81px');
         expect(center.style.top).toBe('31px');
@@ -331,17 +331,17 @@ describe('drop guide', () => {
         over(true, 'right'); // outer-right cell
         expect(
             content.querySelector(
-                '.dv-drop-guide-cell-right.dv-drop-guide-cell-edge.dv-drop-guide-cell-active'
+                '.dv-dnd-compass-cell-right.dv-dnd-compass-cell-edge.dv-dnd-compass-cell-active'
             )
         ).toBeTruthy();
         expect(
-            content.querySelectorAll('.dv-drop-guide-cell-active')
+            content.querySelectorAll('.dv-dnd-compass-cell-active')
         ).toHaveLength(1);
 
         over(false, 'center'); // moves to the inner centre; only it is active
-        const active = content.querySelectorAll('.dv-drop-guide-cell-active');
+        const active = content.querySelectorAll('.dv-dnd-compass-cell-active');
         expect(active).toHaveLength(1);
-        expect(active[0].classList).toContain('dv-drop-guide-cell-center');
+        expect(active[0].classList).toContain('dv-dnd-compass-cell-center');
     });
 
     test('no orphan edge preview when the group has no content container', () => {
@@ -356,7 +356,7 @@ describe('drop guide', () => {
         } as DockviewWillShowOverlayLocationEvent);
         // the compass never mounted, so nothing should be drawn anywhere
         expect(
-            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+            layoutEl.querySelector('.dv-dnd-compass-edge-preview')
         ).toBeNull();
     });
 
@@ -373,7 +373,7 @@ describe('drop guide', () => {
 
         over(true, 'right'); // outer-right → the layout's right-half region
         const band = layoutEl.querySelector<HTMLElement>(
-            '.dv-drop-guide-edge-preview'
+            '.dv-dnd-compass-edge-preview'
         );
         expect(band).toBeTruthy();
         expect(band!.style.width).toBe('50%');
@@ -381,13 +381,13 @@ describe('drop guide', () => {
 
         over(false, 'center'); // inner cell → preview cleared
         expect(
-            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+            layoutEl.querySelector('.dv-dnd-compass-edge-preview')
         ).toBeNull();
 
         over(true, 'top'); // re-show, then end the drag → cleared
         window.dispatchEvent(new Event('pointerup'));
         expect(
-            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+            layoutEl.querySelector('.dv-dnd-compass-edge-preview')
         ).toBeNull();
     });
 
@@ -416,8 +416,8 @@ describe('drop guide', () => {
         } as DockviewWillShowOverlayLocationEvent);
 
         // centre inner cell hidden → 4 inner + 4 outer; edge cells are unaffected
-        expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(8);
-        expect(content.querySelector('.dv-drop-guide-cell-center')).toBeNull();
+        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(8);
+        expect(content.querySelector('.dv-dnd-compass-cell-center')).toBeNull();
     });
 
     test('does not paint a non-content overlay or when disabled', () => {
@@ -428,7 +428,7 @@ describe('drop guide', () => {
             kind: 'tab',
             group,
         } as DockviewWillShowOverlayLocationEvent);
-        expect(content.querySelector('.dv-drop-guide')).toBeNull();
+        expect(content.querySelector('.dv-dnd-compass')).toBeNull();
 
         make(undefined);
         const off = groupWithContent();
@@ -436,6 +436,6 @@ describe('drop guide', () => {
             kind: 'content',
             group: off.group,
         } as DockviewWillShowOverlayLocationEvent);
-        expect(off.content.querySelector('.dv-drop-guide')).toBeNull();
+        expect(off.content.querySelector('.dv-dnd-compass')).toBeNull();
     });
 });

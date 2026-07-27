@@ -141,6 +141,8 @@ IContextMenuHost
 IContextMenuItemComponentProps
 IContextMenuItemRenderer
 IContextMenuService
+IDndCompassHost
+IDndCompassService
 IDockviewComponent
 IDockviewGroupPanel
 IDockviewHeaderActionsProps
@@ -148,8 +150,6 @@ IDockviewPanel
 IDockviewPanelHeaderProps
 IDockviewPanelProps
 IDragGhostSpec
-IDropGuideHost
-IDropGuideService
 IFrameworkPart
 IGridPanelComponentView
 IGridPanelView

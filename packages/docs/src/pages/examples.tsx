@@ -80,7 +80,7 @@ const COMPONENTS: ComponentGroup[] = [
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
             },
             {
-                name: 'drop-guide',
+                name: 'dnd-compass',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
                 enterprise: true,
             },

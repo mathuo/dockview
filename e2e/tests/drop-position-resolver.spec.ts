@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 /**
  * Custom `dropPositionResolver` — overrides how a pointer location maps to a
  * drop position on the group / layout-edge targets, occupying the same seam the
- * Drop Guide compass otherwise fills. Real-browser only: the resolver runs
+ * DnD compass otherwise fills. Real-browser only: the resolver runs
  * inside the live pointer-drag loop. Here `?resolver=right` forces every drop to
  * 'right', so dropping a tab on the *centre* of another group (a merge by
  * default) instead splits it to the right — proving the pointer position was
@@ -15,7 +15,7 @@ test.describe('drop position resolver (override)', () => {
     }) => {
         await page.goto('/e2e/fixtures/index.html?resolver=right');
         await page.waitForFunction(() => (window as any).__ready === true);
-        await page.evaluate(() => (window as any).__dv.setupDropGuide());
+        await page.evaluate(() => (window as any).__dv.setupDndCompass());
         expect(
             await page.evaluate(() => (window as any).__dv.groupCount())
         ).toBe(2);

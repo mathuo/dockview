@@ -32,8 +32,8 @@ class Panel implements IContentRenderer {
 
 const api = createDockview(document.getElementById('app')!, {
     theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
-    // Show the aim-at-a-cell drop guide while dragging tabs.
-    dndGuide: true,
+    // Show the aim-at-a-cell DnD compass while dragging tabs.
+    dndCompass: true,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
@@ -43,7 +43,7 @@ const api = createDockview(document.getElementById('app')!, {
 });
 
 // A small docked layout with panels on every side so that, while dragging a
-// tab, the drop guide can be seen resolving to each cell.
+// tab, the DnD compass can be seen resolving to each cell.
 const panel1 = api.addPanel({
     id: 'panel_1',
     component: 'default',

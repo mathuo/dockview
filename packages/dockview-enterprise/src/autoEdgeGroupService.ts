@@ -90,7 +90,7 @@ function defaultQuadrant(
  *
  * Over a **populated** layout the outer band is reached via a
  * {@link PositionResolver} installed on the group content drop targets (the
- * same mechanism the drop-guide compass uses), so it works without the
+ * same mechanism the DnD compass uses), so it works without the
  * compass. Over an empty grid it also handles the root edge target's
  * `kind: 'edge'` overlays directly. It never `preventDefault`s the overlay
  * (that would clear the drop state), only draws its highlight on top and
