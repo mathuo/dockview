@@ -561,12 +561,13 @@ export class DndCompassService
     }
 }
 
-export const DndCompassModule = defineModule<'dndCompassService', IDndCompassHost>(
-    {
-        name: 'DndCompass',
-        options: ['dndCompass'],
-        serviceKey: 'dndCompassService',
-        dependsOn: [AdvancedDnDModule],
-        create: (host) => new DndCompassService(host),
-    }
-);
+export const DndCompassModule = defineModule<
+    'dndCompassService',
+    IDndCompassHost
+>({
+    name: 'DndCompass',
+    options: ['dndCompass'],
+    serviceKey: 'dndCompassService',
+    dependsOn: [AdvancedDnDModule],
+    create: (host) => new DndCompassService(host),
+});

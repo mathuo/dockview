@@ -21,7 +21,10 @@ describe('DnD compass', () => {
     let gateCalls: Position[];
 
     const make = (
-        dndCompass: { zones?: Position[]; edges?: boolean } | boolean | undefined
+        dndCompass:
+            | { zones?: Position[]; edges?: boolean }
+            | boolean
+            | undefined
     ): void => {
         overlayEmitter = new Emitter<DockviewWillShowOverlayLocationEvent>();
         layoutEl = document.createElement('div');
@@ -196,7 +199,9 @@ describe('DnD compass', () => {
         const compass = content.querySelector('.dv-dnd-compass');
         expect(compass).toBeTruthy();
         // 5 inner cells + 4 outer (edge) cells
-        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(9);
+        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(
+            9
+        );
         expect(
             content.querySelectorAll('.dv-dnd-compass-cell-edge')
         ).toHaveLength(4);
@@ -416,7 +421,9 @@ describe('DnD compass', () => {
         } as DockviewWillShowOverlayLocationEvent);
 
         // centre inner cell hidden → 4 inner + 4 outer; edge cells are unaffected
-        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(8);
+        expect(content.querySelectorAll('.dv-dnd-compass-cell')).toHaveLength(
+            8
+        );
         expect(content.querySelector('.dv-dnd-compass-cell-center')).toBeNull();
     });
 
