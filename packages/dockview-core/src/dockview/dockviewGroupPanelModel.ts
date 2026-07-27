@@ -1497,11 +1497,9 @@ export class DockviewGroupPanelModel
 
     public removePanel(
         groupItemOrId: IDockviewPanel | string,
-        options: {
+        options?: {
             skipSetActive?: boolean;
             skipSetActiveGroup?: boolean;
-        } = {
-            skipSetActive: false,
         }
     ): IDockviewPanel {
         const id =
@@ -1626,7 +1624,7 @@ export class DockviewGroupPanelModel
 
     private _removePanel(
         panel: IDockviewPanel,
-        options: {
+        options?: {
             skipSetActive?: boolean;
             skipSetActiveGroup?: boolean;
         }
@@ -1638,8 +1636,8 @@ export class DockviewGroupPanelModel
         if (isActivePanel && this.panels.length > 0) {
             const nextPanel = this.mostRecentlyUsed[0];
             this.openPanel(nextPanel, {
-                skipSetActive: options.skipSetActive,
-                skipSetGroupActive: options.skipSetActiveGroup,
+                skipSetActive: options?.skipSetActive,
+                skipSetGroupActive: options?.skipSetActiveGroup,
             });
         }
 
@@ -1647,7 +1645,7 @@ export class DockviewGroupPanelModel
             this.doSetActivePanel(undefined);
         }
 
-        if (!options.skipSetActive) {
+        if (!options?.skipSetActive) {
             this.updateContainer();
         }
 
@@ -1684,9 +1682,9 @@ export class DockviewGroupPanelModel
     private doAddPanel(
         panel: IDockviewPanel,
         index: number = this.panels.length,
-        options: {
-            skipSetActive: boolean;
-        } = { skipSetActive: false }
+        options?: {
+            skipSetActive?: boolean;
+        }
     ): void {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
@@ -1696,7 +1694,7 @@ export class DockviewGroupPanelModel
 
         this.tabsContainer.openPanel(panel, index);
 
-        if (!options.skipSetActive) {
+        if (!options?.skipSetActive) {
             this.contentContainer.openPanel(panel);
         } else if (panel.api.renderer === 'always') {
             this.contentContainer.renderPanel(panel, { asActive: false });
@@ -1905,7 +1903,7 @@ export class DockviewGroupPanelModel
 
         const data = getPanelData();
 
-        if (data && data.viewId === this.accessor.id) {
+        if (data?.viewId === this.accessor.id) {
             if (type === 'content') {
                 if (data.groupId === this.id) {
                     // don't allow to drop on self for center position

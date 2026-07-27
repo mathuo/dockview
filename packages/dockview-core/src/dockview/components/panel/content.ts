@@ -145,18 +145,12 @@ export class ContentContainer
         }
     }
 
-    renderPanel(
-        panel: IDockviewPanel,
-        options: { asActive: boolean } = { asActive: true }
-    ): void {
+    renderPanel(panel: IDockviewPanel, options?: { asActive?: boolean }): void {
         const doRender =
-            options.asActive ||
+            (options?.asActive ?? true) ||
             (this.panel && this.group.isPanelActive(this.panel));
 
-        if (
-            this.panel &&
-            this.panel.view.content.element.parentElement === this._element
-        ) {
+        if (this.panel?.view.content.element.parentElement === this._element) {
             /**
              * If the currently attached panel is mounted directly to the content then remove it
              */

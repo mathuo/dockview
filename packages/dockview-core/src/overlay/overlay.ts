@@ -326,7 +326,7 @@ export class Overlay extends CompositeDisposable {
 
     setupDrag(
         dragTarget: HTMLElement,
-        options: { inDragMode: boolean } = { inDragMode: false }
+        options?: { inDragMode?: boolean }
     ): void {
         const track = (captureTarget?: HTMLElement, pointerId?: number) => {
             let offset: { x: number; y: number } | null = null;
@@ -538,7 +538,7 @@ export class Overlay extends CompositeDisposable {
             )
         );
 
-        if (options.inDragMode) {
+        if (options?.inDragMode) {
             track();
         }
     }

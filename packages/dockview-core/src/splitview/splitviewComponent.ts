@@ -244,7 +244,7 @@ export class SplitviewComponent
 
         this._panels.delete(panel.id);
 
-        const index = this.panels.findIndex((_) => _ === panel);
+        const index = this.panels.indexOf(panel);
         const removedView = this.splitview.removeView(index, sizing);
         removedView.dispose();
 
