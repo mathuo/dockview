@@ -307,6 +307,108 @@ describe('ContextMenuController', () => {
         });
     });
 
+    describe('popover z-index for peeking auto-hide edge groups', () => {
+        // A peeking edge group slides its panel out as an overlay on the shell
+        // (z-index 999 / header 1001). A tab context menu shares the shell
+        // stacking context but anchors earlier in DOM order, so at the default
+        // overlay z-index it renders *behind* the peek. The clicked strip tab
+        // isn't inside the peek overlay, so the ancestor walk can't find its
+        // z-index — the menu must key off the peek state and lift clear of it.
+        function dispatchContextMenu(target: HTMLElement): MouseEvent {
+            const event = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+            });
+            target.dispatchEvent(event);
+            return event;
+        }
+
+        const peekingGroup = () =>
+            fromPartial<DockviewGroupPanel>({
+                panels: [],
+                api: { isPeeking: () => true },
+            });
+
+        test('lifts the tab menu above the peek band while peeking', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            // A strip tab with no z-indexed ancestor: at the default overlay
+            // z-index it would render behind the peek.
+            const tab = document.createElement('div');
+            document.body.appendChild(tab);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), peekingGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(var(--dv-overlay-z-index, 999) + 100)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(tab);
+            }
+        });
+
+        test('peek lift takes precedence over a z-indexed ancestor', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const floating = document.createElement('div');
+            floating.style.zIndex = '1001';
+            const tab = document.createElement('div');
+            floating.appendChild(tab);
+            document.body.appendChild(floating);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), peekingGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(var(--dv-overlay-z-index, 999) + 100)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(floating);
+            }
+        });
+
+        test('lifts the chip menu above the peek band while peeking', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabGroupChipContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([{ label: 'Rename', action: jest.fn() }]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const chip = document.createElement('div');
+            document.body.appendChild(chip);
+
+            try {
+                const event = dispatchContextMenu(chip);
+                controller.showForChip(fromPartial({}), peekingGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(var(--dv-overlay-z-index, 999) + 100)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(chip);
+            }
+        });
+    });
+
     describe('ARIA attributes', () => {
         test('built-in label items have role="menuitem"', () => {
             const { accessor, openPopover } = makeAccessor({

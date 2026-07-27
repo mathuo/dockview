@@ -12,7 +12,21 @@ import {
     IContextMenuService,
 } from 'dockview';
 
-function popoverZIndexFor(target: EventTarget | null): string | undefined {
+function popoverZIndexFor(
+    target: EventTarget | null,
+    group: DockviewGroupPanel
+): string | undefined {
+    // A peeking auto-hide edge group slides its active panel out as an overlay
+    // (inline z-index 999) with a title bar above it (z-index 1001), both
+    // mounted on the shell. A context menu opened from that group's tab strip
+    // shares the shell stacking context but anchors *earlier* in DOM order, so
+    // at the default overlay z-index it renders behind the peek. The clicked
+    // tab isn't a descendant of the peek overlay, so the ancestor walk below
+    // can't discover the peek's z-index — key off the peek state directly and
+    // lift the menu clear of the peek band (mirrors the smart-guide "+100").
+    if (group.api?.isPeeking?.()) {
+        return 'calc(var(--dv-overlay-z-index, 999) + 100)';
+    }
     if (!(target instanceof HTMLElement)) {
         return undefined;
     }
@@ -358,7 +372,7 @@ export class ContextMenuController implements IContextMenuService {
         popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
-            zIndex: popoverZIndexFor(event.target),
+            zIndex: popoverZIndexFor(event.target, group),
         });
     }
 
@@ -429,7 +443,7 @@ export class ContextMenuController implements IContextMenuService {
         popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
-            zIndex: popoverZIndexFor(event.target),
+            zIndex: popoverZIndexFor(event.target, group),
         });
     }
 }
