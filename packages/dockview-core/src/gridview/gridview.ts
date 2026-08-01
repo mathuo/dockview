@@ -370,6 +370,8 @@ export class Gridview implements IDisposable {
         }
 
         const { size, orthogonalSize } = this.root;
+        // Flipping orientation transposes the axes, so the swapped argument
+        // order into flipNode is intentional. Sonar S2234 false positive.
         this.root = flipNode(this.root, orthogonalSize, size);
         this.root.layout(size, orthogonalSize);
     }
