@@ -784,7 +784,7 @@ export class TabGroupManager {
                     if (affected.length > 0) {
                         // `void` keeps this side-effect-only read explicit and
                         // avoids S905 (bare expression). Do not drop it.
-                        void affected[0].offsetHeight; // force a single reflow
+                        void affected[0].offsetHeight; // single reflow
                         for (const el of affected) {
                             el.style.removeProperty('transition');
                         }
