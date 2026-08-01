@@ -91,5 +91,14 @@
     &.dv-groupview-header-vertical:has(.dv-tabs-container--wrap) {
         width: auto;
         min-width: var(--dv-tabs-and-actions-container-height);
+
+        // The multi-row module pins the header to `columns x thickness` once it
+        // knows the column count. The scrollable wrapper doesn't inherit that
+        // width and its `overflow: hidden` then clips whatever doesn't fit.
+        // `vertical-rl` stacks columns right-to-left, so the columns lost are
+        // the leading ones: the first tabs disappear and stop hit-testing.
+        > .dv-scrollable {
+            align-self: stretch;
+        }
     }
 }
