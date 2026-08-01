@@ -345,7 +345,7 @@ const config = {
                         sidebarId: 'api',
                         label: 'API',
                     },
-                    // { to: '/blog', label: 'Blog', position: 'right' },
+                    { to: '/blog', label: 'Blog', position: 'right' },
                     {
                         to: '/examples',
                         label: 'Examples',
@@ -433,13 +433,12 @@ const config = {
                     },
                 ],
                 // Registered name is "Dockview Ltd" (Companies House no.
-                // 17326398), not "Dockview, Inc." The second line is the
-                // statutory trading disclosure (registered name, number, place
-                // of registration, registered office) the Companies Act 2006 /
-                // Names and Trading Disclosures Regulations 2015 require on the
-                // website. Keep it in step with LICENSOR_DISCLOSURE in the
-                // dockview-licencing repo (src/lib/legal.ts).
-                copyright: `Copyright © ${new Date().getFullYear()} Dockview Ltd<br /><span style="opacity:0.7;font-size:0.85em">Dockview Ltd, registered in England and Wales (no. 17326398). Registered office: 8 Weald Close, Bromley, England, BR2 8PD.</span>`,
+                // 17326398), not "Dockview, Inc." The registered office address
+                // was deliberately dropped from this disclosure; the registered
+                // name, number and place of registration remain. Keep in step
+                // with LICENSOR_DISCLOSURE in the dockview-licencing repo
+                // (src/lib/legal.ts).
+                copyright: `Copyright © ${new Date().getFullYear()} Dockview Ltd<br /><span style="opacity:0.7;font-size:0.85em">Dockview Ltd, registered in England and Wales (no. 17326398).</span>`,
             },
             prism: {
                 theme: lightCodeTheme,
