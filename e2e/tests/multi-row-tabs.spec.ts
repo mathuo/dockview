@@ -649,10 +649,13 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(before.escaped).toBe(0);
 
         // Shrink the viewport so the (shorter) group reflows the tabs into more
-        // columns than the header was originally sized for. Retry the whole
-        // assertion until the reflow + header re-pin + relayout settle (the pin
-        // lands a frame after the column count changes).
-        await page.setViewportSize({ width: 900, height: 700 });
+        // columns than the header was originally sized for. A vertical strip
+        // wraps on its HEIGHT, so the height has to drop far enough to change
+        // how many tabs fit in a column; trimming the width alone reflows
+        // nothing. Retry the whole assertion until the reflow + header re-pin +
+        // relayout settle (the pin lands a frame after the column count
+        // changes).
+        await page.setViewportSize({ width: 900, height: 400 });
         await expect(async () => {
             const after = await headerMetrics(page);
             // More columns than before ...
@@ -675,8 +678,9 @@ test.describe('multi-row tabs (wrap mode)', () => {
         await expect.poll(() => columnCount(page)).toBeGreaterThan(1);
         const initial = await headerMetrics(page);
 
-        // Shrink → strictly more columns, a wider header (retry until settled).
-        await page.setViewportSize({ width: 900, height: 700 });
+        // Shrink (on the wrap axis, height) → strictly more columns, a wider
+        // header (retry until settled).
+        await page.setViewportSize({ width: 900, height: 400 });
         await expect(async () => {
             const m = await headerMetrics(page);
             expect(m.cols).toBeGreaterThan(initial.cols);
