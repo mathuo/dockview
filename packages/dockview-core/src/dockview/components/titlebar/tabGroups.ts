@@ -782,7 +782,9 @@ export class TabGroupManager {
                         }
                     }
                     if (affected.length > 0) {
-                        affected[0].offsetHeight; // read to force a single reflow
+                        // `void` keeps this side-effect-only read explicit and
+                        // avoids S905 (bare expression). Do not drop it.
+                        void affected[0].offsetHeight; // force a single reflow
                         for (const el of affected) {
                             el.style.removeProperty('transition');
                         }
@@ -805,7 +807,8 @@ export class TabGroupManager {
                             } else {
                                 te.value.element.style.width = `${rect.width}px`;
                             }
-                            te.value.element.offsetHeight; // read to force reflow
+                            // `void` avoids S905 (bare expression); keep it.
+                            void te.value.element.offsetHeight; // force reflow
                             te.value.element.classList.add(
                                 'dv-tab--group-collapsed'
                             );
