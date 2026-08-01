@@ -612,7 +612,9 @@ describe('TabGroupManager', () => {
             expect(mock.animations[0].cancel).toHaveBeenCalledTimes(1);
             expect(el.style.transition).toBe('');
             expect(el.classList.contains('dv-tab--group-expanding')).toBe(true);
-            expect(el.classList.contains('dv-tab--group-collapsed')).toBe(false);
+            expect(el.classList.contains('dv-tab--group-collapsed')).toBe(
+                false
+            );
         });
 
         test('a second collapse does not stack a new animation while collapsed', () => {

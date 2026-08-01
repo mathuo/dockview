@@ -976,7 +976,9 @@ export class TabGroupManager {
             }
             settled = true;
             el.style.removeProperty('transition');
-            if (this._collapseAnimations.get(panelId)?.animation === animation) {
+            if (
+                this._collapseAnimations.get(panelId)?.animation === animation
+            ) {
                 this._collapseAnimations.delete(panelId);
             }
         };

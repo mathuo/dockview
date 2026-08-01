@@ -396,12 +396,16 @@ describe('parseCssTimeMs', () => {
         expect(parseCssTimeMs(value, 999)).toBe(expected);
     });
 
-    test.each(['', '   ', 'abc', '10', '10px', 'fast'])(
-        'falls back for the unparseable value %p',
-        (value) => {
-            expect(parseCssTimeMs(value, 42)).toBe(42);
-        }
-    );
+    test.each([
+        '',
+        '   ',
+        'abc',
+        '10',
+        '10px',
+        'fast',
+    ])('falls back for the unparseable value %p', (value) => {
+        expect(parseCssTimeMs(value, 42)).toBe(42);
+    });
 });
 
 describe('resolveCssDurationMs', () => {
@@ -409,18 +413,18 @@ describe('resolveCssDurationMs', () => {
         const el = document.createElement('div');
         el.style.setProperty('--dv-transition-duration', '0.3s');
         document.body.appendChild(el);
-        expect(
-            resolveCssDurationMs(el, '--dv-transition-duration', 200)
-        ).toBe(300);
+        expect(resolveCssDurationMs(el, '--dv-transition-duration', 200)).toBe(
+            300
+        );
         el.remove();
     });
 
     test('falls back when the property is absent', () => {
         const el = document.createElement('div');
         document.body.appendChild(el);
-        expect(
-            resolveCssDurationMs(el, '--dv-transition-duration', 175)
-        ).toBe(175);
+        expect(resolveCssDurationMs(el, '--dv-transition-duration', 175)).toBe(
+            175
+        );
         el.remove();
     });
 });
