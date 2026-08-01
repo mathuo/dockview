@@ -62,6 +62,21 @@ export interface IView extends IBaseView {
 interface ISashItem {
     container: HTMLElement;
     disposable: () => void;
+    // last `left`/`top` written by `layoutViews`, used to skip no-op style
+    // writes on frames where the sash didn't move
+    appliedLeft?: string;
+    appliedTop?: string;
+}
+
+function setSashPosition(sash: ISashItem, left: string, top: string): void {
+    if (sash.appliedLeft !== left) {
+        sash.appliedLeft = left;
+        sash.container.style.left = left;
+    }
+    if (sash.appliedTop !== top) {
+        sash.appliedTop = top;
+        sash.container.style.top = top;
+    }
 }
 
 interface ISashDragSnapState {
@@ -801,7 +816,17 @@ export class Splitview {
      * For each view `i` the offet must be adjusted by `m * i/(n - 1)`.
      */
     private layoutViews(): void {
-        this._contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+        // single pass to derive content size and the visible-view count,
+        // replacing a `reduce` + a `filter` + a `reduce`-built array
+        let contentSize = 0;
+        let visibleViewCount = 0;
+        for (const item of this.viewItems) {
+            contentSize += item.size;
+            if (item.visible) {
+                visibleViewCount++;
+            }
+        }
+        this._contentSize = contentSize;
 
         this.updateSashEnablement();
 
@@ -809,41 +834,31 @@ export class Splitview {
             return;
         }
 
-        const visibleViewItems = this.viewItems.filter((i) => i.visible);
-
-        const sashCount = Math.max(0, visibleViewItems.length - 1);
+        const sashCount = Math.max(0, visibleViewCount - 1);
         const marginReducedSize =
-            (this.margin * sashCount) / Math.max(1, visibleViewItems.length);
+            (this.margin * sashCount) / Math.max(1, visibleViewCount);
 
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
 
         const sashWidth = 4; // hardcoded in css
 
-        const runningVisiblePanelCount = this.viewItems.reduce(
-            (arr, viewItem, i) => {
-                const flag = viewItem.visible ? 1 : 0;
-                if (i === 0) {
-                    arr.push(flag);
-                } else {
-                    arr.push(arr[i - 1] + flag);
-                }
+        // running count of visible views up to and including the current index,
+        // maintained inline rather than pre-built into an array
+        let runningVisiblePanelCount = 0;
 
-                return arr;
-            },
-            [] as number[]
-        );
-
-        // calculate both view and cash positions
+        // calculate both view and sash positions
         this.viewItems.forEach((view, i) => {
             totalLeftOffset += this.viewItems[i].size;
             viewLeftOffsets.push(totalLeftOffset);
+
+            runningVisiblePanelCount += view.visible ? 1 : 0;
 
             const size = view.visible ? view.size - marginReducedSize : 0;
 
             const visiblePanelsBeforeThisView = Math.max(
                 0,
-                runningVisiblePanelCount[i] - 1
+                runningVisiblePanelCount - 1
             );
 
             const offset =
@@ -859,30 +874,30 @@ export class Splitview {
                     ? offset + size - sashWidth / 2 + this.margin / 2
                     : offset;
 
+                const sash = this.sashes[i];
+
                 if (this._orientation === Orientation.HORIZONTAL) {
-                    this.sashes[i].container.style.left = `${newSize}px`;
-                    this.sashes[i].container.style.top = `0px`;
+                    setSashPosition(sash, `${newSize}px`, `0px`);
                 }
                 if (this._orientation === Orientation.VERTICAL) {
-                    this.sashes[i].container.style.left = `0px`;
-                    this.sashes[i].container.style.top = `${newSize}px`;
+                    setSashPosition(sash, `0px`, `${newSize}px`);
                 }
             }
 
-            // calculate view position
+            // calculate view position (diffed against the last write — most
+            // views don't move on a given frame)
 
             if (this._orientation === Orientation.HORIZONTAL) {
-                view.container.style.width = `${size}px`;
-                view.container.style.left = `${offset}px`;
-                view.container.style.top = '';
-
-                view.container.style.height = '';
+                view.setContainerGeometry('width', `${size}px`);
+                view.setContainerGeometry('left', `${offset}px`);
+                view.setContainerGeometry('top', '');
+                view.setContainerGeometry('height', '');
             }
             if (this._orientation === Orientation.VERTICAL) {
-                view.container.style.height = `${size}px`;
-                view.container.style.top = `${offset}px`;
-                view.container.style.width = '';
-                view.container.style.left = '';
+                view.setContainerGeometry('height', `${size}px`);
+                view.setContainerGeometry('top', `${offset}px`);
+                view.setContainerGeometry('width', '');
+                view.setContainerGeometry('left', '');
             }
 
             view.view.layout(
@@ -926,6 +941,13 @@ export class Splitview {
     }
 
     private updateSashEnablement(): void {
+        // nothing to enable/disable when there are no sashes (e.g. a splitview
+        // holding a single view — very common for single-tab groups). Bailing
+        // here avoids building the collapses/expands arrays every layout frame.
+        if (this.sashes.length === 0) {
+            return;
+        }
+
         let previous = false;
         const collapsesDown = this.viewItems.map(
             (i) => (previous = i.size - i.minimumSize > 0 || previous)
