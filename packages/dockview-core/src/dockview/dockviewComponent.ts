@@ -1365,14 +1365,22 @@ export class DockviewComponent
             // Require the candidate to sit predominantly in the asked-for
             // direction (dominant axis), so 'left' ignores a group that's
             // mostly above/below.
-            const inDirection =
-                direction === 'left'
-                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
-                    : direction === 'right'
-                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
-                      : direction === 'up'
-                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
-                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
+            let inDirection: boolean;
+            switch (direction) {
+                case 'left':
+                    inDirection = dx < 0 && Math.abs(dx) >= Math.abs(dy);
+                    break;
+                case 'right':
+                    inDirection = dx > 0 && Math.abs(dx) >= Math.abs(dy);
+                    break;
+                case 'up':
+                    inDirection = dy < 0 && Math.abs(dy) >= Math.abs(dx);
+                    break;
+                default:
+                    // 'down'
+                    inDirection = dy > 0 && Math.abs(dy) >= Math.abs(dx);
+                    break;
+            }
             if (!inDirection) {
                 continue;
             }
@@ -3183,7 +3191,9 @@ export class DockviewComponent
         // One transaction; the per-panel removals below nest via the depth
         // counter, so consumers see a single edge-group removal.
         this.mutation('remove', () => {
-            // Remove panels inside the group first
+            // Remove panels inside the group first.
+            // Snapshot: removePanel mutates group.panels (the live array), so
+            // iterate over a copy to avoid skipping entries. Do not remove the spread.
             for (const panel of [...group.panels]) {
                 this.removePanel(panel, {
                     removeEmptyGroup: false,
@@ -3938,6 +3948,8 @@ export class DockviewComponent
                             this._groups.has(orphan.id) &&
                             orphan.element.parentElement === null
                         ) {
+                            // Snapshot: removePanel mutates orphan.panels (the
+                            // live array), so iterate a copy. Do not remove the spread.
                             for (const panel of [...orphan.panels]) {
                                 this.removePanel(panel, {
                                     removeEmptyGroup: false,

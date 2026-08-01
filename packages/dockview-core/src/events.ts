@@ -1,5 +1,7 @@
 import { Disposable, IDisposable } from './lifecycle';
 
+// Must stay an interface (not a function-type alias): it is declaration-merged
+// with the `Event` namespace below. Sonar S6598 false positive.
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
 }
@@ -107,6 +109,8 @@ export class Emitter<T> implements IDisposable {
 
     private readonly _pauseTokens = new Set<object>();
 
+    // Reassigned by setLeakageMonitorEnabled below, so it cannot be readonly
+    // (Sonar S1444 false positive).
     static ENABLE_TRACKING = false;
     static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
 

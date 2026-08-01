@@ -78,11 +78,10 @@ describe('GridviewVue Component', () => {
                 ),
         });
 
-        // Update proportional layout
-        api.updateOptions({ proportionalLayout: true });
-
-        // Test passes if no errors are thrown
-        expect(true).toBe(true);
+        // Update proportional layout — should not throw
+        expect(() =>
+            api.updateOptions({ proportionalLayout: true })
+        ).not.toThrow();
 
         api.dispose();
         document.body.removeChild(element);

@@ -965,6 +965,9 @@ export class Gridview implements IDisposable {
                 newSiblingSize = Sizing.Invisible(newSiblingCachedVisibleSize);
             }
 
+            // BranchNode.removeChild(index) is a domain method, not the DOM
+            // Node.removeChild — S7762 (prefer childNode.remove()) is a false
+            // positive here.
             const child = grandParent.removeChild(parentIndex);
             child.dispose();
 

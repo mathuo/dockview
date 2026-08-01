@@ -236,12 +236,18 @@ export class LiveRegionService
             if (!panel) {
                 return;
             }
-            const kind =
-                next === 'floating'
-                    ? 'float'
-                    : next === 'popout'
-                      ? 'popout'
-                      : 'dock';
+            let kind: LiveRegionEvent['kind'];
+            switch (next) {
+                case 'floating':
+                    kind = 'float';
+                    break;
+                case 'popout':
+                    kind = 'popout';
+                    break;
+                default:
+                    kind = 'dock';
+                    break;
+            }
             this._announce(panel, kind);
         });
         this._locationSubs.set(group.id, sub);

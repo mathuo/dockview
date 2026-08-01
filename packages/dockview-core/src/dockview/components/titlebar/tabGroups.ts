@@ -782,7 +782,7 @@ export class TabGroupManager {
                         }
                     }
                     if (affected.length > 0) {
-                        void affected[0].offsetHeight; // single reflow
+                        affected[0].offsetHeight; // read to force a single reflow
                         for (const el of affected) {
                             el.style.removeProperty('transition');
                         }
@@ -805,7 +805,7 @@ export class TabGroupManager {
                             } else {
                                 te.value.element.style.width = `${rect.width}px`;
                             }
-                            void te.value.element.offsetHeight; // force reflow
+                            te.value.element.offsetHeight; // read to force reflow
                             te.value.element.classList.add(
                                 'dv-tab--group-collapsed'
                             );

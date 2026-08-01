@@ -595,10 +595,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 this._tabsList,
                 'drop',
                 (event) => {
-                    if (
-                        !this._animState ||
-                        this._animState.currentInsertionIndex === null
-                    ) {
+                    if (this._animState?.currentInsertionIndex == null) {
                         return;
                     }
 
@@ -962,7 +959,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                             // Collapse source tab instantly (no transition)
                             tab.element.style.transition = 'none';
                             toggleClass(tab.element, 'dv-tab--dragging', true);
-                            void tab.element.offsetHeight; // force reflow
+                            tab.element.offsetHeight; // read to force reflow
                         }
 
                         this._animState.currentInsertionIndex ??= sourceIndex;
@@ -1409,7 +1406,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 );
             }
             // Single reflow for the entire batch
-            void this._tabsList.offsetHeight;
+            this._tabsList.offsetHeight; // read to force reflow
 
             const underline = this._tabGroupManager.groupUnderlines.get(
                 tabGroup.id

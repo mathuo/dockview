@@ -79,7 +79,9 @@ describe('AngularRenderer', () => {
     });
 
     it('should be testable when Angular dependencies are available', () => {
-        expect(true).toBe(true);
+        expect(injector).toBeDefined();
+        expect(environmentInjector).toBeDefined();
+        expect(application).toBeDefined();
     });
 
     it('should initialize and render component', () => {

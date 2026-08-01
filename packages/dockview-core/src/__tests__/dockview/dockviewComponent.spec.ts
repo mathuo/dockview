@@ -3590,7 +3590,7 @@ describe('dockviewComponent', () => {
         expect(panel2Spy).not.toHaveBeenCalled();
     });
 
-    test('panel is not disposed of when moved within another group', () => {
+    test('panel is not disposed of when reordered within its own group', () => {
         const container = document.createElement('div');
 
         const dockview = new DockviewComponent(container, {
