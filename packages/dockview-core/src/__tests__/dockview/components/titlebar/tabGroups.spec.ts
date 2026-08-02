@@ -593,7 +593,7 @@ describe('TabGroupManager', () => {
             expect(el.style.height).toBe('');
         });
 
-        test('expanding mid-collapse cancels the running animation and clears suppression', () => {
+        test('expanding mid-collapse cancels the collapse animation and scripts the expand', async () => {
             const tabs = [createTab('p1')];
             const tg = makeGroup('g1', ['p1']);
             const { manager } = createManager({ tabs, tabGroups: [tg] });
@@ -604,17 +604,160 @@ describe('TabGroupManager', () => {
 
             const el = tabs[0].value.element;
             expect(el.style.transition).toBe('none');
+            expect(mock.animations).toHaveLength(1);
 
-            // Reverse before the animation settles.
+            // Reverse before the collapse settles.
             tg.expand();
             manager.update();
 
+            // The collapse animation is cancelled and a scripted expand (a
+            // second animation) takes over; the tab is in the expanding state.
             expect(mock.animations[0].cancel).toHaveBeenCalledTimes(1);
-            expect(el.style.transition).toBe('');
+            expect(mock.animations).toHaveLength(2);
             expect(el.classList.contains('dv-tab--group-expanding')).toBe(true);
             expect(el.classList.contains('dv-tab--group-collapsed')).toBe(
                 false
             );
+            // The expand suppresses the CSS transition inline while it plays...
+            expect(el.style.transition).toBe('none');
+
+            // ...and clears it once the scripted expand finishes, leaving the
+            // tab at its natural resting state with no expanding marker.
+            mock.animations[1].resolveFinished();
+            await flush();
+            expect(el.style.transition).toBe('');
+            expect(el.classList.contains('dv-tab--group-expanding')).toBe(
+                false
+            );
+        });
+
+        test('expand drives element.animate, drops the collapsed class and suppresses the CSS transition', () => {
+            const tabs = [createTab('p1')];
+            const tg = makeGroup('g1', ['p1']);
+            const { manager } = createManager({ tabs, tabGroups: [tg] });
+
+            manager.update();
+            tg.collapse();
+            manager.update();
+            const el = tabs[0].value.element;
+            expect(mock.animations).toHaveLength(1);
+
+            tg.expand();
+            manager.update();
+
+            // A second (expand) animation is driven; the tab leaves the
+            // collapsed state and the CSS transition is suppressed inline.
+            expect(mock.animations).toHaveLength(2);
+            expect(el.classList.contains('dv-tab--group-collapsed')).toBe(
+                false
+            );
+            expect(el.classList.contains('dv-tab--group-expanding')).toBe(true);
+            expect(el.style.transition).toBe('none');
+        });
+
+        test('finishing the expand removes the inline transition, the expanding class and any geometry', async () => {
+            const tabs = [createTab('p1')];
+            const tg = makeGroup('g1', ['p1']);
+            const { manager } = createManager({ tabs, tabGroups: [tg] });
+
+            manager.update();
+            tg.collapse();
+            manager.update();
+            tg.expand();
+            manager.update();
+
+            mock.animations.at(-1)!.resolveFinished();
+            await flush();
+
+            const el = tabs[0].value.element;
+            expect(el.style.transition).toBe('');
+            expect(el.classList.contains('dv-tab--group-expanding')).toBe(
+                false
+            );
+            expect(el.style.width).toBe('');
+            expect(el.style.height).toBe('');
+        });
+
+        test('collapsing mid-expand cancels the running expand animation', () => {
+            const tabs = [createTab('p1')];
+            const tg = makeGroup('g1', ['p1']);
+            const { manager } = createManager({ tabs, tabGroups: [tg] });
+
+            manager.update();
+            tg.collapse();
+            manager.update();
+            tg.expand();
+            manager.update();
+
+            const expandAnim = mock.animations.at(-1)!;
+
+            // Reverse again before the expand settles.
+            tg.collapse();
+            manager.update();
+
+            expect(expandAnim.cancel).toHaveBeenCalledTimes(1);
+            const el = tabs[0].value.element;
+            expect(el.classList.contains('dv-tab--group-collapsed')).toBe(true);
+            expect(el.classList.contains('dv-tab--group-expanding')).toBe(
+                false
+            );
+        });
+
+        test('disposeAll cancels an in-flight expand animation', () => {
+            const tabs = [createTab('p1')];
+            const tg = makeGroup('g1', ['p1']);
+            const { manager } = createManager({ tabs, tabGroups: [tg] });
+
+            manager.update();
+            tg.collapse();
+            manager.update();
+            tg.expand();
+            manager.update();
+
+            const expandAnim = mock.animations.at(-1)!;
+            manager.disposeAll();
+
+            expect(expandAnim.cancel).toHaveBeenCalledTimes(1);
+            expect(tabs[0].value.element.style.transition).toBe('');
+        });
+
+        test('reduced motion expands instantly with no scripted animation', () => {
+            const win = document.defaultView as Window & {
+                matchMedia?: (q: string) => MediaQueryList;
+            };
+            const originalMatchMedia = win.matchMedia;
+
+            const tabs = [createTab('p1')];
+            const tg = makeGroup('g1', ['p1']);
+            const { manager } = createManager({ tabs, tabGroups: [tg] });
+
+            // Collapse with motion enabled (matchMedia unset → not reduced).
+            manager.update();
+            tg.collapse();
+            manager.update();
+            const collapseCount = mock.animations.length;
+
+            // Now turn reduced motion on and expand: no new animation.
+            win.matchMedia = ((query: string) =>
+                ({
+                    matches: true,
+                    media: query,
+                }) as MediaQueryList) as typeof win.matchMedia;
+            try {
+                tg.expand();
+                manager.update();
+
+                const el = tabs[0].value.element;
+                expect(mock.animations).toHaveLength(collapseCount);
+                expect(el.classList.contains('dv-tab--group-collapsed')).toBe(
+                    false
+                );
+                expect(el.classList.contains('dv-tab--group-expanding')).toBe(
+                    false
+                );
+            } finally {
+                win.matchMedia = originalMatchMedia;
+            }
         });
 
         test('a second collapse does not stack a new animation while collapsed', () => {

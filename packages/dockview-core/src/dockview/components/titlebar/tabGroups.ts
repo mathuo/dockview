@@ -99,6 +99,17 @@ export class TabGroupManager {
         string,
         { animation: Animation; cleanup: () => void }
     >();
+    /**
+     * In-flight Web Animations API expand animations, keyed by panel id — the
+     * counterpart to `_collapseAnimations`. A collapse, another expand, panel
+     * removal, or disposal cancels the running animation cleanly (see
+     * `_cancelExpandAnimation`); each entry carries a `cleanup` that removes the
+     * inline transition-suppression and the `dv-tab--group-expanding` class.
+     */
+    private readonly _expandAnimations = new Map<
+        string,
+        { animation: Animation; cleanup: () => void }
+    >();
 
     get chipRenderers(): ReadonlyMap<string, ChipRendererEntry> {
         return this._chipRenderers;
@@ -296,6 +307,10 @@ export class TabGroupManager {
     cleanupTransition(panelId: string): void {
         this._pendingTransitionCleanups.get(panelId)?.();
         this._pendingTransitionCleanups.delete(panelId);
+        // Also settle any in-flight scripted collapse/expand for this panel
+        // (e.g. the tab is being removed mid-animation).
+        this._cancelCollapseAnimation(panelId);
+        this._cancelExpandAnimation(panelId);
     }
 
     updateDragAndDropState(): void {
@@ -363,6 +378,10 @@ export class TabGroupManager {
 
         for (const panelId of [...this._collapseAnimations.keys()]) {
             this._cancelCollapseAnimation(panelId);
+        }
+
+        for (const panelId of [...this._expandAnimations.keys()]) {
+            this._cancelExpandAnimation(panelId);
         }
 
         for (const [, entry] of this._chipRenderers) {
@@ -730,34 +749,13 @@ export class TabGroupManager {
                     'dv-tab--group-collapsed'
                 );
                 if (!tg.collapsed && isCollapsed) {
-                    // Collapsed → expanding: animate back
+                    // Collapsed → expanding: animate back to the natural size.
                     hasAnimation = true;
-
-                    // Cancel any in-flight animated collapse for this tab so
-                    // the scripted animation and its inline transition
-                    // suppression are torn down before the CSS expand
-                    // transition takes over.
-                    this._cancelCollapseAnimation(panelId);
-
-                    tab.element.classList.remove('dv-tab--group-collapsed');
-                    tab.element.classList.add('dv-tab--group-expanding');
-
-                    // Clean up any previous transitionend listener
-                    // from a rapid collapse/expand cycle
-                    this._pendingTransitionCleanups.get(panelId)?.();
-
-                    const onEnd = () => {
-                        tab.element.classList.remove('dv-tab--group-expanding');
-                        tab.element.style.removeProperty('width');
-                        tab.element.removeEventListener('transitionend', onEnd);
-                        clearTimeout(fallbackTimer);
-                        this._pendingTransitionCleanups.delete(panelId);
-                    };
-                    // Fallback in case transitionend never fires
-                    // (e.g. element removed from DOM mid-transition)
-                    const fallbackTimer = setTimeout(onEnd, 300);
-                    this._pendingTransitionCleanups.set(panelId, onEnd);
-                    tab.element.addEventListener('transitionend', onEnd);
+                    this._animateTabExpand(
+                        tab.element,
+                        panelId,
+                        this._ctx.getDirection() === 'vertical'
+                    );
                 }
             } else {
                 toggleClass(tab.element, 'dv-tab--group-first', false);
@@ -881,9 +879,10 @@ export class TabGroupManager {
         isVert: boolean
     ): void {
         // Tear down any competing in-flight work for this tab so rapid toggles
-        // don't stack: a pending expand cleanup, then any running collapse
-        // animation.
+        // don't stack: a fallback expand cleanup, a scripted expand animation,
+        // then any running collapse animation.
         this._pendingTransitionCleanups.get(panelId)?.();
+        this._cancelExpandAnimation(panelId);
         this._cancelCollapseAnimation(panelId);
 
         // Reduced motion mirrors the CSS `@media (prefers-reduced-motion)` rule
@@ -1006,6 +1005,155 @@ export class TabGroupManager {
         // Remove first so the `finished` rejection handler and `cleanup`'s
         // guard both see the entry as already gone.
         this._collapseAnimations.delete(panelId);
+        entry.cleanup();
+        entry.animation.cancel();
+    }
+
+    /**
+     * Expand a single tab from its collapsed rest state back to its natural
+     * geometry — the inverse of {@link _animateTabCollapse}, and the same
+     * Web Animations API treatment. The old path added `dv-tab--group-expanding`
+     * and relied on a CSS transition finishing via a `transitionend` listener
+     * plus a `setTimeout` fallback (fragile: the event can be missed if the tab
+     * is removed mid-transition, and the timer is a guess). Here a scripted
+     * animation plays `0 → natural`, its `finished` promise runs the cleanup,
+     * and interruptions cancel deterministically — no listeners, no timers.
+     *
+     * `dv-tab--group-expanding` is still added for the animation's duration
+     * (with its CSS transition suppressed inline) so anything observing that
+     * class — e.g. the group indicator — behaves exactly as before; the cleanup
+     * removes it once the animation settles.
+     */
+    private _animateTabExpand(
+        el: HTMLElement,
+        panelId: string,
+        isVert: boolean
+    ): void {
+        // Tear down competing in-flight work: a fallback cleanup, any scripted
+        // expand already running, then any collapse animation still playing.
+        this._pendingTransitionCleanups.get(panelId)?.();
+        this._cancelExpandAnimation(panelId);
+        this._cancelCollapseAnimation(panelId);
+
+        // Leave the collapsed resting state so the element resolves back to its
+        // natural size; add the expanding marker for the animation's duration.
+        el.classList.remove('dv-tab--group-collapsed');
+        el.classList.add('dv-tab--group-expanding');
+
+        // Reduced motion mirrors the CSS `@media (prefers-reduced-motion)` rule:
+        // apply the expanded (natural) state instantly, no scripted animation.
+        if (prefersReducedMotion(el.ownerDocument)) {
+            el.classList.remove('dv-tab--group-expanding');
+            el.style.removeProperty('width');
+            el.style.removeProperty('height');
+            return;
+        }
+
+        // Environments without the Web Animations API (jsdom under test, very
+        // old browsers): fall back to the original CSS-transition +
+        // `transitionend` + `setTimeout` cleanup so the class-driven transition
+        // still plays where one exists.
+        if (typeof el.animate !== 'function') {
+            const onEnd = () => {
+                el.classList.remove('dv-tab--group-expanding');
+                el.style.removeProperty('width');
+                el.removeEventListener('transitionend', onEnd);
+                clearTimeout(fallbackTimer);
+                this._pendingTransitionCleanups.delete(panelId);
+            };
+            const fallbackTimer = setTimeout(onEnd, 300);
+            this._pendingTransitionCleanups.set(panelId, onEnd);
+            el.addEventListener('transitionend', onEnd);
+            return;
+        }
+
+        // Measure the natural target now that the collapsed class is gone.
+        const win = el.ownerDocument.defaultView;
+        const computed = win?.getComputedStyle(el);
+        const sizeEnd = isVert
+            ? `${el.getBoundingClientRect().height}px`
+            : `${el.getBoundingClientRect().width}px`;
+
+        const from: Keyframe = {
+            paddingTop: '0px',
+            paddingRight: '0px',
+            paddingBottom: '0px',
+            paddingLeft: '0px',
+            marginTop: '0px',
+            marginRight: '0px',
+            marginBottom: '0px',
+            marginLeft: '0px',
+            opacity: '0',
+        };
+        const to: Keyframe = {
+            paddingTop: computed?.paddingTop ?? '',
+            paddingRight: computed?.paddingRight ?? '',
+            paddingBottom: computed?.paddingBottom ?? '',
+            paddingLeft: computed?.paddingLeft ?? '',
+            marginTop: computed?.marginTop ?? '',
+            marginRight: computed?.marginRight ?? '',
+            marginBottom: computed?.marginBottom ?? '',
+            marginLeft: computed?.marginLeft ?? '',
+            opacity: computed?.opacity ?? '1',
+        };
+        if (isVert) {
+            from.height = '0px';
+            to.height = sizeEnd;
+        } else {
+            from.width = '0px';
+            to.width = sizeEnd;
+        }
+
+        const duration = resolveCssDurationMs(
+            el,
+            '--dv-transition-duration',
+            200
+        );
+
+        // Suppress the expanding class's CSS transition so only the scripted
+        // animation plays.
+        el.style.transition = 'none';
+
+        const animation = el.animate([from, to], {
+            duration,
+            easing: 'ease-out',
+            fill: 'none',
+        });
+
+        let settled = false;
+        const cleanup = () => {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            el.style.removeProperty('transition');
+            el.classList.remove('dv-tab--group-expanding');
+            el.style.removeProperty('width');
+            el.style.removeProperty('height');
+            if (this._expandAnimations.get(panelId)?.animation === animation) {
+                this._expandAnimations.delete(panelId);
+            }
+        };
+
+        this._expandAnimations.set(panelId, { animation, cleanup });
+
+        animation.finished.then(cleanup).catch(() => {
+            // `finished` rejects on cancellation; `_cancelExpandAnimation` runs
+            // the cleanup itself, so there is nothing to do here.
+        });
+    }
+
+    /**
+     * Cancel an in-flight animated expand for a tab, if any — leaving it in its
+     * natural (expanded) resting state with the transition-suppression and
+     * `dv-tab--group-expanding` marker removed. Idempotent.
+     */
+    private _cancelExpandAnimation(panelId: string): void {
+        const entry = this._expandAnimations.get(panelId);
+        if (!entry) {
+            return;
+        }
+        this._expandAnimations.delete(panelId);
         entry.cleanup();
         entry.animation.cancel();
     }
