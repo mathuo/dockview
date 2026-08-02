@@ -761,23 +761,51 @@ export class Splitview {
     }
 
     private distributeEmptySpace(lowPriorityIndex?: number): void {
-        const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+        let contentSize = 0;
+        for (const item of this.viewItems) {
+            contentSize += item.size;
+        }
         let emptyDelta = this.size - contentSize;
 
-        const indexes = range(this.viewItems.length - 1, -1);
-        const lowPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.Low
-        );
-        const highPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.High
-        );
-
-        for (const index of highPriorityIndexes) {
-            pushToStart(indexes, index);
+        // nothing to redistribute — bail before allocating any index bookkeeping
+        // (the loop below would no-op anyway). Common on frames where the
+        // content already fills the container exactly.
+        if (emptyDelta === 0) {
+            return;
         }
 
-        for (const index of lowPriorityIndexes) {
-            pushToEnd(indexes, index);
+        const indexes = range(this.viewItems.length - 1, -1);
+
+        // Only partition by priority when some view actually declares a
+        // non-Normal priority. The common case has none, so we skip the two
+        // `.filter` allocations and the reorder passes and keep `indexes` in
+        // its natural order — behaviourally identical to filtering out nothing.
+        let hasPriority = false;
+        for (const item of this.viewItems) {
+            if (
+                item.priority === LayoutPriority.Low ||
+                item.priority === LayoutPriority.High
+            ) {
+                hasPriority = true;
+                break;
+            }
+        }
+
+        if (hasPriority) {
+            const lowPriorityIndexes = indexes.filter(
+                (i) => this.viewItems[i].priority === LayoutPriority.Low
+            );
+            const highPriorityIndexes = indexes.filter(
+                (i) => this.viewItems[i].priority === LayoutPriority.High
+            );
+
+            for (const index of highPriorityIndexes) {
+                pushToStart(indexes, index);
+            }
+
+            for (const index of lowPriorityIndexes) {
+                pushToEnd(indexes, index);
+            }
         }
 
         if (typeof lowPriorityIndex === 'number') {
@@ -1059,12 +1087,11 @@ export class Splitview {
             }
         }
         //
-        const upItems = upIndexes.map((i) => this.viewItems[i]);
-        const upSizes = upIndexes.map((i) => sizes[i]);
-        //
-        const downItems = downIndexes.map((i) => this.viewItems[i]);
-        const downSizes = downIndexes.map((i) => sizes[i]);
-        //
+        // `upItems`/`upSizes`/`downItems`/`downSizes` used to be materialised as
+        // four parallel arrays here (via `.map`) on every call — i.e. on every
+        // pointermove of a sash drag and every resize frame. They're only read
+        // by the two delta loops below, so we index `viewItems`/`sizes` through
+        // `upIndexes`/`downIndexes` inline instead and drop the four allocations.
         const minDeltaUp = upIndexes.reduce(
             (_, i) => _ + this.viewItems[i].minimumSize - sizes[i],
             0
@@ -1125,14 +1152,15 @@ export class Splitview {
         //
         let deltaUp = tentativeDelta;
 
-        for (let i = 0; i < upItems.length; i++) {
-            const item = upItems[i];
+        for (let i = 0; i < upIndexes.length; i++) {
+            const item = this.viewItems[upIndexes[i]];
+            const priorSize = sizes[upIndexes[i]];
             const size = clamp(
-                upSizes[i] + deltaUp,
+                priorSize + deltaUp,
                 item.minimumSize,
                 item.maximumSize
             );
-            const viewDelta = size - upSizes[i];
+            const viewDelta = size - priorSize;
 
             actualDelta += viewDelta;
             deltaUp -= viewDelta;
@@ -1140,14 +1168,15 @@ export class Splitview {
         }
         //
         let deltaDown = actualDelta;
-        for (let i = 0; i < downItems.length; i++) {
-            const item = downItems[i];
+        for (let i = 0; i < downIndexes.length; i++) {
+            const item = this.viewItems[downIndexes[i]];
+            const priorSize = sizes[downIndexes[i]];
             const size = clamp(
-                downSizes[i] - deltaDown,
+                priorSize - deltaDown,
                 item.minimumSize,
                 item.maximumSize
             );
-            const viewDelta = size - downSizes[i];
+            const viewDelta = size - priorSize;
 
             deltaDown += viewDelta;
             item.size = size;
