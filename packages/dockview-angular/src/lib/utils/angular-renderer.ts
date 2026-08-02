@@ -166,7 +166,11 @@ export class AngularRenderer<T = unknown>
             }
         );
 
-        // Set initial parameters
+        // Set initial parameters. NOTE: this runs before `viewRef` is assigned
+        // below, so update()'s markForCheck is a no-op here; the initial render
+        // is instead driven by the explicit detectChanges() at the end of this
+        // method. Keep that ordering — assigning viewRef first would make
+        // update() mark-for-check without a following tick and paint stale.
         this.update(parameters);
 
         this.viewRef = this.componentRef.hostView as EmbeddedViewRef<T>;

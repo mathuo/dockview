@@ -619,6 +619,12 @@ export class DockviewGroupPanelModel
             // display:none transitions too — theme-driven height), and relayout
             // the content if the extent moved.
             watchElementResize(this.tabsContainer.element, () => {
+                // `watchElementResize` defers via requestAnimationFrame, so a
+                // frame queued just before disposal can still fire; don't run
+                // layout on a disposed group (mirrors `Resizable`).
+                if (this.isDisposed) {
+                    return;
+                }
                 const size = this.measureHeaderSize();
                 if (size !== this._cachedHeaderSize) {
                     this._cachedHeaderSize = size;
