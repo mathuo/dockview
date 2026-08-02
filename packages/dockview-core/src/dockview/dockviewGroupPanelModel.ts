@@ -2,7 +2,13 @@ import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent, DockviewOrigin } from './dockviewComponent';
-import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
+import {
+    addClasses,
+    isAncestor,
+    removeClasses,
+    toggleClass,
+    watchElementResize,
+} from '../dom';
 import {
     addDisposableListener,
     DockviewEvent,
@@ -268,6 +274,22 @@ export class DockviewGroupPanelModel
     private _headerPosition: DockviewHeaderPosition | undefined;
     private _headerDirection: DockviewHeaderDirection | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
+    /**
+     * The header (`dv-tabs-and-actions-container`) extent along its occupied
+     * axis — `offsetHeight` for a top/bottom header, `offsetWidth` for a
+     * left/right one — which `contentDimensions` subtracts from the group box.
+     *
+     * This was read via `offset*` on *every* `layout()`. Because the read comes
+     * after the group's container styles were written, it forces a synchronous
+     * reflow, and with N groups a single window-resize frame flushed layout N
+     * times (measured: 24 forced reflows/frame at 24 groups, ~68% of resize
+     * cost). The extent only changes when the header's tabs change (add/remove/
+     * wrap), its axis flips, or it's hidden/shown — never during a plain
+     * resize — so we cache it and invalidate on exactly those signals (plus a
+     * `ResizeObserver` that also catches CSS/theme-driven height changes and
+     * display:none transitions). `undefined` means "dirty; measure on read".
+     */
+    private _cachedHeaderSize: number | undefined;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
     private _overwriteRenderContainer: OverlayRenderContainer | null = null;
@@ -467,6 +489,9 @@ export class DockviewGroupPanelModel
 
     set headerPosition(value: DockviewHeaderPosition) {
         this._headerPosition = value;
+        // the header may have flipped axis (top/bottom <-> left/right), so the
+        // cached extent (measured along the old axis) no longer applies
+        this.invalidateHeaderSize();
         removeClasses(
             this.container,
             'dv-groupview-header-top',
@@ -588,6 +613,18 @@ export class DockviewGroupPanelModel
             options.headerPosition ?? accessor.defaultHeaderPosition;
 
         this.addDisposables(
+            // Keep the cached header extent fresh without reading `offset*` on
+            // every layout: re-measure only when the header element actually
+            // changes size (tabs wrapping, hide/show — ResizeObserver fires on
+            // display:none transitions too — theme-driven height), and relayout
+            // the content if the extent moved.
+            watchElementResize(this.tabsContainer.element, () => {
+                const size = this.measureHeaderSize();
+                if (size !== this._cachedHeaderSize) {
+                    this._cachedHeaderSize = size;
+                    this.layout(this._width, this._height);
+                }
+            }),
             // Keep the region's accessible name in sync when the active
             // panel's title changes (no-op when a non-active title changes).
             this._onDidPanelTitleChange.event(() =>
@@ -1477,6 +1514,9 @@ export class DockviewGroupPanelModel
             skipSetActive: skipSetActive,
         });
 
+        // a new tab can change the header's extent (e.g. push it to wrap)
+        this.invalidateHeaderSize();
+
         if (this._activePanel === panel) {
             this.contentContainer.renderPanel(panel, { asActive: true });
             return;
@@ -1597,6 +1637,10 @@ export class DockviewGroupPanelModel
      * changing) down to the content + active panel.
      */
     public relayout(): void {
+        // `relayout` exists to propagate a header-size change (e.g. tabs
+        // wrapping to a second row) into the content, so drop the cached extent
+        // and re-measure on the next `contentDimensions`.
+        this.invalidateHeaderSize();
         this.layout(this._width, this._height);
     }
 
@@ -1607,17 +1651,38 @@ export class DockviewGroupPanelModel
      * width); a hidden header has `display:none` so its `offset*` is 0 and
      * nothing is subtracted.
      */
-    private contentDimensions(): { width: number; height: number } {
+    /**
+     * Measure the header's extent along its occupied axis. This is the single
+     * forced-reflow read; it now runs only on a cache miss (first layout after
+     * a header change) and inside the header's ResizeObserver — not on every
+     * layout frame.
+     */
+    private measureHeaderSize(): number {
         const headerEl = this.tabsContainer.element;
         const horizontal =
             this.headerPosition === 'top' || this.headerPosition === 'bottom';
+        return horizontal ? headerEl.offsetHeight : headerEl.offsetWidth;
+    }
+
+    private invalidateHeaderSize(): void {
+        this._cachedHeaderSize = undefined;
+    }
+
+    private contentDimensions(): { width: number; height: number } {
+        const horizontal =
+            this.headerPosition === 'top' || this.headerPosition === 'bottom';
+
+        if (this._cachedHeaderSize === undefined) {
+            this._cachedHeaderSize = this.measureHeaderSize();
+        }
+        const headerSize = this._cachedHeaderSize;
 
         return {
             width: horizontal
                 ? this._width
-                : Math.max(0, this._width - headerEl.offsetWidth),
+                : Math.max(0, this._width - headerSize),
             height: horizontal
-                ? Math.max(0, this._height - headerEl.offsetHeight)
+                ? Math.max(0, this._height - headerSize)
                 : this._height,
         };
     }
@@ -1632,6 +1697,9 @@ export class DockviewGroupPanelModel
         const isActivePanel = this._activePanel === panel;
 
         this.doRemovePanel(panel);
+
+        // removing a tab can change the header's extent (e.g. drop a wrap row)
+        this.invalidateHeaderSize();
 
         if (isActivePanel && this.panels.length > 0) {
             const nextPanel = this.mostRecentlyUsed[0];

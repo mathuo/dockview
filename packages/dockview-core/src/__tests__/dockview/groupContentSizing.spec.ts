@@ -32,11 +32,75 @@ class TestContentPart implements IContentRenderer {
  * minus the header along its axis. That way panels (and `onDidDimensionsChange`)
  * receive the real space they occupy, not the header-inclusive group box.
  *
- * jsdom performs no layout, so `offset*` is 0 by default and nothing is
- * subtracted; these tests stub the header element's `offsetHeight`/`offsetWidth`
- * to simulate a measured header.
+ * The header extent is measured once and cached (reading `offset*` on every
+ * layout forced a synchronous reflow per group per frame); it is re-measured
+ * when the header element's size actually changes, which the group observes via
+ * a `ResizeObserver`. jsdom performs no layout, so these tests stub the header
+ * element's `offsetHeight`/`offsetWidth` and then fire the observer to model the
+ * browser detecting the new size — the same path production takes.
  */
 describe('group content sizing (header-aware)', () => {
+    interface FakeObserver {
+        cb: (entries: any[]) => void;
+        elements: Element[];
+    }
+    let observers: FakeObserver[];
+    let rAFCallbacks: FrameRequestCallback[];
+    let originalResizeObserver: typeof window.ResizeObserver;
+
+    beforeEach(() => {
+        observers = [];
+        rAFCallbacks = [];
+
+        originalResizeObserver = window.ResizeObserver;
+        (window as any).ResizeObserver = class {
+            private readonly self: FakeObserver;
+            constructor(cb: (entries: any[]) => void) {
+                this.self = { cb, elements: [] };
+                observers.push(this.self);
+            }
+            observe(el: Element): void {
+                this.self.elements.push(el);
+            }
+            unobserve(el: Element): void {
+                this.self.elements = this.self.elements.filter(
+                    (e) => e !== el
+                );
+            }
+            disconnect(): void {
+                this.self.elements = [];
+            }
+        };
+
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+            rAFCallbacks.push(cb);
+            return rAFCallbacks.length;
+        });
+    });
+
+    afterEach(() => {
+        window.ResizeObserver = originalResizeObserver;
+        jest.restoreAllMocks();
+    });
+
+    /**
+     * Model the browser detecting a size change on a specific element: fire only
+     * the observers watching it (with a real `target`), then flush the rAF that
+     * `watchElementResize` defers to.
+     */
+    function fireResizeFor(target: Element): void {
+        for (const observer of observers) {
+            if (observer.elements.includes(target)) {
+                observer.cb([{ target, contentRect: { width: 0, height: 0 } }]);
+            }
+        }
+        const pending = [...rAFCallbacks];
+        rAFCallbacks = [];
+        for (const cb of pending) {
+            cb(performance.now());
+        }
+    }
+
     function createComponent() {
         return new DockviewComponent(document.createElement('div'), {
             createComponent(options) {
@@ -76,7 +140,10 @@ describe('group content sizing (header-aware)', () => {
         const panel = cut.addPanel({ id: 'panel1', component: 'component' });
         const group = panel.group;
 
-        stubOffset(getHeaderElement(group), 'offsetHeight', 35);
+        // header measures 35px; the observer propagates that into the cache
+        const header = getHeaderElement(group);
+        stubOffset(header, 'offsetHeight', 35);
+        fireResizeFor(header);
 
         const dimensions: { width: number; height: number }[] = [];
         const disposable = panel.api.onDidDimensionsChange((event) =>
@@ -97,7 +164,9 @@ describe('group content sizing (header-aware)', () => {
         const group = panel.group;
 
         group.model.headerPosition = 'left';
-        stubOffset(getHeaderElement(group), 'offsetWidth', 40);
+        const header = getHeaderElement(group);
+        stubOffset(header, 'offsetWidth', 40);
+        fireResizeFor(header);
 
         const dimensions: { width: number; height: number }[] = [];
         const disposable = panel.api.onDidDimensionsChange((event) =>
@@ -136,7 +205,9 @@ describe('group content sizing (header-aware)', () => {
         const panel = cut.addPanel({ id: 'panel1', component: 'component' });
         const group = panel.group;
 
-        stubOffset(getHeaderElement(group), 'offsetHeight', 150);
+        const header = getHeaderElement(group);
+        stubOffset(header, 'offsetHeight', 150);
+        fireResizeFor(header);
 
         const dimensions: { width: number; height: number }[] = [];
         const disposable = panel.api.onDidDimensionsChange((event) =>
@@ -158,6 +229,7 @@ describe('group content sizing (header-aware)', () => {
 
         const header = getHeaderElement(group);
         stubOffset(header, 'offsetHeight', 30);
+        fireResizeFor(header);
         group.layout(200, 100);
 
         const dimensions: { width: number; height: number }[] = [];
@@ -165,9 +237,40 @@ describe('group content sizing (header-aware)', () => {
             dimensions.push({ width: event.width, height: event.height })
         );
 
-        // header grows (e.g. a second tab row) without the group box changing
+        // header grows (e.g. a second tab row) without the group box changing;
+        // `relayout()` is the explicit signal to re-measure and re-propagate
         stubOffset(header, 'offsetHeight', 60);
-        group.relayout();
+        group.model.relayout();
+
+        expect(dimensions).toContainEqual({ width: 200, height: 40 });
+
+        disposable.dispose();
+        cut.dispose();
+    });
+
+    test('header wrapping to a taller strip mid-resize shrinks the content (via observer)', () => {
+        const cut = createComponent();
+        const panel = cut.addPanel({ id: 'panel1', component: 'component' });
+        const group = panel.group;
+        const header = getHeaderElement(group);
+
+        // single-row header at a comfortable width
+        stubOffset(header, 'offsetHeight', 30);
+        fireResizeFor(header);
+        group.layout(400, 100);
+
+        const dimensions: { width: number; height: number }[] = [];
+        const disposable = panel.api.onDidDimensionsChange((event) =>
+            dimensions.push({ width: event.width, height: event.height })
+        );
+
+        // the window narrows: tabs wrap to a second row, so the header grows.
+        // the browser fires the ResizeObserver on the header element, which the
+        // group uses to re-measure and re-lay-out the content — no explicit
+        // relayout() call from the resize path itself.
+        group.layout(200, 100);
+        stubOffset(header, 'offsetHeight', 60);
+        fireResizeFor(header);
 
         expect(dimensions).toContainEqual({ width: 200, height: 40 });
 
