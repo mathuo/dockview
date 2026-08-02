@@ -40,9 +40,8 @@ describe('Scrollbar', () => {
     function create(): { scrollbar: Scrollbar; bar: HTMLElement } {
         const scrollable = document.createElement('div');
         const scrollbar = new Scrollbar(scrollable);
-        const bar = scrollbar.element.querySelector<HTMLElement>(
-            '.dv-scrollbar'
-        )!;
+        const bar =
+            scrollbar.element.querySelector<HTMLElement>('.dv-scrollbar')!;
         return { scrollbar, bar };
     }
 
@@ -71,7 +70,9 @@ describe('Scrollbar', () => {
     test('dispose cancels a pending restyle frame', () => {
         const { scrollbar } = create();
 
-        scrollbar.element.dispatchEvent(new WheelEvent('wheel', { deltaY: 10 }));
+        scrollbar.element.dispatchEvent(
+            new WheelEvent('wheel', { deltaY: 10 })
+        );
         expect(rafCallbacks.size).toBe(1);
 
         scrollbar.dispose();

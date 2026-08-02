@@ -1,10 +1,6 @@
 import React from 'react';
 import { act, render } from '@testing-library/react';
-import {
-    DockviewApi,
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview';
+import { DockviewApi, DockviewReadyEvent, IDockviewPanelProps } from 'dockview';
 import { DockviewReact } from '../../dockview/dockview';
 
 /**

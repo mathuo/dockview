@@ -63,9 +63,7 @@ describe('group content sizing (header-aware)', () => {
                 this.self.elements.push(el);
             }
             unobserve(el: Element): void {
-                this.self.elements = this.self.elements.filter(
-                    (e) => e !== el
-                );
+                this.self.elements = this.self.elements.filter((e) => e !== el);
             }
             disconnect(): void {
                 this.self.elements = [];
