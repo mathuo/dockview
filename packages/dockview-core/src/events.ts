@@ -196,9 +196,7 @@ export class Emitter<T> implements IDisposable {
 
     public pause(): IDisposable {
         const token = {};
-        if (this._pauseTokens === undefined) {
-            this._pauseTokens = new Set<object>();
-        }
+        this._pauseTokens ??= new Set<object>();
         this._pauseTokens.add(token);
         return Disposable.from(() => this._pauseTokens?.delete(token));
     }

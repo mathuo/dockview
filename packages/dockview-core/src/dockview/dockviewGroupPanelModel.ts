@@ -1678,10 +1678,8 @@ export class DockviewGroupPanelModel
         const horizontal =
             this.headerPosition === 'top' || this.headerPosition === 'bottom';
 
-        if (this._cachedHeaderSize === undefined) {
-            this._cachedHeaderSize = this.measureHeaderSize();
-        }
-        const headerSize = this._cachedHeaderSize;
+        const headerSize = (this._cachedHeaderSize ??=
+            this.measureHeaderSize());
 
         return {
             width: horizontal

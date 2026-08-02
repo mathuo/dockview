@@ -1152,9 +1152,9 @@ export class Splitview {
         //
         let deltaUp = tentativeDelta;
 
-        for (let i = 0; i < upIndexes.length; i++) {
-            const item = this.viewItems[upIndexes[i]];
-            const priorSize = sizes[upIndexes[i]];
+        for (const upIndex of upIndexes) {
+            const item = this.viewItems[upIndex];
+            const priorSize = sizes[upIndex];
             const size = clamp(
                 priorSize + deltaUp,
                 item.minimumSize,
@@ -1168,9 +1168,9 @@ export class Splitview {
         }
         //
         let deltaDown = actualDelta;
-        for (let i = 0; i < downIndexes.length; i++) {
-            const item = this.viewItems[downIndexes[i]];
-            const priorSize = sizes[downIndexes[i]];
+        for (const downIndex of downIndexes) {
+            const item = this.viewItems[downIndex];
+            const priorSize = sizes[downIndex];
             const size = clamp(
                 priorSize - deltaDown,
                 item.minimumSize,

@@ -139,10 +139,7 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     get priority(): LayoutPriority {
-        if (this._cachedPriority === undefined) {
-            this._cachedPriority = this.computePriority();
-        }
-        return this._cachedPriority;
+        return (this._cachedPriority ??= this.computePriority());
     }
 
     private computePriority(): LayoutPriority {
