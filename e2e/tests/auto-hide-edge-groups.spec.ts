@@ -305,7 +305,7 @@ test.describe('auto-hide edge groups — spaced theme styling', () => {
         page.locator('.dv-groupview-edge .dv-tab').first();
     const px = (v: string) => parseFloat(v);
 
-    test('the peek title bar uses the tab/chrome colour, not the near-black group frame', async ({
+    test('the peek title bar uses the tab-bar colour, not the near-black group frame', async ({
         page,
     }) => {
         await setup(page);
@@ -325,8 +325,8 @@ test.describe('auto-hide edge groups — spaced theme styling', () => {
                 frame: cs(group),
             };
         });
-        // the title bar matches the tab strip (chrome), NOT the group frame
-        // (which is the near-black inter-group gap colour that read as black)
+        // the title bar matches the tab strip (tab-bar colour), NOT the group
+        // frame (the near-black inter-group gap colour that read as black)
         expect(c.header).toBe(c.strip);
         expect(c.header).not.toBe(c.frame);
     });

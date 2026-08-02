@@ -180,13 +180,13 @@ class EdgeGroupController extends CompositeDisposable {
         return location.type === 'edge' ? location.position : undefined;
     }
 
-    /** The opaque backdrop for the tool-window chrome (peek + docked title
-     *  bars). Resolved from the group's tab strip so the bar adopts the theme's
-     *  tab/chrome colour rather than the group-view *frame* colour — the latter
-     *  is the near-black inter-group gap colour in dark (and spaced) themes,
-     *  which made the header read as a plain black band. Falls back to the group
-     *  element when the strip has no opaque background of its own. */
-    private _chromeBackground(): string {
+    /** The opaque backdrop for the tool-window title bars (peek + docked).
+     *  Resolved from the group's tab strip so the bar adopts the theme's tab-bar
+     *  colour rather than the group-view *frame* colour — the latter is the
+     *  near-black inter-group gap colour in dark (and spaced) themes, which made
+     *  the header read as a plain black band. Falls back to the group element
+     *  when the strip has no opaque background of its own. */
+    private _titleBarBackground(): string {
         const strip = this.group.element.querySelector<HTMLElement>(
             '.dv-tabs-and-actions-container'
         );
@@ -303,7 +303,7 @@ class EdgeGroupController extends CompositeDisposable {
             closeLabel: 'Close',
             onPin: () => this.host.setEdgeGroupCollapsed(this.group, true),
             onClose: () => this.group.activePanel?.api.close(),
-            background: this._chromeBackground(),
+            background: this._titleBarBackground(),
         });
         element.style.flexShrink = '0';
         element.style.height = `${TITLEBAR_HEIGHT}px`;
@@ -368,10 +368,10 @@ class EdgeGroupController extends CompositeDisposable {
 
         const doc = this.group.element.ownerDocument;
         // Backdrop = the group *frame* colour (it only shows at the sliding
-        // edges); the title bar uses the tab/chrome colour so it doesn't read
-        // as a black band in dark/spaced themes.
+        // edges); the title bar uses the tab-bar colour so it doesn't read as a
+        // black band in dark/spaced themes.
         const background = resolveOpaqueBackground(this.group.element);
-        const chrome = this._chromeBackground();
+        const titleBarBackground = this._titleBarBackground();
 
         // --- peek backdrop (slides inside the clip frame) ---
         const overlay = doc.createElement('div');
@@ -397,7 +397,7 @@ class EdgeGroupController extends CompositeDisposable {
             closeLabel: 'Close',
             onPin: () => this.pin(),
             onClose: () => this.close(),
-            background: chrome,
+            background: titleBarBackground,
         });
         header.style.position = 'absolute';
         header.style.zIndex = '1001';
