@@ -118,7 +118,8 @@ describe('AngularFrameworkComponentFactory', () => {
 
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe('TEST-DOCKVIEW-COMPONENT');
+            // element is now the OnPush boundary wrapper hosting the component
+            expect(renderer.element.querySelector('test-dockview-component')).toBeTruthy();
         });
 
         it('should throw error for unknown component', () => {
@@ -226,7 +227,7 @@ describe('AngularFrameworkComponentFactory', () => {
 
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element.querySelector('test-tab-component')).toBeTruthy();
         });
 
         it('should use default tab component when specific component not found', () => {
@@ -239,7 +240,7 @@ describe('AngularFrameworkComponentFactory', () => {
 
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element.querySelector('test-tab-component')).toBeTruthy();
         });
 
         it('should return undefined when no component and no default', () => {
@@ -267,7 +268,7 @@ describe('AngularFrameworkComponentFactory', () => {
 
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe('TEST-WATERMARK-COMPONENT');
+            expect(renderer.element.querySelector('test-watermark-component')).toBeTruthy();
         });
 
         it('should throw error when no watermark component provided', () => {

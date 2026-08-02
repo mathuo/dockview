@@ -97,7 +97,8 @@ describe('AngularRenderer', () => {
         application.tick(); // trigger change detection
 
         expect(renderer.element).toBeTruthy();
-        expect(renderer.element.tagName).toBe('TEST-COMPONENT');
+        // element is now the OnPush boundary wrapper hosting the component
+        expect(renderer.element.querySelector('test-component')).toBeTruthy();
         expect(renderer.element.innerHTML).toContain(
             'Updated Title - test-value'
         );
