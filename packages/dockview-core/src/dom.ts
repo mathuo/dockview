@@ -583,11 +583,14 @@ export function parseCssTimeMs(value: string, fallbackMs: number): number {
     if (trimmed === '') {
         return fallbackMs;
     }
-    const match = /^(-?\d*\.?\d+)(ms|s)?$/.exec(trimmed);
+    // Number is either digits with an optional fraction, or a bare fraction
+    // (`.5`). The alternation keeps each digit run owned by exactly one branch,
+    // avoiding the catastrophic backtracking of `\d*\.?\d+`.
+    const match = /^(-?(?:\d+(?:\.\d+)?|\.\d+))(ms|s)?$/.exec(trimmed);
     if (!match) {
         return fallbackMs;
     }
-    const amount = parseFloat(match[1]);
+    const amount = Number.parseFloat(match[1]);
     if (!Number.isFinite(amount)) {
         return fallbackMs;
     }

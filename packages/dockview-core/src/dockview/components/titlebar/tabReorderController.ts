@@ -1388,7 +1388,9 @@ export class TabReorderController extends CompositeDisposable {
             cleanup();
         }
         this._pendingMarginCleanups.clear();
-        for (const el of [...this._marginAnimations.keys()]) {
+        // Each cancel deletes only its own key, so iterating the map's keys
+        // directly (no snapshot copy) is safe.
+        for (const el of this._marginAnimations.keys()) {
             this._cancelMarginAnimation(el);
         }
 

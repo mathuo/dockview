@@ -376,11 +376,13 @@ export class TabGroupManager {
         }
         this._pendingTransitionCleanups.clear();
 
-        for (const panelId of [...this._collapseAnimations.keys()]) {
+        // Each cancel deletes only its own key, which is safe to do while
+        // iterating the map's keys directly (no snapshot copy needed).
+        for (const panelId of this._collapseAnimations.keys()) {
             this._cancelCollapseAnimation(panelId);
         }
 
-        for (const panelId of [...this._expandAnimations.keys()]) {
+        for (const panelId of this._expandAnimations.keys()) {
             this._cancelExpandAnimation(panelId);
         }
 
@@ -905,7 +907,7 @@ export class TabGroupManager {
             } else {
                 el.style.width = `${rect.width}px`;
             }
-            void el.offsetHeight; // force reflow
+            el.getBoundingClientRect(); // force reflow to commit the pinned size
             el.classList.add('dv-tab--group-collapsed');
             return;
         }
