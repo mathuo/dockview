@@ -261,6 +261,70 @@ test.describe('multi-row tabs (wrap mode)', () => {
         ).not.toHaveClass(/dv-tabs-container--wrap/);
     });
 
+    // Regression: even without `overflow.maxRows`, an unbounded wrap must not
+    // grow the header past the group and render its extra rows off-screen. The
+    // header is bounded by the group's height and the surplus rows spill into
+    // the overflow dropdown, keeping every tab reachable.
+    test('unbounded wrap is bounded by the group height: surplus rows spill to the dropdown, nothing off-screen', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        // A short group with many tabs: the rows can't all fit.
+        await page.setViewportSize({ width: 500, height: 400 });
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(80));
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        // The space cap clips the strip even though no `maxRows` was set.
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap-capped/);
+
+        // Retry until the space-cap reflow + relayout settle.
+        await expect(async () => {
+            const m = await page.evaluate(() => {
+                const group = document.querySelector(
+                    '.dv-groupview'
+                ) as HTMLElement;
+                const header = document.querySelector(
+                    '.dv-tabs-and-actions-container'
+                ) as HTMLElement;
+                const list = document.querySelector(
+                    '.dv-tabs-container'
+                ) as HTMLElement;
+                const gb = group.getBoundingClientRect();
+                const hb = header.getBoundingClientRect();
+                const lb = list.getBoundingClientRect();
+                const tabs = Array.from(
+                    list.querySelectorAll<HTMLElement>('.dv-tab')
+                );
+                // Of the tabs still visible in the clipped strip, how many
+                // escape the group box (render off-screen over the content)?
+                const visibleEscaped = tabs.filter((t) => {
+                    const r = t.getBoundingClientRect();
+                    const inStrip =
+                        r.bottom > lb.top + 0.5 && r.top < lb.bottom - 0.5;
+                    return (
+                        inStrip &&
+                        (r.bottom > gb.bottom + 1 || r.top < gb.top - 1)
+                    );
+                }).length;
+                return {
+                    headerBottom: Math.round(hb.bottom),
+                    groupBottom: Math.round(gb.bottom),
+                    visibleEscaped,
+                };
+            });
+            // The header never grows past the group's bottom edge ...
+            expect(m.headerBottom).toBeLessThanOrEqual(m.groupBottom + 1);
+            // ... so no visible tab renders off-screen.
+            expect(m.visibleEscaped).toBe(0);
+        }).toPass();
+
+        // The surplus rows are reachable in the overflow dropdown.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
+    });
+
     // Phase 3: 2-D cross-row drag reorder (smooth mode). A tab dragged from a
     // lower row to a slot on an upper row reorders across the row boundary.
     // Covers both animation modes: default (per-tab drop targets — the common
@@ -696,6 +760,69 @@ test.describe('multi-row tabs (wrap mode)', () => {
             expect(wide.headerWidth).toBeLessThan(narrow.headerWidth);
             expect(wide.escaped).toBe(0);
         }).toPass();
+    });
+
+    // Regression (vertical mirror): an unbounded column wrap must not grow the
+    // header past the group's right edge and render its extra columns off-screen
+    // over the content. The header is bounded by the group's width and the
+    // surplus columns spill into the overflow dropdown.
+    test('vertical header: unbounded wrap is bounded by the group width: surplus columns spill to the dropdown, nothing off-screen', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        // A short group so columns fill quickly, with many tabs so the columns
+        // exceed the group width.
+        await page.setViewportSize({ width: 700, height: 400 });
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(80));
+        await page.evaluate(() =>
+            (window as any).__dv.setHeaderPosition('left')
+        );
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap-capped/);
+
+        await expect(async () => {
+            const m = await page.evaluate(() => {
+                const group = document.querySelector(
+                    '.dv-groupview'
+                ) as HTMLElement;
+                const header = document.querySelector(
+                    '.dv-tabs-and-actions-container'
+                ) as HTMLElement;
+                const list = document.querySelector(
+                    '.dv-tabs-container'
+                ) as HTMLElement;
+                const gb = group.getBoundingClientRect();
+                const hb = header.getBoundingClientRect();
+                const lb = list.getBoundingClientRect();
+                const tabs = Array.from(
+                    list.querySelectorAll<HTMLElement>('.dv-tab')
+                );
+                const visibleEscaped = tabs.filter((t) => {
+                    const r = t.getBoundingClientRect();
+                    const inStrip =
+                        r.right > lb.left + 0.5 && r.left < lb.right - 0.5;
+                    return (
+                        inStrip &&
+                        (r.right > gb.right + 1 || r.left < gb.left - 1)
+                    );
+                }).length;
+                return {
+                    headerRight: Math.round(hb.right),
+                    groupRight: Math.round(gb.right),
+                    visibleEscaped,
+                };
+            });
+            // The header never grows past the group's right edge ...
+            expect(m.headerRight).toBeLessThanOrEqual(m.groupRight + 1);
+            // ... so no visible column renders off-screen over the content.
+            expect(m.visibleEscaped).toBe(0);
+        }).toPass();
+
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
     });
 
     // --- Spaced themes: the wrapped tab must keep its pill inset ---
