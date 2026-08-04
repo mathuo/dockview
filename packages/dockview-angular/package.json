@@ -33,13 +33,13 @@
         "angular",
         "angular-component"
     ],
-    "homepage": "https://github.com/mathuo/dockview",
+    "homepage": "https://github.com/dockview/dockview",
     "bugs": {
-        "url": "https://github.com/mathuo/dockview/issues"
+        "url": "https://github.com/dockview/dockview/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/dockview.git",
+        "url": "git+https://github.com/dockview/dockview.git",
         "directory": "packages/dockview-angular"
     },
     "license": "MIT",

@@ -656,7 +656,7 @@ describe('VueHeaderActionsRenderer', () => {
     });
 
     test('should preserve full params including api after reactive updates', () => {
-        // Regression test for https://github.com/mathuo/dockview/issues/1127
+        // Regression test for https://github.com/dockview/dockview/issues/1127
         // Partial updates (e.g. isGroupActive) must not discard api and other fields
         const renderer = new VueHeaderActionsRenderer(
             mockComponent,

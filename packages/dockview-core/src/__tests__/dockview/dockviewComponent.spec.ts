@@ -10880,7 +10880,7 @@ describe('dockviewComponent', () => {
         });
 
         test('issue 1020: addGroup + moveTo with defaultRenderer="always" repositions panel overlay', async () => {
-            // Reproduces https://github.com/mathuo/dockview/issues/1020
+            // Reproduces https://github.com/dockview/dockview/issues/1020
             // The user split a group by creating a new adjacent group and
             // moving the active panel into it. With defaultRenderer="always"
             // the panel's content overlay stayed at the old grid coordinates
