@@ -166,9 +166,28 @@ export interface IContextMenuItemComponentProps {
     componentProps?: object;
 }
 
+/**
+ * Props passed to a `component` menu item rendered in the tab group chip
+ * context menu. Mirrors {@link IContextMenuItemComponentProps} but carries the
+ * `tabGroup` the chip represents in place of a single `panel`: a chip spans
+ * several panels, so there is no one panel to hand over.
+ */
+export interface IChipContextMenuItemComponentProps {
+    tabGroup: ITabGroup;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    /** Call to close the context menu */
+    close: () => void;
+    componentProps?: object;
+}
+
 export interface IContextMenuItemRenderer extends IDisposable {
     readonly element: HTMLElement;
-    init(props: IContextMenuItemComponentProps): void;
+    init(
+        props:
+            | IContextMenuItemComponentProps
+            | IChipContextMenuItemComponentProps
+    ): void;
 }
 
 export interface CreateContextMenuItemComponentOptions {

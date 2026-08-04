@@ -5,6 +5,8 @@ import {
     DockviewGroupPanel,
     IDockviewPanel,
     IContextMenuItemComponentProps,
+    IChipContextMenuItemComponentProps,
+    ITabGroup,
 } from 'dockview';
 import { DockviewAngularComponent } from '../lib/dockview/dockview-angular.component';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
@@ -22,6 +24,18 @@ class TestContextMenuItemComponent {}
 })
 class TestContextMenuItemWithInputsComponent {
     @Input() panel!: IDockviewPanel;
+    @Input() group!: DockviewGroupPanel;
+    @Input() api!: any;
+    @Input() close!: () => void;
+    @Input() componentProps?: object;
+}
+
+@Component({
+    selector: 'test-chip-context-menu-item-with-inputs',
+    template: '<div></div>',
+})
+class TestChipContextMenuItemWithInputsComponent {
+    @Input() tabGroup!: ITabGroup;
     @Input() group!: DockviewGroupPanel;
     @Input() api!: any;
     @Input() close!: () => void;
@@ -144,6 +158,43 @@ describe('DockviewAngularComponent – context menu', () => {
 
         const instance = renderer.component.instance;
         expect(instance.panel).toBe(panel);
+        expect(instance.group).toBe(group);
+        expect(instance.close).toBe(closeFn);
+        expect(instance.componentProps).toBe(extraProps);
+
+        renderer.dispose();
+    });
+
+    it('forwards tabGroup and componentProps to the Angular component @Inputs for chip menu items', () => {
+        component.ngOnInit();
+
+        const frameworkOptions = (component as any).createFrameworkOptions();
+        const factory = frameworkOptions.createContextMenuItemComponent;
+
+        const renderer: AngularRenderer<TestChipContextMenuItemWithInputsComponent> =
+            factory({
+                id: 'test-id',
+                component:
+                    TestChipContextMenuItemWithInputsComponent as Type<never>,
+            } as CreateContextMenuItemComponentOptions);
+
+        const tabGroup = {} as ITabGroup;
+        const group = {} as DockviewGroupPanel;
+        const closeFn = jest.fn();
+        const extraProps = { foo: 'bar' };
+
+        const props: IChipContextMenuItemComponentProps = {
+            tabGroup,
+            group,
+            api: {} as never,
+            close: closeFn,
+            componentProps: extraProps,
+        };
+
+        renderer.init(props);
+
+        const instance = renderer.component.instance;
+        expect(instance.tabGroup).toBe(tabGroup);
         expect(instance.group).toBe(group);
         expect(instance.close).toBe(closeFn);
         expect(instance.componentProps).toBe(extraProps);

@@ -428,6 +428,22 @@ export class ContextMenuController implements IContextMenuService {
                 );
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
+            } else if (isItemConfig(item) && item.component) {
+                const renderer =
+                    this.accessor.options.createContextMenuItemComponent?.({
+                        id: nextContextMenuItemId(),
+                        component: item.component,
+                    });
+                if (renderer) {
+                    renderer.init({
+                        tabGroup,
+                        group,
+                        api: this.accessor.api,
+                        close,
+                        componentProps: item.componentProps,
+                    });
+                    menuEl.appendChild(renderer.element);
+                }
             } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
                     buildItem(

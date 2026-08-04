@@ -1,5 +1,8 @@
 import { fromPartial } from '@total-typescript/shoehorn';
-import { IContextMenuItemComponentProps } from 'dockview';
+import {
+    IChipContextMenuItemComponentProps,
+    IContextMenuItemComponentProps,
+} from 'dockview';
 import { ReactContextMenuItemPart } from '../../dockview/reactContextMenuItemPart';
 import { ReactPortalStore } from '../../react';
 
@@ -71,6 +74,34 @@ describe('ReactContextMenuItemPart', () => {
         // the user's React component as direct props.
         const parameters = (cut.part as any)
             .parameters as IContextMenuItemComponentProps;
+        expect(parameters.componentProps).toBe(componentProps);
+    });
+
+    test('init accepts chip props (tabGroup) and forwards componentProps', () => {
+        // The same renderer serves the tab group chip context menu, whose props
+        // carry a `tabGroup` instead of a `panel`.
+        const addPortal = jest.fn().mockReturnValue({ dispose: jest.fn() });
+        const cut = new ReactContextMenuItemPart(
+            'id-1',
+            jest.fn(),
+            fromPartial<ReactPortalStore>({ addPortal })
+        );
+
+        const componentProps = { foo: 'bar' };
+        const tabGroup = {} as any;
+        const props: IChipContextMenuItemComponentProps = {
+            tabGroup,
+            group: {} as any,
+            api: {} as any,
+            close: jest.fn(),
+            componentProps,
+        };
+
+        cut.init(props);
+
+        const parameters = (cut.part as any)
+            .parameters as IChipContextMenuItemComponentProps;
+        expect(parameters.tabGroup).toBe(tabGroup);
         expect(parameters.componentProps).toBe(componentProps);
     });
 
