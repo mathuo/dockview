@@ -10,6 +10,8 @@ import {
     defineModule,
     IContextMenuHost,
     IContextMenuService,
+    IContextMenuItemComponentProps,
+    IChipContextMenuItemComponentProps,
 } from 'dockview';
 
 function popoverZIndexFor(
@@ -237,6 +239,33 @@ export class ContextMenuController implements IContextMenuService {
         return this._shouldInjectPin() ? ['pin', ...appItems] : appItems;
     }
 
+    /**
+     * Render a custom `component` menu item: build its framework renderer via
+     * the host's `createContextMenuItemComponent` factory and initialise it
+     * with the given props. Shared by the tab menu (props carry a `panel`) and
+     * the chip menu (props carry a `tabGroup`). Returns the element to append,
+     * or `undefined` when no renderer could be created (no factory, or the
+     * factory declined the component).
+     */
+    private renderComponentItem(
+        component: unknown,
+        props:
+            | IContextMenuItemComponentProps
+            | IChipContextMenuItemComponentProps
+    ): HTMLElement | undefined {
+        const renderer = this.accessor.options.createContextMenuItemComponent?.(
+            {
+                id: nextContextMenuItemId(),
+                component,
+            }
+        );
+        if (!renderer) {
+            return undefined;
+        }
+        renderer.init(props);
+        return renderer.element;
+    }
+
     show(
         panel: IDockviewPanel,
         group: DockviewGroupPanel,
@@ -342,20 +371,15 @@ export class ContextMenuController implements IContextMenuService {
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.component) {
-                const renderer =
-                    this.accessor.options.createContextMenuItemComponent?.({
-                        id: nextContextMenuItemId(),
-                        component: item.component,
-                    });
-                if (renderer) {
-                    renderer.init({
-                        panel,
-                        group,
-                        api: this.accessor.api,
-                        close,
-                        componentProps: item.componentProps,
-                    });
-                    menuEl.appendChild(renderer.element);
+                const element = this.renderComponentItem(item.component, {
+                    panel,
+                    group,
+                    api: this.accessor.api,
+                    close,
+                    componentProps: item.componentProps,
+                });
+                if (element) {
+                    menuEl.appendChild(element);
                 }
             } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
@@ -429,20 +453,15 @@ export class ContextMenuController implements IContextMenuService {
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.component) {
-                const renderer =
-                    this.accessor.options.createContextMenuItemComponent?.({
-                        id: nextContextMenuItemId(),
-                        component: item.component,
-                    });
-                if (renderer) {
-                    renderer.init({
-                        tabGroup,
-                        group,
-                        api: this.accessor.api,
-                        close,
-                        componentProps: item.componentProps,
-                    });
-                    menuEl.appendChild(renderer.element);
+                const element = this.renderComponentItem(item.component, {
+                    tabGroup,
+                    group,
+                    api: this.accessor.api,
+                    close,
+                    componentProps: item.componentProps,
+                });
+                if (element) {
+                    menuEl.appendChild(element);
                 }
             } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
