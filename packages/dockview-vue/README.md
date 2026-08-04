@@ -12,8 +12,8 @@
 [![npm version](https://img.shields.io/npm/v/dockview-vue)](https://www.npmjs.com/package/dockview-vue)
 [![npm downloads](https://img.shields.io/npm/dm/dockview-vue)](https://www.npmjs.com/package/dockview-vue)
 [![CI](https://img.shields.io/github/actions/workflow/status/dockview/dockview/main.yml?branch=master&label=CI)](https://github.com/dockview/dockview/actions?query=workflow%3ACI)
-[![Coverage](https://img.shields.io/sonar/coverage/dockview_dockview-1?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=dockview_dockview-1)
-[![Quality gate](https://img.shields.io/sonar/quality_gate/dockview_dockview-1?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=dockview_dockview-1)
+[![Coverage](https://img.shields.io/sonar/coverage/dockview_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=dockview_dockview)
+[![Quality gate](https://img.shields.io/sonar/quality_gate/dockview_dockview?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/overall?id=dockview_dockview)
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/dockview-vue?label=size)](https://bundlephobia.com/result?p=dockview-vue)
 
 </div>

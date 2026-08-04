@@ -40,7 +40,7 @@ Out of scope:
 
 - All build and publish workflows are public and live under [`.github/workflows`](https://github.com/dockview/dockview/tree/master/.github/workflows).
 - npm releases are published with [provenance statements](https://docs.npmjs.com/generating-provenance-statements/) so the source commit and workflow run can be verified.
-- Code is statically analysed by [SonarCloud](https://sonarcloud.io/summary/overall?id=dockview_dockview-1) on every pull request and by [CodeQL](https://github.com/dockview/dockview/security/code-scanning) on a nightly schedule.
+- Code is statically analysed by [SonarCloud](https://sonarcloud.io/summary/overall?id=dockview_dockview) on every pull request and by [CodeQL](https://github.com/dockview/dockview/security/code-scanning) on a nightly schedule.
 
 ## Configuration guidance
 
