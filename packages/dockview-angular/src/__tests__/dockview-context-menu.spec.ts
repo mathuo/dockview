@@ -165,12 +165,13 @@ describe('DockviewAngularComponent – context menu', () => {
         renderer.dispose();
     });
 
-    it('forwards tabGroup and componentProps to the Angular component @Inputs for chip menu items', () => {
+    it('forwards tabGroup to the Angular component @Input for chip menu items', () => {
+        // The panel test above covers the group/close/componentProps mapping; a
+        // chip item differs only in carrying `tabGroup` in place of `panel`, so
+        // this asserts just that the renderer forwards the tabGroup @Input.
         component.ngOnInit();
-
-        const frameworkOptions = (component as any).createFrameworkOptions();
-        const factory = frameworkOptions.createContextMenuItemComponent;
-
+        const factory = (component as any).createFrameworkOptions()
+            .createContextMenuItemComponent;
         const renderer: AngularRenderer<TestChipContextMenuItemWithInputsComponent> =
             factory({
                 id: 'test-id',
@@ -179,26 +180,14 @@ describe('DockviewAngularComponent – context menu', () => {
             } as CreateContextMenuItemComponentOptions);
 
         const tabGroup = {} as ITabGroup;
-        const group = {} as DockviewGroupPanel;
-        const closeFn = jest.fn();
-        const extraProps = { foo: 'bar' };
-
-        const props: IChipContextMenuItemComponentProps = {
+        renderer.init({
             tabGroup,
-            group,
+            group: {} as never,
             api: {} as never,
-            close: closeFn,
-            componentProps: extraProps,
-        };
+            close: jest.fn(),
+        } as IChipContextMenuItemComponentProps);
 
-        renderer.init(props);
-
-        const instance = renderer.component.instance;
-        expect(instance.tabGroup).toBe(tabGroup);
-        expect(instance.group).toBe(group);
-        expect(instance.close).toBe(closeFn);
-        expect(instance.componentProps).toBe(extraProps);
-
+        expect(renderer.component.instance.tabGroup).toBe(tabGroup);
         renderer.dispose();
     });
 });

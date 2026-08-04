@@ -77,32 +77,22 @@ describe('ReactContextMenuItemPart', () => {
         expect(parameters.componentProps).toBe(componentProps);
     });
 
-    test('init accepts chip props (tabGroup) and forwards componentProps', () => {
+    test('init forwards chip props (tabGroup) to the ReactPart parameters', () => {
         // The same renderer serves the tab group chip context menu, whose props
-        // carry a `tabGroup` instead of a `panel`.
-        const addPortal = jest.fn().mockReturnValue({ dispose: jest.fn() });
+        // carry a `tabGroup` instead of a `panel`; the componentProps test above
+        // already covers the pass-through, so this only checks the tabGroup key.
         const cut = new ReactContextMenuItemPart(
             'id-1',
             jest.fn(),
-            fromPartial<ReactPortalStore>({ addPortal })
+            fromPartial<ReactPortalStore>({
+                addPortal: jest.fn().mockReturnValue({ dispose: jest.fn() }),
+            })
         );
-
-        const componentProps = { foo: 'bar' };
         const tabGroup = {} as any;
-        const props: IChipContextMenuItemComponentProps = {
-            tabGroup,
-            group: {} as any,
-            api: {} as any,
-            close: jest.fn(),
-            componentProps,
-        };
 
-        cut.init(props);
+        cut.init(fromPartial<IChipContextMenuItemComponentProps>({ tabGroup }));
 
-        const parameters = (cut.part as any)
-            .parameters as IChipContextMenuItemComponentProps;
-        expect(parameters.tabGroup).toBe(tabGroup);
-        expect(parameters.componentProps).toBe(componentProps);
+        expect((cut.part as any).parameters.tabGroup).toBe(tabGroup);
     });
 
     test('dispose cleans up the part', () => {

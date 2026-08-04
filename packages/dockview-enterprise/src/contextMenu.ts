@@ -240,30 +240,41 @@ export class ContextMenuController implements IContextMenuService {
     }
 
     /**
-     * Render a custom `component` menu item: build its framework renderer via
-     * the host's `createContextMenuItemComponent` factory and initialise it
-     * with the given props. Shared by the tab menu (props carry a `panel`) and
-     * the chip menu (props carry a `tabGroup`). Returns the element to append,
-     * or `undefined` when no renderer could be created (no factory, or the
-     * factory declined the component).
+     * Render a custom `component` menu item and append it to `menuEl`. Builds
+     * the framework renderer via the host's `createContextMenuItemComponent`
+     * factory and initialises it. Shared by the tab menu and the chip menu,
+     * which differ only in `identity`: the tab menu passes the `panel`, the chip
+     * menu passes the `tabGroup`. No-op when no renderer could be created (no
+     * factory configured, or the factory declined the component).
      */
-    private renderComponentItem(
-        component: unknown,
-        props:
-            | IContextMenuItemComponentProps
-            | IChipContextMenuItemComponentProps
-    ): HTMLElement | undefined {
+    private appendComponentItem(
+        menuEl: HTMLElement,
+        item: ContextMenuItemConfig,
+        identity:
+            | Pick<IContextMenuItemComponentProps, 'panel'>
+            | Pick<IChipContextMenuItemComponentProps, 'tabGroup'>,
+        group: DockviewGroupPanel,
+        close: () => void
+    ): void {
         const renderer = this.accessor.options.createContextMenuItemComponent?.(
             {
                 id: nextContextMenuItemId(),
-                component,
+                component: item.component,
             }
         );
         if (!renderer) {
-            return undefined;
+            return;
         }
-        renderer.init(props);
-        return renderer.element;
+        renderer.init({
+            ...identity,
+            group,
+            api: this.accessor.api,
+            close,
+            componentProps: item.componentProps,
+        } as
+            | IContextMenuItemComponentProps
+            | IChipContextMenuItemComponentProps);
+        menuEl.appendChild(renderer.element);
     }
 
     show(
@@ -371,16 +382,7 @@ export class ContextMenuController implements IContextMenuService {
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.component) {
-                const element = this.renderComponentItem(item.component, {
-                    panel,
-                    group,
-                    api: this.accessor.api,
-                    close,
-                    componentProps: item.componentProps,
-                });
-                if (element) {
-                    menuEl.appendChild(element);
-                }
+                this.appendComponentItem(menuEl, item, { panel }, group, close);
             } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
                     buildItem(
@@ -453,16 +455,13 @@ export class ContextMenuController implements IContextMenuService {
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.component) {
-                const element = this.renderComponentItem(item.component, {
-                    tabGroup,
+                this.appendComponentItem(
+                    menuEl,
+                    item,
+                    { tabGroup },
                     group,
-                    api: this.accessor.api,
-                    close,
-                    componentProps: item.componentProps,
-                });
-                if (element) {
-                    menuEl.appendChild(element);
-                }
+                    close
+                );
             } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
                     buildItem(
