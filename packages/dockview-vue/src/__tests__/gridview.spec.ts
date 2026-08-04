@@ -204,7 +204,7 @@ describe('VueGridviewPanelView', () => {
     });
 });
 
-// Regression coverage for https://github.com/mathuo/dockview/issues/1301
+// Regression coverage for https://github.com/dockview/dockview/issues/1301
 describe('GridviewVue components prop resolves without registration', () => {
     let wrapper: ReturnType<typeof mount>;
 

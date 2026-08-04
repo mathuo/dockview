@@ -26,7 +26,7 @@ const STATS: { value: string; label: string; href?: string }[] = [
     {
         value: '3.3k+',
         label: 'GitHub stars',
-        href: 'https://github.com/mathuo/dockview',
+        href: 'https://github.com/dockview/dockview',
     },
     {
         value: '540k+',

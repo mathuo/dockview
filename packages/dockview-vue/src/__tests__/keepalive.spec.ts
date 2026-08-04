@@ -17,7 +17,7 @@ import PaneviewVue from '../paneview/paneview.vue';
 import { Orientation } from 'dockview';
 
 /**
- * Regression coverage for https://github.com/mathuo/dockview/issues/1369
+ * Regression coverage for https://github.com/dockview/dockview/issues/1369
  *
  * Panels are mounted via `<Teleport>` (rendered by `<DockviewPortals>`), which
  * keeps them as real descendants of the host component in the Vue component
