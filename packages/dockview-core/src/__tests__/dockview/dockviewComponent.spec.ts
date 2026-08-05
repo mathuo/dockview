@@ -10235,16 +10235,18 @@ describe('dockviewComponent', () => {
             });
             expect(api.activePanel).toBe(panel1);
 
-            api.addPanel({
+            const panel2 = api.addPanel({
                 id: 'panel_2',
                 component: 'default',
                 position: { direction: 'within', referencePanel: panel1 },
                 inactive: true,
             });
             expect(api.activePanel).toBe(panel1);
+            expect(panel1.group.model.activePanel).toBe(panel1);
+            expect(panel2.view.content.element.parentElement).toBeNull();
         });
 
-        test('that can add panel positional to another (not within)', () => {
+        test('that can add an inactive panel to a new group without activating the group', () => {
             const container = document.createElement('div');
 
             const dockview = new DockviewComponent(container, {
@@ -10270,13 +10272,16 @@ describe('dockviewComponent', () => {
             });
             expect(api.activePanel).toBe(panel1);
 
-            api.addPanel({
+            const panel2 = api.addPanel({
                 id: 'panel_2',
                 component: 'default',
                 position: { direction: 'right', referencePanel: panel1 },
                 inactive: true,
             });
             expect(api.activePanel).toBe(panel1);
+            expect(panel2.group).not.toBe(panel1.group);
+            expect(panel2.group.model.activePanel).toBe(panel2);
+            expect(panel2.view.content.element.parentElement).toBeTruthy();
         });
     });
 

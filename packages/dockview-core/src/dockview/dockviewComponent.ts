@@ -4024,6 +4024,9 @@ export class DockviewComponent
 
         let index: number | undefined;
 
+        const shouldSkipSetActive = (group: DockviewGroupPanel) =>
+            !!options.inactive && group.model.size > 0;
+
         if (options.position) {
             if (isPanelOptionsWithPanel(options.position)) {
                 const referencePanel =
@@ -4067,7 +4070,7 @@ export class DockviewComponent
 
                 const panel = this.createPanel(options, group);
                 group.model.openPanel(panel, {
-                    skipSetActive: options.inactive,
+                    skipSetActive: shouldSkipSetActive(group),
                     skipSetGroupActive: options.inactive,
                     index,
                 });
@@ -4114,7 +4117,7 @@ export class DockviewComponent
                 panel = this.createPanel(options, group);
 
                 group.model.openPanel(panel, {
-                    skipSetActive: options.inactive,
+                    skipSetActive: shouldSkipSetActive(group),
                     skipSetGroupActive: options.inactive,
                     index,
                 });
@@ -4125,7 +4128,7 @@ export class DockviewComponent
             ) {
                 panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel, {
-                    skipSetActive: options.inactive,
+                    skipSetActive: shouldSkipSetActive(referenceGroup),
                     skipSetGroupActive: options.inactive,
                     index,
                 });
@@ -4154,7 +4157,7 @@ export class DockviewComponent
                 );
                 panel = this.createPanel(options, group);
                 group.model.openPanel(panel, {
-                    skipSetActive: options.inactive,
+                    skipSetActive: shouldSkipSetActive(group),
                     skipSetGroupActive: options.inactive,
                     index,
                 });
@@ -4182,7 +4185,7 @@ export class DockviewComponent
 
             panel = this.createPanel(options, group);
             group.model.openPanel(panel, {
-                skipSetActive: options.inactive,
+                skipSetActive: shouldSkipSetActive(group),
                 skipSetGroupActive: options.inactive,
                 index,
             });
@@ -4195,7 +4198,7 @@ export class DockviewComponent
             );
             panel = this.createPanel(options, group);
             group.model.openPanel(panel, {
-                skipSetActive: options.inactive,
+                skipSetActive: shouldSkipSetActive(group),
                 skipSetGroupActive: options.inactive,
                 index,
             });
