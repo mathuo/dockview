@@ -21,6 +21,7 @@ import {
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
     IContextMenuItemComponentProps,
+    IChipContextMenuItemComponentProps,
 } from 'dockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -204,7 +205,10 @@ export const DockviewReact = React.forwardRef(
                     }
                     return new ReactContextMenuItemPart(
                         options.id,
-                        options.component as React.FunctionComponent<IContextMenuItemComponentProps>,
+                        options.component as React.FunctionComponent<
+                            | IContextMenuItemComponentProps
+                            | IChipContextMenuItemComponentProps
+                        >,
                         { addPortal }
                     );
                 },

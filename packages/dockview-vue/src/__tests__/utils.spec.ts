@@ -14,6 +14,7 @@ import {
     DockviewGroupPanelModel,
     IDockviewPanel,
     IContextMenuItemComponentProps,
+    IChipContextMenuItemComponentProps,
 } from 'dockview';
 import {
     VueContextMenuItemRenderer,
@@ -757,6 +758,23 @@ describe('VueContextMenuItemRenderer', () => {
 
         const passedProps = createVNodeMock.mock.calls[0][1];
         expect(passedProps.params.componentProps).toBe(componentProps);
+    });
+
+    test('chip props (tabGroup) are forwarded via params', () => {
+        // The same renderer serves the chip menu, whose props carry a `tabGroup`
+        // instead of a `panel`; the tests above already cover the params /
+        // componentProps pass-through, so this only checks the tabGroup shape.
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        const props = {
+            tabGroup: {},
+        } as unknown as IChipContextMenuItemComponentProps;
+
+        renderer.init(props);
+
+        expect(createVNodeMock.mock.calls[0][1].params).toBe(props);
     });
 
     test('dispose unmounts the component', () => {

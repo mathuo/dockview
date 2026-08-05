@@ -57,9 +57,14 @@ export class AngularRenderer<T = unknown>
         if ('containerApi' in parameters) {
             filtered['containerApi'] = parameters['containerApi'];
         }
-        // Context menu item renderer fields (IContextMenuItemComponentProps)
+        // Context menu item renderer fields: IContextMenuItemComponentProps
+        // (tab menu, carries `panel`) and IChipContextMenuItemComponentProps
+        // (chip menu, carries `tabGroup`).
         if ('panel' in parameters) {
             filtered['panel'] = parameters['panel'];
+        }
+        if ('tabGroup' in parameters) {
+            filtered['tabGroup'] = parameters['tabGroup'];
         }
         if ('group' in parameters) {
             filtered['group'] = parameters['group'];

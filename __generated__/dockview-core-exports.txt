@@ -135,6 +135,7 @@ IAutoHideEdgeGroupHost
 IAutoHideEdgeGroupService
 IBaseGrid
 IBaseView
+IChipContextMenuItemComponentProps
 IContentContainer
 IContentRenderer
 IContextMenuHost
