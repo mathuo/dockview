@@ -6,7 +6,7 @@ Please **do not** open a public GitHub issue for security reports.
 
 Preferred: use [GitHub's private vulnerability reporting](https://github.com/dockview/dockview/security/advisories/new) on this repository.
 
-Alternative: email **contact@dockview.dev** or **github.mathuo@gmail.com**.
+Alternative: email **contact@dockview.dev**.
 
 When reporting, please include:
 
