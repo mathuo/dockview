@@ -25,6 +25,21 @@ export class BranchNode extends CompositeDisposable implements IView {
 
     public readonly children: Node[] = [];
 
+    /**
+     * `minimumSize`/`maximumSize`/`priority` are aggregates over all children
+     * and were previously recomputed (with array allocations) on every getter
+     * access. They are read repeatedly per frame inside `Splitview.resize` /
+     * `layoutViews` and, because a grid is splitviews-of-splitviews, that made a
+     * sash drag O(children²) with per-read allocation. These values only change
+     * on a structural mutation, a visibility toggle, or a child's own
+     * constraints changing (which surfaces as the child's `onDidChange`) — none
+     * of which fire during a plain sash drag — so we cache them and invalidate
+     * on exactly those signals. `undefined` means "dirty; recompute on read".
+     */
+    private _cachedMinimumSize: number | undefined;
+    private _cachedMaximumSize: number | undefined;
+    private _cachedPriority: LayoutPriority | undefined;
+
     private readonly _onDidChange = new Emitter<{
         size?: number;
         orthogonalSize?: number;
@@ -52,25 +67,35 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     get minimumSize(): number {
-        return this.children.length === 0
-            ? 0
-            : Math.max(
-                  ...this.children.map((c, index) =>
-                      this.splitview.isViewVisible(index)
-                          ? c.minimumOrthogonalSize
-                          : 0
-                  )
-              );
+        if (this._cachedMinimumSize === undefined) {
+            let value = 0;
+            for (let index = 0; index < this.children.length; index++) {
+                if (this.splitview.isViewVisible(index)) {
+                    value = Math.max(
+                        value,
+                        this.children[index].minimumOrthogonalSize
+                    );
+                }
+            }
+            this._cachedMinimumSize = value;
+        }
+        return this._cachedMinimumSize;
     }
 
     get maximumSize(): number {
-        return Math.min(
-            ...this.children.map((c, index) =>
-                this.splitview.isViewVisible(index)
-                    ? c.maximumOrthogonalSize
-                    : Number.POSITIVE_INFINITY
-            )
-        );
+        if (this._cachedMaximumSize === undefined) {
+            let value = Number.POSITIVE_INFINITY;
+            for (let index = 0; index < this.children.length; index++) {
+                if (this.splitview.isViewVisible(index)) {
+                    value = Math.min(
+                        value,
+                        this.children[index].maximumOrthogonalSize
+                    );
+                }
+            }
+            this._cachedMaximumSize = value;
+        }
+        return this._cachedMaximumSize;
     }
 
     get minimumOrthogonalSize(): number {
@@ -114,21 +139,39 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     get priority(): LayoutPriority {
+        this._cachedPriority ??= this.computePriority();
+        return this._cachedPriority;
+    }
+
+    private computePriority(): LayoutPriority {
         if (this.children.length === 0) {
             return LayoutPriority.Normal;
         }
 
-        const priorities = new Set(
-            this.children.map((c) => c.priority ?? LayoutPriority.Normal)
-        );
+        let hasHigh = false;
+        let hasLow = false;
+        for (const child of this.children) {
+            const priority = child.priority ?? LayoutPriority.Normal;
+            if (priority === LayoutPriority.High) {
+                hasHigh = true;
+            } else if (priority === LayoutPriority.Low) {
+                hasLow = true;
+            }
+        }
 
-        if (priorities.has(LayoutPriority.High)) {
+        if (hasHigh) {
             return LayoutPriority.High;
-        } else if (priorities.has(LayoutPriority.Low)) {
+        } else if (hasLow) {
             return LayoutPriority.Low;
         }
 
         return LayoutPriority.Normal;
+    }
+
+    private invalidateCachedSizes(): void {
+        this._cachedMinimumSize = undefined;
+        this._cachedMaximumSize = undefined;
+        this._cachedPriority = undefined;
     }
 
     get disabled(): boolean {
@@ -240,6 +283,8 @@ export class BranchNode extends CompositeDisposable implements IView {
         const wereAllChildrenHidden = this.splitview.contentSize === 0;
 
         this.splitview.setViewVisible(index, visible);
+        // a child's visibility changed, so our aggregate min/max are stale
+        this.invalidateCachedSizes();
         // }
         const areAllChildrenHidden = this.splitview.contentSize === 0;
 
@@ -339,6 +384,10 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     private setupChildrenEvents(): void {
+        // the children set has just changed (add/remove/move), so any cached
+        // aggregate min/max/priority is stale
+        this.invalidateCachedSizes();
+
         this._childrenDisposable.dispose();
 
         this._childrenDisposable = new CompositeDisposable(
@@ -347,6 +396,9 @@ export class BranchNode extends CompositeDisposable implements IView {
                  * indicate a change has occured to allows any re-rendering but don't bubble
                  * event because that was specific to this branch
                  */
+                // a child's size or constraints changed; our cached aggregate
+                // min/max/priority may no longer be valid
+                this.invalidateCachedSizes();
                 this._onDidChange.fire({ size: e.orthogonalSize });
             }),
             ...this.children.map((c, i) => {

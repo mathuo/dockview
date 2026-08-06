@@ -5,6 +5,7 @@ import {
     findRelativeZIndexParent,
     isChildEntirelyVisibleWithinParent,
     isInDocument,
+    onDidWindowMoveEnd,
     prefersReducedMotion,
     quasiDefaultPrevented,
     quasiPreventDefault,
@@ -409,5 +410,69 @@ describe('resolveOpaqueBackground', () => {
         const el = document.createElement('div');
         el.style.backgroundColor = 'rgba(255, 255, 255, 0)';
         expect(resolveOpaqueBackground(el)).toBe('');
+    });
+});
+
+describe('onDidWindowMoveEnd', () => {
+    let rafCallbacks: Map<number, FrameRequestCallback>;
+    let nextHandle: number;
+    let cancelled: number[];
+    let origRaf: typeof requestAnimationFrame;
+    let origCancel: typeof cancelAnimationFrame;
+
+    beforeEach(() => {
+        rafCallbacks = new Map();
+        nextHandle = 1;
+        cancelled = [];
+        origRaf = global.requestAnimationFrame;
+        origCancel = global.cancelAnimationFrame;
+        global.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+            const handle = nextHandle++;
+            rafCallbacks.set(handle, cb);
+            return handle;
+        }) as typeof requestAnimationFrame;
+        global.cancelAnimationFrame = ((handle: number) => {
+            cancelled.push(handle);
+            rafCallbacks.delete(handle);
+        }) as typeof cancelAnimationFrame;
+    });
+
+    afterEach(() => {
+        global.requestAnimationFrame = origRaf;
+        global.cancelAnimationFrame = origCancel;
+    });
+
+    function makeWindow(): Window {
+        return { screenX: 0, screenY: 0, closed: false } as unknown as Window;
+    }
+
+    test('polls each frame while alive', () => {
+        const emitter = onDidWindowMoveEnd(makeWindow());
+
+        // the synchronous first tick scheduled one frame
+        expect(rafCallbacks.size).toBe(1);
+
+        // running the frame reschedules the next one (the poll keeps going)
+        const [[, cb]] = [...rafCallbacks.entries()];
+        rafCallbacks.clear();
+        cb(0);
+        expect(rafCallbacks.size).toBe(1);
+
+        emitter.dispose();
+    });
+
+    test('disposing the emitter cancels the frame loop and it does not reschedule', () => {
+        const emitter = onDidWindowMoveEnd(makeWindow());
+
+        // capture the pending frame callback before disposing
+        const [[, pending]] = [...rafCallbacks.entries()];
+
+        emitter.dispose();
+        expect(cancelled.length).toBeGreaterThan(0);
+
+        // a straggler frame that still fires after dispose must be a no-op
+        rafCallbacks.clear();
+        pending(0);
+        expect(rafCallbacks.size).toBe(0);
     });
 });

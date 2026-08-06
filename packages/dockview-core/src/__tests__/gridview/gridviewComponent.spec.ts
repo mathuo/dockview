@@ -3364,4 +3364,41 @@ describe('gridview', () => {
             )
         ).toThrow('invalid operation');
     });
+
+    test('setConstraints fires onDidChange so cached branch size bounds invalidate', () => {
+        // Regression: BranchNode caches aggregate minimum/maximum size and
+        // invalidates on a child's onDidChange. A runtime constraint change
+        // must therefore surface as onDidChange, otherwise the cache (and the
+        // parent splitview's clamping) stays stale after setConstraints.
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.HORIZONTAL,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestGridview(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+        gridview.layout(1000, 1000);
+
+        const panel = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        let fired = 0;
+        const disposable = panel.onDidChange(() => {
+            fired++;
+        });
+
+        panel.api.setConstraints({ minimumWidth: 400 });
+
+        expect(fired).toBeGreaterThan(0);
+
+        disposable.dispose();
+        gridview.dispose();
+    });
 });

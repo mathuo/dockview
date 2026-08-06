@@ -32,7 +32,8 @@
         "release": "nx release",
         "release:version": "nx release version",
         "release:publish": "nx release publish",
-        "test:e2e": "playwright test"
+        "test:e2e": "playwright test",
+        "bench": "node scripts/bench/bench.mjs"
     },
     "resolutions": {
         "@types/react": "^19.2.14",

@@ -456,9 +456,11 @@ export function onDidWindowMoveEnd(window: Window): Emitter<void> {
     let previousScreenY = window.screenY;
 
     let timeout: any;
+    let rafHandle = 0;
+    let stopped = false;
 
     const checkMovement = () => {
-        if (window.closed) {
+        if (stopped || window.closed) {
             return;
         }
 
@@ -478,10 +480,25 @@ export function onDidWindowMoveEnd(window: Window): Emitter<void> {
             previousScreenY = currentScreenY;
         }
 
-        requestAnimationFrame(checkMovement);
+        rafHandle = requestAnimationFrame(checkMovement);
     };
 
     checkMovement();
+
+    // The rAF loop above polls `screenX`/`screenY` every frame and was
+    // previously only stopped when `window.closed` flipped true. Disposing the
+    // returned emitter (e.g. re-docking a popout whose window is reused, or
+    // tearing down the component) left the poll running forever. Stop it — and
+    // the pending debounce — when the emitter is disposed.
+    const disposeEmitter = emitter.dispose.bind(emitter);
+    emitter.dispose = () => {
+        if (!stopped) {
+            stopped = true;
+            cancelAnimationFrame(rafHandle);
+            clearTimeout(timeout);
+        }
+        disposeEmitter();
+    };
 
     return emitter;
 }
