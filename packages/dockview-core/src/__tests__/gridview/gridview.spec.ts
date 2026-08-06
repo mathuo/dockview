@@ -658,7 +658,7 @@ describe('gridview', () => {
         ).toHaveLength(4);
     });
 
-    test('removeView: remove leaf where parent is root', () => {
+    test('removeView: remove nested leaf collapsing its parent branch', () => {
         const gridview = new Gridview(
             false,
             { separatorBorder: '' },

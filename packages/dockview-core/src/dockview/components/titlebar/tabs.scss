@@ -510,9 +510,6 @@
         color: inherit;
     }
 
-    &.dv-tab-group-chip--collapsed {
-    }
-
     &.dv-tab-group-chip--shifting {
         will-change: margin-left;
         transition: margin-left var(--dv-transition-duration, 200ms) ease-out;

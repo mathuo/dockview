@@ -289,6 +289,10 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     public layout(size: number, orthogonalSize: number) {
+        // A branch's internal splitview lays out along the axis orthogonal to
+        // this branch's own grid axis, so size/orthogonalSize are deliberately
+        // transposed here (mirrored by the width/height getters and flipNode).
+        // Sonar S2234 false positive.
         this._size = orthogonalSize;
         this._orthogonalSize = size;
 

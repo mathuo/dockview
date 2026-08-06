@@ -2998,8 +2998,8 @@ describe('gridview', () => {
         disposable.dispose();
         disposable2.dispose();
 
-        // The main test is that we got this far without errors
-        expect(true).toBeTruthy();
+        // No focus was triggered, so the subscription should not have fired
+        expect(focusEventCount).toBe(0);
     });
 
     function createGridview(

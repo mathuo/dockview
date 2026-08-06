@@ -126,12 +126,14 @@ watch(
     () => props.defaultTabComponent,
     (newValue) => {
         if (instance.value) {
-            const coreDefault =
-                typeof newValue === 'string'
-                    ? newValue
-                    : newValue
-                      ? DEFAULT_VUE_TAB
-                      : undefined;
+            let coreDefault: string | undefined;
+            if (typeof newValue === 'string') {
+                coreDefault = newValue;
+            } else if (newValue) {
+                coreDefault = DEFAULT_VUE_TAB;
+            } else {
+                coreDefault = undefined;
+            }
             instance.value.updateOptions({
                 defaultTabComponent: coreDefault,
                 createTabComponent(options) {
