@@ -188,4 +188,37 @@ describe('v8 review triage', () => {
 
         dockview.dispose();
     });
+
+    /**
+     * The reconciliation must work in both directions: switching from
+     * separate-row back to inline at runtime tears the pinned row down on
+     * existing groups (the else branch of the mode reconciliation).
+     */
+    test('switching pinnedTabs.mode back to inline at runtime tears down the pinned row', async () => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            pinnedTabs: { enabled: true, mode: 'separate-row' },
+        });
+        dockview.layout(1000, 1000);
+
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        p1.api.setPinned(true);
+        await flush();
+
+        const group = dockview.panels.find((p) => p.id === 'p1')!.group;
+        // separate-row: the pinned row is present.
+        expect(group.element.querySelector('.dv-pinned-row')).toBeTruthy();
+
+        dockview.updateOptions({
+            pinnedTabs: { enabled: true, mode: 'inline' },
+        });
+        await flush();
+
+        // Back to inline: the pinned row is torn down on the existing group.
+        expect(group.element.querySelector('.dv-pinned-row')).toBeNull();
+
+        dockview.dispose();
+    });
 });
