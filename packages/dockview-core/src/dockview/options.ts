@@ -660,7 +660,6 @@ export interface PinnedTabsOptions {
     /**
      * `'inline'` (default) keeps pinned tabs first within the existing strip;
      * `'separate-row'` renders them on their own VS-Code-style row.
-     * (Phase 1 implements `'inline'` only.)
      */
     mode?: 'inline' | 'separate-row';
     /**

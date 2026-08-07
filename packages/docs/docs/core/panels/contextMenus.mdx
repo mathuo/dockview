@@ -311,3 +311,11 @@ getTabContextMenuItems: (params) =>
 
 Omitting the builder entirely disables the menu everywhere and lets the native
 browser context menu through.
+
+:::info Pinning adds an item even without a builder
+When `pinnedTabs` is enabled (and `pinnedTabs.contextMenuItem` is left at its
+default), a built-in `'pin'` item is prepended to the tab menu automatically, so
+the menu still opens even when the builder returns an empty array or is omitted.
+Set `pinnedTabs.contextMenuItem: false` to drop it and restore full suppression.
+This applies to the tab menu only; the chip menu is unaffected.
+:::
