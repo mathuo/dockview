@@ -379,6 +379,10 @@ const config = {
                                 to: '/docs/overview/introduction',
                             },
                             {
+                                label: "What's new",
+                                to: '/whats-new',
+                            },
+                            {
                                 label: 'Demo',
                                 to: '/demo',
                             },
