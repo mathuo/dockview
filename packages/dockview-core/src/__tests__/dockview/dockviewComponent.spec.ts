@@ -12428,7 +12428,7 @@ describe('dockviewComponent', () => {
                 dv2.dispose();
             });
 
-            test('revealing into an existing edge with autoHide fires the change event', () => {
+            test('revealing into an existing static edge leaves its auto-hide state untouched', () => {
                 const c = document.createElement('div');
                 const dv = createFixedDockview(c, ['left'], {
                     left: { id: 'left-group' },
@@ -12450,12 +12450,19 @@ describe('dockviewComponent', () => {
                     { autoHide: true }
                 );
 
-                // the reuse path must fire the event so a listener (the
-                // auto-hide controller) can reconcile the group's chrome
-                expect(fired).toContain('left-group');
+                // The reuse path adds the panel but must NOT change the existing
+                // group's auto-hide: a drag-reveal (which always passes
+                // autoHide:true) can't be allowed to silently convert a static
+                // edge group into an auto-hiding one. Programmatic callers use
+                // `getEdgeGroup(position).setAutoHide(...)` for that. So no
+                // change event fires and the group stays static.
+                expect(
+                    dv.getEdgeGroupPanel('left')!.panels.map((p) => p.id)
+                ).toContain('p1');
+                expect(fired).toEqual([]);
                 expect(
                     dv.isEdgeGroupAutoHide(dv.getEdgeGroupPanel('left')!)
-                ).toBe(true);
+                ).toBe(false);
                 dv.dispose();
             });
 

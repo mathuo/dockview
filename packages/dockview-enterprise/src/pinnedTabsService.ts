@@ -634,8 +634,42 @@ export class PinnedTabsService
                 for (const group of this._groups) {
                     this._seedFromRestore(group);
                 }
+            }),
+            // A runtime `updateOptions` can flip the mode (inline <-> separate
+            // row) or toggle sticky. `onDidAddGroup` only reads the mode for
+            // groups added afterwards, so retrofit the existing ones here.
+            this._host.onDidOptionsChange(() => {
+                for (const group of this._groups) {
+                    this._reapplyMode(group);
+                }
             })
         );
+    }
+
+    /** Re-apply the current pinned-tabs mode to an already-tracked group after
+     *  a runtime option change: create or tear down its separate row and set
+     *  inline sticky, then re-assert the pinned-first order and overflow so the
+     *  main strip stays consistent. Idempotent, so a no-op change costs nothing
+     *  visible. */
+    private _reapplyMode(group: DockviewGroupPanel): void {
+        if (this._separateRow) {
+            let row = this._secondRows.get(group);
+            if (!row) {
+                row = new SecondRowController(group, this);
+                this._secondRows.set(group, row);
+            }
+            group.model.header.setPinnedSticky(false);
+            row.render();
+        } else {
+            const row = this._secondRows.get(group);
+            if (row) {
+                row.dispose();
+                this._secondRows.delete(group);
+            }
+            group.model.header.setPinnedSticky(this._inlineSticky);
+        }
+        this.enforceOrder(group);
+        group.model.header.refreshOverflow();
     }
 
     /** Seed the pinned set from a restored group's panels (already in
