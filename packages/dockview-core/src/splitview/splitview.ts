@@ -247,7 +247,6 @@ export class Splitview {
 
         this.style(options.styles);
 
-        // We have an existing set of view, add them now
         if (options.descriptor) {
             this._size = options.descriptor.size;
             options.descriptor.views.forEach((viewDescriptor, index) => {
@@ -270,7 +269,6 @@ export class Splitview {
                 );
             });
 
-            // Initialize content size and proportions for first layout
             this._contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
             this.saveProportions();
         }
@@ -430,7 +428,6 @@ export class Splitview {
         this.viewItems.splice(index, 0, viewItem);
 
         if (this.viewItems.length > 1) {
-            //add sash
             const sash = document.createElement('div');
             sash.className = 'dv-sash';
 
@@ -631,11 +628,9 @@ export class Splitview {
         sizing?: Sizing,
         skipLayout = false
     ): IView {
-        // Remove view
         const viewItem = this.viewItems.splice(index, 1)[0];
         viewItem.dispose();
 
-        // Remove sash
         if (this.viewItems.length >= 1) {
             const sashIndex = Math.max(index - 1, 0);
             const sashItem = this.sashes.splice(sashIndex, 1)[0];
@@ -834,7 +829,6 @@ export class Splitview {
             [] as number[]
         );
 
-        // calculate both view and cash positions
         this.viewItems.forEach((view, i) => {
             totalLeftOffset += this.viewItems[i].size;
             viewLeftOffsets.push(totalLeftOffset);
@@ -854,7 +848,6 @@ export class Splitview {
                           marginReducedSize;
 
             if (i < this.viewItems.length - 1) {
-                // calculate sash position
                 const newSize = view.visible
                     ? offset + size - sashWidth / 2 + this.margin / 2
                     : offset;
@@ -868,8 +861,6 @@ export class Splitview {
                     this.sashes[i].container.style.top = `${newSize}px`;
                 }
             }
-
-            // calculate view position
 
             if (this._orientation === Orientation.HORIZONTAL) {
                 view.container.style.width = `${size}px`;
@@ -893,7 +884,6 @@ export class Splitview {
     }
 
     private findFirstSnapIndex(indexes: number[]): number | undefined {
-        // visible views first
         for (const index of indexes) {
             const viewItem = this.viewItems[index];
 
@@ -906,7 +896,6 @@ export class Splitview {
             }
         }
 
-        // then, hidden views
         for (const index of indexes) {
             const viewItem = this.viewItems[index];
 

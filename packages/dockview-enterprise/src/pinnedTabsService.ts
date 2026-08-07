@@ -250,7 +250,7 @@ class SecondRowController extends CompositeDisposable {
     }
 
     private _onDragOver(event: DragEvent): void {
-        // A reorder originating in this row (behaviour: within-row reorder)…
+        // A reorder originating in this row…
         if (this._dragPanelId !== undefined) {
             event.preventDefault();
             if (event.dataTransfer) {
@@ -845,9 +845,9 @@ export const PinnedTabsModule = defineModule<
     name: 'PinnedTabs',
     options: ['pinnedTabs'],
     serviceKey: 'pinnedTabsService',
-    // ContextMenuModule is an optional enhancer (a later phase adds the
-    // Pin/Unpin menu item only when it is present), not a hard dependency, so
-    // it is intentionally not listed here.
+    // ContextMenuModule is an optional enhancer (it adds the Pin/Unpin menu
+    // item only when present), not a hard dependency, so it is intentionally
+    // not listed here.
     dependsOn: [],
     create: (host) => new PinnedTabsService(host),
 });

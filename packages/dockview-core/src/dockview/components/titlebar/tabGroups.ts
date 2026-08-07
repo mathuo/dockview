@@ -114,7 +114,6 @@ export class TabGroupManager {
         const model = this._ctx.group.model;
         const tabGroups = model.getTabGroups();
 
-        // Track which group IDs are still active
         const activeGroupIds = new Set<string>();
 
         for (const tabGroup of tabGroups) {
@@ -134,7 +133,6 @@ export class TabGroupManager {
             }
         }
 
-        // Update CSS classes on all tabs
         this._updateTabGroupClasses();
     }
 
@@ -651,7 +649,6 @@ export class TabGroupManager {
             return;
         }
 
-        // Find the first tab element of this group
         const firstPanelId = panelIds[0];
         const firstTabEntry = this._ctx.getTabMap().get(firstPanelId);
 
@@ -660,7 +657,6 @@ export class TabGroupManager {
             return;
         }
 
-        // Insert chip before the first tab of the group
         const firstTabEl = firstTabEntry.value.element;
         if (chipEl.nextSibling !== firstTabEl) {
             this._ctx.tabsList.insertBefore(chipEl, firstTabEl);
@@ -745,14 +741,12 @@ export class TabGroupManager {
             }
         }
 
-        // Track active group IDs for underline/collapse handling
         const activeGroupIds = new Set<string>();
 
         // Handle collapse animation per group
         for (const tg of tabGroups) {
             activeGroupIds.add(tg.id);
 
-            // Collapse animation
             const hasNewCollapse =
                 tg.collapsed &&
                 tg.panelIds.some((pid) => {
@@ -817,7 +811,6 @@ export class TabGroupManager {
 
         this._skipNextCollapseAnimation = false;
 
-        // Sync indicator underlines and position them
         this._ensureIndicator();
         if (this._indicator) {
             this._indicator.syncUnderlineElements(activeGroupIds);

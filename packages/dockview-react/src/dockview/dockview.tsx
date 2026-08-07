@@ -88,7 +88,6 @@ export interface IDockviewReactProps extends DockviewOptions {
      * before the browser snapshots it.
      */
     groupDragGhostComponent?: React.FunctionComponent<IDockviewGroupDragGhostProps>;
-    //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
     onWillDrop?: (event: DockviewWillDropEvent) => void;

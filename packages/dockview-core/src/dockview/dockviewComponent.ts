@@ -1879,9 +1879,8 @@ export class DockviewComponent
         // positioned from the source element's viewport-relative rect, so it
         // is offset here by the opener window's own screen position. Doing the
         // normalisation in one place keeps the window construction below
-        // coordinate-space agnostic; previously the opener offset was added
-        // unconditionally at construction, double-offsetting a restored popout
-        // whenever the opener sat on a non-primary monitor (screenX/Y != 0).
+        // coordinate-space agnostic, and avoids double-offsetting a restored
+        // popout when the opener sits on a non-primary monitor (screenX/Y != 0).
         function getBox(): Box {
             if (options?.position) {
                 return options.position;
@@ -3521,7 +3520,6 @@ export class DockviewComponent
         const { grid, panels, activeGroup } = data;
 
         try {
-            // take note of the existing dimensions
             const width = this.width;
             const height = this.height;
 

@@ -240,7 +240,6 @@ export class BranchNode extends CompositeDisposable implements IView {
         const wereAllChildrenHidden = this.splitview.contentSize === 0;
 
         this.splitview.setViewVisible(index, visible);
-        // }
         const areAllChildrenHidden = this.splitview.contentSize === 0;
 
         // If all children are hidden then the parent should hide the entire splitview

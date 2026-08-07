@@ -95,7 +95,6 @@ export class AngularRenderer<T = unknown>
             instance[key] = params[key];
         }
 
-        // Trigger change detection
         if (this.viewRef) {
             this.viewRef.markForCheck();
         }
@@ -115,7 +114,6 @@ export class AngularRenderer<T = unknown>
     }
 
     private setupComponent(component: Type<T>, parameters: Parameters): void {
-        // Create the component using modern Angular API
         this.componentRef = createComponent(component, {
             environmentInjector:
                 this.options.environmentInjector ||
@@ -123,27 +121,22 @@ export class AngularRenderer<T = unknown>
             elementInjector: this.options.injector,
         });
 
-        // Set initial parameters
         this.update(parameters);
 
-        // Get the DOM element
         this.viewRef = this.componentRef.hostView as EmbeddedViewRef<T>;
         this._element = this.viewRef.rootNodes[0] as HTMLElement;
 
-        // always attach for now
         this.appRef.attachView(this.viewRef);
         this.viewRef.markForCheck();
     }
 
     private setupView(template: TemplateRef<T>): void {
-        // Create embedded view from template
         this.viewRef = template.createEmbeddedView(
             <never>{},
             this.options.injector
         );
         this._element = this.viewRef.rootNodes[0] as HTMLElement;
 
-        // always attach for now
         this.appRef.attachView(this.viewRef);
         this.viewRef.markForCheck();
     }
