@@ -10,9 +10,9 @@ import type {
 import { AutoEdgeGroupService } from '../autoEdgeGroupService';
 
 /**
- * Triage reproductions for issues raised in the v8 pre-release review. Each
- * test encodes the *expected* (correct) behaviour, so a failure here confirms
- * the reported defect is real. These are written against the real
+ * Regression guards for issues found in the v8 pre-release review. Each test
+ * encodes the correct behaviour and was first written to fail against the
+ * unfixed code (see the accompanying fix commit). They run against the real
  * `DockviewComponent` (the enterprise jest setup registers every module and a
  * valid licence globally), so they exercise the shipped wiring, not mocks.
  */
@@ -105,11 +105,8 @@ describe('v8 review triage', () => {
             getDropZoneRect: () => rect,
             onWillShowOverlay: willShow.event,
             onWillDrop: willDrop.event,
-            revealEdgeGroupWithData: (
-                pos: any,
-                data: any,
-                opts: any
-            ): void => dockview.revealEdgeGroupWithData(pos, data, opts),
+            revealEdgeGroupWithData: (pos: any, data: any, opts: any): void =>
+                dockview.revealEdgeGroupWithData(pos, data, opts),
         };
         const service = new AutoEdgeGroupService(svcHost as any);
 
@@ -130,9 +127,11 @@ describe('v8 review triage', () => {
                 .model.panels.some((p) => p.id === 'p1')
         ).toBe(true);
 
-        // EXPECTED: the pre-existing static edge group is still static. Fails
-        // today because it was silently flipped to auto-hide.
-        expect(peekHeader(dockview.getEdgeGroupPanel('left')!.element)).toBeNull();
+        // The pre-existing static edge group must stay static: a drag-reveal
+        // must not silently flip it to auto-hide.
+        expect(
+            peekHeader(dockview.getEdgeGroupPanel('left')!.element)
+        ).toBeNull();
 
         service.dispose();
         dockview.dispose();
@@ -179,12 +178,10 @@ describe('v8 review triage', () => {
         p2.api.setPinned(true);
         await flush();
         const newGroup = dockview.panels.find((p) => p.id === 'p2')!.group;
-        expect(
-            newGroup.element.querySelector('.dv-pinned-row')
-        ).toBeTruthy();
+        expect(newGroup.element.querySelector('.dv-pinned-row')).toBeTruthy();
 
-        // EXPECTED: the pre-existing group is retrofitted with a pinned row too.
-        // Fails today: no onDidOptionsChange subscription retrofits it.
+        // The pre-existing group must be retrofitted with a pinned row too
+        // (the onDidOptionsChange subscription reconciles existing groups).
         expect(
             originalGroup.element.querySelector('.dv-pinned-row')
         ).toBeTruthy();
