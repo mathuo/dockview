@@ -77,3 +77,5 @@ Either way, email me at [matt@dockview.dev](mailto:matt@dockview.dev) before you
 Thanks for reading, and thanks for using Dockview.
 
 Matt
+
+<BlogFeedback page="blog:dockview-enterprise" />
