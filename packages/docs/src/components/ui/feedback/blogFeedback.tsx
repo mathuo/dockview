@@ -16,7 +16,9 @@ const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 const TURNSTILE_SCRIPT =
     'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
-const CLIENT_ID_KEY = 'dockview-feedback-client-id';
+const VOTED_KEY_PREFIX = 'dockview-feedback-voted:';
+
+type Vote = 'up' | 'down';
 
 function isLocalhost(): boolean {
     return (
@@ -36,17 +38,24 @@ function feedbackApiUrl(path: string): string {
     return `${base}/api/feedback/${path}`;
 }
 
-// A stable per-browser id so a thumbs vote counts once per browser. Best-effort:
-// if storage is unavailable (private mode) we fall back to a per-session id.
-function getClientId(): string {
+// Remember whether this browser already reacted to a given feedback id, so the
+// counter locks to one vote per browser. Honour-based: the tallies live in a
+// single shared counter server-side with no per-voter record, so this is the
+// only dedup. Best-effort (a no-op if storage is unavailable, e.g. private mode).
+function getVoted(id: string): Vote | null {
     try {
-        const existing = window.localStorage.getItem(CLIENT_ID_KEY);
-        if (existing) return existing;
-        const id = window.crypto.randomUUID();
-        window.localStorage.setItem(CLIENT_ID_KEY, id);
-        return id;
+        const v = window.localStorage.getItem(VOTED_KEY_PREFIX + id);
+        return v === 'up' || v === 'down' ? v : null;
     } catch {
-        return window.crypto?.randomUUID?.() ?? `anon-${Date.now()}`;
+        return null;
+    }
+}
+
+function setVoted(id: string, vote: Vote): void {
+    try {
+        window.localStorage.setItem(VOTED_KEY_PREFIX + id, vote);
+    } catch {
+        /* ignore */
     }
 }
 
@@ -66,8 +75,6 @@ declare global {
         };
     }
 }
-
-type Vote = 'up' | 'down';
 
 function ThumbIcon({ down }: { down?: boolean }): JSX.Element {
     // A single thumbs-up path, flipped for the down variant.
@@ -90,29 +97,23 @@ function ThumbIcon({ down }: { down?: boolean }): JSX.Element {
     );
 }
 
-function Votes({ page }: { page: string }): JSX.Element {
+function Votes({ id }: { id: string }): JSX.Element {
     const [counts, setCounts] = React.useState<{ up: number; down: number } | null>(
         null
     );
     const [mine, setMine] = React.useState<Vote | null>(null);
     const [busy, setBusy] = React.useState(false);
-    const clientIdRef = React.useRef<string>('');
 
     React.useEffect(() => {
-        clientIdRef.current = getClientId();
+        // This browser's prior choice (if any) comes from localStorage; the
+        // tallies come from the shared counter.
+        setMine(getVoted(id));
         let cancelled = false;
-        fetch(
-            feedbackApiUrl(
-                `vote?page=${encodeURIComponent(page)}&clientId=${encodeURIComponent(
-                    clientIdRef.current
-                )}`
-            )
-        )
+        fetch(feedbackApiUrl(`vote?id=${encodeURIComponent(id)}`))
             .then((r) => (r.ok ? r.json() : null))
             .then((data) => {
                 if (cancelled || !data) return;
                 setCounts({ up: data.up ?? 0, down: data.down ?? 0 });
-                setMine(data.vote ?? null);
             })
             .catch(() => {
                 /* counts stay hidden on failure */
@@ -120,16 +121,17 @@ function Votes({ page }: { page: string }): JSX.Element {
         return () => {
             cancelled = true;
         };
-    }, [page]);
+    }, [id]);
 
     // A one-click counter: click a thumb to add to its tally. One vote per
-    // browser, so once you've reacted the buttons lock in your choice. No submit
-    // step and no toggle, it just counts.
+    // browser (remembered in localStorage), so once you've reacted the buttons
+    // lock in your choice. No submit step and no toggle, it just counts.
     async function cast(vote: Vote) {
         if (busy || mine) return;
         setBusy(true);
-        // Optimistic bump so the click feels instant.
+        // Optimistic bump so the click feels instant, and lock this browser in.
         setMine(vote);
+        setVoted(id, vote);
         setCounts((c) =>
             c
                 ? { ...c, [vote]: c[vote] + 1 }
@@ -139,16 +141,11 @@ function Votes({ page }: { page: string }): JSX.Element {
             const res = await fetch(feedbackApiUrl('vote'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    page,
-                    clientId: clientIdRef.current,
-                    vote,
-                }),
+                body: JSON.stringify({ id, vote }),
             });
             if (res.ok) {
                 const data = await res.json();
                 setCounts({ up: data.up ?? 0, down: data.down ?? 0 });
-                setMine(data.vote ?? vote);
             }
         } catch {
             /* keep the optimistic state; a later load reconciles */
@@ -267,7 +264,7 @@ function optional(): JSX.Element {
     );
 }
 
-function MessageBox({ page }: { page: string }): JSX.Element {
+function MessageBox({ id }: { id: string }): JSX.Element {
     const [message, setMessage] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [company, setCompany] = React.useState('');
@@ -330,7 +327,7 @@ function MessageBox({ page }: { page: string }): JSX.Element {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    page,
+                    id,
                     message: message.trim(),
                     email: email.trim().toLowerCase() || undefined,
                     company: company.trim() || undefined,
@@ -481,7 +478,7 @@ export function BlogFeedback({ id }: { id?: string }): JSX.Element {
                 gap: 24,
             }}
         >
-            {key && <Votes page={key} />}
+            {key && <Votes id={key} />}
             <hr
                 style={{
                     margin: 0,
@@ -499,7 +496,7 @@ export function BlogFeedback({ id }: { id?: string }): JSX.Element {
                 >
                     Have a question, a use case, or a feature you want? Tell us.
                 </p>
-                {key && <MessageBox page={key} />}
+                {key && <MessageBox id={key} />}
             </div>
         </section>
     );
