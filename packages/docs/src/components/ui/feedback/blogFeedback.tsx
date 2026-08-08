@@ -2,11 +2,12 @@ import React from 'react';
 
 // Anonymous page feedback: a one-click thumbs up/down reaction plus an optional
 // freeform message box. Both talk to the licensing worker's feedback API (the
-// same worker that serves /enterprise). Both are gated by Cloudflare Turnstile:
-// the message box uses the standard managed widget, the thumbs use an
-// interaction-only widget that stays invisible unless a challenge is needed, so
-// a vote is still one click for a real visitor. One vote per browser is kept
-// client-side in localStorage.
+// same worker that serves /enterprise). Both are gated by Cloudflare Turnstile
+// using interaction-only widgets that stay invisible and mint a token in the
+// background, only surfacing if a visitor actually has to be challenged. So a
+// vote stays one click and the message box has no visible bot-check. Each action
+// keeps its own widget (tokens are single-use, so one can't cover both). One
+// vote per browser is kept client-side in localStorage.
 
 // Public Turnstile site key (safe to expose, it's rendered into the page). The
 // matching secret lives only in the licensing worker (TURNSTILE_SECRET_KEY).
@@ -351,10 +352,56 @@ function MessageBox({ id }: { id: string }): JSX.Element {
     const [company, setCompany] = React.useState('');
     const [error, setError] = React.useState('');
     const [status, setStatus] = React.useState<MessageStatus>('idle');
-    // Standard managed widget (visible) for the freeform box.
-    const { token, widgetRef, reset } = useTurnstileToken();
+    // A submit made before Turnstile has issued its token, held until it lands.
+    const [pendingSubmit, setPendingSubmit] = React.useState(false);
+    // Interaction-only, so nothing shows unless a challenge is actually needed.
+    const { token, widgetRef, reset } = useTurnstileToken('interaction-only');
 
-    async function handleSubmit(e: React.FormEvent) {
+    const doSubmit = React.useCallback(
+        async (turnstileToken: string) => {
+            setStatus('submitting');
+            setError('');
+            try {
+                const res = await fetch(feedbackApiUrl('message'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id,
+                        message: message.trim(),
+                        email: email.trim().toLowerCase() || undefined,
+                        company: company.trim() || undefined,
+                        turnstileToken,
+                    }),
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(
+                        data.error ?? 'Something went wrong. Please try again.'
+                    );
+                }
+                setStatus('done');
+            } catch (err) {
+                setStatus('error');
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : 'Something went wrong. Please try again.'
+                );
+                reset();
+            }
+        },
+        [id, message, email, company, reset]
+    );
+
+    // A submit queued before the token arrived fires the moment it does.
+    React.useEffect(() => {
+        if (pendingSubmit && token) {
+            setPendingSubmit(false);
+            void doSubmit(token);
+        }
+    }, [pendingSubmit, token, doSubmit]);
+
+    function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!message.trim()) {
             setError('Please enter a message.');
@@ -364,41 +411,14 @@ function MessageBox({ id }: { id: string }): JSX.Element {
             setError('Please enter a valid email address, or leave it blank.');
             return;
         }
-        if (!token) {
-            setStatus('error');
-            setError('Please complete the bot check and try again.');
-            return;
-        }
-
-        setStatus('submitting');
         setError('');
-        try {
-            const res = await fetch(feedbackApiUrl('message'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id,
-                    message: message.trim(),
-                    email: email.trim().toLowerCase() || undefined,
-                    company: company.trim() || undefined,
-                    turnstileToken: token,
-                }),
-            });
-            if (!res.ok) {
-                const data = await res.json().catch(() => ({}));
-                throw new Error(
-                    data.error ?? 'Something went wrong. Please try again.'
-                );
-            }
-            setStatus('done');
-        } catch (err) {
-            setStatus('error');
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : 'Something went wrong. Please try again.'
-            );
-            reset();
+        // The token is minted in the background. Send now if it's ready, else
+        // show the sending state and fire the moment it lands.
+        if (token) {
+            void doSubmit(token);
+        } else {
+            setStatus('submitting');
+            setPendingSubmit(true);
         }
     }
 
