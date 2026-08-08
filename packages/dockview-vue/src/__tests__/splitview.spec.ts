@@ -41,11 +41,9 @@ describe('SplitviewVue Component', () => {
     });
 
     test('should create splitview with Vue framework support', () => {
-        // Test that Vue-specific components can be created with proper type safety
         expect(typeof createSplitview).toBe('function');
         expect(typeof VueSplitviewPanelView).toBe('function');
 
-        // Test that a Vue splitview panel view can be instantiated
         const mockVueComponent = { template: '<div>Test</div>' } as any;
         const mockParent = {} as any;
 
@@ -62,7 +60,6 @@ describe('SplitviewVue Component', () => {
     });
 
     test('should handle Vue component integration', () => {
-        // Test Vue component factory creation for splitview
         const mockComponent = {
             template:
                 '<div class="vue-splitview-panel">{{ params.title }}</div>',

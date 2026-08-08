@@ -304,7 +304,6 @@ describe('VuePart', () => {
     });
 
     test('should handle init call without throwing', () => {
-        // Test that init can be called without throwing
         // Note: may fail due to Vue environment setup but should not crash the test
         try {
             vuePart.init();
@@ -482,7 +481,6 @@ describe('VueHeaderActionsRenderer', () => {
 
         onDidAddPanel.fire(undefined);
 
-        // cloneVNode should have been called for the update
         expect(vueRenderMock).toHaveBeenCalled();
 
         renderer.dispose();
@@ -635,7 +633,6 @@ describe('VueHeaderActionsRenderer', () => {
 
         vueRenderMock.mockClear();
 
-        // Fire each event and check it triggers a render
         onDidAddPanel.fire(undefined);
         expect(vueRenderMock).toHaveBeenCalledTimes(1);
 

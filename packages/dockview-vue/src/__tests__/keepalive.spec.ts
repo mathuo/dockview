@@ -148,8 +148,7 @@ describe('Vue components under <keep-alive> (issue #1369)', () => {
             await nextTick();
 
             // Deactivate (e.g. router navigates away): the panel is cached, not
-            // unmounted, so onDeactivated fires. This was entirely missing
-            // before the teleport migration.
+            // unmounted, so onDeactivated fires.
             await wrapper.setProps({ show: false });
             await flushPromises();
             expect(deactivated).toHaveBeenCalledTimes(1);

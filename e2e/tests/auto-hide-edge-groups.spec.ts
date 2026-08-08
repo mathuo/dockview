@@ -37,7 +37,6 @@ test.describe('auto-hide edge groups (peek)', () => {
         expect((await overlay.boundingBox())!.width).toBeGreaterThan(100);
         await expect(overlay.locator('.dv-test-panel')).toBeVisible();
 
-        // title bar with the panel title + pin + close
         await expect(page.locator('.dv-edge-peek-title')).toHaveText('Sidebar');
         await expect(page.locator('.dv-edge-peek-pin')).toBeVisible();
         await expect(page.locator('.dv-edge-peek-close')).toBeVisible();
@@ -45,7 +44,6 @@ test.describe('auto-hide edge groups (peek)', () => {
         const during = (await mainBox(page))!;
         expect(Math.abs(during.width - before.width)).toBeLessThan(2);
 
-        // click outside → hide
         await page.mouse.click(900, 500);
         await expect(overlay).toHaveCount(0);
     });
@@ -111,7 +109,7 @@ test.describe('auto-hide edge groups (peek)', () => {
         await page.mouse.move(900, 500);
         await expect(overlay).toBeVisible();
 
-        // clicking the peeked tab again hides it (still no reflow)
+        // still no reflow
         await edgeTab(page).click();
         await expect(overlay).toHaveCount(0);
         expect(
@@ -174,7 +172,6 @@ test.describe('auto-hide edge groups (peek)', () => {
 
         await page.locator('.dv-edge-peek-close').click();
         await expect(page.locator('.dv-edge-peek')).toHaveCount(0);
-        // the sidebar panel is gone
         await expect(
             page.locator('.dv-test-panel', { hasText: 'sidebar' })
         ).toHaveCount(0);
@@ -263,7 +260,6 @@ test.describe('auto-hide edge groups (peek)', () => {
         await tabs.nth(0).click(); // peek Alpha
         await expect(page.locator('.dv-edge-peek')).toBeVisible();
 
-        // switch to Bravo, then back to Alpha
         await tabs.nth(1).click();
         await tabs.nth(0).click();
 

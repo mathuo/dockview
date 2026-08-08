@@ -78,7 +78,6 @@ describe('DockviewAngularComponent – context menu', () => {
     it('createContextMenuItemComponent returns an AngularRenderer for a component', () => {
         component.ngOnInit();
 
-        // Access the private method via casting to any
         const frameworkOptions = (component as any).createFrameworkOptions();
         const factory = frameworkOptions.createContextMenuItemComponent;
 

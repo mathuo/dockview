@@ -96,7 +96,6 @@ test.describe('multi-row tabs (wrap mode)', () => {
             .first()
             .boundingBox())!;
 
-        // multi-row header
         expect(headerBox.height).toBeGreaterThan(44);
 
         // the active panel was laid out with the shrunk content area, not the
@@ -163,7 +162,6 @@ test.describe('multi-row tabs (wrap mode)', () => {
         await page.waitForFunction(() => (window as any).__ready === true);
         await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
 
-        // Open the chevron dropdown.
         const handle = page.locator('.dv-tabs-overflow-dropdown-default');
         await expect(handle).toBeVisible();
         await handle.click();
@@ -180,7 +178,6 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(listed).toContain('wrap-tab-long-title-19');
         expect(listed).not.toContain('wrap-tab-long-title-0');
 
-        // Picking a spilled tab activates it and closes the dropdown.
         await overflow
             .locator('.dv-tab', { hasText: 'wrap-tab-long-title-19' })
             .click();
@@ -197,7 +194,6 @@ test.describe('multi-row tabs (wrap mode)', () => {
         await page.waitForFunction(() => (window as any).__ready === true);
         await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
 
-        // Surplus present → dropdown shown.
         await expect(
             page.locator('.dv-tabs-overflow-dropdown-root').first()
         ).toBeVisible();

@@ -56,7 +56,6 @@ test.describe('tab-group chips', () => {
         await page.waitForTimeout(250);
         await page.mouse.click(600, 450);
         await expect(page.locator('.dv-context-menu')).toHaveCount(0);
-        // The chip itself survives.
         await expect(chip).toBeVisible();
     });
 

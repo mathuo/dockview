@@ -40,11 +40,9 @@ describe('PaneviewVue Component', () => {
     });
 
     test('should create paneview with Vue framework support', () => {
-        // Test that Vue-specific components can be created with proper type safety
         expect(typeof createPaneview).toBe('function');
         expect(typeof VuePaneviewPanelView).toBe('function');
 
-        // Test that a Vue paneview panel view can be instantiated
         const mockVueComponent = { template: '<div>Test</div>' } as any;
         const mockParent = {} as any;
 
@@ -62,7 +60,6 @@ describe('PaneviewVue Component', () => {
     });
 
     test('should handle Vue component integration for panes', () => {
-        // Test Vue component factory creation for paneview
         const mockComponent = {
             template:
                 '<div class="vue-pane-panel">{{ title }}: {{ params.content }}</div>',
