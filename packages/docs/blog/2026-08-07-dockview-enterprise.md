@@ -78,4 +78,4 @@ Thanks for reading, and thanks for using Dockview.
 
 Matt
 
-<BlogFeedback page="blog:dockview-enterprise" />
+<BlogFeedback id="v8-feedback" />

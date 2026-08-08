@@ -122,13 +122,19 @@ function Votes({ page }: { page: string }): JSX.Element {
         };
     }, [page]);
 
+    // A one-click counter: click a thumb to add to its tally. One vote per
+    // browser, so once you've reacted the buttons lock in your choice. No submit
+    // step and no toggle, it just counts.
     async function cast(vote: Vote) {
-        if (busy) return;
-        // Clicking the already-selected thumb clears the vote.
-        const next = mine === vote ? null : vote;
+        if (busy || mine) return;
         setBusy(true);
-        // Optimistic update so the click feels instant.
-        setMine(next);
+        // Optimistic bump so the click feels instant.
+        setMine(vote);
+        setCounts((c) =>
+            c
+                ? { ...c, [vote]: c[vote] + 1 }
+                : { up: vote === 'up' ? 1 : 0, down: vote === 'down' ? 1 : 0 }
+        );
         try {
             const res = await fetch(feedbackApiUrl('vote'), {
                 method: 'POST',
@@ -136,20 +142,22 @@ function Votes({ page }: { page: string }): JSX.Element {
                 body: JSON.stringify({
                     page,
                     clientId: clientIdRef.current,
-                    vote: next,
+                    vote,
                 }),
             });
             if (res.ok) {
                 const data = await res.json();
                 setCounts({ up: data.up ?? 0, down: data.down ?? 0 });
-                setMine(data.vote ?? null);
+                setMine(data.vote ?? vote);
             }
         } catch {
-            /* leave the optimistic state; a later load will reconcile */
+            /* keep the optimistic state; a later load reconciles */
         } finally {
             setBusy(false);
         }
     }
+
+    const voted = mine !== null;
 
     const btn = (active: boolean): React.CSSProperties => ({
         display: 'inline-flex',
@@ -166,7 +174,8 @@ function Votes({ page }: { page: string }): JSX.Element {
         color: active ? '#fff' : 'var(--ifm-font-color-base)',
         font: 'inherit',
         fontSize: '0.9rem',
-        cursor: busy ? 'default' : 'pointer',
+        cursor: busy || voted ? 'default' : 'pointer',
+        opacity: voted && !active ? 0.6 : 1,
     });
 
     return (
@@ -182,7 +191,7 @@ function Votes({ page }: { page: string }): JSX.Element {
             <button
                 type="button"
                 onClick={() => cast('up')}
-                disabled={busy}
+                disabled={busy || voted}
                 aria-pressed={mine === 'up'}
                 aria-label="Yes, this was helpful"
                 style={btn(mine === 'up')}
@@ -193,7 +202,7 @@ function Votes({ page }: { page: string }): JSX.Element {
             <button
                 type="button"
                 onClick={() => cast('down')}
-                disabled={busy}
+                disabled={busy || voted}
                 aria-pressed={mine === 'down'}
                 aria-label="No, this was not helpful"
                 style={btn(mine === 'down')}
@@ -201,6 +210,16 @@ function Votes({ page }: { page: string }): JSX.Element {
                 <ThumbIcon down />
                 {counts && <span>{counts.down}</span>}
             </button>
+            {voted && (
+                <span
+                    style={{
+                        fontSize: '0.85rem',
+                        color: 'var(--ifm-color-content-secondary)',
+                    }}
+                >
+                    Thanks!
+                </span>
+            )}
         </div>
     );
 }
@@ -433,20 +452,21 @@ function MessageBox({ page }: { page: string }): JSX.Element {
     );
 }
 
-// The `page` prop keys the feedback (votes are deduped, messages tagged) so one
-// widget can serve several posts. Defaults to the current path.
-export function BlogFeedback({ page }: { page?: string }): JSX.Element {
-    const [resolvedPage, setResolvedPage] = React.useState(page ?? '');
+// The `id` prop keys the feedback (votes are deduped, messages tagged) so one
+// widget can serve several pages, e.g. id="v8-feedback". Defaults to the current
+// path when omitted.
+export function BlogFeedback({ id }: { id?: string }): JSX.Element {
+    const [resolvedId, setResolvedId] = React.useState(id ?? '');
 
     React.useEffect(() => {
-        if (!page && typeof window !== 'undefined') {
-            setResolvedPage(window.location.pathname);
+        if (!id && typeof window !== 'undefined') {
+            setResolvedId(window.location.pathname);
         }
-    }, [page]);
+    }, [id]);
 
-    // Wait for a page key before hitting the API (avoids a spurious call with an
+    // Wait for a key before hitting the API (avoids a spurious call with an
     // empty key during the first client render when no prop is given).
-    const key = page ?? resolvedPage;
+    const key = id ?? resolvedId;
 
     return (
         <section
