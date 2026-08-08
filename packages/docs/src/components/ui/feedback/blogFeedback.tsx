@@ -2,10 +2,11 @@ import React from 'react';
 
 // Anonymous page feedback: a one-click thumbs up/down reaction plus an optional
 // freeform message box. Both talk to the licensing worker's feedback API (the
-// same worker that serves /enterprise), reusing the Turnstile bot-check pattern
-// from the contact page for the message box. The thumbs vote is deliberately
-// frictionless (no bot-check), deduped per browser by a random client id kept
-// in localStorage.
+// same worker that serves /enterprise). Both are gated by Cloudflare Turnstile:
+// the message box uses the standard managed widget, the thumbs use an
+// interaction-only widget that stays invisible unless a challenge is needed, so
+// a vote is still one click for a real visitor. One vote per browser is kept
+// client-side in localStorage.
 
 // Public Turnstile site key (safe to expose, it's rendered into the page). The
 // matching secret lives only in the licensing worker (TURNSTILE_SECRET_KEY).
@@ -66,6 +67,7 @@ declare global {
                 el: HTMLElement,
                 opts: {
                     sitekey: string;
+                    appearance?: 'always' | 'execute' | 'interaction-only';
                     callback: (token: string) => void;
                     'expired-callback'?: () => void;
                     'error-callback'?: () => void;
@@ -74,6 +76,63 @@ declare global {
             reset: (id?: string) => void;
         };
     }
+}
+
+// Load the Turnstile script once and render a widget, exposing its token. The
+// managed widget is mostly automatic: with appearance 'interaction-only' it
+// stays invisible and issues a token in the background unless a real challenge
+// is needed. Tokens are single-use, so `reset` fetches a fresh one after a token
+// is spent. Multiple widgets can coexist on a page; each tracks its own id.
+function useTurnstileToken(appearance?: 'interaction-only'): {
+    token: string;
+    widgetRef: React.RefObject<HTMLDivElement>;
+    reset: () => void;
+} {
+    const [token, setToken] = React.useState('');
+    const widgetRef = React.useRef<HTMLDivElement>(null);
+    const widgetIdRef = React.useRef<string | null>(null);
+    const renderedRef = React.useRef(false);
+
+    React.useEffect(() => {
+        function render() {
+            if (renderedRef.current || !widgetRef.current || !window.turnstile)
+                return;
+            renderedRef.current = true;
+            widgetIdRef.current = window.turnstile.render(widgetRef.current, {
+                sitekey: turnstileSiteKey(),
+                appearance,
+                callback: setToken,
+                'expired-callback': () => setToken(''),
+                'error-callback': () => setToken(''),
+            });
+        }
+
+        if (window.turnstile) {
+            render();
+            return;
+        }
+        const existing = document.querySelector<HTMLScriptElement>(
+            `script[src="${TURNSTILE_SCRIPT}"]`
+        );
+        const script = existing ?? document.createElement('script');
+        script.src = TURNSTILE_SCRIPT;
+        script.async = true;
+        script.defer = true;
+        script.addEventListener('load', render);
+        if (!existing) document.head.appendChild(script);
+        return () => script.removeEventListener('load', render);
+    }, [appearance]);
+
+    const reset = React.useCallback(() => {
+        try {
+            window.turnstile?.reset(widgetIdRef.current ?? undefined);
+        } catch {
+            /* ignore */
+        }
+        setToken('');
+    }, []);
+
+    return { token, widgetRef, reset };
 }
 
 function ThumbIcon({ down }: { down?: boolean }): JSX.Element {
@@ -103,6 +162,10 @@ function Votes({ id }: { id: string }): JSX.Element {
     );
     const [mine, setMine] = React.useState<Vote | null>(null);
     const [busy, setBusy] = React.useState(false);
+    // A vote clicked before Turnstile has issued a token, held until it lands.
+    const [pending, setPending] = React.useState<Vote | null>(null);
+    // Invisible unless a challenge is needed, so a vote stays one click.
+    const { token, widgetRef, reset } = useTurnstileToken('interaction-only');
 
     React.useEffect(() => {
         // This browser's prior choice (if any) comes from localStorage; the
@@ -123,35 +186,49 @@ function Votes({ id }: { id: string }): JSX.Element {
         };
     }, [id]);
 
-    // A one-click counter: click a thumb to add to its tally. One vote per
-    // browser (remembered in localStorage), so once you've reacted the buttons
-    // lock in your choice. No submit step and no toggle, it just counts.
-    async function cast(vote: Vote) {
+    // Send the vote once a Turnstile token is in hand. The token is single-use,
+    // so we drop it afterwards; the browser is now locked, so no fresh one is
+    // needed.
+    const send = React.useCallback(
+        async (vote: Vote) => {
+            try {
+                const res = await fetch(feedbackApiUrl('vote'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, vote, turnstileToken: token }),
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setCounts({ up: data.up ?? 0, down: data.down ?? 0 });
+                    setMine(vote);
+                    setVoted(id, vote);
+                }
+            } catch {
+                /* swallow — the buttons unlock and the visitor can retry */
+            } finally {
+                reset();
+                setBusy(false);
+            }
+        },
+        [id, token, reset]
+    );
+
+    // A click made before the token arrived fires the moment it does.
+    React.useEffect(() => {
+        if (pending && token) {
+            const vote = pending;
+            setPending(null);
+            void send(vote);
+        }
+    }, [pending, token, send]);
+
+    // One-click counter: click a thumb to add to its tally. One vote per browser
+    // (remembered in localStorage), so once you've reacted the buttons lock in.
+    function cast(vote: Vote) {
         if (busy || mine) return;
         setBusy(true);
-        // Optimistic bump so the click feels instant, and lock this browser in.
-        setMine(vote);
-        setVoted(id, vote);
-        setCounts((c) =>
-            c
-                ? { ...c, [vote]: c[vote] + 1 }
-                : { up: vote === 'up' ? 1 : 0, down: vote === 'down' ? 1 : 0 }
-        );
-        try {
-            const res = await fetch(feedbackApiUrl('vote'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, vote }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setCounts({ up: data.up ?? 0, down: data.down ?? 0 });
-            }
-        } catch {
-            /* keep the optimistic state; a later load reconciles */
-        } finally {
-            setBusy(false);
-        }
+        if (token) void send(vote);
+        else setPending(vote);
     }
 
     const voted = mine !== null;
@@ -176,47 +253,51 @@ function Votes({ id }: { id: string }): JSX.Element {
     });
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                flexWrap: 'wrap',
-            }}
-        >
-            <span style={{ fontWeight: 600 }}>Was this helpful?</span>
-            <button
-                type="button"
-                onClick={() => cast('up')}
-                disabled={busy || voted}
-                aria-pressed={mine === 'up'}
-                aria-label="Yes, this was helpful"
-                style={btn(mine === 'up')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    flexWrap: 'wrap',
+                }}
             >
-                <ThumbIcon />
-                {counts && <span>{counts.up}</span>}
-            </button>
-            <button
-                type="button"
-                onClick={() => cast('down')}
-                disabled={busy || voted}
-                aria-pressed={mine === 'down'}
-                aria-label="No, this was not helpful"
-                style={btn(mine === 'down')}
-            >
-                <ThumbIcon down />
-                {counts && <span>{counts.down}</span>}
-            </button>
-            {voted && (
-                <span
-                    style={{
-                        fontSize: '0.85rem',
-                        color: 'var(--ifm-color-content-secondary)',
-                    }}
+                <span style={{ fontWeight: 600 }}>Was this helpful?</span>
+                <button
+                    type="button"
+                    onClick={() => cast('up')}
+                    disabled={busy || voted}
+                    aria-pressed={mine === 'up'}
+                    aria-label="Yes, this was helpful"
+                    style={btn(mine === 'up')}
                 >
-                    Thanks!
-                </span>
-            )}
+                    <ThumbIcon />
+                    {counts && <span>{counts.up}</span>}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => cast('down')}
+                    disabled={busy || voted}
+                    aria-pressed={mine === 'down'}
+                    aria-label="No, this was not helpful"
+                    style={btn(mine === 'down')}
+                >
+                    <ThumbIcon down />
+                    {counts && <span>{counts.down}</span>}
+                </button>
+                {voted && (
+                    <span
+                        style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--ifm-color-content-secondary)',
+                        }}
+                    >
+                        Thanks!
+                    </span>
+                )}
+            </div>
+            {/* Invisible unless Turnstile needs to challenge the visitor. */}
+            <div ref={widgetRef} />
         </div>
     );
 }
@@ -270,39 +351,8 @@ function MessageBox({ id }: { id: string }): JSX.Element {
     const [company, setCompany] = React.useState('');
     const [error, setError] = React.useState('');
     const [status, setStatus] = React.useState<MessageStatus>('idle');
-    const [token, setToken] = React.useState('');
-    const widgetRef = React.useRef<HTMLDivElement>(null);
-    const renderedRef = React.useRef(false);
-
-    // Load the Turnstile script once and render the widget explicitly.
-    React.useEffect(() => {
-        function render() {
-            if (renderedRef.current || !widgetRef.current || !window.turnstile)
-                return;
-            renderedRef.current = true;
-            window.turnstile.render(widgetRef.current, {
-                sitekey: turnstileSiteKey(),
-                callback: setToken,
-                'expired-callback': () => setToken(''),
-                'error-callback': () => setToken(''),
-            });
-        }
-
-        if (window.turnstile) {
-            render();
-            return;
-        }
-        const existing = document.querySelector<HTMLScriptElement>(
-            `script[src="${TURNSTILE_SCRIPT}"]`
-        );
-        const script = existing ?? document.createElement('script');
-        script.src = TURNSTILE_SCRIPT;
-        script.async = true;
-        script.defer = true;
-        script.addEventListener('load', render);
-        if (!existing) document.head.appendChild(script);
-        return () => script.removeEventListener('load', render);
-    }, []);
+    // Standard managed widget (visible) for the freeform box.
+    const { token, widgetRef, reset } = useTurnstileToken();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -348,8 +398,7 @@ function MessageBox({ id }: { id: string }): JSX.Element {
                     ? err.message
                     : 'Something went wrong. Please try again.'
             );
-            window.turnstile?.reset();
-            setToken('');
+            reset();
         }
     }
 
