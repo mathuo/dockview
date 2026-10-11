@@ -606,22 +606,9 @@ export class ShellManager implements IDisposable {
 
         this._viewConfigs.set(position, options);
 
-        // Recompute gap adjustments now that _viewConfigs has grown.
-        const outerN =
-            1 +
-            (this._viewConfigs.has('left') ? 1 : 0) +
-            (this._viewConfigs.has('right') ? 1 : 0);
-        const innerN =
-            1 +
-            (this._viewConfigs.has('top') ? 1 : 0) +
-            (this._viewConfigs.has('bottom') ? 1 : 0);
-        const outerGapAdd =
-            outerN > 1 ? (this._gap * (outerN - 1)) / outerN : 0;
-        const innerGapAdd =
-            innerN > 1 ? (this._gap * (innerN - 1)) / innerN : 0;
-
+        // The new view joins its axis visible, so count it in the gap share.
+        const gapAdd = this._gapAddFor(position, { position, visible: true });
         const isHorizontal = position === 'left' || position === 'right';
-        const gapAdd = isHorizontal ? outerGapAdd : innerGapAdd;
         const orientation = isHorizontal ? 'horizontal' : 'vertical';
 
         const view = new EdgeGroupView(
@@ -724,75 +711,77 @@ export class ShellManager implements IDisposable {
         this._gap = gap;
         this._defaultCollapsedSize = defaultCollapsedSize;
 
-        const outerN =
-            1 +
-            (this._viewConfigs.has('left') ? 1 : 0) +
-            (this._viewConfigs.has('right') ? 1 : 0);
-        const innerN =
-            1 +
-            (this._viewConfigs.has('top') ? 1 : 0) +
-            (this._viewConfigs.has('bottom') ? 1 : 0);
-        const outerGapAdd = outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
-        const innerGapAdd = innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
-
         // Update splitview margins.
         this._outerSplitview.margin = gap;
         this._middleColumn.updateMargin(gap);
 
-        // Recompute effective collapsed sizes from the original config values.
-        const updateView = (
-            view: EdgeGroupView,
-            baseCfg: EdgeGroupOptions,
-            gapAdd: number
-        ) => {
-            const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
-            view.updateSizing(baseCS, baseCfg.minimumSize, gapAdd);
-        };
-
-        const topCfg = this._viewConfigs.get('top');
-        if (this._topView && topCfg) {
-            updateView(this._topView, topCfg, innerGapAdd);
-        }
-        const bottomCfg = this._viewConfigs.get('bottom');
-        if (this._bottomView && bottomCfg) {
-            updateView(this._bottomView, bottomCfg, innerGapAdd);
-        }
-        const leftCfg = this._viewConfigs.get('left');
-        if (this._leftView && leftCfg) {
-            updateView(this._leftView, leftCfg, outerGapAdd);
-        }
-        const rightCfg = this._viewConfigs.get('right');
-        if (this._rightView && rightCfg) {
-            updateView(this._rightView, rightCfg, outerGapAdd);
-        }
-
-        // Resize currently-collapsed groups to their new collapsed size so
-        // they immediately match the new theme's tab-strip dimensions.
-        if (this._leftView?.isCollapsed && this._leftIndex !== undefined) {
-            this._outerSplitview.resizeView(
-                this._leftIndex,
-                this._leftView.collapsedSize
-            );
-        }
-        if (this._rightView?.isCollapsed && this._rightIndex !== undefined) {
-            this._outerSplitview.resizeView(
-                this._rightIndex,
-                this._rightView.collapsedSize
-            );
-        }
-        if (this._topView?.isCollapsed) {
-            this._middleColumn.resizeView('top', this._topView.collapsedSize);
-        }
-        if (this._bottomView?.isCollapsed) {
-            this._middleColumn.resizeView(
-                'bottom',
-                this._bottomView.collapsedSize
-            );
-        }
+        this._applyGapAdds();
 
         // Re-run layout with the current shell dimensions.
         if (this._currentWidth > 0 && this._currentHeight > 0) {
             this.layout(this._currentWidth, this._currentHeight);
+        }
+    }
+
+    /**
+     * The gap share a view on `position`'s axis gives up to the splitview
+     * margins. The splitview spreads its margins over its visible views only,
+     * so a hidden sibling does not count. `override` states a visibility that
+     * is about to change, so the share can be set before the splitview
+     * re-lays out and the views record their expanded sizes.
+     */
+    private _gapAddFor(
+        position: EdgeGroupPosition,
+        override?: { position: EdgeGroupPosition; visible: boolean }
+    ): number {
+        const axis: EdgeGroupPosition[] =
+            position === 'left' || position === 'right'
+                ? ['left', 'right']
+                : ['top', 'bottom'];
+        let n = 1; // the center column
+        for (const p of axis) {
+            const visible =
+                override?.position === p
+                    ? override.visible
+                    : this.isEdgeGroupVisible(p);
+            if (visible) {
+                n++;
+            }
+        }
+        return n > 1 ? (this._gap * (n - 1)) / n : 0;
+    }
+
+    /**
+     * Recompute every edge view's sizing from its original config and the
+     * current gap share, then resize the collapsed ones so their strips match.
+     * Runs on a theme or gap change and whenever a view joins, leaves or
+     * changes visibility on an axis, since each of those moves the share.
+     */
+    private _applyGapAdds(override?: {
+        position: EdgeGroupPosition;
+        visible: boolean;
+    }): void {
+        const positions: EdgeGroupPosition[] = [
+            'top',
+            'bottom',
+            'left',
+            'right',
+        ];
+        for (const position of positions) {
+            const view = this._getView(position);
+            const baseCfg = this._viewConfigs.get(position);
+            if (!view || !baseCfg) {
+                continue;
+            }
+            const baseCS = baseCfg.collapsedSize ?? this._defaultCollapsedSize;
+            view.updateSizing(
+                baseCS,
+                baseCfg.minimumSize,
+                this._gapAddFor(position, override)
+            );
+            if (view.isCollapsed) {
+                this._resizeView(position, view.collapsedSize);
+            }
         }
     }
 
@@ -854,6 +843,15 @@ export class ShellManager implements IDisposable {
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
+        // The share moves with the visible count on the axis. Set it first so
+        // the re-layout inside setViewVisible records expanded sizes with it.
+        if (
+            this._getView(position) &&
+            visible !== this.isEdgeGroupVisible(position)
+        ) {
+            this._applyGapAdds({ position, visible });
+        }
+
         switch (position) {
             case 'left':
                 if (this._leftIndex !== undefined) {

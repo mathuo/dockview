@@ -582,6 +582,18 @@ describe('ShellManager', () => {
                     },
                 }) as Parameters<typeof makeShell>[0];
 
+            test('a collapse and expand under a gap keep its size', () => {
+                const shell = makeShell(cfg(), 10);
+                shell.layout(1000, 800);
+                const before = sizeOf(shell, position);
+
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupCollapsed(position, false);
+
+                expect(sizeOf(shell, position)).toBe(before);
+                shell.dispose();
+            });
+
             test('resizes along its own axis', () => {
                 const shell = makeShell(cfg());
                 shell.layout(1000, 800);
@@ -919,6 +931,96 @@ describe('ShellManager', () => {
             // The peek uses the group's own size, without the gap share.
             expect(shell.getEdgeGroupExpandedSize('left')).toBe(295);
             shell.dispose();
+        });
+
+        describe.each([
+            ['left', 'right'],
+            ['top', 'bottom'],
+        ] as const)('%s with a hidden %s', (position, sibling) => {
+            const sizeOf = (shell: ShellManager, pos: typeof position) => {
+                const s = shell as any;
+                return pos === 'left'
+                    ? s._outerSplitview.getViewSize(s._leftIndex)
+                    : s._middleColumn.getViewSize(pos);
+            };
+            const gapAddOf = (shell: ShellManager, pos: typeof position) =>
+                (shell as any)[`_${pos}View`]._gapAdd;
+            const cycle = (shell: ShellManager) => {
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupCollapsed(position, false);
+            };
+            const two = () =>
+                ({
+                    [position]: { id: position, initialSize: 260 },
+                    [sibling]: { id: sibling, initialSize: 200 },
+                }) as Parameters<typeof makeShell>[0];
+
+            test('the gap share follows the visible views on the axis', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                // three visible views share two margins
+                expect(gapAddOf(shell, position)).toBeCloseTo(20 / 3);
+
+                shell.setEdgeGroupVisible(sibling, false);
+                // two visible views share one margin
+                expect(gapAddOf(shell, position)).toBe(5);
+
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(gapAddOf(shell, position)).toBeCloseTo(20 / 3);
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size after the sibling is hidden', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                expect(sizeOf(shell, position)).toBe(260);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(260);
+                }
+                expect((shell.toJSON() as any)[position].size).toBe(260);
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size when the sibling is hidden before layout', () => {
+                const shell = makeShell(two(), 10);
+                shell.setEdgeGroupVisible(sibling, false);
+                shell.layout(1000, 800);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(260);
+                }
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size after the sibling is shown again', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                cycle(shell);
+                shell.setEdgeGroupVisible(sibling, true);
+                const before = sizeOf(shell, position);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(before);
+                }
+                shell.dispose();
+            });
+
+            test('a collapsed strip tracks the share when the sibling is hidden', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupCollapsed(position, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(35 + 20 / 3);
+
+                shell.setEdgeGroupVisible(sibling, false);
+                expect(sizeOf(shell, position)).toBe(40);
+
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(35 + 20 / 3);
+                shell.dispose();
+            });
         });
 
         test('gap is added to collapsedSize for all four positions', () => {
