@@ -1642,6 +1642,9 @@ export class DockviewComponent
             options.theme?.gap ?? 0,
             options.theme?.edgeGroupCollapsedSize
         );
+        // The base grid took `locked` from the options; the shell's splitviews
+        // host the edge groups and need it too (#1671).
+        this._shellManager.locked = !!options.locked;
         // The shell wraps the dockview element, so move the popup anchor
         // into the shell so overflow dropdowns in edge groups position correctly
         this.popupService.updateRoot(this._shellManager.element);
@@ -2896,7 +2899,7 @@ export class DockviewComponent
                 ? { separatorBorder: 'transparent' }
                 : undefined,
             orientation,
-            false,
+            this.gridview.locked,
             this.options.theme?.gap ?? 0
         );
     }
@@ -3107,6 +3110,22 @@ export class DockviewComponent
             }
             for (const entry of this._popoutWindowService?.entries ?? []) {
                 entry.gridview.proportionalLayout = proportionalLayout;
+            }
+        }
+
+        if ('locked' in options) {
+            // super.updateOptions has already updated the main grid; the shell
+            // hosts the edge groups, and floating and popout windows host
+            // their own nested gridviews (#1671)
+            const locked = this.locked;
+            if (this._shellManager) {
+                this._shellManager.locked = locked;
+            }
+            for (const floating of this.floatingGroups) {
+                floating.gridview.locked = locked;
+            }
+            for (const entry of this._popoutWindowService?.entries ?? []) {
+                entry.gridview.locked = locked;
             }
         }
 

@@ -472,6 +472,15 @@ class MiddleColumnView implements IView, IDisposable {
         this._splitview.margin = gap;
     }
 
+    /** Disables the sashes of the top/bottom edge groups. */
+    get disabled(): boolean {
+        return this._splitview.disabled;
+    }
+
+    set disabled(value: boolean) {
+        this._splitview.disabled = value;
+    }
+
     dispose(): void {
         this._onDidChange.dispose();
         this._splitview.dispose();
@@ -586,6 +595,21 @@ export class ShellManager implements IDisposable {
 
     get element(): HTMLElement {
         return this._shellElement;
+    }
+
+    /**
+     * Mirrors the dock's `locked` option onto the shell: the grid disables
+     * its branch splitviews, and the edge groups are resized with the sashes
+     * of the shell's own splitviews (left/right in the outer one, top/bottom
+     * in the middle column), so they have to be disabled too. See #1671.
+     */
+    get locked(): boolean {
+        return this._outerSplitview.disabled;
+    }
+
+    set locked(value: boolean) {
+        this._outerSplitview.disabled = value;
+        this._middleColumn.disabled = value;
     }
 
     /**
