@@ -1187,6 +1187,34 @@ describe('splitview', () => {
             expect(isCorner(innerSash)).toBe(true);
         });
 
+        test("a sash leaving does not clear the other sash's corner", () => {
+            const { outerSash, innerSash } = setup();
+
+            hover(innerSash, 197, 150);
+            // the pointer moves onto the outer sash, which finds the same
+            // corner before the inner sash hears its pointerleave
+            hover(outerSash, 200, 150);
+            fireEvent(innerSash, new MouseEvent('pointerleave'));
+
+            expect(isCorner(outerSash)).toBe(true);
+            expect(isCorner(innerSash)).toBe(true);
+
+            fireEvent(outerSash, new MouseEvent('pointerleave'));
+
+            expect(isCorner(outerSash)).toBe(false);
+            expect(isCorner(innerSash)).toBe(false);
+        });
+
+        test('no corner with a locked (disabled) splitview', () => {
+            const { outer, outerSash, innerSash } = setup();
+            outer.disabled = true;
+
+            hover(innerSash, 197, 150);
+
+            expect(isCorner(innerSash)).toBe(false);
+            expect(isCorner(outerSash)).toBe(false);
+        });
+
         test('away from the junction it is a plain sash', () => {
             const { outerSash, innerSash } = setup();
 

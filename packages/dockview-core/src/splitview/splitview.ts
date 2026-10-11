@@ -81,7 +81,12 @@ function setSashPosition(sash: ISashItem, left: string, top: string): void {
 
 interface ISashDrag {
     update(delta: number): void;
-    end(): void;
+    /**
+     * Settle the drag (save the new proportions) and return the end
+     * notification. Linked drags all settle before any is notified, since a
+     * listener may relayout through an ancestor and re-lay-out the others.
+     */
+    end(): () => void;
 }
 
 /**
@@ -94,6 +99,41 @@ const splitviewByElement = new WeakMap<HTMLElement, Splitview>();
 // touch matches the coarse-pointer hit-area overhang in splitview.scss
 const CORNER_POINTER_REACH = 4;
 const CORNER_TOUCH_REACH = 10;
+
+interface ICornerCandidate {
+    readonly splitview: Splitview;
+    /** whether `splitview` encloses the splitview looking for a corner */
+    readonly isOuter: boolean;
+}
+
+/**
+ * The highlighted corner, if any. There is one pointer, so at most one corner
+ * is marked `dv-sash-corner` at a time; it belongs to the sash whose hover (or
+ * drag) found it, and only that sash clears it.
+ */
+let activeCorner: { owner: HTMLElement; partner: HTMLElement } | undefined;
+
+function setActiveCorner(
+    corner: { owner: HTMLElement; partner: HTMLElement } | undefined
+): void {
+    if (
+        activeCorner?.owner === corner?.owner &&
+        activeCorner?.partner === corner?.partner
+    ) {
+        return;
+    }
+    activeCorner?.owner.classList.remove('dv-sash-corner');
+    activeCorner?.partner.classList.remove('dv-sash-corner');
+    activeCorner = corner;
+    corner?.owner.classList.add('dv-sash-corner');
+    corner?.partner.classList.add('dv-sash-corner');
+}
+
+function clearActiveCorner(owner: HTMLElement): void {
+    if (activeCorner?.owner === owner) {
+        setActiveCorner(undefined);
+    }
+}
 
 function isNearRect(rect: DOMRect, x: number, y: number, slack: number) {
     return (
@@ -511,19 +551,14 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'dv-sash';
 
-            // the orthogonal sash this one currently forms a corner with, if
-            // any; both are marked `dv-sash-corner` while it is set
-            let cornerPartner: HTMLElement | undefined;
             let dragging = false;
+            // splitviews whose sashes this one may meet, gathered once per
+            // hover rather than on every pointermove
+            let candidates: ICornerCandidate[] | undefined;
 
-            const setCornerPartner = (partner: HTMLElement | undefined) => {
-                if (cornerPartner === partner) {
-                    return;
-                }
-                cornerPartner?.classList.remove('dv-sash-corner');
-                cornerPartner = partner;
-                toggleClass(sash, 'dv-sash-corner', !!partner);
-                partner?.classList.add('dv-sash-corner');
+            const findCorner = (event: PointerEvent) => {
+                candidates ??= this.getCornerCandidates();
+                return this.findCornerSash(sash, event, candidates);
             };
 
             const onPointerMove = (event: PointerEvent) => {
@@ -531,14 +566,21 @@ export class Splitview {
                 if (dragging || event.buttons !== 0) {
                     return;
                 }
-                setCornerPartner(
-                    this.findCornerSash(sash, event)?.sash.container
-                );
+                const corner = findCorner(event);
+                if (corner) {
+                    setActiveCorner({
+                        owner: sash,
+                        partner: corner.sash.container,
+                    });
+                } else {
+                    clearActiveCorner(sash);
+                }
             };
 
             const onPointerLeave = () => {
                 if (!dragging) {
-                    setCornerPartner(undefined);
+                    candidates = undefined;
+                    clearActiveCorner(sash);
                 }
             };
 
@@ -548,8 +590,15 @@ export class Splitview {
                     (s) => s.container === sash
                 );
 
-                const corner = this.findCornerSash(sash, event);
-                setCornerPartner(corner?.sash.container);
+                const corner = findCorner(event);
+                if (corner) {
+                    setActiveCorner({
+                        owner: sash,
+                        partner: corner.sash.container,
+                    });
+                } else {
+                    clearActiveCorner(sash);
+                }
                 dragging = true;
 
                 const targets: {
@@ -574,7 +623,8 @@ export class Splitview {
 
                 this.startPointerDrag(sash, event, targets, () => {
                     dragging = false;
-                    setCornerPartner(undefined);
+                    candidates = undefined;
+                    clearActiveCorner(sash);
                 });
             };
 
@@ -585,7 +635,7 @@ export class Splitview {
             const sashItem: ISashItem = {
                 container: sash,
                 disposable: () => {
-                    setCornerPartner(undefined);
+                    clearActiveCorner(sash);
                     sash.removeEventListener('pointerdown', onPointerStart);
                     sash.removeEventListener('pointermove', onPointerMove);
                     sash.removeEventListener('pointerleave', onPointerLeave);
@@ -1055,7 +1105,7 @@ export class Splitview {
 
                 this.saveProportions();
 
-                this._onDidSashEnd.fire(undefined);
+                return () => this._onDidSashEnd.fire(undefined);
             },
         };
     }
@@ -1099,8 +1149,9 @@ export class Splitview {
             doc.removeEventListener('pointercancel', end);
             doc.removeEventListener('contextmenu', end);
 
-            for (const { drag } of drags) {
-                drag.end();
+            const notifications = drags.map(({ drag }) => drag.end());
+            for (const notify of notifications) {
+                notify();
             }
 
             onEnd();
@@ -1113,21 +1164,28 @@ export class Splitview {
     }
 
     /**
-     * Find an orthogonal sash that `sash` meets near the pointer, i.e. a
-     * corner where both can be dragged together. Candidates are the sashes of
-     * enclosing and nested splitviews sharing this `cornerResizeScope` (the
-     * T-junctions of a grid), so unrelated splitviews are never linked.
+     * The splitviews whose sashes may meet this one's: enclosing and nested
+     * splitviews in the same `cornerResizeScope` with the other orientation
+     * (the T-junctions of a grid), so unrelated splitviews are never linked.
      */
-    private findCornerSash(
-        sash: HTMLElement,
-        event: PointerEvent
-    ): { splitview: Splitview; sash: ISashItem; isOuter: boolean } | undefined {
+    private getCornerCandidates(): ICornerCandidate[] {
         const scope = this.cornerResizeScope?.();
-        if (!scope || sash.classList.contains('dv-disabled')) {
-            return undefined;
+        if (!scope) {
+            return [];
         }
 
-        const candidates: { splitview: Splitview; isOuter: boolean }[] = [];
+        const candidates: ICornerCandidate[] = [];
+        const add = (element: Element, isOuter: boolean) => {
+            const splitview = splitviewByElement.get(element as HTMLElement);
+            if (
+                splitview &&
+                splitview._orientation !== this._orientation &&
+                splitview.cornerResizeScope?.() === scope
+            ) {
+                candidates.push({ splitview, isOuter });
+            }
+        };
+
         for (
             let element = this.element.parentElement?.closest(
                 '.dv-split-view-container'
@@ -1135,18 +1193,33 @@ export class Splitview {
             element;
             element = element.parentElement?.closest('.dv-split-view-container')
         ) {
-            const splitview = splitviewByElement.get(element as HTMLElement);
-            if (splitview) {
-                candidates.push({ splitview, isOuter: true });
-            }
+            add(element, true);
         }
         for (const element of this.viewContainer.querySelectorAll(
             '.dv-split-view-container'
         )) {
-            const splitview = splitviewByElement.get(element as HTMLElement);
-            if (splitview) {
-                candidates.push({ splitview, isOuter: false });
-            }
+            add(element, false);
+        }
+
+        return candidates;
+    }
+
+    /**
+     * Find an orthogonal sash that `sash` meets near the pointer, i.e. a
+     * corner where both can be dragged together.
+     */
+    private findCornerSash(
+        sash: HTMLElement,
+        event: PointerEvent,
+        candidates: ICornerCandidate[]
+    ): { splitview: Splitview; sash: ISashItem; isOuter: boolean } | undefined {
+        if (
+            candidates.length === 0 ||
+            this._disabled ||
+            sash.classList.contains('dv-disabled') ||
+            !this.cornerResizeScope?.()
+        ) {
+            return undefined;
         }
 
         const reach =
@@ -1165,10 +1238,8 @@ export class Splitview {
         let bestDistance = Number.POSITIVE_INFINITY;
 
         for (const { splitview, isOuter } of candidates) {
-            if (
-                splitview._orientation === this._orientation ||
-                splitview.cornerResizeScope?.() !== scope
-            ) {
+            // a locked splitview stays locked, whichever sash is grabbed
+            if (splitview._disabled) {
                 continue;
             }
 
@@ -1177,6 +1248,10 @@ export class Splitview {
                     continue;
                 }
                 const other = item.container.getBoundingClientRect();
+                // not laid out (e.g. inside a hidden view)
+                if (other.width === 0 && other.height === 0) {
+                    continue;
+                }
 
                 // where the centre lines of the two sashes cross
                 const x = horizontal

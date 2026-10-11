@@ -2891,7 +2891,7 @@ export class DockviewComponent
     private createNestedGridview(
         orientation: Orientation = Orientation.HORIZONTAL
     ): Gridview {
-        return new Gridview(
+        const gridview = new Gridview(
             this.gridview.proportionalLayout,
             this.options.hideBorders
                 ? { separatorBorder: 'transparent' }
@@ -2900,6 +2900,8 @@ export class DockviewComponent
             false,
             this.options.theme?.gap ?? 0
         );
+        gridview.cornerResize = this.gridview.cornerResize;
+        return gridview;
     }
 
     /**
@@ -3108,6 +3110,16 @@ export class DockviewComponent
             }
             for (const entry of this._popoutWindowService?.entries ?? []) {
                 entry.gridview.proportionalLayout = proportionalLayout;
+            }
+        }
+
+        if ('disableCornerResize' in options) {
+            const cornerResize = this.gridview.cornerResize;
+            for (const floating of this.floatingGroups) {
+                floating.gridview.cornerResize = cornerResize;
+            }
+            for (const entry of this._popoutWindowService?.entries ?? []) {
+                entry.gridview.cornerResize = cornerResize;
             }
         }
 

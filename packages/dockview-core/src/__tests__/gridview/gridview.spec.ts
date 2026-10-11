@@ -1492,6 +1492,58 @@ describe('gridview', () => {
             expect(columnSash.classList.contains('dv-sash-corner')).toBe(true);
         });
 
+        test('a corner below the root keeps both resizes on release', () => {
+            // root columns | right column split into rows | its top row split
+            // into columns: the corner is between two non-root splitviews, so
+            // ending the outer drag relays out through the root
+            const gridview = new Gridview(
+                true,
+                undefined,
+                Orientation.HORIZONTAL
+            );
+            container.appendChild(gridview.element);
+            gridview.layout(400, 300);
+
+            const left = new MockGridview();
+            const a = new MockGridview();
+            gridview.addView(left, Sizing.Distribute, [0]);
+            gridview.addView(a, Sizing.Distribute, [1]);
+            gridview.addView(new MockGridview(), Sizing.Distribute, [1, 1]);
+            gridview.addView(new MockGridview(), Sizing.Distribute, [1, 0, 1]);
+
+            expect([a.width, a.height]).toEqual([100, 150]);
+
+            const sashesOf = (node: HTMLElement) =>
+                Array.from(
+                    node.querySelectorAll<HTMLElement>(
+                        ':scope > .dv-split-view-container > .dv-sash-container > .dv-sash'
+                    )
+                );
+            const branches = Array.from(
+                gridview.element.querySelectorAll<HTMLElement>(
+                    '.dv-branch-node'
+                )
+            );
+            // [root, right column, its top row]
+            const [rowSash] = sashesOf(branches[1]);
+            const [innerColumnSash] = sashesOf(branches[2]);
+            setRect(rowSash, 200, 148, 200, 4);
+            setRect(innerColumnSash, 298, 0, 4, 150);
+
+            innerColumnSash.dispatchEvent(
+                new MouseEvent('pointerdown', { clientX: 300, clientY: 150 })
+            );
+            document.dispatchEvent(
+                new MouseEvent('pointermove', { clientX: 330, clientY: 180 })
+            );
+            expect([a.width, a.height]).toEqual([130, 180]);
+
+            document.dispatchEvent(
+                new MouseEvent('pointerup', { clientX: 330, clientY: 180 })
+            );
+            expect([a.width, a.height]).toEqual([130, 180]);
+        });
+
         test('cornerResize = false disables it', () => {
             const { gridview, rowSash } = setup();
             gridview.cornerResize = false;
