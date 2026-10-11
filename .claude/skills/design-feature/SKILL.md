@@ -1,264 +1,192 @@
 ---
 name: design-feature
-description: Plan a dockview feature or behavioural change before writing code. Use this whenever the work adds or changes a DockviewOptions field, a module/service, a public API method, a tab/group/drag behaviour, serialization, or an enterprise feature, or when the user says "design", "plan", "spec out", "how should we implement", "add a feature", "new option" or asks where a change should live. Also use it when a bug fix would change a default behaviour, because that needs the same free-vs-enterprise, opt-in and back-compat decisions. Produces a design note listing every layer the change touches (core, enterprise, bindings, docs, tests) and the open questions for the maintainer.
+description: Work out how to fix a dockview problem before touching code. Use this whenever the user reports or pastes a bug, a regression, a GitHub or Linear issue, a behaviour that is wrong in one layout, framework, theme or popout window, a flaky or failing test, or asks why dockview behaves a certain way; trigger on "fix", "broken", "regression", "doesn't work", "wrong when", "used to", "after upgrading". Also use it for small behavioural changes and new options, which it treats the same way: reproduce, find the cause, change the least. Produces a short fix note with the failing test, the root cause, the smallest correct change, the behaviour that must not change, and whether a Playwright spec is needed.
 ---
 
-# Designing a dockview feature
+# Designing a dockview fix
 
-A dockview feature is rarely one file. The same behaviour has to be declared
-in core, wired through the module system, forwarded by three framework
-bindings, documented for four frameworks, kept serialisable, and kept off by
-default. Most review churn on this repo comes from a layer that was forgotten
-rather than from the core logic being wrong, so the job of this skill is to
-make the full footprint explicit before any code exists.
+Most dockview problems live between layers: a size that is right in the grid
+and wrong in a floating group, an option that works in React and is ignored
+in Angular, a layout that restores differently from how it was saved, a drag
+that behaves in jsdom and not in Chrome. The wrong fix patches where the
+symptom shows up; the right one restores the invariant that broke, and
+changes nothing else. This skill is the thinking before the code.
 
-Read `AGENTS.md` at the repo root and the `AGENTS.md` of every package you
-expect to touch. The rules below assume them.
+Read `AGENTS.md` at the repo root and the `AGENTS.md` of the package you
+expect to touch. Two of its rules carry the most weight here:
 
-Three principles run through every step:
+- **A bug fix changes the defect and nothing else.** Not a tidy-up, not a
+  nearby improvement, and never a default that other users rely on. Passing
+  tests are not permission: the absence of a test for the old behaviour does
+  not mean nobody depends on it.
+- **The failing test comes first.** A reproduction you can run is the
+  definition of the problem; without it you are guessing at both the cause
+  and the fix.
 
-- **Follow the existing design patterns.** The codebase already has a way to
-  add an option, a service, an event, a drop target, a context-menu item, a
-  docs page. Find that way and copy it. A feature that introduces a second
-  pattern for something the repo already does is wrong even when it works,
-  because every later reader has to learn both.
-- **Tests come first.** Write the failing specs from the design before the
-  implementation: for a bug the failing reproduction is mandatory (see
-  `AGENTS.md`), and for a feature the specs are the executable version of the
-  design note. A behaviour you cannot write a test for is a behaviour you have
-  not finished designing.
-- **End-to-end where it matters.** jsdom cannot measure widths, complete a
-  native drag, route real focus or open a second document. Decide up front
-  which behaviours need a Playwright spec under `e2e/tests` so they are not
-  waved through as "manually verified".
+And two habits: follow the pattern the surrounding code already uses, and
+reach for a Playwright spec when jsdom cannot show the problem.
 
-## Step 1: classify the change
+## Step 1: pin the problem down
 
-Answer these four questions first; everything downstream depends on them.
+From the report (issue, message, failing CI job) write one line each for:
 
-1. **Free or enterprise?** The free feature set lives in `dockview-core`; paid
-   features are modules in `packages/dockview-enterprise`. The current split
-   is the table in `packages/docs/docs/overview/licence.mdx` and the
-   `ENTERPRISE_MODULE_NAMES` set in `packages/dockview-core/src/dockview/modules.ts`.
-   This is a commercial decision, not an engineering one: if the feature is
-   new and the user has not said which side it belongs on, list it as an open
-   question rather than deciding. Default your draft to whichever side the
-   closest existing feature is on and say so.
-2. **Module or plain change?** Use a module (a service registered with
-   `defineModule`) when the behaviour is opt-in, owns state or subscriptions,
-   or is enterprise. Core reaches a module through its optional
-   `ServiceCollection` slot, so the free package keeps working when the module
-   is absent. A small tweak to existing core behaviour, or a new method on an
-   existing API object, does not need a module.
-3. **Does it persist?** If the state must survive `toJSON()` / `fromJSON()`
-   (pinned flags do; hover state does not), serialization and old-layout
-   compatibility are part of the design.
-4. **Bug fix or feature?** A bug fix corrects the defect and nothing else. If
-   the only fix changes a long-standing default (size redistribution on close,
-   tab ordering, focus routing), stop: the design must gate the new behaviour
-   behind an opt-in option and raise the default change with the maintainer.
-   Passing tests are not permission to change a default.
+- **Observed** and **expected** behaviour, in dockview terms (panel, group,
+  tab, floating, popout, edge group, maximised).
+- **Where it shows**: which package, which framework binding, which browser,
+  and whether it is also wrong in plain `dockview` without a binding. A bug
+  only in one binding is usually plumbing, not engine.
+- **Options in play**: copy the `DockviewOptions` from the report. An
+  enterprise option that "does nothing" is often a missing module or a wrong
+  `OPTION_MODULE_RULES` predicate, not the feature itself.
+- **State in play**: created fresh, or restored with `fromJSON`? Saved by an
+  older version? Inside a popout? After a drag, a resize, or a theme change?
+- **Since when**: a version or commit, if the reporter gives one. Compare
+  against `packages/docs/docs/releases/` to see whether the behaviour was a
+  deliberate change.
 
-## Step 2: read the nearest neighbour and copy its pattern
+Fill the gaps with a reproduction before theorising: fork the nearest
+example under `packages/docs/templates/dockview/` or, faster, go straight to
+Step 2. If the report cannot be reproduced at all, the fix note says so and
+lists what was tried; do not guess a fix.
 
-Find the existing feature most like the one being designed and read it end to
-end before drafting anything. The module system is consistent, so one worked
-example teaches the pattern. `references/feature-footprint.md` walks the
-pinned tabs feature through every layer of the repo and is the fastest way to
-see the shape; use it as the checklist when listing files for the new feature.
+## Step 2: reproduce as a failing test
 
-Name the neighbour in the design note and keep to its shape: same option
-style, same host/service split, same event naming (`onDid*` after the fact,
-`onWill*` when cancellable), same CSS class scheme, same docs page layout.
-When the neighbour's pattern genuinely does not fit, say why in the note and
-propose the smallest deviation, rather than quietly inventing a new one.
+Pick the layer, write the spec, run it, and watch it fail for the reported
+reason (not a setup error):
 
-Files that define the contracts, in reading order:
+- **Engine behaviour**: a Jest spec driving a real `DockviewComponent` in
+  `packages/dockview-core/src/__tests__/...` or, when the behaviour belongs
+  to an enterprise module, `packages/dockview-enterprise/src/__tests__/...`
+  (where all modules and a licence are preregistered). Put it in the file
+  that already covers the area.
+- **Binding behaviour**: a spec in the binding's `__tests__` when the engine
+  spec passes but the wrapper misbehaves (props not forwarded, renderer
+  lifecycle, change detection, slots).
+- **Real-browser behaviour**: a Playwright spec under `e2e/tests` when the
+  problem depends on measured widths, native drag and drop, pointer capture,
+  real focus, or a popout's second document. The jsdom popout mock shares
+  the main document, so cross-window bugs cannot be reproduced in Jest.
 
-- `packages/dockview-core/src/dockview/modules.ts`: `ServiceCollection`,
-  `DockviewModule`, `defineModule`, `registerModules`, `ENTERPRISE_MODULE_NAMES`.
-- `packages/dockview-core/src/dockview/moduleContracts.ts`: the `IFooHost` and
-  `IFooService` interface pairs. The host interface is the whole surface a
-  service may see; keep it to the events and options the service needs.
-- `packages/dockview-core/src/dockview/options.ts`: `DockviewOptions`, the
-  per-feature option types, and `PROPERTY_KEYS_DOCKVIEW`.
-- `packages/dockview-core/src/dockview/optionsModules.ts`:
-  `OPTION_MODULE_RULES`, which maps an option to the module that must be
-  registered for it to do anything.
-- The service file for the neighbour (`packages/dockview-enterprise/src/*Service.ts`
-  or `packages/dockview-core/src/dockview/*Service.ts`).
+Name the test for the behaviour, not the issue number. The `test-feature`
+skill has the harness recipes (mocks, geometry, popouts, async settling).
 
-## Step 3: design the option surface
+## Step 3: find the root cause
 
-Every v8 addition ships as an opt-in `DockviewOptions` field that is off by
-default; the migration guide promises users that upgrading needs no code
-changes. Keep that promise:
+Trace from the failing assertion to the invariant that broke. Places that
+account for most dockview bugs, with where to look:
 
-- Model the option as an object with an `enabled` switch (or a mode value whose
-  default is the current behaviour), typed in core `options.ts` even when the
-  module lives in enterprise. Document every field with a TypeDoc comment:
-  the docs site renders those comments through `<DocRef>`.
-- Add the key to `PROPERTY_KEYS_DOCKVIEW`. TypeScript fails the build if you
-  forget, which is the point: React and Vue forward every listed key
-  automatically, but Angular needs an explicit `@Input()` typed as
-  `DockviewOptions['key']` in `dockview-angular.component.ts`, or the binding
-  raises NG0303 and silently never reaches core.
-- Decide whether the option can change at runtime through `updateOptions`.
-  If yes, the service listens to the host's `onDidOptionsChange` and
-  retrofits existing groups; if no, say so in the option's doc comment.
-- For an enterprise module, add an `OPTION_MODULE_RULES` entry (with the
-  `when` predicate that means "the user asked for this") and list the option
-  in the module's `options` array. `enterpriseModuleNames.spec.ts` fails when
-  the two drift. Also add the module name to `ENTERPRISE_MODULE_NAMES` and to
-  the `Modules` array in `packages/dockview-enterprise/src/index.ts`.
+- **State lives in two places and disagrees**: model versus service, panel
+  versus group, DOM versus model. Look at who owns the state
+  (`dockviewPanel.ts`, `dockviewGroupPanelModel.ts`, the feature's service)
+  and who else writes it.
+- **Event order**: a listener that runs before the state it reads is set.
+  `onWill*` events are cancellable and fire before; `onDid*` fire after.
+  `strictEventsSequencing.ts` shows the ordering the engine promises.
+- **Lifecycle**: a listener or DOM node that outlives its owner, or state not
+  pruned on `onDidRemovePanel` / `onDidRemoveGroup`. Leak symptoms show up
+  as "works the first time".
+- **Serialization**: a field written by `toJSON` but ignored or defaulted by
+  `deserializer.ts`, or honoured when the governing option is off.
+- **Option plumbing**: key missing from `PROPERTY_KEYS_DOCKVIEW`, no Angular
+  `@Input()`, a runtime `updateOptions` the service never listens for, or
+  an `OPTION_MODULE_RULES` `when` that does not match how users set it.
+- **Module seams**: a code path that assumes the service exists instead of
+  going through `this.services.<x>?.`; the free bundle then differs from
+  enterprise.
+- **Window ownership**: `document` or `window` used directly where a popout
+  group's element lives in another document.
+- **Geometry**: a value measured at the wrong time (before layout, during a
+  transition) or a mocked value in the spec hiding a real-browser difference.
+- **Sizing and constraints**: `splitview`, `gridview` and the sash code
+  redistribute space on add, remove and resize; check the invariant the
+  reporter expected against what the code promises before calling it a bug.
 
-## Step 4: design the module wiring
+Fix where the invariant breaks, not where the symptom is observed. If the
+cause is in a shared primitive (`splitview`, `events`, `lifecycle`,
+`droptarget`), expect the fix to affect every consumer and check them.
 
-- Split the contract: `IFooHost` (what the component exposes), `IFooService`
-  (what the component may call), and a slot on `ServiceCollection`. The
-  licence slot is the one exception that is declaration-merged from
-  enterprise; do not add others.
-- Build the module with `defineModule({ name, serviceKey, create, init, dependsOn, options })`.
-  `init` runs once after construction and returns the disposable that tears
-  the module down; subscribe to host events there, not from component code.
-  Declare `dependsOn` for modules whose services you call (for example
-  `AdvancedDnDModule` or `LiveRegionModule`).
-- Core calls the service through optional chaining
-  (`this.services.fooService?.method()`), so the free bundle must behave
-  exactly as before when the module is missing. Design the seams so that
-  "service absent" and "option disabled" produce the same result.
-- Enterprise files import from `dockview`, never from `dockview-core` and
-  never from a `dist/` path.
+## Step 4: choose the smallest correct change
 
-## Step 5: state, serialization and lifecycle
+- Change the code that broke the invariant and nothing around it. No
+  renames, no reformatting, no refactor "while here". Those are separate
+  changes with their own review.
+- Keep every default. If the only correct fix changes a long-standing
+  behaviour (space redistribution on close, tab order, which panel becomes
+  active, focus routing), stop: write up both options in the fix note, and
+  prefer an opt-in option that leaves the default as it is. The maintainer
+  decides.
+- Match the surrounding pattern: the same guard style, the same event
+  names, the same place for the check. If the neighbouring code solves the
+  same problem differently, use its way.
+- Fix all the places the invariant is enforced, not one. A clamp added to
+  one code path while another path (keyboard, API call, restore) still
+  bypasses it is half a fix.
+- Comments describe the resulting code, briefly. Not "fixed", not "was",
+  not the issue number.
 
-- If the feature persists, extend the serialized types in
-  `packages/dockview-core/src/dockview/types.ts`, write the field in the
-  panel or group `toJSON()`, read it in `deserializer.ts`, and seed the
-  service from `onDidLayoutFromJSON`. A layout saved before the feature
-  existed must still load, so every new field defaults when absent.
-- Own disposal explicitly: services extend or compose `CompositeDisposable`,
-  and listeners on a group are removed when the group goes. Prune per-panel
-  bookkeeping on `onDidRemovePanel` so closed panel ids cannot leak.
-- Fire events after the state they describe has changed, and keep event
-  payloads to plain data.
-- Anything that touches `document` or `window` must use the owning window
-  of the group, because popout groups live in another document. Features
-  that need a genuine second window are only testable with the Playwright
-  harness (see the test-feature skill).
+## Step 5: blast radius
 
-## Step 6: the visible surface
+Before writing the fix note, check each of these and record the answer, even
+when it is "not affected":
 
-- CSS classes use the `dv-` prefix with `--modifier` suffixes
-  (`dv-tab--pinned`). SCSS lives only in `dockview-core`; every other package
-  copies the compiled CSS.
-- Themeable values are `--dv-*` custom properties declared in
-  `packages/dockview-core/src/theme.scss`, with a default that keeps the
-  current look.
-- Assistive-technology strings go through `DockviewMessages` in
-  `accessibilityMessages.ts` so they are localisable, and announcements go
-  through the live region service rather than ad-hoc `aria-live` nodes.
-- A keyboard path or context-menu item is part of the feature when the mouse
-  gesture has one; look at how pinned tabs registers its built-in
-  `contextMenuItem` and keyboard shortcut.
+- Other callers of the function or event you are changing (`grep` them).
+- The four layout kinds: grid, floating, popout, edge group; and maximised.
+- The four bindings: does the fix need a binding change, or does the engine
+  fix cover them?
+- Layouts saved before the fix: do they still load, and load correctly?
+- The docs page that describes the behaviour: is it now wrong, or did it
+  always describe the intended behaviour the bug violated?
+- User-visible behaviour change, even a correct one: a line in the current
+  `releases/whats-new/` or `releases/migrating/` page.
+- Public exports touched: `yarn gen`.
 
-## Step 7: public API and exports
+## Step 6: pin what must not change
 
-- Programmatic control belongs on the API objects in
-  `packages/dockview-core/src/api/` (`DockviewApi`, `DockviewPanelApi`,
-  group APIs), with events exposed as `onDid*`.
-- New public symbols are exported from `packages/dockview-core/src/index.ts`
-  (types with the `type` keyword). Running `yarn gen` regenerates
-  `__generated__/dockview-core-exports.txt`; CI fails when it is stale, so
-  treat an export change as part of the design.
-- Deprecate instead of removing: keep the old name as an alias and note it in
-  the migration guide.
+For every default or behaviour the fix sits next to, add a spec that asserts
+the current behaviour before you change anything. These specs are the
+contract that the fix did not widen; they are also what lets the reviewer
+accept it quickly.
 
-## Step 8: documentation and examples
+## When the fix needs new surface
 
-Plan the docs with the code, because the docs rules shape the public option
-names and wording:
+Sometimes the right fix is an option, an API method or an event rather than
+a code change behind existing behaviour. Treat it as a small feature:
 
-- One page under `packages/docs/docs/` (`core/panels/`, `core/groups/`,
-  `core/dnd/`, `advanced/`), with `enterprise: true` in the frontmatter and
-  `sidebar_custom_props` for enterprise features. The sidebar is
-  autogenerated from the folder, so no `sidebars.js` edit is needed.
-- A live example: `<CodeRunner id="dockview/<id>" />` backed by
-  `packages/docs/templates/dockview/<id>/{react,typescript,vue,angular}`. All
-  four variants, and the `LicenseManager` boilerplate only when the feature
-  is enterprise. Register the example in `packages/docs/src/pages/examples.tsx`.
-- The licence table in `overview/licence.mdx`, the current
-  `releases/whats-new/` page, and the hand-maintained `llms.txt` /
-  `llms-full.txt` at the repo root all list features; a new one belongs in
-  each.
-- Public prose never mentions `dockview-core`, modules, `registerModules`, or
-  the unlicensed watermark behaviour, and uses British spelling with no
-  em dashes. See `packages/docs/AGENTS.md`.
+- New behaviour is opt-in and off by default, typed in core `options.ts`,
+  listed in `PROPERTY_KEYS_DOCKVIEW`, with an Angular `@Input()`.
+- It lands where the code it extends lives. A knob on a free behaviour is
+  free; a knob on an enterprise module goes in that module. Genuinely new
+  paid functionality is a maintainer decision, not yours: list it as an open
+  question.
+- `references/feature-footprint.md` is the full layer-by-layer list (option,
+  contract, module rules, exports, serialization, bindings, docs page, four
+  template variants, release notes) for the rarer case where the change is a
+  real feature. Use it as the checklist; do not reach for it for a bug fix.
 
-## Step 9: the test plan, written before the code
+## Output: the fix note
 
-The specs are the first files the implementation creates, and they start red.
-For each behaviour in the design note, decide its layer now:
-
-- **Unit (jsdom; Jest, or Vitest for the Vue binding)**: logic, ordering, option plumbing, module gating,
-  events, serialization round trips, disposal. These live next to the
-  neighbour's specs (`packages/dockview-core/src/__tests__/...` or
-  `packages/dockview-enterprise/src/__tests__/...`) and bindings get their
-  own spec when the wrapper does more than forward an option.
-- **End-to-end (Playwright, `e2e/tests`)**: anything that depends on measured
-  widths, native drag and drop, real focus, pointer capture, or a popout's
-  second document. Playwright does not run in CI, so the design note states
-  which specs exist and the PR says they were run locally.
-- **A pinning test for every preserved default**: if the change touches a
-  behaviour users rely on (sizing on close, tab order, focus), add a spec
-  that asserts the current behaviour before touching it, so a regression is
-  caught by the suite and not by a user.
-
-The `test-feature` skill has the harness details, recipes and the commands to
-run one spec. For a bug fix the order is fixed: failing reproduction, then
-the fix, then confirm nothing else changed.
-
-## Output: the design note
-
-Write the note into the scratchpad (or straight into the reply when short)
-with these sections. Keep each bullet to one line; the value is in
-completeness, not prose.
+Short, one line per bullet, written to the scratchpad or straight into the
+reply. Its job is to be checkable, not persuasive.
 
 ```
-# <Feature name>
+# <Problem, in one line>
 
-## Summary
-One paragraph: what the user gets and what they do to get it.
-
-## Classification
-Free / enterprise, module / plain, persisted / transient, and why.
-
-## Option surface
-The `DockviewOptions` field(s), defaults, runtime-update behaviour.
-
+## Observed / expected
+## Reproduction
+Spec path and name; confirmed red for the reported reason. (Or: not reproducible, and what was tried.)
+## Root cause
+file:line, the invariant that breaks, and why the symptom appears where it does.
+## Fix
+What changes. What deliberately does not.
 ## Behaviour that must not change
-Existing defaults this touches and how the design preserves them.
-
-## Files by layer
-- core: ...
-- enterprise: ...
-- bindings (react / vue / angular): ...
-- docs + templates: ...
-- generated / exports: ...
-
-## Serialization and compatibility
-## Accessibility and keyboard
-## Test plan
-Unit specs by file, and which behaviours need e2e.
-
+Defaults nearby, and the pinning specs that guard them.
+## Blast radius
+Callers, layout kinds, bindings, saved layouts, docs, release note, gen.
+## Tests
+Unit specs; e2e specs (run locally, not in CI); pinning specs.
 ## Open questions for the maintainer
+Only if a default would change or the fix needs new surface.
 ```
 
-The note feeds the `test-feature` skill (specs first) and, once the branch is
-ready, the `review-feature` skill, which is run on every branch before a pull
-request is opened.
-
-Do not start implementing from an incomplete note. If a classification
-question is unresolved and the answer changes the file list, ask; if it only
-changes a default, draft with the conservative choice (off, free-side
-behaviour unchanged) and flag it.
+Then implement in that order: red spec, fix, pinning specs green, and hand
+the branch to the `review-feature` skill before opening a pull request.

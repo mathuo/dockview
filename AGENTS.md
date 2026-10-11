@@ -179,7 +179,7 @@ Linting and formatting are **Biome** (`biome.json` at the root). There is no ESL
 
 ### Adding New Features
 
--   Run the `design-feature` skill first: it classifies the change (free or enterprise, module or plain, persisted or not), names the existing feature to pattern on, and lists every layer to touch
+-   Run the `design-feature` skill first: for a fix it produces the failing test, root cause and smallest change; for new surface its reference lists every layer to touch and the existing feature to pattern on
 -   Write the specs before the implementation (`test-feature` skill)
 -   Start with the core package implementation; option types and module contracts live in `dockview-core` even for enterprise modules
 -   Add corresponding API methods in `api/`, with TypeDoc comments (the docs site renders them)
@@ -232,11 +232,13 @@ Three repo-specific skills live under `.claude/skills/` and encode the
 workflow above for agents. Invoke them by name (`/design-feature`,
 `/test-feature`, `/review-feature`); they also trigger on matching requests.
 
--   **`design-feature`** - run before implementing any feature, new option,
-    module or behavioural change. Produces a design note that follows the
-    nearest existing pattern, lists every layer the change touches (core,
-    enterprise, bindings, docs, generated files) and writes the test plan,
-    including which behaviours need e2e. Tests are written before the code.
+-   **`design-feature`** - run before fixing a reported bug, regression or
+    wrong behaviour, and before any small behavioural change or new option.
+    It pins the problem down, reproduces it as a failing test (Playwright
+    when jsdom cannot show it), traces the root cause, picks the smallest fix
+    that changes nothing else, and lists the behaviour that must stay as it
+    is. Its reference file carries the full layer-by-layer footprint for the
+    rarer case of a real new feature.
 -   **`test-feature`** - where specs live per package, how to run one, the
     jsdom recipes (mocks, geometry, popouts, leak checks), the failing-test-
     first rule for bug fixes, and when a behaviour needs a Playwright spec.
