@@ -202,6 +202,26 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
     State that enterprise features are governed by a licence key and link to the
     enterprise page; don't present the key as optional.
 
+## Project skills
+
+Three repo-specific skills live under `.claude/skills/` and encode the
+workflow above for agents. Invoke them by name (`/design-feature`,
+`/test-feature`, `/review-feature`); they also trigger on matching requests.
+
+-   **`design-feature`** - run before implementing any feature, new option,
+    module or behavioural change. Produces a design note that follows the
+    nearest existing pattern, lists every layer the change touches (core,
+    enterprise, bindings, docs, generated files) and writes the test plan,
+    including which behaviours need e2e. Tests are written before the code.
+-   **`test-feature`** - where specs live per package, how to run one, the
+    jsdom recipes (mocks, geometry, popouts, leak checks), the failing-test-
+    first rule for bug fixes, and when a behaviour needs a Playwright spec.
+-   **`review-feature`** - **run on every branch before opening a pull
+    request**, and again on each CI or review event. It is iterative: review,
+    fix, re-run the checks, re-read the new diff, and stop only when a full
+    pass finds nothing. Covers preserved defaults, option and module plumbing,
+    serialization compatibility, Sonar smells, docs rules and test coverage.
+
 ## Linear issue workflow
 
 When the work maps to a Linear issue (the user names an issue identifier such as
