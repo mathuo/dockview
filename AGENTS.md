@@ -8,6 +8,12 @@ Dockview is a zero-dependency layout manager supporting tabs, groups, grids and 
 
 See per-package `AGENTS.md` files under `packages/` for package-specific guidance.
 
+`AGENTS.md` is the single source of agent guidance at every level. Each
+`CLAUDE.md` (repo root and every package) is a **symlink to its sibling
+`AGENTS.md`**, never a copy or a stub: a copy drifts the moment one side is
+edited. When adding a package, create `CLAUDE.md` with `ln -s AGENTS.md CLAUDE.md`;
+when editing guidance, edit `AGENTS.md` only.
+
 ## Development Commands
 
 > **Use Yarn, not npm.** This repo is a **Yarn v1** workspaces monorepo. Install
@@ -20,7 +26,8 @@ See per-package `AGENTS.md` files under `packages/` for package-specific guidanc
 
 ### Build
 
--   `yarn build` - Build all publishable packages via NX (dockview-core, dockview, dockview-vue, dockview-react, dockview-angular)
+-   `yarn build` - Build all publishable packages via NX (dockview-core, dockview-enterprise, dockview, dockview-vue, dockview-react, dockview-angular): type declarations + CSS
+-   `yarn build:bundle` - Build the rolldown bundles (CJS/ESM package entries and UMD/CDN bundles) for the same packages; the e2e fixtures and the Tauri demo load these
 -   `yarn clean` - Clean all packages
 -   `npx nx run <package>:<script>` - Run a specific script for a single package (e.g. `npx nx run dockview-core:build`)
 
@@ -28,26 +35,38 @@ See per-package `AGENTS.md` files under `packages/` for package-specific guidanc
 
 NX handles build ordering automatically via `dependsOn: ["^build"]`. The dependency chain is:
 
+    dockview-core → dockview → dockview-enterprise
     dockview-core → dockview → dockview-react
     dockview-core → dockview → dockview-vue
     dockview-core → dockview → dockview-angular
 
 ### CSS Flow
 
--   `dockview-core` compiles SCSS to CSS via Gulp (`gulp sass`)
--   All other packages copy CSS from `dockview-core` using `scripts/copy-css.js`
+-   `dockview-core` compiles SCSS to CSS with `scripts/build-css.js` (`sass-embedded`) into `dist/styles/dockview.css`
+-   All other packages copy that CSS from `dockview-core` using their `scripts/copy-css.js` (`copy-css.cjs` in `dockview-vue`)
 
 ### Testing
 
--   `yarn test` - Run Jest tests across all packages via NX
--   `yarn test:cov` - Run tests with coverage (root-level Jest invocation for SonarCloud unified coverage)
+-   `yarn test` - Run the unit tests across all packages via NX (Jest for dockview-core, dockview, dockview-react, dockview-angular and dockview-enterprise; Vitest for dockview-vue)
+-   `yarn test:cov` - Run tests with coverage (root-level Jest invocation plus the Vue Vitest coverage, merged by SonarCloud)
+-   `npx jest <path>` - Run a single Jest spec from the repo root; `npx jest --selectProjects <package>` runs one package
+-   `yarn test:e2e` - Playwright specs under `e2e/` in a real browser (popouts, measured layout, native drag). Needs the bundles first: `yarn nx run-many -t build:bundle -p dockview-core dockview dockview-enterprise`. **Not run in CI**; say in the PR when you ran them. See `e2e/README.md`.
+-   `yarn bench` - Performance harness (`scripts/bench`) that drives the built `dockview-core` UMD bundle in headless Chromium; run `npx nx run dockview-core:build:bundle` first
 
 ### Linting & Formatting
 
--   `yarn lint` - Run ESLint across all packages via NX
--   `yarn lint:fix` - Run ESLint with automatic fixing
--   `yarn format` - Run Prettier across all packages
--   `yarn format:check` - Check Prettier formatting
+Linting and formatting are **Biome** (`biome.json` at the root). There is no ESLint or Prettier.
+
+-   `yarn lint` - Run Biome lint across all packages via NX (`biome lint src` per package)
+-   `yarn lint:fix` - Biome lint with automatic fixing
+-   `yarn format` - Biome format across all packages (`packages/docs` is deliberately excluded)
+-   `yarn format:check` - Check formatting (the CI `format` job)
+-   `yarn types:check` - Validate each package's published type resolution with `attw` (the CI `bundle` job); needs `build` and `build:bundle` first
+
+### Generated Files
+
+-   `yarn gen` - Regenerate `__generated__/dockview-core-exports.txt`, the sorted list of `dockview-core`'s public exports
+-   `yarn gen:check` - Fail if the generated file is stale (the CI `gen` job). Run `yarn gen` and commit whenever a public export is added, removed or renamed
 
 ### Documentation
 
@@ -69,7 +88,8 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 ### Monorepo Structure
 
 -   **packages/dockview-core** - Internal core layout engine (TypeScript, framework-agnostic, zero dependencies). Not a documented install target — consumers use `dockview` or a framework binding.
--   **packages/dockview** - Canonical JavaScript package (`npm install dockview`). Batteries-included: re-exports the core API and registers the separable feature modules. No `react` peer dependency.
+-   **packages/dockview** - Canonical JavaScript package (`npm install dockview`). A pure re-export of `dockview-core` with no side effects. No `react` peer dependency.
+-   **packages/dockview-enterprise** - The separately-licensed enterprise package: the paid feature modules plus the licence gate. Depends on and re-exports `dockview`, and registers its modules on import. See its `AGENTS.md`.
 -   **packages/dockview-react** - Canonical React bindings package — what docs, READMEs, and examples point users at (`npm install dockview-react`). Holds the actual React source and depends on `dockview`.
 -   **packages/dockview-vue** - Vue 3 bindings and components
 -   **packages/dockview-angular** - Angular bindings and components
@@ -107,18 +127,21 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 
 -   **NX** for monorepo orchestration (package-based, `useInferencePlugins: false`)
 -   **Yarn v1** for package management and workspaces
--   **TypeScript** (`tsc`) for CJS + ESM compilation
--   **Gulp** for SCSS processing (dockview-core only)
--   **Rollup** for UMD bundles (dockview-core, dockview, dockview-react)
+-   **TypeScript** (`tsc`, `emitDeclarationOnly`) for the `.d.ts` output; the runtime JS ships from the bundles
+-   **rolldown** for the CJS/ESM package entries and UMD/CDN bundles (dockview-core, dockview, dockview-enterprise, dockview-react)
+-   **sass-embedded** via `scripts/build-css.js` for SCSS (dockview-core only)
 -   **Vite** for Vue package builds
 -   **ng-packagr** for Angular Package Format builds
+-   **Biome** for lint and format
 
 ### Testing Strategy
 
--   Jest with ts-jest preset for TypeScript support
--   Testing Library for React component testing
+-   Jest with `@swc/jest` (jsdom) for dockview-core, dockview, dockview-react and dockview-enterprise; `jest-preset-angular` for dockview-angular; **Vitest** (jsdom) for dockview-vue, configured in its `vite.config.ts`
+-   Testing Library for React component testing, `@vue/test-utils` for Vue, TestBed for Angular
+-   Playwright for cross-window and measured-layout behaviour under `e2e/` (local only, not in CI)
 -   Coverage reporting with SonarCloud integration
--   Each package has its own jest.config.ts extending root configuration
+-   Every Jest package has its own `jest.config.ts`, listed as a project by the root `jest.config.ts`; the root `jest-setup.ts` resets the `PointerDragController` singleton after each test
+-   Tests are written before the implementation: a failing reproduction for a bug, the specs from the design note for a feature (see the `test-feature` skill)
 
 ### Code Quality
 
@@ -131,10 +154,9 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
     and prefer gating any behavioural change behind an opt-in option. Passing
     tests are necessary but not sufficient here — the absence of a test
     asserting the old behaviour is not permission to change it.
--   ESLint configuration extends recommended TypeScript rules
--   Prettier for code formatting
--   Linting targets source files in packages/\*/src/\*\* (excludes tests, docs, node_modules)
--   Current rules focus on TypeScript best practices while allowing some flexibility
+-   Biome lint rules are in `biome.json` (recommended set plus the listed a11y, complexity, correctness, style and suspicious rules, mostly at `warn`)
+-   Biome formatter: 4-space indent, 80 columns, single quotes, semicolons, ES5 trailing commas
+-   Lint and format target `packages/*/src/**` (`.ts`, `.tsx`, `.js`, `.jsx`, `.vue`), excluding `dist/`, `packages/docs/` and `__mocks__/`. Tests under `__tests__` are linted but excluded from Sonar
 -   **SonarCloud must introduce no new issues.** Every PR runs a SonarCloud
     analysis (the `sonar` check). A PR is not ready to merge while it reports
     any new issues, even if the Quality Gate still passes — treat "New issues:
@@ -157,12 +179,14 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 
 ### Adding New Features
 
--   Start with core package implementation
--   Add corresponding API methods in api/ directory
--   Create framework-specific wrappers as needed
--   Update TypeDoc documentation
--   Add tests in \_\_tests\_\_ directories
--   Run `yarn lint` to check code quality before committing
+-   Run the `design-feature` skill first: it classifies the change (free or enterprise, module or plain, persisted or not), names the existing feature to pattern on, and lists every layer to touch
+-   Write the specs before the implementation (`test-feature` skill)
+-   Start with the core package implementation; option types and module contracts live in `dockview-core` even for enterprise modules
+-   Add corresponding API methods in `api/`, with TypeDoc comments (the docs site renders them)
+-   Add the option key to `PROPERTY_KEYS_DOCKVIEW` and an Angular `@Input()`; React and Vue forward automatically
+-   Export new public symbols from `packages/dockview-core/src/index.ts` and run `yarn gen`
+-   Add the docs page and the four template variants (`packages/docs/AGENTS.md`)
+-   Run the `review-feature` skill before opening the pull request; it runs `yarn lint`, `yarn format:check`, `yarn gen:check` and the affected tests
 
 ### State Management
 

@@ -128,6 +128,13 @@ code itself.
 - [ ] Package READMEs untouched unless the change is to installation or
       quickstart.
 
+## Agent guidance files
+
+- [ ] Every `CLAUDE.md` (root and each package) is a symlink to its sibling
+      `AGENTS.md`, not a copy or a stub: `find . -name CLAUDE.md -not -path '*/node_modules/*' -not -type l`
+      prints nothing. Guidance edits go to `AGENTS.md` only.
+- [ ] A new package ships `AGENTS.md` plus the `CLAUDE.md` symlink.
+
 ## Pull request
 
 - [ ] Body follows `.github/pull_request_template.md`: description, type,

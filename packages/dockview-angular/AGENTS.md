@@ -24,20 +24,18 @@ Angular bindings for dockview using standalone components and NgModule.
 
 ## Testing
 
-- `test` - Jest with `jest-preset-angular`
-- Setup file: `__tests__/setup-jest.ts`
+- `test` - Jest with `jest-preset-angular` (TestBed)
+- Setup file: `src/__tests__/setup-jest.ts`
 - Config: `jest.config.ts` (project name: `dockview-angular`)
+- `dockview-angular.component.spec.ts` asserts that every `PROPERTY_KEYS_DOCKVIEW` key has an `@Input()`: a new core option needs `@Input() <key>?: DockviewOptions['<key>'];` in `dockview-angular.component.ts`, or `[key]` bindings raise NG0303 and never reach core
 
 ## Config Files
 
 - `tsconfig.lib.json` - ng-packagr TypeScript config
+- `tsconfig.spec.json` / `tsconfig.test.json` - Jest configs
 - `ng-package.json` - ng-packagr package config
 - Self-contained tsconfig (does not extend root `tsconfig.base.json`)
 - Uses `experimentalDecorators` and `emitDecoratorMetadata`
-
-## Known Issues
-
-- Angular peer deps (`>=21.0.6`) conflict with root devDependencies (`@angular ^17.0.0`). The peer dep version is set for end-user compatibility, while dev uses v17 for build tooling.
 
 ## Dependencies
 

@@ -1,10 +1,10 @@
 # AGENTS.md - dockview-enterprise
 
 The separately-published **enterprise** package: dockview's paid feature modules
-plus the license gate. Depends only on `dockview` (the free package) at an exact
-version and re-exports it (`export * from 'dockview'`), so it is a drop-in
-superset of the free package. Importing it self-registers its modules + the
-license check.
+plus the license gate. Depends only on `dockview` (the free package), at the
+same major version (a caret range), and re-exports it
+(`export * from 'dockview'`), so it is a drop-in superset of the free package.
+Importing it self-registers its modules + the license check.
 
 ## Modules hosted here
 
@@ -48,8 +48,10 @@ calls `registerModules(Modules)` at import (a side effect — hence
 
 ## Build / Test
 
-- `build` - `tsc` declarations only (`emitDeclarationOnly`; no CSS, styles live
-  in core). The runtime JS ships as the rolldown bundles.
+- `build` - `build:cjs` (`tsc` declarations only, `emitDeclarationOnly`) +
+  `build:css` (copies the compiled CSS from `dockview-core` into `dist/styles`
+  with `scripts/copy-css.js`; the SCSS source lives in core). The runtime JS
+  ships as the rolldown bundles.
 - `build:bundle` - rolldown; externalizes `dockview`. Emits the CJS/ESM package
   entries (`dist/package`) and UMD bundle, and stamps the build date into
   `releaseDate.ts` (replacing the `__DOCKVIEW_RELEASE_DATE__` token) for
@@ -61,5 +63,6 @@ calls `registerModules(Modules)` at import (a side effect — hence
 
 ## Dependencies
 
-- Depends on: `dockview` (exact version). Build chain: `dockview-core` ->
-  `dockview` -> `dockview-enterprise`.
+- Depends on: `dockview` (caret range on the same major; the release tooling
+  bumps both together). Build chain: `dockview-core` -> `dockview` ->
+  `dockview-enterprise`.

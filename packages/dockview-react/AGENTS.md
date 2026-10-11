@@ -21,7 +21,9 @@ bridge, hooks. All documentation, READMEs, and examples point at this package fo
 - `src/splitview/` - React components for splitview
 - `src/paneview/` - React components for paneview
 - `src/react.ts` - React utilities (HOCs, hooks, portal bridge)
+- `src/svg.tsx`, `src/types.ts` - Shared icons and prop types
 - `src/index.ts` - Main entry point, re-exports `dockview` + React components
+- Options: `IDockviewReactProps extends DockviewOptions` and the component forwards every `PROPERTY_KEYS_DOCKVIEW` key, so a new core option needs no React change unless it introduces a renderer
 
 ## Build
 
@@ -33,8 +35,9 @@ bridge, hooks. All documentation, READMEs, and examples point at this package fo
 
 ## Testing
 
-- `test` - Jest with `@swc/jest`, jsdom environment
+- `test` - Jest with `@swc/jest`, jsdom environment, Testing Library (`render` / `act` / `waitFor`)
 - Uses `moduleNameMapper` to resolve `dockview` and `dockview-core` from source
+- `lint` / `format` - Biome over `src`
 - Config: `jest.config.ts` (project name: `dockview-react`)
 
 ## Dependencies

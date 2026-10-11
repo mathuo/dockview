@@ -12,22 +12,26 @@ Vue 3 bindings for dockview.
 
 - `build:js` - Vite build (produces ES, UMD, and CJS outputs)
 - `build:types` - Type declarations via `vue-tsc` (`tsconfig.build-types.json`)
-- `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
+- `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.cjs`)
 - `build` - All three above in sequence
 - `build:bundle` - No-op (`echo 'noop'`), Vite already produces all needed formats
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
 
-- `test` - Jest with `@vue/vue3-jest` transformer and `@vue/test-utils`
-- Config: `jest.config.ts` (project name: `dockview-vue`)
+- `test` - **Vitest** (`vitest run`, jsdom), not Jest: use `vi.fn()` / `vi.spyOn()`, and `mount` from `@vue/test-utils`
+- Config: the `test` block in `vite.config.ts`. It aliases `dockview`, `dockview-core` and `dockview-enterprise` to their source and loads `src/__tests__/__mocks__/resizeObserver.vitest.ts`
+- `test:cov` - Vitest coverage (`lcovonly`), then `scripts/fix-lcov-paths.cjs` rewrites the paths to repo-root-relative so SonarCloud can merge them with the Jest coverage
+- The root `yarn test` / `yarn test:cov` include this package; running it alone: `cd packages/dockview-vue && npx vitest run [spec]`
 
 ## Config Files
 
 - `tsconfig.json` - Project references
 - `tsconfig.app.json` - App/source config
 - `tsconfig.build-types.json` - Declaration-only build config
-- `vite.config.ts` - Vite build configuration
+- `tsconfig.config.json` - Config-file (Vite) type checking
+- `tsconfig.typedoc.json` - TypeDoc input
+- `vite.config.ts` - Vite build and Vitest configuration
 
 ## Dependencies
 

@@ -23,13 +23,15 @@ model. When writing or editing docs:
 
 ## Build Commands
 
-- `build` - Build templates then build Docusaurus site
+- `build` - Copy the root `llms.txt` / `llms-full.txt` in, build templates, then build the Docusaurus site
 - `start` - Start dev server (Docusaurus + ESM server via concurrently)
 - `build-templates` - Generate framework example templates from source
 - `build-templates:local` - Generate templates using local package references
+- `copy-llms` - Copy `llms.txt` and `llms-full.txt` from the repo root into `static/`; those two files are hand-maintained at the root and should mention every feature
 - `typecheck` - Run TypeScript type checking
+- `record-clips` - Record the demo clips (`scripts/record/`); output is gitignored
 
-**Do NOT format the docs package.** It is deliberately excluded from Prettier / `nx format` / `format:check`. Don't run Prettier on files under `packages/docs/` and don't "fix" formatting warnings here — CI does not check it.
+**Do NOT format the docs package.** It is deliberately excluded from Biome (`biome.json` lists `!packages/docs/**`) and so from `yarn format` / `yarn format:check`. Don't run a formatter on files under `packages/docs/` and don't "fix" formatting warnings here: CI does not check it.
 
 ## Documentation Structure
 
