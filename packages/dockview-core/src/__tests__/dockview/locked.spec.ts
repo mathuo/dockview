@@ -24,6 +24,13 @@ class TestPanel implements IContentRenderer {
 describe('dockview locked option', () => {
     const DISABLED = 'dv-splitview-disabled';
 
+    const originalOpen = window.open;
+
+    afterEach(() => {
+        window.open = originalOpen;
+        jest.useRealTimers();
+    });
+
     function createDockview(locked: boolean | undefined): DockviewComponent {
         const container = document.createElement('div');
         const dockview = new DockviewComponent(container, {
@@ -311,7 +318,6 @@ describe('dockview locked option', () => {
             );
 
             dockview.dispose();
-            jest.useRealTimers();
         });
 
         test('popout windows follow the option, at creation and at runtime', async () => {

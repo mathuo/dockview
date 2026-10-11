@@ -514,7 +514,6 @@ export class ShellManager implements IDisposable {
     private readonly _pendingSizes = new Map<EdgeGroupPosition, number>();
     private _currentWidth = 0;
     private _currentHeight = 0;
-    private _locked = false;
     private _gap: number;
     private _defaultCollapsedSize: number;
 
@@ -604,11 +603,10 @@ export class ShellManager implements IDisposable {
      * in the middle column), so locking disables both.
      */
     get locked(): boolean {
-        return this._locked;
+        return this._outerSplitview.disabled;
     }
 
     set locked(value: boolean) {
-        this._locked = value;
         this._outerSplitview.disabled = value;
         this._middleColumn.disabled = value;
     }
