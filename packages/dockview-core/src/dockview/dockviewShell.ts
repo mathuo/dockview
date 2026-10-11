@@ -514,6 +514,7 @@ export class ShellManager implements IDisposable {
     private readonly _pendingSizes = new Map<EdgeGroupPosition, number>();
     private _currentWidth = 0;
     private _currentHeight = 0;
+    private _locked = false;
     private _gap: number;
     private _defaultCollapsedSize: number;
 
@@ -598,16 +599,16 @@ export class ShellManager implements IDisposable {
     }
 
     /**
-     * Mirrors the dock's `locked` option onto the shell: the grid disables
-     * its branch splitviews, and the edge groups are resized with the sashes
+     * The dock's `locked` option. The edge groups are resized with the sashes
      * of the shell's own splitviews (left/right in the outer one, top/bottom
-     * in the middle column), so they have to be disabled too. See #1671.
+     * in the middle column), so locking disables both.
      */
     get locked(): boolean {
-        return this._outerSplitview.disabled;
+        return this._locked;
     }
 
     set locked(value: boolean) {
+        this._locked = value;
         this._outerSplitview.disabled = value;
         this._middleColumn.disabled = value;
     }

@@ -1643,8 +1643,8 @@ export class DockviewComponent
             options.theme?.edgeGroupCollapsedSize
         );
         // The base grid took `locked` from the options; the shell's splitviews
-        // host the edge groups and need it too (#1671).
-        this._shellManager.locked = !!options.locked;
+        // host the edge groups and need it too.
+        this.locked = !!options.locked;
         // The shell wraps the dockview element, so move the popup anchor
         // into the shell so overflow dropdowns in edge groups position correctly
         this.popupService.updateRoot(this._shellManager.element);
@@ -2886,6 +2886,35 @@ export class DockviewComponent
     }
 
     /**
+     * Locks the main grid, the shell whose splitviews host the edge groups,
+     * and the nested gridviews of floating and popout windows. The base
+     * setter stops at the main grid; `updateOptions` reaches this override.
+     */
+    override get locked(): boolean {
+        return this.gridview.locked;
+    }
+
+    override set locked(value: boolean) {
+        this.gridview.locked = value;
+        if (this._shellManager) {
+            this._shellManager.locked = value;
+        }
+        for (const gridview of this.nestedGridviews()) {
+            gridview.locked = value;
+        }
+    }
+
+    /** The gridviews hosted by open floating and popout windows. */
+    private nestedGridviews(): Gridview[] {
+        return [
+            ...this.floatingGroups.map((floating) => floating.gridview),
+            ...(this._popoutWindowService?.entries ?? []).map(
+                (entry) => entry.gridview
+            ),
+        ];
+    }
+
+    /**
      * Build an empty gridview configured to match the main grid's styling and
      * resize behaviour, for hosting a nested layout inside a floating or popout
      * window.
@@ -3102,30 +3131,10 @@ export class DockviewComponent
         }
 
         if ('proportionalLayout' in options) {
-            // super.updateOptions has already updated the main grid; floating
-            // and popout windows host their own nested gridviews
+            // super.updateOptions has already updated the main grid
             const proportionalLayout = this.gridview.proportionalLayout;
-            for (const floating of this.floatingGroups) {
-                floating.gridview.proportionalLayout = proportionalLayout;
-            }
-            for (const entry of this._popoutWindowService?.entries ?? []) {
-                entry.gridview.proportionalLayout = proportionalLayout;
-            }
-        }
-
-        if ('locked' in options) {
-            // super.updateOptions has already updated the main grid; the shell
-            // hosts the edge groups, and floating and popout windows host
-            // their own nested gridviews (#1671)
-            const locked = this.locked;
-            if (this._shellManager) {
-                this._shellManager.locked = locked;
-            }
-            for (const floating of this.floatingGroups) {
-                floating.gridview.locked = locked;
-            }
-            for (const entry of this._popoutWindowService?.entries ?? []) {
-                entry.gridview.locked = locked;
+            for (const gridview of this.nestedGridviews()) {
+                gridview.proportionalLayout = proportionalLayout;
             }
         }
 

@@ -129,6 +129,28 @@ describe('dockview locked option', () => {
             dockview.dispose();
         });
 
+        test('the locked setter reaches the edge groups like updateOptions does', () => {
+            const dockview = createDockview(undefined);
+            dockview.addEdgeGroup('left', { id: 'left', initialSize: 250 });
+            dockview.addEdgeGroup('top', { id: 'top', initialSize: 100 });
+
+            const { outer, middle } = shellSplitviews(dockview);
+
+            dockview.locked = true;
+
+            expect(isDisabled(gridSplitview(dockview))).toBe(true);
+            expect(isDisabled(outer)).toBe(true);
+            expect(isDisabled(middle)).toBe(true);
+
+            dockview.locked = false;
+
+            expect(isDisabled(gridSplitview(dockview))).toBe(false);
+            expect(isDisabled(outer)).toBe(false);
+            expect(isDisabled(middle)).toBe(false);
+
+            dockview.dispose();
+        });
+
         test('an unrelated updateOptions leaves the lock untouched', () => {
             const dockview = createDockview(true);
             dockview.addEdgeGroup('left', { id: 'left', initialSize: 250 });
@@ -221,6 +243,22 @@ describe('dockview locked option', () => {
 
             expect(gridview.locked).toBe(false);
             expect(isDisabled(splitview)).toBe(false);
+
+            dockview.dispose();
+        });
+
+        test('the locked setter reaches an open floating window', () => {
+            const dockview = createFloatingSplit(undefined);
+
+            const gridview = floatingGridview(dockview);
+
+            dockview.locked = true;
+
+            expect(gridview.locked).toBe(true);
+
+            dockview.locked = false;
+
+            expect(gridview.locked).toBe(false);
 
             dockview.dispose();
         });
