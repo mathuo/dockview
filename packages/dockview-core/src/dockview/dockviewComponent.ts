@@ -1642,8 +1642,8 @@ export class DockviewComponent
             options.theme?.gap ?? 0,
             options.theme?.edgeGroupCollapsedSize
         );
-        // The base grid took `locked` from the options; the shell's splitviews
-        // host the edge groups and need it too.
+        // The base constructor locked the grid only; the override also
+        // reaches the shell, which exists now.
         this.locked = !!options.locked;
         // The shell wraps the dockview element, so move the popup anchor
         // into the shell so overflow dropdowns in edge groups position correctly
@@ -2139,6 +2139,9 @@ export class DockviewComponent
                 if (!options?.overridePopoutGridview) {
                     popoutGridview.addView(group, Sizing.Distribute, [0]);
                 }
+                // A restored gridview was built when fromJSON ran, before the
+                // window opened; the lock may have changed in between.
+                popoutGridview.locked = this.gridview.locked;
                 // Fill the popout window. Unlike the main grid (explicit px) and
                 // floating windows (CSS inside .dv-resize-container), the popout
                 // gridview has no sizing context, so without this it collapses
@@ -6361,13 +6364,8 @@ export class DockviewComponent
 
         const gap = theme.gap ?? 0;
         this.gridview.margin = gap;
-        // Floating / popout windows host their own nested gridviews; keep their
-        // gap in sync with the main grid when the theme changes at runtime.
-        for (const floating of this.floatingGroups) {
-            floating.gridview.margin = gap;
-        }
-        for (const entry of this._popoutWindowService?.entries ?? []) {
-            entry.gridview.margin = gap;
+        for (const gridview of this.nestedGridviews()) {
+            gridview.margin = gap;
         }
         this._shellManager?.updateTheme(
             gap,

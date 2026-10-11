@@ -26,7 +26,6 @@ describe('dockview locked option', () => {
 
     function createDockview(locked: boolean | undefined): DockviewComponent {
         const container = document.createElement('div');
-        document.body.appendChild(container);
         const dockview = new DockviewComponent(container, {
             createComponent: () => new TestPanel(),
             ...(locked === undefined ? {} : { locked }),
@@ -275,6 +274,44 @@ describe('dockview locked option', () => {
             expect(floatingGridview(dockview).locked).toBe(true);
 
             dockview.dispose();
+        });
+
+        test('a popout window locked while its restore is pending opens locked', async () => {
+            jest.useFakeTimers();
+            window.open = () => setupMockWindow();
+
+            const dockview = createDockview(undefined);
+            const panel1 = dockview.getGroupPanel('panel_1')!;
+            const panel2 = dockview.getGroupPanel('panel_2')!;
+
+            await dockview.addPopoutGroup(panel1);
+            // split panel_2's group into the popout -> 2-group popout window
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel1.group, position: 'right' },
+            });
+
+            const state = dockview.toJSON();
+            expect(state.popoutGroups![0].grid).toBeDefined();
+
+            dockview.clear();
+            dockview.fromJSON(state);
+
+            // fromJSON built the popout gridview synchronously but the window
+            // only opens on a timer; the lock lands in between
+            dockview.updateOptions({ locked: true });
+
+            jest.advanceTimersByTime(500);
+            await dockview.popoutRestorationPromise;
+
+            const restored = dockview.getGroupPanel('panel_1')!;
+            expect(restored.api.location.type).toBe('popout');
+            expect(dockview.getGridviewForGroup(restored.group).locked).toBe(
+                true
+            );
+
+            dockview.dispose();
+            jest.useRealTimers();
         });
 
         test('popout windows follow the option, at creation and at runtime', async () => {
