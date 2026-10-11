@@ -2883,6 +2883,18 @@ export class DockviewComponent
         }
     }
 
+    /** The gridviews of every floating and popout window. */
+    private forEachNestedGridview(
+        callback: (gridview: Gridview) => void
+    ): void {
+        for (const floating of this.floatingGroups) {
+            callback(floating.gridview);
+        }
+        for (const entry of this._popoutWindowService?.entries ?? []) {
+            callback(entry.gridview);
+        }
+    }
+
     /**
      * Build an empty gridview configured to match the main grid's styling and
      * resize behaviour, for hosting a nested layout inside a floating or popout
@@ -3101,26 +3113,20 @@ export class DockviewComponent
             this.updateDragAndDropState();
         }
 
+        // super.updateOptions has already updated the main grid; floating and
+        // popout windows host their own nested gridviews
         if ('proportionalLayout' in options) {
-            // super.updateOptions has already updated the main grid; floating
-            // and popout windows host their own nested gridviews
             const proportionalLayout = this.gridview.proportionalLayout;
-            for (const floating of this.floatingGroups) {
-                floating.gridview.proportionalLayout = proportionalLayout;
-            }
-            for (const entry of this._popoutWindowService?.entries ?? []) {
-                entry.gridview.proportionalLayout = proportionalLayout;
-            }
+            this.forEachNestedGridview((gridview) => {
+                gridview.proportionalLayout = proportionalLayout;
+            });
         }
 
         if ('disableCornerResize' in options) {
             const cornerResize = this.gridview.cornerResize;
-            for (const floating of this.floatingGroups) {
-                floating.gridview.cornerResize = cornerResize;
-            }
-            for (const entry of this._popoutWindowService?.entries ?? []) {
-                entry.gridview.cornerResize = cornerResize;
-            }
+            this.forEachNestedGridview((gridview) => {
+                gridview.cornerResize = cornerResize;
+            });
         }
 
         if ('theme' in options) {

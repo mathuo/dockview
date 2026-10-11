@@ -144,6 +144,34 @@ function isNearRect(rect: DOMRect, x: number, y: number, slack: number) {
     );
 }
 
+/**
+ * Where the centre lines of two orthogonal sashes cross, if that point lies on
+ * (or within `slack` of) both, i.e. the sashes actually meet there. `own` is a
+ * sash of a horizontal splitview (a vertical bar) when `horizontal` is set.
+ */
+function findSashJunction(
+    own: DOMRect,
+    other: DOMRect,
+    horizontal: boolean,
+    slack: number
+): { x: number; y: number } | undefined {
+    // not laid out (e.g. inside a hidden view)
+    if (other.width === 0 && other.height === 0) {
+        return undefined;
+    }
+
+    const x = horizontal
+        ? own.left + own.width / 2
+        : other.left + other.width / 2;
+    const y = horizontal
+        ? other.top + other.height / 2
+        : own.top + own.height / 2;
+
+    return isNearRect(own, x, y, slack) && isNearRect(other, x, y, slack)
+        ? { x, y }
+        : undefined;
+}
+
 interface ISashDragSnapState {
     readonly index: number;
     readonly limitDelta: number;
@@ -1237,47 +1265,36 @@ export class Splitview {
             | undefined;
         let bestDistance = Number.POSITIVE_INFINITY;
 
-        for (const { splitview, isOuter } of candidates) {
+        const others = candidates
             // a locked splitview stays locked, whichever sash is grabbed
-            if (splitview._disabled) {
+            .filter(({ splitview }) => !splitview._disabled)
+            .flatMap(({ splitview, isOuter }) =>
+                splitview.sashes
+                    .filter(
+                        (item) =>
+                            !item.container.classList.contains('dv-disabled')
+                    )
+                    .map((item) => ({ splitview, sash: item, isOuter }))
+            );
+
+        for (const other of others) {
+            const junction = findSashJunction(
+                own,
+                other.sash.container.getBoundingClientRect(),
+                horizontal,
+                gap + reach
+            );
+            if (!junction) {
                 continue;
             }
 
-            for (const item of splitview.sashes) {
-                if (item.container.classList.contains('dv-disabled')) {
-                    continue;
-                }
-                const other = item.container.getBoundingClientRect();
-                // not laid out (e.g. inside a hidden view)
-                if (other.width === 0 && other.height === 0) {
-                    continue;
-                }
-
-                // where the centre lines of the two sashes cross
-                const x = horizontal
-                    ? own.left + own.width / 2
-                    : other.left + other.width / 2;
-                const y = horizontal
-                    ? other.top + other.height / 2
-                    : own.top + own.height / 2;
-
-                // ...which must lie on (or within a gap of) both sashes, or
-                // they never actually meet
-                if (
-                    !isNearRect(own, x, y, gap + reach) ||
-                    !isNearRect(other, x, y, gap + reach)
-                ) {
-                    continue;
-                }
-
-                const distance = Math.max(
-                    Math.abs(event.clientX - x),
-                    Math.abs(event.clientY - y)
-                );
-                if (distance <= reach + gap / 2 && distance < bestDistance) {
-                    bestDistance = distance;
-                    best = { splitview, sash: item, isOuter };
-                }
+            const distance = Math.max(
+                Math.abs(event.clientX - junction.x),
+                Math.abs(event.clientY - junction.y)
+            );
+            if (distance <= reach + gap / 2 && distance < bestDistance) {
+                bestDistance = distance;
+                best = other;
             }
         }
 
