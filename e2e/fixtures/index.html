@@ -738,8 +738,8 @@
                             position: { direction: 'below', referencePanel: 'tr' },
                         });
                     },
-                    setDisableCornerResize: (value) =>
-                        dockview.updateOptions({ disableCornerResize: value }),
+                    setDisableOrthogonalSashMultidrag: (value) =>
+                        dockview.updateOptions({ disableOrthogonalSashMultidrag: value }),
                     // 2x2 grid: tl | tr over bl | br, so every group meets
                     // at a single centre junction of the row and column sashes.
                     setupTwoByTwo: () => {

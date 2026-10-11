@@ -1419,8 +1419,7 @@ describe('gridview', () => {
         subscription.dispose();
     });
 
-    describe('corner resize', () => {
-        // jsdom has no layout; give a sash the rect it would have on screen
+    describe('orthogonal sash multidrag', () => {
         const setRect = (
             element: HTMLElement,
             left: number,
@@ -1441,8 +1440,7 @@ describe('gridview', () => {
             } as DOMRect);
         };
 
-        // two columns, the first split into two rows: the row sash ends on
-        // the column sash at (200, 150)
+        // two columns, the first split into two rows
         const setup = () => {
             const gridview = new Gridview(
                 true,
@@ -1482,20 +1480,20 @@ describe('gridview', () => {
                 })
             );
 
-        test('a row sash meeting a column sash forms a corner', () => {
+        test('a row sash meeting a column sash is linked', () => {
             const { gridview, columnSash, rowSash } = setup();
-            expect(gridview.cornerResize).toBe(true);
+            expect(gridview.orthogonalSashMultidrag).toBe(true);
 
             hover(rowSash);
 
-            expect(rowSash.classList.contains('dv-sash-corner')).toBe(true);
-            expect(columnSash.classList.contains('dv-sash-corner')).toBe(true);
+            expect(rowSash.classList.contains('dv-sash-multidrag')).toBe(true);
+            expect(columnSash.classList.contains('dv-sash-multidrag')).toBe(
+                true
+            );
         });
 
-        test('a corner below the root keeps both resizes on release', () => {
-            // root columns | right column split into rows | its top row split
-            // into columns: the corner is between two non-root splitviews, so
-            // ending the outer drag relays out through the root
+        test('a junction below the root keeps both resizes on release', () => {
+            // the junction is between two non-root splitviews
             const gridview = new Gridview(
                 true,
                 undefined,
@@ -1544,14 +1542,14 @@ describe('gridview', () => {
             expect([a.width, a.height]).toEqual([130, 180]);
         });
 
-        test('cornerResize = false disables it', () => {
+        test('orthogonalSashMultidrag = false disables it', () => {
             const { gridview, rowSash } = setup();
-            gridview.cornerResize = false;
-            expect(gridview.cornerResize).toBe(false);
+            gridview.orthogonalSashMultidrag = false;
+            expect(gridview.orthogonalSashMultidrag).toBe(false);
 
             hover(rowSash);
 
-            expect(rowSash.classList.contains('dv-sash-corner')).toBe(false);
+            expect(rowSash.classList.contains('dv-sash-multidrag')).toBe(false);
         });
 
         test('sashes of a grid nested in a view are not linked', () => {
@@ -1563,13 +1561,16 @@ describe('gridview', () => {
             inner.addView(new MockGridview(), Sizing.Distribute, [1]);
             const innerSash =
                 inner.element.querySelector<HTMLElement>('.dv-sash')!;
-            // touching the outer column sash, as a nested grid's sash would
             setRect(innerSash, 0, 148, 200, 4);
 
             hover(innerSash);
 
-            expect(innerSash.classList.contains('dv-sash-corner')).toBe(false);
-            expect(columnSash.classList.contains('dv-sash-corner')).toBe(false);
+            expect(innerSash.classList.contains('dv-sash-multidrag')).toBe(
+                false
+            );
+            expect(columnSash.classList.contains('dv-sash-multidrag')).toBe(
+                false
+            );
         });
     });
 });

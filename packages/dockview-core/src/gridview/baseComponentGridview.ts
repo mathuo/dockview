@@ -45,7 +45,7 @@ export interface BaseGridOptions {
     readonly locked?: boolean;
     readonly margin?: number;
     readonly className?: string;
-    readonly disableCornerResize?: boolean;
+    readonly disableOrthogonalSashMultidrag?: boolean;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -179,7 +179,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
         );
 
         this.gridview.locked = !!options.locked;
-        this.gridview.cornerResize = !options.disableCornerResize;
+        this.gridview.orthogonalSashMultidrag =
+            !options.disableOrthogonalSashMultidrag;
 
         this.element.appendChild(this.gridview.element);
 
@@ -253,8 +254,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
         if ('margin' in options) {
             this.gridview.margin = options.margin ?? 0;
         }
-        if ('disableCornerResize' in options) {
-            this.gridview.cornerResize = !options.disableCornerResize;
+        if ('disableOrthogonalSashMultidrag' in options) {
+            this.gridview.orthogonalSashMultidrag =
+                !options.disableOrthogonalSashMultidrag;
         }
         if ('className' in options) {
             this._classNames.setClassNames(options.className ?? '');

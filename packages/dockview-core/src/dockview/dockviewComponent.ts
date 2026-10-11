@@ -1579,7 +1579,8 @@ export class DockviewComponent
             locked: options.locked,
             margin: options.theme?.gap ?? 0,
             className: options.className,
-            disableCornerResize: options.disableCornerResize,
+            disableOrthogonalSashMultidrag:
+                options.disableOrthogonalSashMultidrag,
         });
 
         this._options = options;
@@ -2883,7 +2884,6 @@ export class DockviewComponent
         }
     }
 
-    /** The gridviews of every floating and popout window. */
     private forEachNestedGridview(
         callback: (gridview: Gridview) => void
     ): void {
@@ -2912,7 +2912,8 @@ export class DockviewComponent
             false,
             this.options.theme?.gap ?? 0
         );
-        gridview.cornerResize = this.gridview.cornerResize;
+        gridview.orthogonalSashMultidrag =
+            this.gridview.orthogonalSashMultidrag;
         return gridview;
     }
 
@@ -3113,8 +3114,7 @@ export class DockviewComponent
             this.updateDragAndDropState();
         }
 
-        // super.updateOptions has already updated the main grid; floating and
-        // popout windows host their own nested gridviews
+        // floating and popout windows have their own gridviews
         if ('proportionalLayout' in options) {
             const proportionalLayout = this.gridview.proportionalLayout;
             this.forEachNestedGridview((gridview) => {
@@ -3122,10 +3122,11 @@ export class DockviewComponent
             });
         }
 
-        if ('disableCornerResize' in options) {
-            const cornerResize = this.gridview.cornerResize;
+        if ('disableOrthogonalSashMultidrag' in options) {
+            const orthogonalSashMultidrag =
+                this.gridview.orthogonalSashMultidrag;
             this.forEachNestedGridview((gridview) => {
-                gridview.cornerResize = cornerResize;
+                gridview.orthogonalSashMultidrag = orthogonalSashMultidrag;
             });
         }
 

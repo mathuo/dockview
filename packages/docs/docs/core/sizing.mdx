@@ -149,21 +149,21 @@ sizes in place at that moment as the proportions to preserve, rather than the
 proportions from before it was disabled. Passing `undefined` restores the
 default.
 
-## Corner resizing
+## Dragging two splitters at once
 
-Where a row splitter meets a column splitter, hovering the junction shows a
-move cursor and dragging it resizes along both axes at once. This is on by
-default. Set `disableCornerResize` to drag each splitter on its own.
+Where a row splitter meets a column splitter, drag the junction to resize both
+at once. This is on by default. Set `disableOrthogonalSashMultidrag` to turn it
+off.
 
 ```tsx
-disableCornerResize={true}
+disableOrthogonalSashMultidrag={true}
 ```
 
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(element, {
     theme: themeAbyss,
-    disableCornerResize: true,
+    disableOrthogonalSashMultidrag: true,
     createComponent: (options) => new MyPanel(),
 });
 ```
@@ -172,7 +172,7 @@ const api = createDockview(element, {
 <FrameworkSpecific framework='React'>
 ```tsx
 <DockviewReact
-    disableCornerResize={true}
+    disableOrthogonalSashMultidrag={true}
     onReady={onReady}
     components={components}
 />
@@ -181,19 +181,19 @@ const api = createDockview(element, {
 
 <FrameworkSpecific framework='Vue'>
 ```html
-<dockview-vue :disableCornerResize="true" @ready="onReady" />
+<dockview-vue :disableOrthogonalSashMultidrag="true" @ready="onReady" />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
 ```html
-<dv-dockview [disableCornerResize]="true" (ready)="onReady($event)" />
+<dv-dockview [disableOrthogonalSashMultidrag]="true" (ready)="onReady($event)" />
 ```
 </FrameworkSpecific>
 
-The option can also be changed after initialization with
-`api.updateOptions({ disableCornerResize })`. Locking the layout disables
-corner resizing along with the rest of the splitters.
+It can also be changed with
+`api.updateOptions({ disableOrthogonalSashMultidrag })`. A locked layout
+disables it along with the other splitters.
 
 ## Hiding borders
 

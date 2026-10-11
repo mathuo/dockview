@@ -81,57 +81,43 @@ function setSashPosition(sash: ISashItem, left: string, top: string): void {
 
 interface ISashDrag {
     update(delta: number): void;
-    /**
-     * Settle the drag (save the new proportions) and return the end
-     * notification. Linked drags all settle before any is notified, since a
-     * listener may relayout through an ancestor and re-lay-out the others.
-     */
+    /** Saves proportions; returns the end notification to fire afterwards. */
     end(): () => void;
 }
 
-/**
- * Splitview root element -> its splitview, so a sash can find the sashes of
- * enclosing and nested splitviews it may meet (corner resize).
- */
 const splitviewByElement = new WeakMap<HTMLElement, Splitview>();
 
-// how close (px) to where two sashes meet the pointer must be for a corner;
-// touch matches the coarse-pointer hit-area overhang in splitview.scss
-const CORNER_POINTER_REACH = 4;
-const CORNER_TOUCH_REACH = 10;
+// px from the sash junction; touch matches the coarse-pointer overhang
+const MULTIDRAG_POINTER_REACH = 4;
+const MULTIDRAG_TOUCH_REACH = 10;
 
-interface ICornerCandidate {
+interface IOrthogonalSashCandidate {
     readonly splitview: Splitview;
-    /** whether `splitview` encloses the splitview looking for a corner */
     readonly isOuter: boolean;
 }
 
-/**
- * The highlighted corner, if any. There is one pointer, so at most one corner
- * is marked `dv-sash-corner` at a time; it belongs to the sash whose hover (or
- * drag) found it, and only that sash clears it.
- */
-let activeCorner: { owner: HTMLElement; partner: HTMLElement } | undefined;
+// owned by the sash that found it; only the owner clears it
+let activeMultidrag: { owner: HTMLElement; partner: HTMLElement } | undefined;
 
-function setActiveCorner(
-    corner: { owner: HTMLElement; partner: HTMLElement } | undefined
+function setActiveMultidrag(
+    pair: { owner: HTMLElement; partner: HTMLElement } | undefined
 ): void {
     if (
-        activeCorner?.owner === corner?.owner &&
-        activeCorner?.partner === corner?.partner
+        activeMultidrag?.owner === pair?.owner &&
+        activeMultidrag?.partner === pair?.partner
     ) {
         return;
     }
-    activeCorner?.owner.classList.remove('dv-sash-corner');
-    activeCorner?.partner.classList.remove('dv-sash-corner');
-    activeCorner = corner;
-    corner?.owner.classList.add('dv-sash-corner');
-    corner?.partner.classList.add('dv-sash-corner');
+    activeMultidrag?.owner.classList.remove('dv-sash-multidrag');
+    activeMultidrag?.partner.classList.remove('dv-sash-multidrag');
+    activeMultidrag = pair;
+    pair?.owner.classList.add('dv-sash-multidrag');
+    pair?.partner.classList.add('dv-sash-multidrag');
 }
 
-function clearActiveCorner(owner: HTMLElement): void {
-    if (activeCorner?.owner === owner) {
-        setActiveCorner(undefined);
+function clearActiveMultidrag(owner: HTMLElement): void {
+    if (activeMultidrag?.owner === owner) {
+        setActiveMultidrag(undefined);
     }
 }
 
@@ -144,18 +130,13 @@ function isNearRect(rect: DOMRect, x: number, y: number, slack: number) {
     );
 }
 
-/**
- * Where the centre lines of two orthogonal sashes cross, if that point lies on
- * (or within `slack` of) both, i.e. the sashes actually meet there. `own` is a
- * sash of a horizontal splitview (a vertical bar) when `horizontal` is set.
- */
+/** Where two orthogonal sashes meet, if they do (within `slack`). */
 function findSashJunction(
     own: DOMRect,
     other: DOMRect,
     horizontal: boolean,
     slack: number
 ): { x: number; y: number } | undefined {
-    // not laid out (e.g. inside a hidden view)
     if (other.width === 0 && other.height === 0) {
         return undefined;
     }
@@ -222,12 +203,10 @@ export class Splitview {
     private _margin = 0;
 
     /**
-     * Enables corner resizing: dragging where one of this splitview's sashes
-     * meets an orthogonal sash of a nested or enclosing splitview drags both.
-     * Returns the scope to match on, or `undefined` while disabled; only
-     * splitviews returning the same scope are linked.
+     * Enables orthogonal sash multidrag with nested or enclosing splitviews
+     * that return the same scope. `undefined` disables it.
      */
-    cornerResizeScope: (() => object | undefined) | undefined;
+    multidragScope: (() => object | undefined) | undefined;
 
     private readonly _onDidSashEnd = new Emitter<void>();
     readonly onDidSashEnd = this._onDidSashEnd.event;
@@ -580,35 +559,37 @@ export class Splitview {
             sash.className = 'dv-sash';
 
             let dragging = false;
-            // splitviews whose sashes this one may meet, gathered once per
-            // hover rather than on every pointermove
-            let candidates: ICornerCandidate[] | undefined;
+            // cached per hover
+            let candidates: IOrthogonalSashCandidate[] | undefined;
 
-            const findCorner = (event: PointerEvent) => {
-                candidates ??= this.getCornerCandidates();
-                return this.findCornerSash(sash, event, candidates);
+            const findOrthogonal = (event: PointerEvent) => {
+                candidates ??= this.getOrthogonalSashCandidates();
+                const orthogonal = this.findOrthogonalSash(
+                    sash,
+                    event,
+                    candidates
+                );
+                if (orthogonal) {
+                    setActiveMultidrag({
+                        owner: sash,
+                        partner: orthogonal.sash.container,
+                    });
+                } else {
+                    clearActiveMultidrag(sash);
+                }
+                return orthogonal;
             };
 
             const onPointerMove = (event: PointerEvent) => {
-                // hover feedback only; a drag in progress keeps its corner
-                if (dragging || event.buttons !== 0) {
-                    return;
-                }
-                const corner = findCorner(event);
-                if (corner) {
-                    setActiveCorner({
-                        owner: sash,
-                        partner: corner.sash.container,
-                    });
-                } else {
-                    clearActiveCorner(sash);
+                if (!dragging && event.buttons === 0) {
+                    findOrthogonal(event);
                 }
             };
 
             const onPointerLeave = () => {
                 if (!dragging) {
                     candidates = undefined;
-                    clearActiveCorner(sash);
+                    clearActiveMultidrag(sash);
                 }
             };
 
@@ -618,15 +599,7 @@ export class Splitview {
                     (s) => s.container === sash
                 );
 
-                const corner = findCorner(event);
-                if (corner) {
-                    setActiveCorner({
-                        owner: sash,
-                        partner: corner.sash.container,
-                    });
-                } else {
-                    clearActiveCorner(sash);
-                }
+                const orthogonal = findOrthogonal(event);
                 dragging = true;
 
                 const targets: {
@@ -634,25 +607,26 @@ export class Splitview {
                     sashIndex: number;
                 }[] = [{ splitview: this, sashIndex }];
 
-                if (corner) {
-                    const cornerTarget = {
-                        splitview: corner.splitview,
-                        sashIndex: corner.splitview.sashes.indexOf(corner.sash),
+                if (orthogonal) {
+                    const orthogonalTarget = {
+                        splitview: orthogonal.splitview,
+                        sashIndex: orthogonal.splitview.sashes.indexOf(
+                            orthogonal.sash
+                        ),
                     };
-                    // laying out an outer splitview re-lays-out the inner one
-                    // from its saved proportions, so the inner drag must
-                    // update last on each move or its sizes are overwritten
-                    if (corner.isOuter) {
-                        targets.unshift(cornerTarget);
+                    // the outer layout resets the inner from its proportions,
+                    // so the inner drag must update last
+                    if (orthogonal.isOuter) {
+                        targets.unshift(orthogonalTarget);
                     } else {
-                        targets.push(cornerTarget);
+                        targets.push(orthogonalTarget);
                     }
                 }
 
                 this.startPointerDrag(sash, event, targets, () => {
                     dragging = false;
                     candidates = undefined;
-                    clearActiveCorner(sash);
+                    clearActiveMultidrag(sash);
                 });
             };
 
@@ -663,7 +637,7 @@ export class Splitview {
             const sashItem: ISashItem = {
                 container: sash,
                 disposable: () => {
-                    clearActiveCorner(sash);
+                    clearActiveMultidrag(sash);
                     sash.removeEventListener('pointerdown', onPointerStart);
                     sash.removeEventListener('pointermove', onPointerMove);
                     sash.removeEventListener('pointerleave', onPointerLeave);
@@ -1039,11 +1013,6 @@ export class Splitview {
         return undefined;
     }
 
-    /**
-     * Start resizing via the sash at `sashIndex`: captures the view sizes and
-     * the drag limits, then `update` applies a pointer offset (px along this
-     * splitview's axis) relative to those starting sizes.
-     */
     private beginSashDrag(sashIndex: number): ISashDrag {
         for (const item of this.viewItems) {
             item.enabled = false;
@@ -1138,10 +1107,7 @@ export class Splitview {
         };
     }
 
-    /**
-     * Drive one or more sash drags from a single pointer, each along its own
-     * splitview's axis. `targets` are updated in order on every move.
-     */
+    /** Drives each target's sash along its own axis, in order. */
     private startPointerDrag(
         sash: HTMLElement,
         event: PointerEvent,
@@ -1191,24 +1157,20 @@ export class Splitview {
         doc.addEventListener('contextmenu', end);
     }
 
-    /**
-     * The splitviews whose sashes may meet this one's: enclosing and nested
-     * splitviews in the same `cornerResizeScope` with the other orientation
-     * (the T-junctions of a grid), so unrelated splitviews are never linked.
-     */
-    private getCornerCandidates(): ICornerCandidate[] {
-        const scope = this.cornerResizeScope?.();
+    /** Enclosing and nested orthogonal splitviews in the same scope. */
+    private getOrthogonalSashCandidates(): IOrthogonalSashCandidate[] {
+        const scope = this.multidragScope?.();
         if (!scope) {
             return [];
         }
 
-        const candidates: ICornerCandidate[] = [];
+        const candidates: IOrthogonalSashCandidate[] = [];
         const add = (element: Element, isOuter: boolean) => {
             const splitview = splitviewByElement.get(element as HTMLElement);
             if (
                 splitview &&
                 splitview._orientation !== this._orientation &&
-                splitview.cornerResizeScope?.() === scope
+                splitview.multidragScope?.() === scope
             ) {
                 candidates.push({ splitview, isOuter });
             }
@@ -1232,30 +1194,26 @@ export class Splitview {
         return candidates;
     }
 
-    /**
-     * Find an orthogonal sash that `sash` meets near the pointer, i.e. a
-     * corner where both can be dragged together.
-     */
-    private findCornerSash(
+    /** The orthogonal sash that `sash` meets nearest the pointer, if any. */
+    private findOrthogonalSash(
         sash: HTMLElement,
         event: PointerEvent,
-        candidates: ICornerCandidate[]
+        candidates: IOrthogonalSashCandidate[]
     ): { splitview: Splitview; sash: ISashItem; isOuter: boolean } | undefined {
         if (
             candidates.length === 0 ||
             this._disabled ||
             sash.classList.contains('dv-disabled') ||
-            !this.cornerResizeScope?.()
+            !this.multidragScope?.()
         ) {
             return undefined;
         }
 
         const reach =
             event.pointerType === 'touch'
-                ? CORNER_TOUCH_REACH
-                : CORNER_POINTER_REACH;
-        // with a margin the views (and so the sashes ending at their edges)
-        // stop short of the sash between them
+                ? MULTIDRAG_TOUCH_REACH
+                : MULTIDRAG_POINTER_REACH;
+        // with a margin, sashes stop short of the sash they meet
         const gap = this._margin;
         const horizontal = this._orientation === Orientation.HORIZONTAL;
         const own = sash.getBoundingClientRect();
@@ -1266,7 +1224,6 @@ export class Splitview {
         let bestDistance = Number.POSITIVE_INFINITY;
 
         const others = candidates
-            // a locked splitview stays locked, whichever sash is grabbed
             .filter(({ splitview }) => !splitview._disabled)
             .flatMap(({ splitview, isOuter }) =>
                 splitview.sashes

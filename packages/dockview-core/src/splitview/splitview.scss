@@ -124,7 +124,7 @@
 
             &:not(.disabled):active,
             &:not(.disabled):hover,
-            &.dv-sash-corner {
+            &.dv-sash-multidrag {
                 background-color: var(--dv-active-sash-color, transparent);
                 transition-property: background-color;
                 transition-timing-function: ease-in-out;
@@ -137,11 +137,10 @@
         }
     }
 
-    // Where two orthogonal sashes meet (corner resize) both drag together;
-    // override the per-orientation resize cursors set above.
+    // orthogonal sash multidrag
     &.dv-horizontal,
     &.dv-vertical {
-        & > .dv-sash-container > .dv-sash.dv-sash-corner:not(.dv-disabled) {
+        & > .dv-sash-container > .dv-sash.dv-sash-multidrag:not(.dv-disabled) {
             cursor: move;
         }
     }

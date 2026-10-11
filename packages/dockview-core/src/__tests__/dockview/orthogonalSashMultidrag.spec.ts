@@ -15,18 +15,16 @@ class TestPanel implements IContentRenderer {
     }
 }
 
-/**
- * `disableCornerResize` must reach every grid dockview hosts: floating and
- * popout windows each lay out their groups in a nested gridview of their own.
- */
-describe('dockview disableCornerResize option', () => {
-    function create(disableCornerResize?: boolean): DockviewComponent {
+describe('dockview disableOrthogonalSashMultidrag option', () => {
+    function create(
+        disableOrthogonalSashMultidrag?: boolean
+    ): DockviewComponent {
         const container = document.createElement('div');
         const dockview = new DockviewComponent(container, {
             createComponent: () => new TestPanel(),
-            ...(disableCornerResize === undefined
+            ...(disableOrthogonalSashMultidrag === undefined
                 ? {}
-                : { disableCornerResize }),
+                : { disableOrthogonalSashMultidrag }),
         });
         dockview.layout(1000, 500);
         return dockview;
@@ -51,12 +49,12 @@ describe('dockview disableCornerResize option', () => {
         return dockview.floatingGroups[0].gridview;
     }
 
-    test('corner resize is on by default, floating windows included', () => {
+    test('enabled by default, floating windows included', () => {
         const dockview = create();
         const floating = addFloatingSplit(dockview);
 
-        expect(dockview.gridview.cornerResize).toBe(true);
-        expect(floating.cornerResize).toBe(true);
+        expect(dockview.gridview.orthogonalSashMultidrag).toBe(true);
+        expect(floating.orthogonalSashMultidrag).toBe(true);
 
         dockview.dispose();
     });
@@ -65,13 +63,13 @@ describe('dockview disableCornerResize option', () => {
         const dockview = create(true);
         const floating = addFloatingSplit(dockview);
 
-        expect(dockview.gridview.cornerResize).toBe(false);
-        expect(floating.cornerResize).toBe(false);
+        expect(dockview.gridview.orthogonalSashMultidrag).toBe(false);
+        expect(floating.orthogonalSashMultidrag).toBe(false);
 
-        dockview.updateOptions({ disableCornerResize: false });
+        dockview.updateOptions({ disableOrthogonalSashMultidrag: false });
 
-        expect(dockview.gridview.cornerResize).toBe(true);
-        expect(floating.cornerResize).toBe(true);
+        expect(dockview.gridview.orthogonalSashMultidrag).toBe(true);
+        expect(floating.orthogonalSashMultidrag).toBe(true);
 
         dockview.dispose();
     });
@@ -91,11 +89,11 @@ describe('dockview disableCornerResize option', () => {
 
         const popout = dockview.getGridviewForGroup(panel2.group);
         expect(popout).not.toBe(dockview.gridview);
-        expect(popout.cornerResize).toBe(false);
+        expect(popout.orthogonalSashMultidrag).toBe(false);
 
-        dockview.updateOptions({ disableCornerResize: false });
+        dockview.updateOptions({ disableOrthogonalSashMultidrag: false });
 
-        expect(popout.cornerResize).toBe(true);
+        expect(popout.orthogonalSashMultidrag).toBe(true);
 
         dockview.dispose();
     });

@@ -11,7 +11,7 @@ import {
 } from '../splitview/splitview';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';
-import { BranchNode, CORNER_RESIZE_DISABLED_CLASS } from './branchNode';
+import { BranchNode, MULTIDRAG_DISABLED_CLASS } from './branchNode';
 import { Node } from './types';
 import { Emitter, Event } from '../events';
 import { IDisposable, MutableDisposable } from '../lifecycle';
@@ -425,16 +425,12 @@ export class Gridview implements IDisposable {
         }
     }
 
-    /**
-     * Dragging where a row sash meets a column sash resizes both at once.
-     * On by default.
-     */
-    get cornerResize(): boolean {
-        return !this.element.classList.contains(CORNER_RESIZE_DISABLED_CLASS);
+    get orthogonalSashMultidrag(): boolean {
+        return !this.element.classList.contains(MULTIDRAG_DISABLED_CLASS);
     }
 
-    set cornerResize(value: boolean) {
-        toggleClass(this.element, CORNER_RESIZE_DISABLED_CLASS, !value);
+    set orthogonalSashMultidrag(value: boolean) {
+        toggleClass(this.element, MULTIDRAG_DISABLED_CLASS, !value);
     }
 
     get margin(): number {

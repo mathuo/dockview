@@ -16,9 +16,7 @@ import { INodeDescriptor } from './gridview';
 import { Node } from './types';
 import { CompositeDisposable, IDisposable, Disposable } from '../lifecycle';
 
-/** Set on a `.dv-grid-view` to turn corner resizing off for that grid. */
-export const CORNER_RESIZE_DISABLED_CLASS =
-    'dv-grid-view-corner-resize-disabled';
+export const MULTIDRAG_DISABLED_CLASS = 'dv-grid-view-multidrag-disabled';
 
 export class BranchNode extends CompositeDisposable implements IView {
     readonly element: HTMLElement;
@@ -266,12 +264,10 @@ export class BranchNode extends CompositeDisposable implements IView {
 
         this.disabled = disabled;
 
-        // corner resizing links sashes of the same grid only, so a grid nested
-        // in a panel (or any other splitview) never drags along with this one
-        this.splitview.cornerResizeScope = () => {
+        // scoped to this grid, so nested grids are never linked
+        this.splitview.multidragScope = () => {
             const grid = this.element.closest('.dv-grid-view');
-            return grid &&
-                !grid.classList.contains(CORNER_RESIZE_DISABLED_CLASS)
+            return grid && !grid.classList.contains(MULTIDRAG_DISABLED_CLASS)
                 ? grid
                 : undefined;
         };

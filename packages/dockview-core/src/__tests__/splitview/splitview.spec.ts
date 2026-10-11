@@ -1055,10 +1055,8 @@ describe('splitview', () => {
         ]);
     });
 
-    describe('corner resize', () => {
-        // A view hosting a vertical splitview, nested in a horizontal one -
-        // the shape of a grid branch - so the inner sashes end on the outer
-        // sash between this view and its sibling.
+    describe('orthogonal sash multidrag', () => {
+        // a view hosting a vertical splitview, like a grid branch
         class NestedView implements IView {
             readonly element = document.createElement('div');
             readonly inner = new Splitview(this.element, {
@@ -1084,7 +1082,6 @@ describe('splitview', () => {
             }
         }
 
-        // jsdom has no layout; give a sash the rect it would have on screen
         const setRect = (
             element: HTMLElement,
             left: number,
@@ -1105,9 +1102,7 @@ describe('splitview', () => {
             } as DOMRect);
         };
 
-        // a 400x300 outer splitview split at x=200, its left view split at
-        // y=150; `gap` mimics a margin, pulling the inner sash short of the
-        // outer one
+        // 400x300 split at x=200, its left view split at y=150
         const setup = (gap = 0) => {
             const outer = new Splitview(document.createElement('div'), {
                 orientation: Orientation.HORIZONTAL,
@@ -1126,8 +1121,8 @@ describe('splitview', () => {
             nested.inner.addView(bottom, Sizing.Distribute);
 
             const scope = {};
-            outer.cornerResizeScope = () => scope;
-            nested.inner.cornerResizeScope = () => scope;
+            outer.multidragScope = () => scope;
+            nested.inner.multidragScope = () => scope;
             outer.margin = gap;
             nested.inner.margin = gap;
 
@@ -1161,21 +1156,21 @@ describe('splitview', () => {
                 })
             );
 
-        const isCorner = (sash: HTMLElement) =>
-            sash.classList.contains('dv-sash-corner');
+        const isMultidrag = (sash: HTMLElement) =>
+            sash.classList.contains('dv-sash-multidrag');
 
         test('hovering where an inner sash meets an outer sash marks both', () => {
             const { outerSash, innerSash } = setup();
 
             hover(innerSash, 197, 150);
 
-            expect(isCorner(innerSash)).toBe(true);
-            expect(isCorner(outerSash)).toBe(true);
+            expect(isMultidrag(innerSash)).toBe(true);
+            expect(isMultidrag(outerSash)).toBe(true);
 
             fireEvent(innerSash, new MouseEvent('pointerleave'));
 
-            expect(isCorner(innerSash)).toBe(false);
-            expect(isCorner(outerSash)).toBe(false);
+            expect(isMultidrag(innerSash)).toBe(false);
+            expect(isMultidrag(outerSash)).toBe(false);
         });
 
         test('hovering the outer sash at the junction marks both', () => {
@@ -1183,58 +1178,56 @@ describe('splitview', () => {
 
             hover(outerSash, 200, 152);
 
-            expect(isCorner(outerSash)).toBe(true);
-            expect(isCorner(innerSash)).toBe(true);
+            expect(isMultidrag(outerSash)).toBe(true);
+            expect(isMultidrag(innerSash)).toBe(true);
         });
 
-        test("a sash leaving does not clear the other sash's corner", () => {
+        test("a sash leaving does not clear the other sash's highlight", () => {
             const { outerSash, innerSash } = setup();
 
             hover(innerSash, 197, 150);
-            // the pointer moves onto the outer sash, which finds the same
-            // corner before the inner sash hears its pointerleave
+            // the outer sash's pointermove arrives before the inner's pointerleave
             hover(outerSash, 200, 150);
             fireEvent(innerSash, new MouseEvent('pointerleave'));
 
-            expect(isCorner(outerSash)).toBe(true);
-            expect(isCorner(innerSash)).toBe(true);
+            expect(isMultidrag(outerSash)).toBe(true);
+            expect(isMultidrag(innerSash)).toBe(true);
 
             fireEvent(outerSash, new MouseEvent('pointerleave'));
 
-            expect(isCorner(outerSash)).toBe(false);
-            expect(isCorner(innerSash)).toBe(false);
+            expect(isMultidrag(outerSash)).toBe(false);
+            expect(isMultidrag(innerSash)).toBe(false);
         });
 
-        test('no corner with a locked (disabled) splitview', () => {
+        test('not linked with a locked (disabled) splitview', () => {
             const { outer, outerSash, innerSash } = setup();
             outer.disabled = true;
 
             hover(innerSash, 197, 150);
 
-            expect(isCorner(innerSash)).toBe(false);
-            expect(isCorner(outerSash)).toBe(false);
+            expect(isMultidrag(innerSash)).toBe(false);
+            expect(isMultidrag(outerSash)).toBe(false);
         });
 
         test('away from the junction it is a plain sash', () => {
             const { outerSash, innerSash } = setup();
 
             hover(innerSash, 100, 150);
-            expect(isCorner(innerSash)).toBe(false);
+            expect(isMultidrag(innerSash)).toBe(false);
 
             hover(outerSash, 200, 50);
-            expect(isCorner(outerSash)).toBe(false);
+            expect(isMultidrag(outerSash)).toBe(false);
         });
 
-        test('a margin gap between the sashes still forms a corner', () => {
+        test('linked across a margin gap', () => {
             const { outerSash, innerSash } = setup(10);
 
-            // on the outer sash, where the inner one stops 5px short of it
             hover(outerSash, 200, 150);
-            expect(isCorner(outerSash)).toBe(true);
-            expect(isCorner(innerSash)).toBe(true);
+            expect(isMultidrag(outerSash)).toBe(true);
+            expect(isMultidrag(innerSash)).toBe(true);
         });
 
-        test('dragging the corner resizes both splitviews', () => {
+        test('dragging the junction resizes both splitviews', () => {
             const {
                 outer,
                 nested,
@@ -1253,9 +1246,7 @@ describe('splitview', () => {
             expect([outer.getViewSize(0), sibling.size]).toEqual([200, 200]);
             expect([top.size, bottom.size]).toEqual([150, 150]);
 
-            // grabbed from the inner sash: the outer (proportional) splitview
-            // re-lays-out the inner one on every move, which must not undo
-            // the inner drag
+            // the outer (proportional) layout must not undo the inner drag
             fireEvent(
                 innerSash,
                 new MouseEvent('pointerdown', { clientX: 200, clientY: 150 })
@@ -1275,10 +1266,9 @@ describe('splitview', () => {
 
             expect(outerSashEnd).toHaveBeenCalledTimes(1);
             expect(innerSashEnd).toHaveBeenCalledTimes(1);
-            expect(isCorner(innerSash)).toBe(false);
-            expect(isCorner(outerSash)).toBe(false);
+            expect(isMultidrag(innerSash)).toBe(false);
+            expect(isMultidrag(outerSash)).toBe(false);
 
-            // the drag has ended
             fireEvent(
                 document,
                 new MouseEvent('pointermove', { clientX: 300, clientY: 250 })
@@ -1286,7 +1276,7 @@ describe('splitview', () => {
             expect([outer.getViewSize(0), top.size]).toEqual([230, 190]);
         });
 
-        test('dragging the corner from the outer sash resizes both', () => {
+        test('dragging the junction from the outer sash resizes both', () => {
             const { outer, top, outerSash } = setup();
 
             fireEvent(
@@ -1307,13 +1297,13 @@ describe('splitview', () => {
             [
                 'the scopes differ',
                 (ctx: ReturnType<typeof setup>) => {
-                    ctx.nested.inner.cornerResizeScope = () => ({});
+                    ctx.nested.inner.multidragScope = () => ({});
                 },
             ],
             [
-                'corner resize is disabled for the scope',
+                'multidrag is disabled for the scope',
                 (ctx: ReturnType<typeof setup>) => {
-                    ctx.outer.cornerResizeScope = () => undefined;
+                    ctx.outer.multidragScope = () => undefined;
                 },
             ],
             [
@@ -1322,12 +1312,12 @@ describe('splitview', () => {
                     ctx.outerSash.classList.add('dv-disabled');
                 },
             ],
-        ])('no corner when %s', (_, configure) => {
+        ])('not linked when %s', (_, configure) => {
             const ctx = setup();
             configure(ctx);
 
             hover(ctx.innerSash);
-            expect(isCorner(ctx.innerSash)).toBe(false);
+            expect(isMultidrag(ctx.innerSash)).toBe(false);
 
             fireEvent(
                 ctx.innerSash,
@@ -1344,9 +1334,8 @@ describe('splitview', () => {
             expect(ctx.top.size).toBe(190);
         });
 
-        test('no corner between orthogonal splitviews that are not nested', () => {
-            // side by side rather than nested, with sashes that touch and a
-            // shared scope, so only the nesting rule can reject the corner
+        test('not linked between orthogonal splitviews that are not nested', () => {
+            // touching and in the same scope, but not nested
             const scope = {};
             const create = (orientation: Orientation) => {
                 const splitview = new Splitview(document.createElement('div'), {
@@ -1355,7 +1344,7 @@ describe('splitview', () => {
                 splitview.layout(400, 300);
                 splitview.addView(new Testview(0, 1000), Sizing.Distribute);
                 splitview.addView(new Testview(0, 1000), Sizing.Distribute);
-                splitview.cornerResizeScope = () => scope;
+                splitview.multidragScope = () => scope;
                 return (splitview as any).element.querySelector(
                     '.dv-sash'
                 ) as HTMLElement;
@@ -1367,7 +1356,7 @@ describe('splitview', () => {
 
             hover(rowSash);
 
-            expect(isCorner(rowSash)).toBe(false);
+            expect(isMultidrag(rowSash)).toBe(false);
         });
     });
 });

@@ -122,7 +122,8 @@ export class GridviewComponent
                 : undefined,
             disableAutoResizing: options.disableAutoResizing,
             className: options.className,
-            disableCornerResize: options.disableCornerResize,
+            disableOrthogonalSashMultidrag:
+                options.disableOrthogonalSashMultidrag,
         });
 
         this._options = options;
