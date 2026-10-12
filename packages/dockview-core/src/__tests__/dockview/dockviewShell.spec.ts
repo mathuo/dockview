@@ -986,6 +986,98 @@ describe('ShellManager', () => {
         });
     });
 
+    describe('locked', () => {
+        /**
+         * The shell's two splitviews: the outer one hosts the left/right edge
+         * groups and the middle column's hosts the top/bottom ones. A disabled
+         * splitview carries `dv-splitview-disabled`, which is what turns its
+         * sashes inert (`pointer-events: none`).
+         */
+        function splitviews(shell: ShellManager): {
+            outer: HTMLElement;
+            middle: HTMLElement;
+        } {
+            const outer = shell.element.querySelector<HTMLElement>(
+                ':scope > .dv-split-view-container'
+            )!;
+            const middle = shell.element.querySelector<HTMLElement>(
+                '.dv-shell-middle-column > .dv-split-view-container'
+            )!;
+            expect(outer).toBeTruthy();
+            expect(middle).toBeTruthy();
+            return { outer, middle };
+        }
+
+        test('is unlocked by default', () => {
+            const shell = makeShell({
+                left: { id: 'left' },
+                top: { id: 'top' },
+            });
+            const { outer, middle } = splitviews(shell);
+
+            expect(shell.locked).toBe(false);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            shell.dispose();
+        });
+
+        test('locking disables both the outer and the middle-column splitview (#1671)', () => {
+            const shell = makeShell({
+                left: { id: 'left' },
+                right: { id: 'right' },
+                top: { id: 'top' },
+                bottom: { id: 'bottom' },
+            });
+            const { outer, middle } = splitviews(shell);
+
+            shell.locked = true;
+
+            expect(shell.locked).toBe(true);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+
+            shell.locked = false;
+
+            expect(shell.locked).toBe(false);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            shell.dispose();
+        });
+
+        test('edge groups added after locking are hosted by the disabled splitviews', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                layoutGrid
+            );
+            shell.locked = true;
+
+            shell.addEdgeView('left', { id: 'left' }, makeGroup());
+            shell.addEdgeView('bottom', { id: 'bottom' }, makeGroup());
+
+            const { outer, middle } = splitviews(shell);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+            shell.dispose();
+        });
+    });
+
     describe('dispose', () => {
         test('removes the shell element from the container', () => {
             const shell = makeShell({ left: { id: 'left' } });

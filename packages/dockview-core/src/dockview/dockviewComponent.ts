@@ -1642,6 +1642,9 @@ export class DockviewComponent
             options.theme?.gap ?? 0,
             options.theme?.edgeGroupCollapsedSize
         );
+        // The base grid took `locked` from the options; the shell's splitviews
+        // host the edge groups and need it too.
+        this._shellManager.locked = !!options.locked;
         // The shell wraps the dockview element, so move the popup anchor
         // into the shell so overflow dropdowns in edge groups position correctly
         this.popupService.updateRoot(this._shellManager.element);
@@ -2133,7 +2136,11 @@ export class DockviewComponent
                 const popoutGridview =
                     options?.overridePopoutGridview ??
                     this.createNestedGridview();
-                if (!options?.overridePopoutGridview) {
+                if (options?.overridePopoutGridview) {
+                    // A restored gridview was built when fromJSON ran, before
+                    // the window opened; the lock may have changed in between.
+                    popoutGridview.locked = this.gridview.locked;
+                } else {
                     popoutGridview.addView(group, Sizing.Distribute, [0]);
                 }
                 // Fill the popout window. Unlike the main grid (explicit px) and
@@ -2883,6 +2890,35 @@ export class DockviewComponent
     }
 
     /**
+     * Locks the main grid, the shell whose splitviews host the edge groups,
+     * and the nested gridviews of floating and popout windows. The base
+     * setter stops at the main grid; `updateOptions` reaches this override.
+     */
+    override get locked(): boolean {
+        return this.gridview.locked;
+    }
+
+    override set locked(value: boolean) {
+        this.gridview.locked = value;
+        if (this._shellManager) {
+            this._shellManager.locked = value;
+        }
+        for (const gridview of this.nestedGridviews()) {
+            gridview.locked = value;
+        }
+    }
+
+    /** The gridviews hosted by open floating and popout windows. */
+    private nestedGridviews(): Gridview[] {
+        return [
+            ...this.floatingGroups.map((floating) => floating.gridview),
+            ...(this._popoutWindowService?.entries ?? []).map(
+                (entry) => entry.gridview
+            ),
+        ];
+    }
+
+    /**
      * Build an empty gridview configured to match the main grid's styling and
      * resize behaviour, for hosting a nested layout inside a floating or popout
      * window.
@@ -2896,7 +2932,7 @@ export class DockviewComponent
                 ? { separatorBorder: 'transparent' }
                 : undefined,
             orientation,
-            false,
+            this.gridview.locked,
             this.options.theme?.gap ?? 0
         );
     }
@@ -3099,14 +3135,10 @@ export class DockviewComponent
         }
 
         if ('proportionalLayout' in options) {
-            // super.updateOptions has already updated the main grid; floating
-            // and popout windows host their own nested gridviews
+            // super.updateOptions has already updated the main grid
             const proportionalLayout = this.gridview.proportionalLayout;
-            for (const floating of this.floatingGroups) {
-                floating.gridview.proportionalLayout = proportionalLayout;
-            }
-            for (const entry of this._popoutWindowService?.entries ?? []) {
-                entry.gridview.proportionalLayout = proportionalLayout;
+            for (const gridview of this.nestedGridviews()) {
+                gridview.proportionalLayout = proportionalLayout;
             }
         }
 
@@ -6333,13 +6365,8 @@ export class DockviewComponent
 
         const gap = theme.gap ?? 0;
         this.gridview.margin = gap;
-        // Floating / popout windows host their own nested gridviews; keep their
-        // gap in sync with the main grid when the theme changes at runtime.
-        for (const floating of this.floatingGroups) {
-            floating.gridview.margin = gap;
-        }
-        for (const entry of this._popoutWindowService?.entries ?? []) {
-            entry.gridview.margin = gap;
+        for (const gridview of this.nestedGridviews()) {
+            gridview.margin = gap;
         }
         this._shellManager?.updateTheme(
             gap,
