@@ -2883,6 +2883,13 @@ export class DockviewComponent
         }
     }
 
+    /** Whether a move leaves its emptied source group in place. */
+    private keepEmptyGroups(options: { keepEmptyGroups?: boolean }): boolean {
+        return (
+            options.keepEmptyGroups ?? this.options.closeEmptyGroups === false
+        );
+    }
+
     private removeGroupIfEmpty(group: DockviewGroupPanel): void {
         if (group.model.size === 0) {
             this.doRemoveGroup(group, { skipActive: true });
@@ -4687,7 +4694,9 @@ export class DockviewComponent
     ): void {
         this.mutation('remove', () =>
             this._doRemovePanel(panel, {
-                removeEmptyGroup: options?.removeEmptyGroup ?? true,
+                removeEmptyGroup:
+                    options?.removeEmptyGroup ??
+                    this.options.closeEmptyGroups !== false,
                 skipDispose: options?.skipDispose,
                 skipSetActiveGroup: options?.skipSetActiveGroup,
             })
@@ -5341,7 +5350,7 @@ export class DockviewComponent
 
             // keep the source group when moving within it
             if (
-                !options.keepEmptyGroups &&
+                !this.keepEmptyGroups(options) &&
                 sourceGroup.model.size === 0 &&
                 sourceGroup !== destinationGroup
             ) {
@@ -5710,7 +5719,7 @@ export class DockviewComponent
         // so a tab-group drag onto its own group's edge still cleans up
         // the now-empty source.
         if (
-            !options.keepEmptyGroups &&
+            !this.keepEmptyGroups(options) &&
             sourceGroup.model.size === 0 &&
             sourceGroup !== targetGroup
         ) {

@@ -452,6 +452,12 @@ export interface DockviewOptions {
      * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
      */
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
+    /**
+     * Whether a group is removed once its last panel is closed or moved out.
+     * Defaults to `true`. When `false` the empty group stays in the layout
+     * (rendering the watermark) until it is closed explicitly.
+     */
+    closeEmptyGroups?: boolean;
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
     /**
@@ -807,6 +813,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndStrategy: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
+        closeEmptyGroups: undefined,
         dndEdges: undefined,
         dropPositionResolver: undefined,
         dndCompass: undefined,
