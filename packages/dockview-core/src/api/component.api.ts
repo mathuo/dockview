@@ -1005,10 +1005,17 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     /**
      * Remove a panel given the panel object.
+     *
+     * `removeEmptyGroup` overrides the `closeEmptyGroups` option for this
+     * call: `false` keeps the group if the panel was its last one, `true`
+     * removes it.
      */
-    removePanel(panel: IDockviewPanel): void {
+    removePanel(
+        panel: IDockviewPanel,
+        options?: { removeEmptyGroup?: boolean }
+    ): void {
         this.component.withOrigin('api', () =>
-            this.component.removePanel(panel)
+            this.component.removePanel(panel, options)
         );
     }
 

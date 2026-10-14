@@ -607,7 +607,10 @@ describe('component.api', () => {
             expect(addGroup).toHaveBeenCalledWith(addGroupOptions);
 
             cut.removePanel(panel);
-            expect(component.removePanel).toHaveBeenCalledWith(panel);
+            expect(component.removePanel).toHaveBeenCalledWith(
+                panel,
+                undefined
+            );
 
             cut.closeAllGroups();
             expect(component.closeAllGroups).toHaveBeenCalledTimes(1);

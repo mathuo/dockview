@@ -468,7 +468,10 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): IDockviewPanel;
-    removePanel(panel: IDockviewPanel): void;
+    removePanel(
+        panel: IDockviewPanel,
+        options?: { removeEmptyGroup?: boolean }
+    ): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
@@ -2746,7 +2749,9 @@ export class DockviewComponent
 
             // outside `movingLock`: this group is destroyed rather than
             // relocated, so its removal is owed an event
-            this.removeGroupIfEmpty(sourceGroup);
+            if (this.options.closeEmptyGroups !== false) {
+                this.removeGroupIfEmpty(sourceGroup);
+            }
 
             this.movingLock(() =>
                 group.model.openPanel(item, { skipSetGroupActive: true })
@@ -4459,10 +4464,23 @@ export class DockviewComponent
         // One transaction; the per-panel removals inside nest via the depth
         // counter, so consumers (undo, announcements) see a single mutation.
         this.mutation('remove', () => {
-            for (const entry of this._groups.entries()) {
-                const [_, group] = entry;
+            const groups = Array.from(this._groups.values()).map(
+                (_) => _.value
+            );
+            for (const group of groups) {
+                // closing one group can remove another (e.g. a popout's
+                // hidden reference group)
+                if (!this._groups.has(group.id)) {
+                    continue;
+                }
 
-                group.value.model.closeAllPanels();
+                group.model.closeAllPanels();
+
+                // with `closeEmptyGroups: false` the panels' removal leaves
+                // the group behind; closing all groups still removes it
+                if (this._groups.has(group.id) && group.model.size === 0) {
+                    this.removeGroup(group, { skipActive: true });
+                }
             }
         });
     }
@@ -5394,10 +5412,12 @@ export class DockviewComponent
                 destinationTarget
             );
 
-            if (sourceGroup.size < 2) {
+            if (sourceGroup.size < 2 && !this.keepEmptyGroups(options)) {
                 /**
                  * If we are moving from a group which only has one panel left we will consider
-                 * moving the group itself rather than moving the panel into a newly created group
+                 * moving the group itself rather than moving the panel into a newly created group.
+                 * When empty groups are kept the group must stay where it is, so the panel is
+                 * moved into a newly created group like any other panel.
                  */
 
                 const [targetParentLocation, to] = tail(targetLocation);
