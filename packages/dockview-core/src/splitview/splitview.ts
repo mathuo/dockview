@@ -253,6 +253,20 @@ export class Splitview {
         return this._margin;
     }
 
+    /**
+     * The size each visible view gives up to the margins: `n` visible views
+     * are separated by `n - 1` margins, spread evenly over the `n`.
+     */
+    get marginShare(): number {
+        let visibleViewCount = 0;
+        for (const item of this.viewItems) {
+            if (item.visible) {
+                visibleViewCount++;
+            }
+        }
+        return this.marginShareFor(visibleViewCount);
+    }
+
     set margin(value: number) {
         this._margin = value;
 
@@ -889,8 +903,7 @@ export class Splitview {
         }
 
         const sashCount = Math.max(0, visibleViewCount - 1);
-        const marginReducedSize =
-            (this.margin * sashCount) / Math.max(1, visibleViewCount);
+        const marginReducedSize = this.marginShareFor(visibleViewCount);
 
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
@@ -952,11 +965,13 @@ export class Splitview {
                 view.setContainerGeometry('left', '');
             }
 
-            view.view.layout(
-                view.size - marginReducedSize,
-                this._orthogonalSize
-            );
+            view.view.layout(size, this._orthogonalSize);
         });
+    }
+
+    private marginShareFor(visibleViewCount: number): number {
+        const sashCount = Math.max(0, visibleViewCount - 1);
+        return (this._margin * sashCount) / Math.max(1, visibleViewCount);
     }
 
     private findFirstSnapIndex(indexes: number[]): number | undefined {

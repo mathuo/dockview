@@ -144,6 +144,7 @@ import {
     SerializedEdgeGroups,
     ShellManager,
     IEdgeGroupHost,
+    isHorizontal,
 } from './dockviewShell';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 import {
@@ -3268,10 +3269,9 @@ export class DockviewComponent
                     // constraint change, not a size request
                     return;
                 }
-                const size =
-                    position === 'left' || position === 'right'
-                        ? event.width
-                        : event.height;
+                const size = isHorizontal(position)
+                    ? event.width
+                    : event.height;
                 if (typeof size !== 'number') {
                     // cross axis, which the shell splitview does not own
                     return;
