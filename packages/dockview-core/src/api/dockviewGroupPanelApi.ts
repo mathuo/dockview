@@ -140,6 +140,7 @@ const NOT_INITIALIZED_MESSAGE =
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
     private _pendingSize: SizeEvent | undefined;
+    private _isApplyingSize = false;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelLocationChangeEvent>();
@@ -223,6 +224,15 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                     super.setSize(this._pendingSize);
                     this._pendingSize = undefined;
                 }
+            }),
+            this.onDidDimensionsChange(() => {
+                // Any resize the layout reports while the group is visible,
+                // other than the one our own setSize call produces, makes the
+                // pending request stale: a sash drag, a window resize or a
+                // setSize on another group has moved this group since.
+                if (this.isVisible && !this._isApplyingSize) {
+                    this._pendingSize = undefined;
+                }
             })
         );
     }
@@ -230,7 +240,12 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     public override setSize(event: SizeEvent): void {
         this._pendingSize = { ...event };
 
-        super.setSize(event);
+        this._isApplyingSize = true;
+        try {
+            super.setSize(event);
+        } finally {
+            this._isApplyingSize = false;
+        }
     }
 
     close(): void {

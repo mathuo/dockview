@@ -11896,6 +11896,191 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.width).toBe(400);
         });
 
+        test('issue 1050: setSize then setVisible(false) before the first layout is applied on show', () => {
+            // The ordering from the original report: both calls run in
+            // onReady, before the component has been laid out. The group
+            // reports its minimum size at that point, so the size can only
+            // be honoured once the group becomes visible after layout.
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            panel1.group.api.setSize({ width: 350 });
+            panel1.group.api.setVisible(false);
+
+            dockview.layout(1000, 600);
+
+            panel1.group.api.setVisible(true);
+
+            expect(panel1.group.api.width).toBe(350);
+        });
+
+        test('setSize before the first layout is superseded by the layout once the group is visible', () => {
+            // Unlike the test above the group stays visible through the
+            // first layout. The layout pass is a later resize, so it wins
+            // and a hide/show afterwards must not resurrect the old request.
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            panel1.group.api.setSize({ width: 350 });
+
+            dockview.layout(1000, 600);
+            expect(panel1.group.api.width).toBe(500);
+
+            panel1.group.api.setVisible(false);
+            panel1.group.api.setVisible(true);
+
+            expect(panel1.group.api.width).toBe(500);
+        });
+
+        describe('issue 1688: setSize on a visible group must not be re-applied later', () => {
+            // Reproduces https://github.com/dockview/dockview/issues/1688
+            // setSize stored a pending size that was only cleared when the
+            // group became visible. For a group that was already visible
+            // the size applied at once but the pending value lingered, and
+            // the next hide/show (including maximize/restore of another
+            // group) re-applied it over every resize made since.
+            function setup() {
+                const container = document.createElement('div');
+
+                const dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 600);
+
+                const a = dockview.addPanel({
+                    id: 'a',
+                    component: 'default',
+                });
+
+                const b = dockview.addPanel({
+                    id: 'b',
+                    component: 'default',
+                    position: { direction: 'right' },
+                });
+
+                return { dockview, a: a.group, b: b.group };
+            }
+
+            test('not re-applied after maximize/restore of another group', () => {
+                const { dockview, a, b } = setup();
+
+                a.api.setSize({ width: 300 });
+                expect(a.api.width).toBe(300);
+
+                // stands in for a later sash drag
+                b.api.setSize({ width: 400 });
+                expect(a.api.width).toBe(600);
+
+                b.api.maximize();
+                dockview.exitMaximizedGroup();
+
+                expect(a.api.width).toBe(600);
+            });
+
+            test('not re-applied after hide/show', () => {
+                const { a, b } = setup();
+
+                a.api.setSize({ width: 300 });
+                b.api.setSize({ width: 400 });
+                expect(a.api.width).toBe(600);
+
+                a.api.setVisible(false);
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(600);
+            });
+
+            test('a request the layout clamps is not re-applied after hide/show', () => {
+                const { a, b } = setup();
+
+                // wider than the container: clamped by b's minimum width
+                a.api.setSize({ width: 5000 });
+                expect(a.api.width).toBe(900);
+
+                b.api.setSize({ width: 400 });
+                expect(a.api.width).toBe(600);
+
+                a.api.setVisible(false);
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(600);
+            });
+
+            test('a size set while hidden is still applied on show', () => {
+                const { a, b } = setup();
+
+                a.api.setVisible(false);
+                a.api.setSize({ width: 300 });
+
+                // resizing the remaining visible group must not discard the
+                // pending size of the hidden one
+                b.api.setSize({ width: 900 });
+
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(300);
+            });
+        });
+
         test('issue 1020: addGroup + moveTo with defaultRenderer="always" repositions panel overlay', async () => {
             // Reproduces https://github.com/dockview/dockview/issues/1020
             // The user split a group by creating a new adjacent group and

@@ -291,6 +291,90 @@ describe('DockviewGroupPanelApiImpl', () => {
 
             expect(events).toHaveLength(0);
         });
+
+        test('the dimension change produced by setSize itself keeps the pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            // simulate a laid-out group: the layout answers setSize
+            // synchronously with the resulting dimensions
+            cut.onDidSizeChange((e) => {
+                cut._onDidDimensionChange.fire({
+                    width: e.width ?? 0,
+                    height: e.height ?? 0,
+                });
+            });
+
+            cut.setSize({ width: 100, height: 200 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 100, height: 200 }]);
+        });
+
+        test('a later dimension change while visible clears the pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            cut.setSize({ width: 100, height: 200 });
+
+            // e.g. a sash drag or a setSize on another group
+            cut._onDidDimensionChange.fire({ width: 300, height: 200 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toHaveLength(0);
+        });
+
+        test('a dimension change while hidden keeps the pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut.setSize({ width: 100, height: 200 });
+
+            // hidden groups are laid out at zero size
+            cut._onDidDimensionChange.fire({ width: 0, height: 200 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 100, height: 200 }]);
+        });
+
+        test('setSize after a stale-clearing resize stores a fresh pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            cut.setSize({ width: 100, height: 200 });
+            cut._onDidDimensionChange.fire({ width: 300, height: 200 });
+            cut.setSize({ width: 150 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 150 }]);
+        });
     });
 
     describe('close', () => {
