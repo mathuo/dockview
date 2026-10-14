@@ -221,8 +221,9 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             this._onDidHeaderDirectionChange,
             this._onDidVisibilityChange.event((event) => {
                 if (event.isVisible && this._pendingSize) {
-                    super.setSize(this._pendingSize);
+                    const pendingSize = this._pendingSize;
                     this._pendingSize = undefined;
+                    super.setSize(pendingSize);
                 }
             }),
             this.onDidDimensionsChange(() => {
@@ -238,13 +239,21 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     }
 
     public override setSize(event: SizeEvent): void {
-        this._pendingSize = { ...event };
+        const hasDimension =
+            typeof event.width === 'number' || typeof event.height === 'number';
 
+        // an event without dimensions asks for nothing, so it must not
+        // replace a size still waiting to be applied
+        if (hasDimension) {
+            this._pendingSize = { ...event };
+        }
+
+        const wasApplyingSize = this._isApplyingSize;
         this._isApplyingSize = true;
         try {
             super.setSize(event);
         } finally {
-            this._isApplyingSize = false;
+            this._isApplyingSize = wasApplyingSize;
         }
     }
 

@@ -358,6 +358,97 @@ describe('DockviewGroupPanelApiImpl', () => {
             expect(events).toEqual([{ width: 100, height: 200 }]);
         });
 
+        test('a setSize without dimensions does not replace the pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut.setSize({ width: 100, height: 200 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            // what addPanel sends when no initial size is given
+            cut.setSize({ width: undefined, height: undefined });
+            expect(events).toEqual([{ width: undefined, height: undefined }]);
+
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([
+                { width: undefined, height: undefined },
+                { width: 100, height: 200 },
+            ]);
+        });
+
+        test('a setSize issued while the pending size is being re-applied is kept', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut.setSize({ width: 100, height: 200 });
+
+            // a listener reacting to the re-applied size asks for another
+            cut.onDidSizeChange((e) => {
+                if (e.width === 100) {
+                    cut.setSize({ width: 450 });
+                }
+            });
+
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 450 }]);
+        });
+
+        test('a nested setSize does not let the outer resize clear its pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            // simulate a layout that answers setSize synchronously in two
+            // passes, each reporting the latest width it was asked for
+            let laidOutWidth = 0;
+            cut.onDidSizeChange((e) => {
+                laidOutWidth = e.width ?? laidOutWidth;
+                cut._onDidDimensionChange.fire({
+                    width: laidOutWidth,
+                    height: 0,
+                });
+                cut._onDidDimensionChange.fire({
+                    width: laidOutWidth,
+                    height: 0,
+                });
+            });
+            // a listener that answers a width below 200 with a nested setSize
+            cut.onDidDimensionsChange((e) => {
+                if (e.width < 200) {
+                    cut.setSize({ width: 200 });
+                }
+            });
+
+            // the nested call returns before the outer layout's second pass,
+            // which must still count as the group's own resize
+            cut.setSize({ width: 100 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 200 }]);
+        });
+
         test('setSize after a stale-clearing resize stores a fresh pending size', () => {
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',

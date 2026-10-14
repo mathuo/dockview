@@ -11981,12 +11981,10 @@ describe('dockviewComponent', () => {
         });
 
         describe('issue 1688: setSize on a visible group must not be re-applied later', () => {
-            // Reproduces https://github.com/dockview/dockview/issues/1688
-            // setSize stored a pending size that was only cleared when the
-            // group became visible. For a group that was already visible
-            // the size applied at once but the pending value lingered, and
-            // the next hide/show (including maximize/restore of another
-            // group) re-applied it over every resize made since.
+            // https://github.com/dockview/dockview/issues/1688
+            // A size set on a visible group applies at once. Any resize
+            // after it is the newer intent, so a later hide/show (including
+            // maximize/restore of another group) must keep that resize.
             function setup() {
                 const container = document.createElement('div');
 
@@ -12065,6 +12063,61 @@ describe('dockviewComponent', () => {
                 expect(a.api.width).toBe(600);
             });
 
+            test('not re-applied after a container resize then hide/show', () => {
+                const { dockview, a } = setup();
+
+                a.api.setSize({ width: 300 });
+                expect(a.api.width).toBe(300);
+
+                dockview.layout(1200, 600);
+                expect(a.api.width).toBe(360);
+
+                a.api.setVisible(false);
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(360);
+            });
+
+            test('not re-applied after a sash drag then hide/show', () => {
+                const { dockview, a, b } = setup();
+
+                a.api.setSize({ width: 300 });
+                expect(a.api.width).toBe(300);
+                expect(b.api.width).toBe(700);
+
+                const sash = dockview.element.querySelector(
+                    '.dv-sash'
+                ) as HTMLElement;
+                expect(sash).toBeTruthy();
+
+                fireEvent(
+                    sash,
+                    new MouseEvent('pointerdown', {
+                        clientX: 300,
+                        clientY: 100,
+                    })
+                );
+                fireEvent(
+                    document,
+                    new MouseEvent('pointermove', {
+                        clientX: 600,
+                        clientY: 100,
+                    })
+                );
+                fireEvent(
+                    document,
+                    new MouseEvent('pointerup', { clientX: 600, clientY: 100 })
+                );
+
+                expect(a.api.width).toBe(600);
+                expect(b.api.width).toBe(400);
+
+                a.api.setVisible(false);
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(600);
+            });
+
             test('a size set while hidden is still applied on show', () => {
                 const { a, b } = setup();
 
@@ -12074,6 +12127,25 @@ describe('dockviewComponent', () => {
                 // resizing the remaining visible group must not discard the
                 // pending size of the hidden one
                 b.api.setSize({ width: 900 });
+
+                a.api.setVisible(true);
+
+                expect(a.api.width).toBe(300);
+            });
+
+            test('a size set while hidden survives adding a panel to that group', () => {
+                const { dockview, a } = setup();
+
+                a.api.setVisible(false);
+                a.api.setSize({ width: 300 });
+
+                // addPanel calls setSize on the target group with the
+                // initialWidth/initialHeight options, both undefined here
+                dockview.addPanel({
+                    id: 'c',
+                    component: 'default',
+                    position: { referenceGroup: a },
+                });
 
                 a.api.setVisible(true);
 
