@@ -122,6 +122,7 @@ describe('DockviewAngularComponent', () => {
             ['disableDnd', true],
             ['dndStrategy', 'pointer'],
             ['noPanelsOverlay', 'emptyGroup'],
+            ['closeEmptyGroups', false],
             ['theme', { name: 't', className: 'dv-t' }],
         ];
 
