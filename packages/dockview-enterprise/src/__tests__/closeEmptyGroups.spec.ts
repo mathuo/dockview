@@ -1,4 +1,4 @@
-import { DockviewComponent, IContentRenderer } from 'dockview-core';
+import { DockviewComponent, type IContentRenderer } from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -103,7 +103,7 @@ describe('LayoutHistory with closeEmptyGroups: false', () => {
             to: { group: g2, position: 'bottom' },
         });
         expect(d.size).toBe(3);
-        expect(d.getPanel(g1.id)!.panels).toHaveLength(0);
+        expect(g1.panels).toHaveLength(0);
 
         d.undo();
         expect(layout(d)).toEqual(before);
@@ -133,7 +133,7 @@ describe('LayoutHistory with closeEmptyGroups: false', () => {
 
         d.addFloatingGroup(p1);
         expect(d.floatingGroups).toHaveLength(1);
-        expect(d.getPanel(g1.id)!.panels).toHaveLength(0);
+        expect(g1.panels).toHaveLength(0);
 
         d.undo();
         expect(d.floatingGroups).toHaveLength(0);
