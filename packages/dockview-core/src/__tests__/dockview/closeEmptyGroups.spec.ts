@@ -94,6 +94,27 @@ describe('closeEmptyGroups', () => {
             expect(panelIds(dockview, g1.id)).toEqual(['p1']);
         });
 
+        test("closeAllGroups() keeps the last group under noPanelsOverlay 'emptyGroup'", () => {
+            const dockview = createDockview({ noPanelsOverlay: 'emptyGroup' });
+            twoGroups(dockview);
+
+            dockview.closeAllGroups();
+
+            expect(dockview.size).toBe(1);
+            expect(dockview.totalPanels).toBe(0);
+        });
+
+        test('popping out a lone panel takes its group along', async () => {
+            window.open = () => setupMockWindow();
+            const dockview = createDockview({});
+            const { p1, g1 } = twoGroups(dockview);
+
+            await dockview.addPopoutGroup(p1);
+
+            expect(dockview.groups).toContain(g1);
+            expect(g1.api.isVisible).toBe(false);
+        });
+
         test("noPanelsOverlay 'emptyGroup' still keeps only the last group", () => {
             const dockview = createDockview({ noPanelsOverlay: 'emptyGroup' });
             const { p1, p2, p3, g1, g2 } = twoGroups(dockview);
@@ -220,6 +241,19 @@ describe('closeEmptyGroups', () => {
             expect(dockview.totalPanels).toBe(0);
         });
 
+        test("closeAllGroups() keeps one group under noPanelsOverlay 'emptyGroup'", () => {
+            const dockview = createDockview({
+                closeEmptyGroups: false,
+                noPanelsOverlay: 'emptyGroup',
+            });
+            twoGroups(dockview);
+
+            dockview.closeAllGroups();
+
+            expect(dockview.size).toBe(1);
+            expect(dockview.totalPanels).toBe(0);
+        });
+
         test('clear() removes everything', () => {
             const dockview = createDockview({ closeEmptyGroups: false });
             twoGroups(dockview);
@@ -304,6 +338,45 @@ describe('closeEmptyGroups', () => {
                 }
                 expect(restored.getPopouts()).toHaveLength(1);
                 expect(restored.getPopouts()[0].group.panels).toHaveLength(0);
+            });
+
+            test('popping out a lone panel leaves its group in the grid', async () => {
+                const dockview = createDockview({ closeEmptyGroups: false });
+                const { p1, g1 } = twoGroups(dockview);
+
+                await dockview.addPopoutGroup(p1);
+
+                expect(p1.group.api.location.type).toBe('popout');
+                expect(p1.group).not.toBe(g1);
+                expect(dockview.groups).toContain(g1);
+                expect(g1.api.isVisible).toBe(true);
+                expect(g1.panels).toHaveLength(0);
+                expect(g1.model.hasWatermark).toBe(true);
+            });
+
+            test('closing the popout group of a lone panel keeps its empty grid group', async () => {
+                const dockview = createDockview({ closeEmptyGroups: false });
+                const { p1, g1 } = twoGroups(dockview);
+                await dockview.addPopoutGroup(p1);
+
+                p1.group.api.close();
+
+                expect(dockview.getPopouts()).toHaveLength(0);
+                expect(dockview.groups).toContain(g1);
+                expect(g1.api.isVisible).toBe(true);
+            });
+
+            test('closing a whole-group popout still removes its hidden reference group', async () => {
+                const dockview = createDockview({ closeEmptyGroups: false });
+                const { g1 } = twoGroups(dockview);
+                await dockview.addPopoutGroup(g1);
+                const popout = dockview.getPopouts()[0].group;
+                expect(g1.api.isVisible).toBe(false);
+
+                popout.api.close();
+
+                expect(dockview.groups).not.toContain(g1);
+                expect(dockview.size).toBe(1);
             });
 
             test('closing the window of an emptied popout returns an empty group to the grid', async () => {

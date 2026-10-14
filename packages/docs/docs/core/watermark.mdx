@@ -102,7 +102,7 @@ const api = createDockview(element, {
 ```
 </FrameworkSpecific>
 
-`api.removePanel(panel, { removeEmptyGroup })` overrides the option for a single call. `api.closeAllGroups()` and `api.clear()` always remove the groups.
+`api.removePanel(panel, { removeEmptyGroup })` overrides the option for a single call. `api.closeAllGroups()` and `api.clear()` remove the groups as well as their panels, except that `closeAllGroups()` keeps the last group when `noPanelsOverlay` is `'emptyGroup'`.
 
 ## Options
 

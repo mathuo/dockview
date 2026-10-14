@@ -2011,7 +2011,14 @@ export class DockviewGroupPanelModel
             const fromSameGroup =
                 this.tabsContainer.indexOf(data.panelId) !== -1;
 
-            if (fromSameGroup && this.tabsContainer.size === 1) {
+            // a lone panel cannot split its own group when the emptied
+            // group would be removed; with `closeEmptyGroups: false` the
+            // group stays, so the split is allowed
+            if (
+                fromSameGroup &&
+                this.tabsContainer.size === 1 &&
+                this.accessor.options.closeEmptyGroups !== false
+            ) {
                 return;
             }
 

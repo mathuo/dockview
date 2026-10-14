@@ -1968,9 +1968,12 @@ export class DockviewComponent
             return Promise.resolve(false);
         }
 
+        // a lone panel takes its whole group along, unless that group is to
+        // stay in place as an empty group
         if (
             itemToPopout instanceof DockviewPanel &&
-            itemToPopout.group.size === 1
+            itemToPopout.group.size === 1 &&
+            this.closeEmptyGroups
         ) {
             return this.addPopoutGroup(itemToPopout.group, options);
         }
@@ -2749,9 +2752,7 @@ export class DockviewComponent
 
             // outside `movingLock`: this group is destroyed rather than
             // relocated, so its removal is owed an event
-            if (this.options.closeEmptyGroups !== false) {
-                this.removeGroupIfEmpty(sourceGroup);
-            }
+            this.removeGroupIfEmpty(sourceGroup);
 
             this.movingLock(() =>
                 group.model.openPanel(item, { skipSetGroupActive: true })
@@ -2888,15 +2889,18 @@ export class DockviewComponent
         }
     }
 
+    /** The `closeEmptyGroups` option: remove a group once it empties. */
+    private get closeEmptyGroups(): boolean {
+        return this.options.closeEmptyGroups !== false;
+    }
+
     /** Whether a move leaves its emptied source group in place. */
     private keepEmptyGroups(options: { keepEmptyGroups?: boolean }): boolean {
-        return (
-            options.keepEmptyGroups ?? this.options.closeEmptyGroups === false
-        );
+        return options.keepEmptyGroups ?? !this.closeEmptyGroups;
     }
 
     private removeGroupIfEmpty(group: DockviewGroupPanel): void {
-        if (group.model.size === 0) {
+        if (group.model.size === 0 && this.closeEmptyGroups) {
             this.doRemoveGroup(group, { skipActive: true });
         }
     }
@@ -4477,8 +4481,17 @@ export class DockviewComponent
                 group.model.closeAllPanels();
 
                 // with `closeEmptyGroups: false` the panels' removal leaves
-                // the group behind; closing all groups still removes it
-                if (this._groups.has(group.id) && group.model.size === 0) {
+                // the group behind; closing all groups still removes it,
+                // keeping the last one when `noPanelsOverlay` asks for it
+                const keepLast =
+                    this.options.noPanelsOverlay === 'emptyGroup' &&
+                    this._groups.size === 1;
+                if (
+                    !this.closeEmptyGroups &&
+                    !keepLast &&
+                    this._groups.has(group.id) &&
+                    group.model.size === 0
+                ) {
                     this.removeGroup(group, { skipActive: true });
                 }
             }
@@ -4713,8 +4726,7 @@ export class DockviewComponent
         this.mutation('remove', () =>
             this._doRemovePanel(panel, {
                 removeEmptyGroup:
-                    options?.removeEmptyGroup ??
-                    this.options.closeEmptyGroups !== false,
+                    options?.removeEmptyGroup ?? this.closeEmptyGroups,
                 skipDispose: options?.skipDispose,
                 skipSetActiveGroup: options?.skipSetActiveGroup,
             })
@@ -5030,7 +5042,10 @@ export class DockviewComponent
                     const refGroup = selectedGroup.referenceGroup
                         ? this.getPanel(selectedGroup.referenceGroup)
                         : undefined;
-                    if (refGroup?.panels.length === 0) {
+                    if (
+                        refGroup?.panels.length === 0 &&
+                        (this.closeEmptyGroups || !refGroup.api.isVisible)
+                    ) {
                         this.removeGroup(refGroup);
                     }
                 }
