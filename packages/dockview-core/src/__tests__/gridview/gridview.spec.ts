@@ -84,6 +84,32 @@ describe('gridview', () => {
         expect(gridview.maximumHeight).toBe(Number.MAX_VALUE);
     });
 
+    test('a hidden view is laid out at zero under a margin', () => {
+        const gridview = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.margin = 10;
+        gridview.layout(1000, 1000);
+
+        const views = [
+            new MockGridview(),
+            new MockGridview(),
+            new MockGridview(),
+        ];
+        gridview.addView(views[0], Sizing.Distribute, [0]);
+        gridview.addView(views[1], Sizing.Distribute, [1]);
+        gridview.addView(views[2], Sizing.Distribute, [2]);
+
+        gridview.setViewVisible([1], false);
+
+        expect(views[1].width).toBe(0);
+        // the two visible views share the one margin left between them
+        expect(views[0].width + views[2].width).toBe(1000 - 10);
+        gridview.dispose();
+    });
+
     test('a nested branch with all children hidden round-trips hidden, not visible at size 0', () => {
         const gridview = new Gridview(
             false,

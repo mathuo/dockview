@@ -95,12 +95,14 @@ export class ViewItem {
         }
 
         if (visible) {
+            // visible first, so constraints that depend on it see the new state
+            const cachedVisibleSize = this._cachedVisibleSize ?? 0;
+            this._cachedVisibleSize = undefined;
             this.size = clamp(
-                this._cachedVisibleSize ?? 0,
+                cachedVisibleSize,
                 this.viewMinimumSize,
                 this.viewMaximumSize
             );
-            this._cachedVisibleSize = undefined;
         } else {
             this._cachedVisibleSize =
                 typeof size === 'number' ? size : this.size;

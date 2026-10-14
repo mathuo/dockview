@@ -10,6 +10,31 @@ import { isInDocument, watchElementResize } from '../dom';
 
 export type EdgeGroupPosition = 'top' | 'bottom' | 'left' | 'right';
 
+const EDGE_POSITIONS: readonly EdgeGroupPosition[] = [
+    'left',
+    'right',
+    'top',
+    'bottom',
+];
+
+export function isHorizontal(position: EdgeGroupPosition): boolean {
+    return position === 'left' || position === 'right';
+}
+
+/** What an edge view reads live from the splitview it sits in. */
+export interface IEdgeGroupAxis {
+    /** The size each visible view gives up to the margins between them. */
+    readonly marginShare: number;
+    /** The splitview's extent along the axis; zero until it is laid out. */
+    readonly size: number;
+}
+
+/** A view outside a shell: no gap, and every layout is real. */
+const UNBOUNDED_AXIS: IEdgeGroupAxis = {
+    marginShare: 0,
+    size: Number.POSITIVE_INFINITY,
+};
+
 export interface EdgeGroupOptions {
     id: string;
     initialSize?: number;
@@ -86,14 +111,15 @@ export class EdgeGroupView implements IView {
     readonly priority = LayoutPriority.Low;
 
     private _isCollapsed = false;
+    private _isVisible = true;
     private _lastExpandedSize: number;
 
-    // Sizing is stored as pre-gap "base" values plus the current gap
-    // contribution (_gapAdd) so the effective collapsed size can be recomputed
-    // whenever either the theme gap OR the measured tab-strip size changes.
+    // Sizing is stored as pre-gap "base" values; the gap share is read live
+    // from the owning splitview, so the effective sizes follow the theme gap,
+    // the views visible on the axis and the measured tab-strip size.
     private _baseCollapsedSize: number;
     private _baseMinimumSize: number | undefined;
-    private _gapAdd: number;
+    private readonly _axis: IEdgeGroupAxis;
     private readonly _expandedMaximumSize: number;
 
     // The live cross-axis size of the group's tab strip. When defined it wins
@@ -122,8 +148,8 @@ export class EdgeGroupView implements IView {
         // Otherwise fall back to collapsedSize + 50 so the expanded state is
         // visually distinguishable from the collapsed state.
         return this._baseMinimumSize !== undefined
-            ? this._baseMinimumSize + this._gapAdd
-            : this._effectiveBaseCollapsed + 50 + this._gapAdd;
+            ? this._baseMinimumSize + this._axis.marginShare
+            : this._effectiveBaseCollapsed + 50 + this._axis.marginShare;
     }
 
     get maximumSize(): number {
@@ -148,11 +174,11 @@ export class EdgeGroupView implements IView {
 
     /** Without the gap share. */
     get lastExpandedContentSize(): number {
-        return this._lastExpandedSize - this._gapAdd;
+        return this._lastExpandedSize - this._axis.marginShare;
     }
 
     get collapsedSize(): number {
-        return this._effectiveBaseCollapsed + this._gapAdd;
+        return this._effectiveBaseCollapsed + this._axis.marginShare;
     }
 
     /** The user-configured (pre-gap) geometry constraints, for serialization.
@@ -175,7 +201,7 @@ export class EdgeGroupView implements IView {
         options: EdgeGroupOptions,
         group: IEdgeGroupHost,
         orientation: 'horizontal' | 'vertical',
-        gapAdd = 0
+        axis: IEdgeGroupAxis = UNBOUNDED_AXIS
     ) {
         this._group = group;
         this._orientation = orientation;
@@ -185,7 +211,7 @@ export class EdgeGroupView implements IView {
 
         this._baseCollapsedSize = options.collapsedSize ?? 35;
         this._baseMinimumSize = options.minimumSize;
-        this._gapAdd = gapAdd;
+        this._axis = axis;
         this._expandedMaximumSize =
             options.maximumSize ?? Number.POSITIVE_INFINITY;
 
@@ -239,9 +265,12 @@ export class EdgeGroupView implements IView {
     }
 
     layout(size: number, orthogonalSize: number): void {
-        // `size` excludes the gap share; the restored slot includes it.
-        if (!this._isCollapsed) {
-            this._lastExpandedSize = size + this._gapAdd;
+        // Track the expanded size through sash drags. `size` excludes the gap
+        // share; the restored slot includes it. A hidden view is laid out at
+        // zero, and one in a splitview with no extent yet at its minimum;
+        // neither is a size to come back to.
+        if (!this._isCollapsed && this._isVisible && this._axis.size > 0) {
+            this._lastExpandedSize = size + this._axis.marginShare;
         }
 
         // horizontal (left/right): size=width, orthogonalSize=height → layout(width, height)
@@ -262,33 +291,31 @@ export class EdgeGroupView implements IView {
         // ShellManager calls resizeView directly after this; no _onDidChange needed
     }
 
-    setVisible(_visible: boolean): void {
-        // visibility is managed by the parent splitview
+    setVisible(visible: boolean): void {
+        // the parent splitview manages visibility; only the flag is kept
+        this._isVisible = visible;
     }
 
     /**
-     * Restore the last-expanded size from serialized state without triggering
-     * a layout. Must be called before setCollapsed(true) during fromJSON so
-     * that expanding after deserialization restores the correct size.
+     * Set the expanded size without triggering a layout: from serialized
+     * state (before setCollapsed(true) during fromJSON, so that expanding
+     * restores the right size) or from an explicit resize.
      */
     restoreExpandedSize(size: number): void {
         this._lastExpandedSize = size;
     }
 
     /**
-     * Apply a new base (pre-gap) collapsed size, base minimum size and gap
-     * contribution after a theme or gap change. Base values come from the
-     * original config; the ShellManager owns the gap arithmetic. A live
-     * measured tab size (if any) continues to win over the base collapsed size.
+     * Apply a new base (pre-gap) collapsed size and base minimum size after a
+     * theme change. Base values come from the original config. A live measured
+     * tab size (if any) continues to win over the base collapsed size.
      */
     updateSizing(
         baseCollapsedSize: number,
-        baseMinimumSize: number | undefined,
-        gapAdd: number
+        baseMinimumSize: number | undefined
     ): void {
         this._baseCollapsedSize = baseCollapsedSize;
         this._baseMinimumSize = baseMinimumSize;
-        this._gapAdd = gapAdd;
     }
 
     dispose(): void {
@@ -463,9 +490,9 @@ class MiddleColumnView implements IView, IDisposable {
         }
     }
 
-    /** The inner splitview's primary-axis (height) extent; zero until laid out. */
-    get axisSize(): number {
-        return this._splitview.size;
+    /** The inner splitview, as the axis its edge views read. */
+    get axis(): IEdgeGroupAxis {
+        return this._splitview;
     }
 
     updateMargin(gap: number): void {
@@ -543,7 +570,6 @@ export class ShellManager implements IDisposable {
             proportionalLayout: false,
             margin: gap,
         });
-
         this._middleIndex = 0;
         this._outerSplitview.addView(
             this._middleColumn,
@@ -583,8 +609,6 @@ export class ShellManager implements IDisposable {
                 ) {
                     return;
                 }
-                this._currentWidth = width;
-                this._currentHeight = height;
                 this.layout(width, height);
             }),
             this._outerSplitview,
@@ -629,31 +653,15 @@ export class ShellManager implements IDisposable {
 
         this._viewConfigs.set(position, options);
 
-        // Recompute gap adjustments now that _viewConfigs has grown.
-        const outerN =
-            1 +
-            (this._viewConfigs.has('left') ? 1 : 0) +
-            (this._viewConfigs.has('right') ? 1 : 0);
-        const innerN =
-            1 +
-            (this._viewConfigs.has('top') ? 1 : 0) +
-            (this._viewConfigs.has('bottom') ? 1 : 0);
-        const outerGapAdd =
-            outerN > 1 ? (this._gap * (outerN - 1)) / outerN : 0;
-        const innerGapAdd =
-            innerN > 1 ? (this._gap * (innerN - 1)) / innerN : 0;
-
-        const isHorizontal = position === 'left' || position === 'right';
-        const gapAdd = isHorizontal ? outerGapAdd : innerGapAdd;
-        const orientation = isHorizontal ? 'horizontal' : 'vertical';
-
         const view = new EdgeGroupView(
             { collapsedSize: this._defaultCollapsedSize, ...options },
             group,
-            orientation,
-            gapAdd
+            isHorizontal(position) ? 'horizontal' : 'vertical',
+            this._axisFor(position)
         );
 
+        // A collapsed view's strip is its locked min and max, which read the
+        // axis share once it is in, so the add clamps it to the right strip.
         const initialSize = view.isCollapsed
             ? view.collapsedSize
             : view.lastExpandedSize;
@@ -696,9 +704,9 @@ export class ShellManager implements IDisposable {
             this._pendingSizes.set(position, initialSize);
         }
 
-        // Recalculate gap adjustments for all views now that n has changed.
-        // updateTheme already guards the layout() call by _currentWidth/_currentHeight.
-        this.updateTheme(this._gap, this._defaultCollapsedSize);
+        // The axis has one more visible view, so its other collapsed strips
+        // move with the gap share.
+        this._relayout();
 
         return view;
     }
@@ -733,6 +741,8 @@ export class ShellManager implements IDisposable {
     }
 
     layout(width: number, height: number): void {
+        this._currentWidth = width;
+        this._currentHeight = height;
         // Outer splitview is HORIZONTAL: layout(size=width, orthogonalSize=height)
         this._outerSplitview.layout(width, height);
         this._flushPendingSizes();
@@ -747,75 +757,68 @@ export class ShellManager implements IDisposable {
         this._gap = gap;
         this._defaultCollapsedSize = defaultCollapsedSize;
 
-        const outerN =
-            1 +
-            (this._viewConfigs.has('left') ? 1 : 0) +
-            (this._viewConfigs.has('right') ? 1 : 0);
-        const innerN =
-            1 +
-            (this._viewConfigs.has('top') ? 1 : 0) +
-            (this._viewConfigs.has('bottom') ? 1 : 0);
-        const outerGapAdd = outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
-        const innerGapAdd = innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
-
         // Update splitview margins.
         this._outerSplitview.margin = gap;
         this._middleColumn.updateMargin(gap);
 
-        // Recompute effective collapsed sizes from the original config values.
-        const updateView = (
-            view: EdgeGroupView,
-            baseCfg: EdgeGroupOptions,
-            gapAdd: number
-        ) => {
-            const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
-            view.updateSizing(baseCS, baseCfg.minimumSize, gapAdd);
-        };
+        this._applyThemeSizing();
+        this._relayout();
+    }
 
-        const topCfg = this._viewConfigs.get('top');
-        if (this._topView && topCfg) {
-            updateView(this._topView, topCfg, innerGapAdd);
-        }
-        const bottomCfg = this._viewConfigs.get('bottom');
-        if (this._bottomView && bottomCfg) {
-            updateView(this._bottomView, bottomCfg, innerGapAdd);
-        }
-        const leftCfg = this._viewConfigs.get('left');
-        if (this._leftView && leftCfg) {
-            updateView(this._leftView, leftCfg, outerGapAdd);
-        }
-        const rightCfg = this._viewConfigs.get('right');
-        if (this._rightView && rightCfg) {
-            updateView(this._rightView, rightCfg, outerGapAdd);
-        }
+    /** Whether the other edge of `position`'s axis holds a view. */
+    private _hasSiblingOn(position: EdgeGroupPosition): boolean {
+        return isHorizontal(position)
+            ? this._leftView !== undefined && this._rightView !== undefined
+            : this._topView !== undefined && this._bottomView !== undefined;
+    }
 
-        // Resize currently-collapsed groups to their new collapsed size so
-        // they immediately match the new theme's tab-strip dimensions.
-        if (this._leftView?.isCollapsed && this._leftIndex !== undefined) {
-            this._outerSplitview.resizeView(
-                this._leftIndex,
-                this._leftView.collapsedSize
-            );
-        }
-        if (this._rightView?.isCollapsed && this._rightIndex !== undefined) {
-            this._outerSplitview.resizeView(
-                this._rightIndex,
-                this._rightView.collapsedSize
-            );
-        }
-        if (this._topView?.isCollapsed) {
-            this._middleColumn.resizeView('top', this._topView.collapsedSize);
-        }
-        if (this._bottomView?.isCollapsed) {
-            this._middleColumn.resizeView(
-                'bottom',
-                this._bottomView.collapsedSize
-            );
-        }
+    /** The splitview `position`'s view sits in, as its edge axis. */
+    private _axisFor(position: EdgeGroupPosition): IEdgeGroupAxis {
+        return isHorizontal(position)
+            ? this._outerSplitview
+            : this._middleColumn.axis;
+    }
 
-        // Re-run layout with the current shell dimensions.
+    /** Re-derive every edge view's base sizing from its original config and
+     *  the current defaults. */
+    private _applyThemeSizing(): void {
+        for (const position of EDGE_POSITIONS) {
+            const view = this._getView(position);
+            const baseCfg = this._viewConfigs.get(position);
+            if (view && baseCfg) {
+                view.updateSizing(
+                    baseCfg.collapsedSize ?? this._defaultCollapsedSize,
+                    baseCfg.minimumSize
+                );
+            }
+        }
+    }
+
+    /**
+     * Lay the shell out again at its current size, once it has one. The
+     * splitviews clamp every view to its current constraints, which is how a
+     * collapsed strip or a group at its minimum follows a moved gap share.
+     */
+    private _relayout(): void {
         if (this._currentWidth > 0 && this._currentHeight > 0) {
             this.layout(this._currentWidth, this._currentHeight);
+        }
+    }
+
+    /** The view's slot in its splitview: its laid-out size plus the gap share. */
+    private _slotSize(position: EdgeGroupPosition): number {
+        switch (position) {
+            case 'left':
+                return this._leftIndex === undefined
+                    ? 0
+                    : this._outerSplitview.getViewSize(this._leftIndex);
+            case 'right':
+                return this._rightIndex === undefined
+                    ? 0
+                    : this._outerSplitview.getViewSize(this._rightIndex);
+            case 'top':
+            case 'bottom':
+                return this._middleColumn.getViewSize(position);
         }
     }
 
@@ -859,8 +862,9 @@ export class ShellManager implements IDisposable {
         this._viewConfigs.delete(position);
         this._pendingSizes.delete(position);
 
-        // Recalculate gap adjustments for remaining views.
-        this.updateTheme(this._gap, this._defaultCollapsedSize);
+        // The axis has one fewer visible view, so its collapsed strips move
+        // with the gap share.
+        this._relayout();
     }
 
     hasEdgeGroup(position: EdgeGroupPosition): boolean {
@@ -877,6 +881,10 @@ export class ShellManager implements IDisposable {
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
+        const changes =
+            this._getView(position) !== undefined &&
+            visible !== this.isEdgeGroupVisible(position);
+
         switch (position) {
             case 'left':
                 if (this._leftIndex !== undefined) {
@@ -898,6 +906,13 @@ export class ShellManager implements IDisposable {
             case 'bottom':
                 this._middleColumn.setViewVisible(position, visible);
                 break;
+        }
+
+        if (changes && this._gap > 0 && this._hasSiblingOn(position)) {
+            // The visible count on the axis moved, and the gap share with it.
+            // The toggle clamped only the view itself; a sibling at its
+            // collapsed or minimum size has to follow.
+            this._relayout();
         }
 
         if (visible) {
@@ -979,14 +994,10 @@ export class ShellManager implements IDisposable {
     /** A resize lands only on a visible view (a hidden one is pinned to zero)
      *  whose splitview has extent to distribute. */
     private _canResize(position: EdgeGroupPosition): boolean {
-        if (!this.isEdgeGroupVisible(position)) {
-            return false;
-        }
-        const axisSize =
-            position === 'left' || position === 'right'
-                ? this._outerSplitview.size
-                : this._middleColumn.axisSize;
-        return axisSize > 0;
+        return (
+            this.isEdgeGroupVisible(position) &&
+            this._axisFor(position).size > 0
+        );
     }
 
     private _resizeView(position: EdgeGroupPosition, size: number): void {
@@ -1047,125 +1058,77 @@ export class ShellManager implements IDisposable {
 
     toJSON(): SerializedEdgeGroups {
         const edgeGroups: SerializedEdgeGroups = {};
-
-        // Persist the user-configured constraints so the auto-create fromJSON
-        // path restores them. Omit unconfigured/Infinity values (Infinity isn't
-        // JSON-representable) so they fall back to defaults on restore.
-        const constraints = (
-            view: EdgeGroupView
-        ): Pick<
-            SerializedEdgeGroup,
-            'minimumSize' | 'maximumSize' | 'collapsedSize'
-        > => ({
-            minimumSize: view.configuredMinimumSize,
-            maximumSize: Number.isFinite(view.configuredMaximumSize)
-                ? view.configuredMaximumSize
-                : undefined,
-            collapsedSize: view.configuredCollapsedSize,
-        });
-
-        // Record the size to restore the group to. An expanded-but-hidden
-        // group reports getViewSize 0, so fall back to its cached visible size
-        // (then lastExpandedSize); otherwise re-showing snaps to minimumSize.
-        const expandedSize = (
-            view: EdgeGroupView,
-            position: EdgeGroupPosition,
-            isVisible: boolean,
-            liveSize: number,
-            cachedVisibleSize: number | undefined
-        ): number => {
-            if (view.isCollapsed) {
-                return view.lastExpandedSize;
+        for (const position of EDGE_POSITIONS) {
+            const view = this._getView(position);
+            if (!view) {
+                continue;
             }
-            // a held size is the size the group will take, so persist that
-            // rather than the size it is stranded at
-            const pending = this._pendingSizes.get(position);
-            if (pending !== undefined) {
-                return pending;
-            }
-            if (!isVisible) {
-                return cachedVisibleSize ?? view.lastExpandedSize;
-            }
-            return liveSize;
-        };
-
-        if (this._leftView && this._leftIndex !== undefined) {
-            const visible = this._outerSplitview.isViewVisible(this._leftIndex);
-            edgeGroups.left = {
-                size: expandedSize(
-                    this._leftView,
-                    'left',
-                    visible,
-                    this._outerSplitview.getViewSize(this._leftIndex),
-                    this._outerSplitview.getViewCachedVisibleSize(
-                        this._leftIndex
-                    )
-                ),
+            const visible = this.isEdgeGroupVisible(position);
+            edgeGroups[position] = {
+                size: this._expandedSize(view, position, visible),
                 visible,
-                collapsed: this._leftView.isCollapsed || undefined,
-                ...constraints(this._leftView),
+                collapsed: view.isCollapsed || undefined,
+                // The user-configured constraints, so the auto-create fromJSON
+                // path restores them. Infinity isn't JSON-representable, so an
+                // unconfigured maximum is omitted and falls back to the default.
+                minimumSize: view.configuredMinimumSize,
+                maximumSize: Number.isFinite(view.configuredMaximumSize)
+                    ? view.configuredMaximumSize
+                    : undefined,
+                collapsedSize: view.configuredCollapsedSize,
             };
         }
-        if (this._rightView && this._rightIndex !== undefined) {
-            const visible = this._outerSplitview.isViewVisible(
-                this._rightIndex
-            );
-            edgeGroups.right = {
-                size: expandedSize(
-                    this._rightView,
-                    'right',
-                    visible,
-                    this._outerSplitview.getViewSize(this._rightIndex),
-                    this._outerSplitview.getViewCachedVisibleSize(
-                        this._rightIndex
-                    )
-                ),
-                visible,
-                collapsed: this._rightView.isCollapsed || undefined,
-                ...constraints(this._rightView),
-            };
-        }
-        if (this._topView) {
-            const visible = this._middleColumn.isViewVisible('top');
-            edgeGroups.top = {
-                size: expandedSize(
-                    this._topView,
-                    'top',
-                    visible,
-                    this._middleColumn.getViewSize('top'),
-                    this._middleColumn.getViewCachedVisibleSize('top')
-                ),
-                visible,
-                collapsed: this._topView.isCollapsed || undefined,
-                ...constraints(this._topView),
-            };
-        }
-        if (this._bottomView) {
-            const visible = this._middleColumn.isViewVisible('bottom');
-            edgeGroups.bottom = {
-                size: expandedSize(
-                    this._bottomView,
-                    'bottom',
-                    visible,
-                    this._middleColumn.getViewSize('bottom'),
-                    this._middleColumn.getViewCachedVisibleSize('bottom')
-                ),
-                visible,
-                collapsed: this._bottomView.isCollapsed || undefined,
-                ...constraints(this._bottomView),
-            };
-        }
-
         return edgeGroups;
     }
 
+    /** The size to restore the group to. An expanded-but-hidden group has a
+     *  slot of 0, so fall back to its cached visible size (then
+     *  lastExpandedSize); otherwise re-showing snaps to minimumSize. */
+    private _expandedSize(
+        view: EdgeGroupView,
+        position: EdgeGroupPosition,
+        visible: boolean
+    ): number {
+        if (view.isCollapsed) {
+            return view.lastExpandedSize;
+        }
+        // a held size is the size the group will take, so persist that
+        // rather than the size it is stranded at
+        const pending = this._pendingSizes.get(position);
+        if (pending !== undefined) {
+            return pending;
+        }
+        if (!visible) {
+            return this._cachedVisibleSize(position) ?? view.lastExpandedSize;
+        }
+        return this._slotSize(position);
+    }
+
+    /** The slot a hidden view had when it was last visible. */
+    private _cachedVisibleSize(
+        position: EdgeGroupPosition
+    ): number | undefined {
+        switch (position) {
+            case 'left':
+                return this._leftIndex === undefined
+                    ? undefined
+                    : this._outerSplitview.getViewCachedVisibleSize(
+                          this._leftIndex
+                      );
+            case 'right':
+                return this._rightIndex === undefined
+                    ? undefined
+                    : this._outerSplitview.getViewCachedVisibleSize(
+                          this._rightIndex
+                      );
+            case 'top':
+            case 'bottom':
+                return this._middleColumn.getViewCachedVisibleSize(position);
+        }
+    }
+
     fromJSON(data: SerializedEdgeGroups): void {
-        for (const position of [
-            'left',
-            'right',
-            'top',
-            'bottom',
-        ] as EdgeGroupPosition[]) {
+        for (const position of EDGE_POSITIONS) {
             const state = data[position];
             const view = this._getView(position);
             if (!state || !view) {
