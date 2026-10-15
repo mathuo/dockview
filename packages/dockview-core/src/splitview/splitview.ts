@@ -734,6 +734,15 @@ export class Splitview {
         this.size = size;
         this.orthogonalSize = orthogonalSize;
 
+        // Views batch-added with `skipLayout` (a branch rebuilt by the
+        // gridview's clone/flip) have never had their proportions captured.
+        // Adopt the sizes they were added with before laying out, so this and
+        // later layouts scale every view instead of pushing the whole delta
+        // onto the last one.
+        if (!this._proportions) {
+            this.saveProportions();
+        }
+
         if (this.proportions) {
             let total = 0;
 
@@ -867,9 +876,21 @@ export class Splitview {
     }
 
     private saveProportions(): void {
-        if (this.proportionalLayout && this._contentSize > 0) {
+        if (!this.proportionalLayout) {
+            return;
+        }
+
+        // summed here rather than read from `_contentSize`, which is only
+        // refreshed by `layoutViews` and so is stale for views added with
+        // `skipLayout` that have not been laid out yet
+        let contentSize = 0;
+        for (const item of this.viewItems) {
+            contentSize += item.size;
+        }
+
+        if (contentSize > 0) {
             this._proportions = this.viewItems.map((i) =>
-                i.visible ? i.size / this._contentSize : undefined
+                i.visible ? i.size / contentSize : undefined
             );
         }
     }
