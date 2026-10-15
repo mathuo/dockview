@@ -5,7 +5,7 @@ import {
     createPaneview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
-import { undefinedDefaults } from '../utils';
+import { undefinedDefaults } from '../props';
 import { VuePaneviewPanelView } from './view';
 import DockviewPortals from '../dockviewPortals.vue';
 import type { IPaneviewVueProps, PaneviewVueEvents } from './types';

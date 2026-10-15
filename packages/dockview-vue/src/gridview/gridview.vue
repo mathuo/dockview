@@ -5,7 +5,7 @@ import {
     createGridview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
-import { undefinedDefaults } from '../utils';
+import { undefinedDefaults } from '../props';
 import { VueGridviewPanelView } from './view';
 import DockviewPortals from '../dockviewPortals.vue';
 import type { IGridviewVueProps, GridviewVueEvents } from './types';

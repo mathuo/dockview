@@ -5,7 +5,7 @@ import {
     createSplitview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
-import { undefinedDefaults } from '../utils';
+import { undefinedDefaults } from '../props';
 import { VueSplitviewPanelView } from './view';
 import DockviewPortals from '../dockviewPortals.vue';
 import type { ISplitviewVueProps, SplitviewVueEvents } from './types';

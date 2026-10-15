@@ -30,7 +30,6 @@ import {
     VueWatermarkRenderer,
     findComponent,
     resolveComponent,
-    undefinedDefaults,
     type VueComponent,
     type VueRenderable,
 } from '../utils';
@@ -40,6 +39,7 @@ import {
     createSlotReference,
 } from '../slots';
 import DockviewPortals from '../dockviewPortals.vue';
+import { undefinedDefaults } from '../props';
 import type { DockviewVueSlots, IDockviewVueProps, VueEvents } from './types';
 
 const DEFAULT_VUE_TAB = 'props.defaultTabComponent';

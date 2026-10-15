@@ -18,12 +18,11 @@ import PaneviewVue from '../paneview/paneview.vue';
 import SplitviewVue from '../splitview/splitview.vue';
 
 /**
- * Regression tests for #1691. Vue casts an absent `Boolean` prop to `false`
- * unless the prop declares a default, so the wrappers used to hand
- * dockview-core an explicit `false` for every boolean option the consumer
- * left out, overriding core's own defaults (`proportionalLayout: true`,
- * `closeEmptyGroups: true`, `announcements` on, ...). An omitted option must
- * reach core as `undefined`; an explicit `false` must still get through.
+ * Regression tests for #1691: Vue casts an absent `Boolean` prop to `false`
+ * unless the prop declares a default, which overrode dockview-core's own
+ * defaults for `proportionalLayout`, `closeEmptyGroups`, `announcements` and
+ * `dndEdges`. An omitted option must reach core as `undefined`; an explicit
+ * `false` must still get through.
  */
 
 const MockPanel = defineComponent({
