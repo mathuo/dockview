@@ -532,3 +532,25 @@ export class VuePart<T extends Record<string, any> = any> {
         this._renderDisposable?.dispose();
     }
 }
+
+/**
+ * `withDefaults` entry keeping omitted options out of dockview-core's way.
+ *
+ * The wrappers declare the core options as type-only props, and Vue casts an
+ * absent `Boolean` prop to `false` unless its declaration has an own
+ * `default` key. That `false` reached dockview-core and overrode its own
+ * defaults (`proportionalLayout`, `closeEmptyGroups`, `announcements`, ...).
+ * A `default` of `undefined` disables the cast, so an option the consumer
+ * leaves out is passed as `undefined` and core's default applies.
+ *
+ * Typed as `object` on purpose: `withDefaults` folds the keys of its defaults
+ * into the component's public prop types, and that inference mistypes the
+ * union-valued options (`dndCompass`, `keyboardNavigation`, ...) as
+ * `undefined`. The defaults carry no type information anyway, since every
+ * option stays optional.
+ *
+ * @internal
+ */
+export function undefinedDefaults(keys: readonly string[]): object {
+    return Object.fromEntries(keys.map((key) => [key, undefined]));
+}

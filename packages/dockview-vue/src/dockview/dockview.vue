@@ -30,6 +30,7 @@ import {
     VueWatermarkRenderer,
     findComponent,
     resolveComponent,
+    undefinedDefaults,
     type VueComponent,
     type VueRenderable,
 } from '../utils';
@@ -68,7 +69,10 @@ defineOptions({ inheritAttrs: false });
 
 const emit = defineEmits<VueEvents>();
 
-const props = defineProps<IDockviewVueProps>();
+const props = withDefaults(
+    defineProps<IDockviewVueProps>(),
+    undefinedDefaults(PROPERTY_KEYS_DOCKVIEW)
+);
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);
