@@ -382,7 +382,7 @@ describe('DockviewGroupPanelApiImpl', () => {
             ]);
         });
 
-        test('a setSize issued while the pending size is being re-applied is kept', () => {
+        test('the visibility handler does not discard a setSize issued during its re-apply', () => {
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
                 fromPartial<DockviewComponent>({})
@@ -391,7 +391,8 @@ describe('DockviewGroupPanelApiImpl', () => {
             cut._onDidVisibilityChange.fire({ isVisible: false });
             cut.setSize({ width: 100, height: 200 });
 
-            // a listener reacting to the re-applied size asks for another
+            // a listener reacting to the re-applied size asks for another;
+            // the handler must not wipe that request after its own re-apply
             cut.onDidSizeChange((e) => {
                 if (e.width === 100) {
                     cut.setSize({ width: 450 });

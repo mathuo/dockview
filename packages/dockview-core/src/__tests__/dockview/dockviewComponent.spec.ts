@@ -12047,7 +12047,7 @@ describe('dockviewComponent', () => {
                 expect(a.api.width).toBe(600);
             });
 
-            test('a request the layout clamps is not re-applied after hide/show', () => {
+            test('a request the layout clamps is dropped once a later resize lands', () => {
                 const { a, b } = setup();
 
                 // wider than the container: clamped by b's minimum width
