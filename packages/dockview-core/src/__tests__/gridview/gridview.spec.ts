@@ -1289,6 +1289,68 @@ describe('gridview', () => {
     });
 
     describe('normalize', () => {
+        test('the promoted branch keeps its proportions (#1692)', () => {
+            const gridview = new Gridview(
+                true,
+                { separatorBorder: '' },
+                Orientation.VERTICAL
+            );
+            gridview.layout(900, 600);
+
+            const view1 = new MockGridview('1');
+            const view2 = new MockGridview('2');
+            const view3 = new MockGridview('3');
+
+            // a vertical root whose only child is a horizontal row of three
+            gridview.addView(view1, Sizing.Distribute, [0]);
+            gridview.addView(view2, Sizing.Distribute, [0, 1]);
+            gridview.addView(view3, Sizing.Distribute, [0, 2]);
+
+            const views = [view1, view2, view3];
+            expect(views.map((v) => v.width)).toEqual([300, 300, 300]);
+
+            // the row is cloned into the root position
+            gridview.normalize();
+            expect(gridview.orientation).toBe(Orientation.HORIZONTAL);
+            expect(gridview).toHaveLength(3);
+
+            gridview.layout(600, 600);
+            expect(views.map((v) => v.width)).toEqual([200, 200, 200]);
+
+            gridview.layout(900, 600);
+            expect(views.map((v) => v.width)).toEqual([300, 300, 300]);
+        });
+
+        test('a flipped grid keeps the proportions of its rebuilt branches (#1692)', () => {
+            const gridview = new Gridview(
+                true,
+                { separatorBorder: '' },
+                Orientation.HORIZONTAL
+            );
+            gridview.layout(900, 600);
+
+            const view1 = new MockGridview('1');
+            const view2 = new MockGridview('2');
+            const view3 = new MockGridview('3');
+
+            gridview.addView(view1, Sizing.Distribute, [0]);
+            gridview.addView(view2, Sizing.Distribute, [1]);
+            gridview.addView(view3, Sizing.Distribute, [2]);
+
+            const views = [view1, view2, view3];
+            expect(views.map((v) => v.width)).toEqual([300, 300, 300]);
+
+            // the whole tree is rebuilt with the axes transposed
+            gridview.orientation = Orientation.VERTICAL;
+            expect(views.map((v) => v.height)).toEqual([200, 200, 200]);
+
+            gridview.layout(900, 300);
+            expect(views.map((v) => v.height)).toEqual([100, 100, 100]);
+
+            gridview.layout(900, 600);
+            expect(views.map((v) => v.height)).toEqual([200, 200, 200]);
+        });
+
         test('should normalize after structure correctly', () => {
             // Since gridview already normalizes during remove operations,
             // we'll test the method directly with known scenarios

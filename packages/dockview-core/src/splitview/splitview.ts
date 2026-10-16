@@ -734,6 +734,12 @@ export class Splitview {
         this.size = size;
         this.orthogonalSize = orthogonalSize;
 
+        // views added with `skipLayout` have no proportions yet; adopt their
+        // current sizes before laying out
+        if (!this._proportions) {
+            this.saveProportions();
+        }
+
         if (this.proportions) {
             let total = 0;
 
@@ -867,9 +873,20 @@ export class Splitview {
     }
 
     private saveProportions(): void {
-        if (this.proportionalLayout && this._contentSize > 0) {
+        if (!this.proportionalLayout) {
+            return;
+        }
+
+        // `_contentSize` is only refreshed by `layoutViews`, so it is stale
+        // for views added with `skipLayout` that are not yet laid out
+        let contentSize = 0;
+        for (const item of this.viewItems) {
+            contentSize += item.size;
+        }
+
+        if (contentSize > 0) {
             this._proportions = this.viewItems.map((i) =>
-                i.visible ? i.size / this._contentSize : undefined
+                i.visible ? i.size / contentSize : undefined
             );
         }
     }
