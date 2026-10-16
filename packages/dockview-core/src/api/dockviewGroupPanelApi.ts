@@ -141,6 +141,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
     private _pendingSize: SizeEvent | undefined;
     private _isApplyingSize = false;
+    private _reportedSize: { width: number; height: number } | undefined;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelLocationChangeEvent>();
@@ -226,12 +227,22 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                     super.setSize(pendingSize);
                 }
             }),
-            this.onDidDimensionsChange(() => {
-                // Any resize the layout reports while the group is visible,
+            this.onDidDimensionsChange((event) => {
+                const moved =
+                    event.width !== this._reportedSize?.width ||
+                    event.height !== this._reportedSize?.height;
+                this._reportedSize = {
+                    width: event.width,
+                    height: event.height,
+                };
+
+                // A resize the layout reports while the group is visible,
                 // other than the one our own setSize call produces, makes the
                 // pending request stale: a sash drag, a window resize or a
-                // setSize on another group has moved this group since.
-                if (this.isVisible && !this._isApplyingSize) {
+                // setSize on another group has moved this group since. A
+                // layout pass that reports the same size again is not a
+                // resize, so a request the layout clamped stays pending.
+                if (moved && this.isVisible && !this._isApplyingSize) {
                     this._pendingSize = undefined;
                 }
             })

@@ -12118,6 +12118,25 @@ describe('dockviewComponent', () => {
                 expect(a.api.width).toBe(600);
             });
 
+            test('a request the layout clamps survives a layout pass reporting the same size', () => {
+                const { dockview, a, b } = setup();
+
+                a.api.setSize({ width: 5000 });
+                expect(a.api.width).toBe(900);
+
+                // the same dimensions again: not a resize
+                dockview.layout(1000, 600);
+                expect(a.api.width).toBe(900);
+
+                a.api.setVisible(false);
+                // room opens up while the group is hidden
+                b.api.setConstraints({ minimumWidth: 50 });
+                a.api.setVisible(true);
+
+                // the request is re-applied and clamped against the new room
+                expect(a.api.width).toBe(950);
+            });
+
             test('a size set while hidden is still applied on show', () => {
                 const { a, b } = setup();
 

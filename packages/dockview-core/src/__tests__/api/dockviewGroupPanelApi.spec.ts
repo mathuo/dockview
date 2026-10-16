@@ -338,6 +338,28 @@ describe('DockviewGroupPanelApiImpl', () => {
             expect(events).toHaveLength(0);
         });
 
+        test('a dimension report of the same size while visible keeps the pending size', () => {
+            const cut = new DockviewGroupPanelApiImpl(
+                'test-id',
+                fromPartial<DockviewComponent>({})
+            );
+
+            // laid out at 300x200
+            cut._onDidDimensionChange.fire({ width: 300, height: 200 });
+
+            // a request the layout cannot honour: it reports 300 again
+            cut.setSize({ width: 100, height: 200 });
+            cut._onDidDimensionChange.fire({ width: 300, height: 200 });
+
+            const events: { width?: number; height?: number }[] = [];
+            cut.onDidSizeChange((e) => events.push(e));
+
+            cut._onDidVisibilityChange.fire({ isVisible: false });
+            cut._onDidVisibilityChange.fire({ isVisible: true });
+
+            expect(events).toEqual([{ width: 100, height: 200 }]);
+        });
+
         test('a dimension change while hidden keeps the pending size', () => {
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
