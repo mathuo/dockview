@@ -71,9 +71,9 @@ describe('omitted core options reach dockview-core as undefined (#1691)', () => 
             component: 'MockPanel',
             position: { direction: 'right' },
         });
-        expect(api.groups.length).toBe(2);
+        expect(api.groups).toHaveLength(2);
         api.getPanel('p2')!.api.close();
-        expect(api.groups.length).toBe(1);
+        expect(api.groups).toHaveLength(1);
     });
 
     test('DockviewVue passes an explicit false through', async () => {
@@ -101,7 +101,7 @@ describe('omitted core options reach dockview-core as undefined (#1691)', () => 
             position: { direction: 'right' },
         });
         api.getPanel('p2')!.api.close();
-        expect(api.groups.length).toBe(2);
+        expect(api.groups).toHaveLength(2);
     });
 
     test('SplitviewVue', async () => {
