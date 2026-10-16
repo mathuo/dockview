@@ -140,6 +140,8 @@ const NOT_INITIALIZED_MESSAGE =
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
     private _pendingSize: SizeEvent | undefined;
+    private _isApplyingSize = false;
+    private _reportedSize: { width: number; height: number } | undefined;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelLocationChangeEvent>();
@@ -220,7 +222,27 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             this._onDidHeaderDirectionChange,
             this._onDidVisibilityChange.event((event) => {
                 if (event.isVisible && this._pendingSize) {
-                    super.setSize(this._pendingSize);
+                    const pendingSize = this._pendingSize;
+                    this._pendingSize = undefined;
+                    super.setSize(pendingSize);
+                }
+            }),
+            this.onDidDimensionsChange((event) => {
+                const moved =
+                    event.width !== this._reportedSize?.width ||
+                    event.height !== this._reportedSize?.height;
+                this._reportedSize = {
+                    width: event.width,
+                    height: event.height,
+                };
+
+                // A resize the layout reports while the group is visible,
+                // other than the one our own setSize call produces, makes the
+                // pending request stale: a sash drag, a window resize or a
+                // setSize on another group has moved this group since. A
+                // layout pass that reports the same size again is not a
+                // resize, so a request the layout clamped stays pending.
+                if (moved && this.isVisible && !this._isApplyingSize) {
                     this._pendingSize = undefined;
                 }
             })
@@ -228,9 +250,22 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     }
 
     public override setSize(event: SizeEvent): void {
-        this._pendingSize = { ...event };
+        const hasDimension =
+            typeof event.width === 'number' || typeof event.height === 'number';
 
-        super.setSize(event);
+        // an event without dimensions asks for nothing, so it must not
+        // replace a size still waiting to be applied
+        if (hasDimension) {
+            this._pendingSize = { ...event };
+        }
+
+        const wasApplyingSize = this._isApplyingSize;
+        this._isApplyingSize = true;
+        try {
+            super.setSize(event);
+        } finally {
+            this._isApplyingSize = wasApplyingSize;
+        }
     }
 
     close(): void {
