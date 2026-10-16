@@ -17,14 +17,6 @@ import GridviewVue from '../gridview/gridview.vue';
 import PaneviewVue from '../paneview/paneview.vue';
 import SplitviewVue from '../splitview/splitview.vue';
 
-/**
- * Regression tests for #1691: Vue casts an absent `Boolean` prop to `false`
- * unless the prop declares a default, which overrode dockview-core's own
- * defaults for `proportionalLayout`, `closeEmptyGroups`, `announcements` and
- * `dndEdges`. An omitted option must reach core as `undefined`; an explicit
- * `false` must still get through.
- */
-
 const MockPanel = defineComponent({
     name: 'MockPanel',
     props: ['params', 'api', 'containerApi', 'title'],
@@ -63,8 +55,6 @@ describe('omitted core options reach dockview-core as undefined (#1691)', () => 
             expect(options[key], key).toBeUndefined();
         }
 
-        // Core's defaults apply: closing the only panel of a group removes
-        // the group (`closeEmptyGroups` defaults to `true`).
         api.addPanel({ id: 'p1', component: 'MockPanel' });
         api.addPanel({
             id: 'p2',
