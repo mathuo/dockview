@@ -1312,7 +1312,7 @@ describe('gridview', () => {
             // the row is cloned into the root position
             gridview.normalize();
             expect(gridview.orientation).toBe(Orientation.HORIZONTAL);
-            expect(gridview.length).toBe(3);
+            expect(gridview).toHaveLength(3);
 
             gridview.layout(600, 600);
             expect(views.map((v) => v.width)).toEqual([200, 200, 200]);
