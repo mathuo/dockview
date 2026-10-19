@@ -268,7 +268,8 @@ docs/           design notes
 src/            frontend
   main.ts       builds the dockview instance and its panels
   panels.ts     the five probe panels plus a scratch panel
-  hub.ts        cross-window drag and drop through the shell
+  crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
+  hub.ts        the Tauri transport that interceptor reaches the shell through
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface

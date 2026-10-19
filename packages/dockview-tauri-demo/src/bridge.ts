@@ -118,13 +118,7 @@ export async function closeNativePopout(win: Window): Promise<void> {
 
 export const RELEASE_EVENT = 'dockview:release';
 
-export type DragKind = 'panel' | 'group';
-
-export interface ReleaseNotice {
-    session: string;
-    /** The window label that took the group. */
-    to: string;
-}
+import type { DragKind, ReleaseNotice } from './crossWindowDnd';
 
 /** The source window announces a drag, handing the shell the serialized group. */
 export async function dragStart(

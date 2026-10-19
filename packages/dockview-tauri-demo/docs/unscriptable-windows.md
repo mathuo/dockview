@@ -3,7 +3,7 @@
 > **Status.** Written before dockview 8.6.1. Since then direction A below has
 > shipped in core: `serializeGroup` / `addGroupFromJSON` (the per-group
 > envelope and merge entry point of sub-question 1) and the `groupIdGenerator`
-> option (the id namespacing of sub-question 2). The demo's `src/hub.ts`
+> option (the id namespacing of sub-question 2). The demo's `src/crossWindowDnd.ts`
 > builds on them to drag a group between native windows through the shell,
 > which the UX consequence under sub-question 4 said could not exist: the OS
 > drag carries a session id, the shell carries the state. The measurements

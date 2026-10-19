@@ -19,10 +19,14 @@ not a published package and not a supported example.
   a crate of its own behind any host. Keep it that way: no `AppHandle`, no
   window handling, no event emission in this module. `cargo test` covers it;
   the commands in `lib.rs` are thin wrappers over it.
-- `src/hub.ts` — cross-window drag and drop. The shell is the hub: it holds
-  the serialized group for the drag in flight, the OS drag carries only a
-  session id, and the window the drop lands in rebuilds the group with
-  `addGroupFromJSON`. Windows are peers; none owns another.
+- `src/crossWindowDnd.ts` — cross-window drag and drop as an interceptor
+  over dockview's public drag hooks: register it once and ordinary drags
+  keep working, with the addition that a drag can land in another window.
+  The OS drag carries only a session id; a hub outside every window holds
+  the serialized group; the window the drop lands in rebuilds it with
+  `addGroupFromJSON`. It reaches the hub only through the `DragTransport`
+  it is given, so it knows nothing about Tauri.
+- `src/hub.ts` — the Tauri `DragTransport`, over the commands in `bridge.ts`.
 - `popout.html` — dockview opens `/popout.html` by default, so the host has to
   serve it. It is a second Vite entry point.
 
@@ -59,10 +63,11 @@ not a published package and not a supported example.
 - `host.ts` asks dockview's exported `getPopoutUrlError` for its verdict rather
   than restating the rules, so the panel cannot drift from the library while
   still explaining *why* a popout would be refused.
-- The hub hangs off dockview's public drag hooks only: `onWillDragPanel` /
-  `onWillDragGroup` to mark the drag and serialize the group,
-  `onUnhandledDragOver` to accept it, `onDidDrop` to place it. It never
-  reads dockview's DOM or its internal transfer object.
+- `crossWindowDnd.ts` hangs off dockview's public drag hooks only:
+  `onWillDragPanel` / `onWillDragGroup` to mark the drag and serialize the
+  group, `onUnhandledDragOver` to accept it, `onDidDrop` to place it. It
+  never reads dockview's DOM or its internal transfer object, and it never
+  imports from `bridge.ts` or `@tauri-apps/api`: the transport is injected.
 - Closing popout windows goes through `api.onWillClosePopoutWindow` in
   `src/main.ts`, registered once: it covers every popout the component opens,
   including the ones dockview opens for itself (the group context menu, a
