@@ -30,6 +30,22 @@ function findLeaf(candiateNode: Node, last: boolean): LeafNode {
     throw new Error('invalid node');
 }
 
+/**
+ * The sizing to re-add a branch's child with, so a hidden child stays hidden
+ * (with its cached size) instead of coming back visible at size 0.
+ */
+function childSizing(
+    node: BranchNode,
+    index: number,
+    size: number,
+    scale = 1
+): number | Sizing {
+    const cachedVisibleSize = node.getChildCachedVisibleSize(index);
+    return cachedVisibleSize === undefined
+        ? size
+        : Sizing.Invisible(Math.round(cachedVisibleSize * scale));
+}
+
 function cloneNode<T extends Node>(
     node: T,
     size: number,
@@ -51,7 +67,7 @@ function cloneNode<T extends Node>(
 
             result.addChild(
                 cloneNode(child, child.size, child.orthogonalSize),
-                child.size,
+                childSizing(node, i, child.size),
                 0,
                 true
             );
@@ -99,7 +115,12 @@ function flipNode<T extends Node>(
 
             result.addChild(
                 flipNode(child, orthogonalSize, newSize),
-                newSize,
+                childSizing(
+                    node,
+                    i,
+                    newSize,
+                    node.size === 0 ? 0 : size / node.size
+                ),
                 0,
                 true
             );
@@ -1099,7 +1120,11 @@ export class Gridview implements IDisposable {
             // and add those siblings to the grandparent
             for (let i = 0; i < sibling.children.length; i++) {
                 const child = sibling.children[i];
-                grandParent.addChild(child, child.size, parentIndex + i);
+                grandParent.addChild(
+                    child,
+                    childSizing(sibling, i, child.size),
+                    parentIndex + i
+                );
             }
 
             /**

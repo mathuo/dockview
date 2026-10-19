@@ -154,6 +154,80 @@ describe('gridview', () => {
         expect(restoredBranch.size).toBeGreaterThan(0);
     });
 
+    describe('hidden views survive tree restructuring', () => {
+        function createGridview(): Gridview {
+            const gridview = new Gridview(
+                false,
+                { separatorBorder: '' },
+                Orientation.HORIZONTAL
+            );
+            gridview.layout(1000, 1000);
+            return gridview;
+        }
+
+        function isVisible(gridview: Gridview, view: MockGridview): boolean {
+            return gridview.isViewVisible(getGridLocation(view.element));
+        }
+
+        test('flipping the orientation keeps a hidden view hidden', () => {
+            const gridview = createGridview();
+            const views = [
+                new MockGridview(),
+                new MockGridview(),
+                new MockGridview(),
+            ];
+            gridview.addView(views[0], Sizing.Distribute, [0]);
+            gridview.addView(views[1], Sizing.Distribute, [1]);
+            gridview.addView(views[2], Sizing.Distribute, [2]);
+
+            gridview.setViewVisible([1], false);
+            gridview.orientation = Orientation.VERTICAL;
+
+            expect(isVisible(gridview, views[1])).toBe(false);
+
+            gridview.setViewVisible(getGridLocation(views[1].element), true);
+            expect(views[1].height).toBeGreaterThan(0);
+        });
+
+        test('normalize() keeps a hidden view hidden', () => {
+            const gridview = createGridview();
+            const views = [new MockGridview(), new MockGridview()];
+            gridview.addView(views[0], Sizing.Distribute, [0]);
+            gridview.addView(views[1], Sizing.Distribute, [1]);
+            gridview.insertOrthogonalSplitviewAtRoot();
+
+            gridview.setViewVisible([0, 1], false);
+            gridview.normalize();
+
+            expect(isVisible(gridview, views[1])).toBe(false);
+
+            gridview.setViewVisible(getGridLocation(views[1].element), true);
+            expect(views[1].width).toBeGreaterThan(0);
+        });
+
+        test('removing a view keeps a hidden view hidden when its branch is merged into the grandparent', () => {
+            const gridview = createGridview();
+            const [first, removed, hidden, last] = [
+                new MockGridview(),
+                new MockGridview(),
+                new MockGridview(),
+                new MockGridview(),
+            ];
+            gridview.addView(first, Sizing.Distribute, [0]);
+            gridview.addView(removed, Sizing.Distribute, [1]);
+            gridview.addView(hidden, Sizing.Distribute, [1, 1]);
+            gridview.addView(last, Sizing.Distribute, [1, 1, 1]);
+
+            gridview.setViewVisible(getGridLocation(hidden.element), false);
+            gridview.removeView(getGridLocation(removed.element));
+
+            expect(isVisible(gridview, hidden)).toBe(false);
+
+            gridview.setViewVisible(getGridLocation(hidden.element), true);
+            expect(hidden.width).toBeGreaterThan(0);
+        });
+    });
+
     test('insertOrthogonalSplitviewAtRoot #1', () => {
         const gridview = new Gridview(
             false,
