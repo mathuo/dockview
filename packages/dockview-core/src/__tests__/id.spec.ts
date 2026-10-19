@@ -64,14 +64,11 @@ describe('generateId', () => {
         expect(getRandomValues).toHaveBeenCalledTimes(1);
     });
 
-    test('falls back to Math.random without crypto at all', () => {
-        const random = jest.spyOn(Math, 'random').mockReturnValue(0);
-
+    test('throws a clear error without Web Crypto', () => {
         withCrypto(undefined, () => {
-            expect(generateId()).toBe('00000000-0000-4000-8000-000000000000');
+            expect(() => generateId()).toThrow(
+                'dockview: generateId requires crypto.getRandomValues or crypto.randomUUID'
+            );
         });
-
-        expect(random).toHaveBeenCalledTimes(16);
-        random.mockRestore();
     });
 });
