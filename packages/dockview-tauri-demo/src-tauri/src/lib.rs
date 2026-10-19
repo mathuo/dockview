@@ -1,14 +1,20 @@
 mod hub;
+mod workspace;
 
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::Mutex;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
 use tauri::{
     webview::{NewWindowFeatures, NewWindowResponse},
-    AppHandle, Emitter, Manager, State, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
+    AppHandle, Emitter, Manager, RunEvent, State, Url, WebviewUrl, WebviewWindow,
+    WebviewWindowBuilder, WindowEvent,
 };
 
 use hub::{DragEnd, DragSession, Hub, Release};
+use workspace::{FileStore, Geometry, Store, Workspace, WorkspaceState};
 
 /// Event carrying a serialized dockview layout between native windows.
 const LAYOUT_EVENT: &str = "dockview:layout";
@@ -28,6 +34,178 @@ const AUTOTEST_ENV: &str = "DOCKVIEW_DEMO_AUTOTEST";
 
 fn autotest() -> bool {
     std::env::var_os(AUTOTEST_ENV).is_some()
+}
+
+/// Overrides where the workspace file lives; the harness points it at a
+/// temporary file so a measurement never starts from a previous run.
+const WORKSPACE_ENV: &str = "DOCKVIEW_DEMO_WORKSPACE";
+
+/// How long after a change the workspace file is written. Changes come in
+/// bursts (a drag is two layout reports and a few geometry events) and the
+/// file is small, so this only coalesces, it does not risk much.
+const SAVE_DEBOUNCE: Duration = Duration::from_millis(500);
+
+/// The windows the workspace records: the ones running the frontend. Popout
+/// windows belong to the dockview instance that opened them and travel
+/// inside its layout.
+fn is_dock_window(label: &str) -> bool {
+    label == "main" || label.starts_with("dock-")
+}
+
+fn workspace_path(app: &AppHandle) -> PathBuf {
+    if let Some(path) = std::env::var_os(WORKSPACE_ENV) {
+        return PathBuf::from(path);
+    }
+    match app.path().app_data_dir() {
+        Ok(dir) => dir.join("workspace.json"),
+        Err(err) => {
+            eprintln!("workspace: no app data dir ({err}); using the working directory");
+            PathBuf::from("workspace.json")
+        }
+    }
+}
+
+/// The host's side of persistence: the store, whether anything changed since
+/// the last write, and whether the app is on its way out (so windows closing
+/// as part of the exit are not mistaken for the user closing them).
+struct Persistence {
+    store: FileStore,
+    dirty: AtomicBool,
+    exiting: AtomicBool,
+    last_saved: Mutex<Option<SystemTime>>,
+}
+
+impl Persistence {
+    fn mark_dirty(&self) {
+        self.dirty.store(true, Ordering::Relaxed);
+    }
+
+    /// Writes the workspace if anything changed since the last write.
+    fn save_if_dirty(&self, workspace: &Workspace) {
+        if !self.dirty.swap(false, Ordering::Relaxed) {
+            return;
+        }
+        match workspace.snapshot() {
+            Ok(snapshot) => match self.store.save(&snapshot) {
+                Ok(()) => {
+                    if let Ok(mut last) = self.last_saved.lock() {
+                        *last = Some(SystemTime::now());
+                    }
+                }
+                Err(err) => {
+                    eprintln!(
+                        "workspace: could not save {}: {err}",
+                        self.store.path().display()
+                    );
+                    self.dirty.store(true, Ordering::Relaxed);
+                }
+            },
+            Err(err) => eprintln!("workspace: {err}"),
+        }
+    }
+}
+
+/// Records a window's current frame, in logical pixels, which is what the
+/// builder takes when the window is recreated.
+fn record_geometry(app: &AppHandle, window: &tauri::Window) {
+    let (Ok(position), Ok(size), Ok(scale)) = (
+        window.outer_position(),
+        window.inner_size(),
+        window.scale_factor(),
+    ) else {
+        return;
+    };
+    let position = position.to_logical::<f64>(scale);
+    let size = size.to_logical::<f64>(scale);
+    let geometry = Geometry {
+        x: position.x.round() as i32,
+        y: position.y.round() as i32,
+        width: size.width.round() as u32,
+        height: size.height.round() as u32,
+    };
+    if let Err(err) = app
+        .state::<Workspace>()
+        .set_geometry(window.label(), geometry)
+    {
+        eprintln!("workspace: {err}");
+        return;
+    }
+    app.state::<Persistence>().mark_dirty();
+}
+
+/// A window reports its dockview layout; the orchestrator keeps it and
+/// writes the workspace shortly after. Refused, and nothing recorded, if the
+/// layout names a panel another window holds.
+#[tauri::command]
+fn layout_changed(
+    workspace: State<Workspace>,
+    persistence: State<Persistence>,
+    label: String,
+    layout: serde_json::Value,
+) -> Result<(), String> {
+    workspace
+        .set_layout(&label, layout)
+        .map_err(|err| err.to_string())?;
+    persistence.mark_dirty();
+    Ok(())
+}
+
+/// A freshly loaded window asks what layout to start with: the one it last
+/// reported, or the one the workspace file held for it. `None` means build
+/// the defaults.
+#[tauri::command]
+fn initial_layout(
+    workspace: State<Workspace>,
+    label: String,
+) -> Result<Option<serde_json::Value>, String> {
+    workspace
+        .initial_layout(&label)
+        .map_err(|err| err.to_string())
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WorkspaceWindowInfo {
+    label: String,
+    geometry: Option<Geometry>,
+    has_layout: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WorkspaceInfo {
+    path: String,
+    /// Milliseconds since the Unix epoch, or `None` if never written this run.
+    last_saved: Option<u64>,
+    windows: Vec<WorkspaceWindowInfo>,
+}
+
+/// What the Workspace panel shows.
+#[tauri::command]
+fn workspace_info(
+    workspace: State<Workspace>,
+    persistence: State<Persistence>,
+) -> Result<WorkspaceInfo, String> {
+    let snapshot = workspace.snapshot().map_err(|err| err.to_string())?;
+    let last_saved = persistence
+        .last_saved
+        .lock()
+        .map_err(|err| err.to_string())?
+        .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+        .map(|since| since.as_millis() as u64);
+    Ok(WorkspaceInfo {
+        path: persistence.store.path().display().to_string(),
+        last_saved,
+        windows: snapshot
+            .windows
+            .into_iter()
+            .map(|window| WorkspaceWindowInfo {
+                label: window.label,
+                geometry: window.geometry,
+                has_layout: window.layout.is_some(),
+            })
+            .collect(),
+    })
 }
 
 /// Labels for the windows `window.open` creates; a label must be unique for
@@ -142,6 +320,7 @@ fn drag_end(
                         &label,
                         &format!("dockview — {label}"),
                         (900.0, 600.0),
+                        None,
                     ) {
                         Ok(_) => {
                             if let Err(err) = deliver(&handle, release) {
@@ -284,21 +463,38 @@ fn build_dock_window(
     label: &str,
     title: &str,
     size: (f64, f64),
+    geometry: Option<Geometry>,
 ) -> tauri::Result<WebviewWindow> {
     let handle = app.clone();
     let mut builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App("index.html".into()))
         .title(title)
-        .inner_size(size.0, size.1)
         // Tauri's own drag-drop interception is the documented reason HTML5
         // drag-and-drop misbehaves in WebView2; the demo takes no file drops.
         .disable_drag_drop_handler()
         .on_new_window(move |url, features| open_related_window(&handle, url, features));
 
+    builder = match geometry {
+        Some(geometry) => builder
+            .position(f64::from(geometry.x), f64::from(geometry.y))
+            .inner_size(f64::from(geometry.width), f64::from(geometry.height)),
+        None => builder.inner_size(size.0, size.1),
+    };
+
     if autotest() {
         builder = builder.initialization_script("window.__DOCKVIEW_AUTOTEST__ = true;");
     }
 
-    builder.build()
+    let window = builder.build()?;
+
+    // On record from the moment it exists, frame included, so a workspace
+    // saved before the window reports a layout, or before the user moves
+    // it, still brings the window back where it was.
+    if let Err(err) = app.state::<Workspace>().ensure_window(label) {
+        eprintln!("workspace: {err}");
+    }
+    record_geometry(app, &window.as_ref().window());
+
+    Ok(window)
 }
 
 /// The frontend's side of the measurement harness: one JSON line per report
@@ -322,6 +518,7 @@ async fn open_dock_window(app: AppHandle, label: String) -> Result<(), String> {
         &label,
         &format!("dockview — {label}"),
         (1000.0, 700.0),
+        None,
     )
     .map_err(|err| err.to_string())?;
 
@@ -338,23 +535,110 @@ fn broadcast_layout(app: AppHandle, from: String, layout: serde_json::Value) -> 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .manage(Hub::default())
         .setup(|app| {
-            build_dock_window(app.handle(), "main", "dockview + Tauri", (1280.0, 820.0))?;
+            let handle = app.handle().clone();
+
+            // The workspace is the orchestrator's: it is read once here,
+            // before any window exists, and every window is created from it.
+            let store = FileStore::new(workspace_path(&handle));
+            let restored = match store.load() {
+                Ok(Some(state)) => state,
+                Ok(None) => WorkspaceState::default(),
+                Err(err) => {
+                    eprintln!(
+                        "workspace: could not read {}: {err}; starting fresh",
+                        store.path().display()
+                    );
+                    WorkspaceState::default()
+                }
+            };
+            let recorded: Vec<(String, Option<Geometry>)> = restored
+                .windows
+                .iter()
+                .filter(|window| is_dock_window(&window.label))
+                .map(|window| (window.label.clone(), window.geometry))
+                .collect();
+            app.manage(Workspace::restore(restored));
+            app.manage(Persistence {
+                store,
+                dirty: AtomicBool::new(false),
+                exiting: AtomicBool::new(false),
+                last_saved: Mutex::new(None),
+            });
+
+            if !recorded.iter().any(|(label, _)| label == "main") {
+                build_dock_window(&handle, "main", "dockview + Tauri", (1280.0, 820.0), None)?;
+            }
+            for (label, geometry) in &recorded {
+                let title = if label == "main" {
+                    "dockview + Tauri".to_string()
+                } else {
+                    format!("dockview — {label}")
+                };
+                build_dock_window(&handle, label, &title, (1000.0, 700.0), *geometry)?;
+            }
 
             // The harness needs two windows at known places from the start.
             if autotest() {
                 eprintln!("{AUTOTEST_ENV} is set: opening dock-2 and reporting on stdout");
-                let second = build_dock_window(
-                    app.handle(),
-                    "dock-2",
-                    "dockview — dock-2",
-                    (1000.0, 700.0),
-                )?;
-                second.set_position(tauri::PhysicalPosition::new(1300, 0))?;
+                if !recorded.iter().any(|(label, _)| label == "dock-2") {
+                    build_dock_window(
+                        &handle,
+                        "dock-2",
+                        "dockview — dock-2",
+                        (1000.0, 700.0),
+                        Some(Geometry {
+                            x: 1300,
+                            y: 0,
+                            width: 1000,
+                            height: 700,
+                        }),
+                    )?;
+                }
             }
+
+            // Writes coalesce here rather than on every event.
+            std::thread::spawn(move || loop {
+                std::thread::sleep(SAVE_DEBOUNCE);
+                handle
+                    .state::<Persistence>()
+                    .save_if_dirty(&handle.state::<Workspace>());
+            });
+
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            let label = window.label().to_string();
+            if !is_dock_window(&label) {
+                return;
+            }
+            let app = window.app_handle();
+            match event {
+                WindowEvent::Moved(_) | WindowEvent::Resized(_) => {
+                    record_geometry(app, window);
+                }
+                WindowEvent::CloseRequested { .. } if label == "main" => {
+                    // Closing the main window closes the app, keeping every
+                    // window on record for next time.
+                    app.state::<Persistence>()
+                        .exiting
+                        .store(true, Ordering::Relaxed);
+                }
+                WindowEvent::Destroyed => {
+                    let persistence = app.state::<Persistence>();
+                    if label != "main" && !persistence.exiting.load(Ordering::Relaxed) {
+                        // The user closed one window: it, and the panels it
+                        // held, leave the workspace.
+                        if let Err(err) = app.state::<Workspace>().remove_window(&label) {
+                            eprintln!("workspace: {err}");
+                        }
+                        persistence.mark_dirty();
+                    }
+                }
+                _ => {}
+            }
         })
         .invoke_handler(tauri::generate_handler![
             host_info,
@@ -366,8 +650,26 @@ pub fn run() {
             claim_drop,
             drag_end,
             take_pending_group,
+            layout_changed,
+            initial_layout,
+            workspace_info,
             autotest_report
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running the dockview tauri demo");
+        .build(tauri::generate_context!())
+        .expect("error while building the dockview tauri demo");
+
+    app.run(|app, event| match event {
+        RunEvent::ExitRequested { .. } => {
+            app.state::<Persistence>()
+                .exiting
+                .store(true, Ordering::Relaxed);
+        }
+        RunEvent::Exit => {
+            // The last write: everything is already in memory, so nothing
+            // has to be collected from the closing windows.
+            app.state::<Persistence>()
+                .save_if_dirty(&app.state::<Workspace>());
+        }
+        _ => {}
+    });
 }

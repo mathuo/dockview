@@ -15,7 +15,11 @@ build of the shell. Example:
 The shell is started with DOCKVIEW_DEMO_AUTOTEST set, which opens a second
 window at a known position and makes each window report its geometry and
 the cross-window drag log as JSON lines on stdout. Those lines are the only
-thing this script reads; it never looks at pixels.
+thing this script reads; it never looks at pixels. The workspace file is a
+fresh temporary one unless --workspace names another, so a run never starts
+from a previous run's layout; with --restart the shell is closed after the
+drag and started again from that file, and the run passes only if both
+windows come back with the tab where the drag left it.
 """
 
 import argparse
@@ -23,6 +27,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from queue import Empty, Queue
@@ -91,29 +96,53 @@ def main():
     )
     parser.add_argument("--screenshot", help="write a PNG of the screen after the drop")
     parser.add_argument("--timeout", type=float, default=40.0)
+    parser.add_argument("--workspace", help="workspace file to use (default: a fresh temporary file)")
+    parser.add_argument(
+        "--restart",
+        action="store_true",
+        help="after the drag, close the shell and start it again from the workspace file",
+    )
     args = parser.parse_args()
 
-    env = dict(os.environ, DOCKVIEW_DEMO_AUTOTEST="1")
-    app = subprocess.Popen(
-        [args.binary], env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-        text=True,
+    workspace = args.workspace or os.path.join(
+        tempfile.mkdtemp(prefix="dockview-workspace-"), "workspace.json"
     )
+    env = dict(os.environ, DOCKVIEW_DEMO_AUTOTEST="1", DOCKVIEW_DEMO_WORKSPACE=workspace)
+    print(f"workspace file: {workspace}")
+
     lines = Queue()
-
-    def pump():
-        for line in app.stdout:
-            lines.put(line)
-
-    threading.Thread(target=pump, daemon=True).start()
-
     rects = {}
     log = []
     deadline = time.monotonic() + args.timeout
 
+    def launch():
+        app = subprocess.Popen(
+            [args.binary], env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            text=True,
+        )
+
+        def pump():
+            for line in app.stdout:
+                lines.put(line)
+
+        threading.Thread(target=pump, daemon=True).start()
+        return app
+
+    def stop(app):
+        app.terminate()
+        try:
+            app.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            app.kill()
+
+    app = launch()
+
+    nonlocal_deadline = [deadline]
+
     def take(until):
         """Consume report lines until `until()` holds or the deadline passes."""
         while not until():
-            remaining = deadline - time.monotonic()
+            remaining = nonlocal_deadline[0] - time.monotonic()
             if remaining <= 0:
                 return False
             try:
@@ -199,13 +228,36 @@ def main():
         print("main panels:  ", sorted(rects["main"]["panels"]))
         print("dock-2 panels:", sorted(rects["dock-2"]["panels"]))
         print("RESULT:", "the tab crossed windows" if ok else "the tab did not cross")
-        return 0 if ok else 1
+        if not ok or not args.restart:
+            return 0 if ok else 1
+
+        # Let the shell's debounced save run, then close it the way the
+        # user would and bring it back from the file alone.
+        time.sleep(1.5)
+        stop(app)
+        before = {label: sorted(report["panels"]) for label, report in rects.items()}
+        print()
+        print("restarting the shell from the workspace file")
+        rects.clear()
+        app = launch()
+        deadline = time.monotonic() + args.timeout
+        # take() reads the deadline from the enclosing scope; rebind it.
+        nonlocal_deadline[0] = deadline
+        # A window reports geometry before its restore has finished, so wait
+        # for panels, not merely for a report.
+        restored = lambda: all(
+            rects.get(label, {}).get("panels") for label in ("main", "dock-2")
+        )
+        if not take(restored):
+            raise SystemExit("timed out waiting for both windows to come back")
+        after = {label: sorted(rects[label]["panels"]) for label in ("main", "dock-2")}
+        print("main panels:  ", after["main"])
+        print("dock-2 panels:", after["dock-2"])
+        same = after == {label: before[label] for label in ("main", "dock-2")}
+        print("RESULT:", "both windows came back with their layouts" if same else "the layouts did not survive the restart")
+        return 0 if same else 1
     finally:
-        app.terminate()
-        try:
-            app.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            app.kill()
+        stop(app)
 
 
 if __name__ == "__main__":

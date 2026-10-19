@@ -5,9 +5,19 @@ import './styles.css';
 // dockview instance in this webview.
 import 'dockview-enterprise';
 
-import { type IContentRenderer, createDockview, themeAbyss } from 'dockview';
+import {
+    type IContentRenderer,
+    type SerializedDockview,
+    createDockview,
+    themeAbyss,
+} from 'dockview';
 import { installAutotest } from './autotest';
-import { closeNativePopout, windowLabel } from './bridge';
+import {
+    closeNativePopout,
+    initialLayout,
+    layoutChanged,
+    windowLabel,
+} from './bridge';
 import { resolveDndStrategy } from './dnd';
 import { type Hub, installHub, randomId } from './hub';
 import {
@@ -17,7 +27,9 @@ import {
     NativeWindowPanel,
     PopoutPanel,
     ScratchPanel,
+    WorkspacePanel,
 } from './panels';
+import { installWorkspace } from './workspace';
 
 // Assigned once the instance exists; the hub panel is created lazily by
 // dockview, after that.
@@ -29,6 +41,7 @@ const renderers: Record<string, () => IContentRenderer> = {
     native: () => new NativeWindowPanel(),
     sync: () => new LayoutSyncPanel(),
     hub: () => new HubPanel(() => hub),
+    workspace: () => new WorkspacePanel(),
     scratch: () => new ScratchPanel(),
 };
 
@@ -75,7 +88,7 @@ const height = (fraction: number) =>
  * main one suffixes its ids with its label; a panel that crosses keeps the
  * id it was born with.
  */
-void windowLabel().then((label) => {
+function buildDefaults(label: string): void {
     const id = (name: string) =>
         label === 'main' || label === 'browser' ? name : `${name}-${label}`;
 
@@ -114,10 +127,37 @@ void windowLabel().then((label) => {
     });
 
     api.addPanel({
+        id: id('workspace'),
+        component: 'workspace',
+        title: 'Workspace',
+        position: { referencePanel: id('native'), direction: 'within' },
+        inactive: true,
+    });
+
+    api.addPanel({
         id: id('scratch'),
         component: 'scratch',
         title: 'Scratch',
         position: { referencePanel: id('host'), direction: 'below' },
         initialHeight: height(0.3),
     });
-});
+}
+
+/**
+ * The orchestrator decides what this window starts with: the layout it
+ * held for this label, or nothing, in which case the defaults are built.
+ * From then on every layout change is reported back to it.
+ */
+installWorkspace(
+    api,
+    {
+        label: windowLabel,
+        initialLayout: (label) =>
+            initialLayout(label) as Promise<SerializedDockview | null>,
+        layoutChanged,
+    },
+    {
+        buildDefaults,
+        onLog: (line) => console.info(`workspace: ${line}`),
+    }
+);

@@ -27,13 +27,27 @@ not a published package and not a supported example.
   `addGroupFromJSON`. It reaches the hub only through the `DragTransport`
   it is given, so it knows nothing about Tauri.
 - `src/hub.ts` — the Tauri `DragTransport`, over the commands in `bridge.ts`.
+- `src-tauri/src/workspace.rs` — the workspace: which windows exist, their
+  frames, and each one's dockview layout as opaque JSON, plus the atomic
+  `FileStore`. Tauri-free and unit tested like `hub.rs`. The one field of a
+  layout it reads is the keys of `panels`, to refuse duplicate panel ids
+  across windows. `lib.rs` loads it before any window exists, creates the
+  windows from it, records geometry from window events, and writes it on a
+  debounce and on exit.
+- `src/workspace.ts` — a window's side: ask the orchestrator for the initial
+  layout (restore with `fromJSON`, else build the defaults), then report
+  `toJSON()` on every change. Reaches the shell only through its
+  `WorkspaceTransport`.
 - `src/autotest.ts` and `scripts/measure-cross-window-drag.py` — the
   measurement harness. With `DOCKVIEW_DEMO_AUTOTEST` in the shell's
   environment a second window opens at a known position and each window
   reports panel geometry and the drag log as JSON lines on stdout; the
-  driver turns that into an xdotool drag and judges it from the log. It
-  reads geometry through the public api (`panel.view.tab.element`), never
-  by querying dockview's DOM.
+  driver turns that into an xdotool drag and judges it from the log, and
+  with `--restart` closes the shell and checks both windows come back from
+  the workspace file. It points `DOCKVIEW_DEMO_WORKSPACE` at a temporary
+  file so no run starts from another's layout. It reads geometry through
+  the public api (`panel.view.tab.element`), never by querying dockview's
+  DOM.
 - `popout.html` — dockview opens `/popout.html` by default, so the host has to
   serve it. It is a second Vite entry point.
 

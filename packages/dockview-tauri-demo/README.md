@@ -70,6 +70,11 @@ dockview into another's, with the shell as the hub. Reports the drag backend
 in use, counts each stage of a drag, and logs what crossed. See
 [Dragging between windows](#dragging-between-windows).
 
+**Workspace** — what the shell has on record: the workspace file, when it was
+last written, and every window with its frame and whether it has reported a
+layout. Close the app and reopen it to see every window return. See
+[Persisting the workspace](#persisting-the-workspace).
+
 **Layout sync** — serializes the layout and fans it out over Tauri's event bus,
 so windows on either side of the process boundary converge on the same
 arrangement without sharing a DOM. What that whole-layout resync costs, and
@@ -229,6 +234,45 @@ The Cross-window drag panel's counters tell the same story interactively:
 reached the second window; `drag-overs accepted` rising with `drops claimed`
 at zero means the drop landed but was refused, and the log says why.
 
+### Persisting the workspace
+
+Only the party that creates windows can bring them back, so the workspace
+is the shell's: one JSON file naming every window, its frame, and its
+dockview layout. The dockview part stays in each window, `toJSON` on the
+way out and `fromJSON` on the way in; the shell stores the result without
+reading it, bar one field: the keys of a layout's `panels` map, so it can
+refuse a layout that would give two windows the same panel id, which a drag
+between them relies on never happening.
+
+- **Load.** On start the shell reads the file, creates each recorded window
+  at its saved position and size, and each window, once dockview is ready,
+  asks `initial_layout` for its layout and applies it with `fromJSON`. A
+  window with nothing on record builds its default panels. The data flows
+  from the shell to the window, but the window makes the call: nothing can
+  be pushed into a webview before it has loaded, and a reloaded window
+  simply asks again.
+- **Save.** Each window reports `layout_changed` with `api.toJSON()` on a
+  debounce; the shell records native moves and resizes itself; a background
+  thread writes the file half a second after the last change, to a sibling
+  file renamed over the old one, so a crash mid-write leaves the previous
+  workspace intact. A final write runs on exit. Nothing is collected from
+  windows at shutdown, since a closing webview offers no reliable last
+  callback; the shell already holds everything.
+- **Close.** Closing the main window closes the app and keeps every window
+  on record. Closing any other window removes it, and the panels it held,
+  from the workspace.
+- **Where.** The app data directory, or the path in `DOCKVIEW_DEMO_WORKSPACE`,
+  which the measurement driver points at a fresh temporary file so a run
+  never starts from a previous run's layout. Popout windows are not on
+  record: they belong to the dockview instance that opened them and travel
+  inside its layout.
+
+Measured on Linux (WebKitGTK 2.52.6, under Xvfb) with
+`scripts/measure-cross-window-drag.py --restart`: after the Scratch tab had
+crossed from the main window into the second, the shell was closed and
+started again from the workspace file alone, and both windows came back at
+their positions with the same panels, Scratch still in the second window.
+
 ### Measured in a release build
 
 Running a packaged build on Linux (WebKitGTK, tauri 2.11.5, webview 2.52.6),
@@ -301,6 +345,7 @@ src/            frontend
   panels.ts     the five probe panels plus a scratch panel
   crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
   hub.ts        the Tauri transport that interceptor reaches the shell through
+  workspace.ts  a window's side of the workspace: layout in at start, reports out on change
   autotest.ts   geometry and log reporting for the measurement driver
 scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis
@@ -308,5 +353,6 @@ scripts/        measure-cross-window-drag.py drives a real drag between two wind
   bridge.ts     lazy wrapper over the Tauri IPC surface
 src-tauri/      Rust shell: host info, native window creation, layout broadcast
   src/hub.rs    the drag orchestrator, Tauri-free and unit tested
+  src/workspace.rs  the workspace: windows, frames and opaque layouts, with an atomic file store
 popout.html     served at /popout.html, dockview's default popout target
 ```

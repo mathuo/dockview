@@ -11,6 +11,7 @@ import {
     onLayoutBroadcast,
     openNativeWindow,
     windowLabel,
+    workspaceInfo,
 } from './bridge';
 import { resolveDndStrategy } from './dnd';
 import { LogView, button, el, field, verdict } from './dom';
@@ -516,6 +517,78 @@ export class HubPanel extends DemoPanel {
                     ' open a new window when a drag ends outside every window (an Escape-cancelled drag looks the same to HTML5, so off by default)'
                 ),
                 log.element
+            )
+        );
+    }
+}
+
+/**
+ * What the orchestrator has on record: the file, when it was last written,
+ * and every window with its frame and whether it has reported a layout.
+ * Read back from the shell rather than from this window, since the point is
+ * that the shell is the one that knows.
+ */
+export class WorkspacePanel extends DemoPanel {
+    init(parameters: GroupPanelPartInitParameters): void {
+        const api = parameters.containerApi;
+        const body = el('div');
+
+        const render = async () => {
+            const info = await workspaceInfo();
+            if (!info) {
+                body.replaceChildren(field('shell', 'not running under Tauri'));
+                return;
+            }
+            body.replaceChildren(
+                field('file', info.path),
+                field(
+                    'last saved',
+                    info.lastSaved
+                        ? new Date(info.lastSaved).toLocaleTimeString()
+                        : 'not yet this run'
+                ),
+                ...info.windows.map((window) =>
+                    field(
+                        window.label,
+                        `${
+                            window.geometry
+                                ? `${window.geometry.width}×${window.geometry.height} at ${window.geometry.x},${window.geometry.y}`
+                                : 'no geometry yet'
+                        } — ${window.hasLayout ? 'layout on record' : 'no layout yet'}`
+                    )
+                )
+            );
+        };
+
+        const refresh = () => {
+            void render().catch((err: unknown) => {
+                body.replaceChildren(
+                    field('workspace_info failed', describe(err))
+                );
+            });
+        };
+
+        // The save is debounced in the shell; look a moment after a change.
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        this.onDispose(
+            api.onDidLayoutChange(() => {
+                clearTimeout(timer);
+                timer = setTimeout(refresh, 1200);
+            }).dispose
+        );
+        this.onDispose(() => clearTimeout(timer));
+        refresh();
+
+        this.root.append(
+            section(
+                'Workspace',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'The shell owns one file naming every window, its frame and its dockview layout. Each window receives its layout from the shell at start and reports changes back; close the app and reopen it to see every window return.'
+                ),
+                body,
+                button('Re-read', refresh)
             )
         );
     }
