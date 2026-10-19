@@ -12,11 +12,13 @@ import {
     PopoutGroupChangePositionEvent,
     PopoutGroupChangeSizeEvent,
     SerializedDockview,
+    SerializedDockviewGroup,
 } from '../dockview/dockviewComponent';
 import { PopoutWindowEvent, PopoutWindowFailure } from '../popoutWindow';
 import { DndCapabilities } from '../dockview/dndCapabilities';
 import {
     AddGroupOptions,
+    AddGroupFromJSONOptions,
     AddPanelOptions,
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
@@ -1025,6 +1027,30 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
         return this.component.withOrigin('api', () =>
             this.component.addGroup(options)
+        );
+    }
+
+    /**
+     * Serialize one group together with the state of every panel it holds.
+     * The result is self-contained and can be rehydrated with
+     * `addGroupFromJSON`, on this instance or another one.
+     */
+    serializeGroup(group: IDockviewGroupPanel): SerializedDockviewGroup {
+        return this.component.serializeGroup(<DockviewGroupPanel>group);
+    }
+
+    /**
+     * Rebuild a group from `serializeGroup` output and add it to the live
+     * layout, positioned as for `addGroup`, leaving the rest of the layout
+     * untouched. Throws before changing anything if a panel id is already in
+     * use.
+     */
+    addGroupFromJSON(
+        data: SerializedDockviewGroup,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        return this.component.withOrigin('api', () =>
+            this.component.addGroupFromJSON(data, options)
         );
     }
 
