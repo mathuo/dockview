@@ -3973,7 +3973,10 @@ export class DockviewComponent
 
                 const group = this.createGroup({
                     id,
-                    locked: !!locked,
+                    // `locked` is `boolean | 'no-drop-target'`; coercing it
+                    // to a boolean would restore `'no-drop-target'` as a
+                    // plain `true` and re-enable dropping on the group.
+                    locked: locked ?? false,
                     hideHeader: !!hideHeader,
                     headerPosition,
                 });
