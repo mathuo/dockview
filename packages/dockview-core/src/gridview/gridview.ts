@@ -97,6 +97,11 @@ function flipNode<T extends Node>(
 
         let totalSize = 0;
 
+        // A hidden branch is laid out at size 0, so its children have nothing
+        // to scale against. Keep their cached sizes as they are rather than
+        // collapsing them to 0.
+        const cachedSizeScale = node.size === 0 ? 1 : size / node.size;
+
         for (let i = node.children.length - 1; i >= 0; i--) {
             const child = node.children[i];
             const childSize =
@@ -115,15 +120,7 @@ function flipNode<T extends Node>(
 
             result.addChild(
                 flipNode(child, orthogonalSize, newSize),
-                // A hidden branch is laid out at size 0, so its children have
-                // nothing to scale against. Keep their cached sizes as they
-                // are rather than collapsing them to 0.
-                childSizing(
-                    node,
-                    i,
-                    newSize,
-                    node.size === 0 ? 1 : size / node.size
-                ),
+                childSizing(node, i, newSize, cachedSizeScale),
                 0,
                 true
             );
