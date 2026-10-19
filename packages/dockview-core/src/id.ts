@@ -6,13 +6,18 @@
  * defined in a secure context, and a custom-scheme origin such as
  * `tauri://localhost` is not always one, so elsewhere the id is built from
  * 16 bytes of `crypto.getRandomValues`, which every browser and webview
- * provides. Without Web Crypto at all the call throws, since no id would be
- * worth having in that case.
+ * provides. Without Web Crypto at all (an old Node, an engine without the
+ * global) the id is a timestamp and a counter instead: unique within this
+ * JavaScript realm, not random, and not a uuid, which is enough for a
+ * layout that has no other realm to collide with.
  *
  * Intended for consumers that need ids unique across dockview instances, for
  * example as a `groupIdGenerator` or to name panels that move between
  * windows, where the default sequential group ids would collide.
  */
+/** Distinguishes ids minted in the same millisecond without Web Crypto. */
+let fallbackCounter = 0;
+
 export function generateId(): string {
     const crypto = globalThis.crypto;
 
@@ -21,9 +26,7 @@ export function generateId(): string {
     }
 
     if (typeof crypto?.getRandomValues !== 'function') {
-        throw new Error(
-            'dockview: generateId requires crypto.getRandomValues or crypto.randomUUID'
-        );
+        return `${Date.now().toString(36)}-${(fallbackCounter++).toString(36)}`;
     }
 
     const bytes = crypto.getRandomValues(new Uint8Array(16));

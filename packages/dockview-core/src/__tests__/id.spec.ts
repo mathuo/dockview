@@ -64,11 +64,19 @@ describe('generateId', () => {
         expect(getRandomValues).toHaveBeenCalledTimes(1);
     });
 
-    test('throws a clear error without Web Crypto', () => {
+    test('falls back to a timestamp and counter without Web Crypto', () => {
+        const now = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
+
         withCrypto(undefined, () => {
-            expect(() => generateId()).toThrow(
-                'dockview: generateId requires crypto.getRandomValues or crypto.randomUUID'
-            );
+            const first = generateId();
+            const second = generateId();
+
+            // Same millisecond, so only the counter tells them apart.
+            expect(first).toMatch(/^lfls-[0-9a-z]+$/);
+            expect(second).toMatch(/^lfls-[0-9a-z]+$/);
+            expect(second).not.toBe(first);
         });
+
+        now.mockRestore();
     });
 });
