@@ -125,4 +125,67 @@ describe('hidden groups survive gridview restructuring', () => {
 
         dockview.dispose();
     });
+
+    test('a hidden group stays hidden after adding a group at a layout edge', () => {
+        const dockview = createDockview();
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { referenceGroup: p1.group, direction: 'below' },
+        });
+
+        p2.group.api.setVisible(false);
+
+        // addGroup with a bare direction is the third caller of orthogonalize()
+        dockview.addGroup({ direction: 'left' });
+
+        expect(findLeaf(dockview.toJSON().grid.root, 'p2')?.visible).toBe(
+            false
+        );
+        expect(p2.group.api.height).toBe(0);
+
+        p2.group.api.setVisible(true);
+        expect(p2.group.api.height).toBeGreaterThan(0);
+
+        dockview.dispose();
+    });
+
+    test('a layout saved after the restructure restores the hidden group with its size', () => {
+        const dockview = createDockview();
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { referenceGroup: p1.group, direction: 'below' },
+        });
+        p2.group.api.setVisible(false);
+        dockview.addPanel({
+            id: 'p3',
+            component: 'default',
+            position: { direction: 'left' },
+        });
+
+        const saved = dockview.toJSON();
+        const leaf = findLeaf(saved.grid.root, 'p2');
+        expect(leaf?.visible).toBe(false);
+        expect(leaf?.size).toBeGreaterThan(0);
+        dockview.dispose();
+
+        const restored = createDockview();
+        restored.fromJSON(saved);
+
+        const group = restored.getGroupPanel('p2')?.group;
+        if (!group) {
+            throw new Error('p2 was not restored');
+        }
+        expect(group.api.isVisible).toBe(false);
+        expect(group.api.height).toBe(0);
+
+        group.api.setVisible(true);
+        expect(group.api.isVisible).toBe(true);
+        expect(group.api.height).toBeGreaterThan(0);
+
+        restored.dispose();
+    });
 });
