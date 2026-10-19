@@ -115,11 +115,14 @@ function flipNode<T extends Node>(
 
             result.addChild(
                 flipNode(child, orthogonalSize, newSize),
+                // A hidden branch is laid out at size 0, so its children have
+                // nothing to scale against. Keep their cached sizes as they
+                // are rather than collapsing them to 0.
                 childSizing(
                     node,
                     i,
                     newSize,
-                    node.size === 0 ? 0 : size / node.size
+                    node.size === 0 ? 1 : size / node.size
                 ),
                 0,
                 true
@@ -1117,12 +1120,17 @@ export class Gridview implements IDisposable {
                 ...sibling.children.map((c) => c.size)
             );
 
-            // and add those siblings to the grandparent
+            // and add those siblings to the grandparent. If the sibling branch
+            // itself was hidden its children must stay hidden too, otherwise
+            // they come back visible once the branch is flattened away.
             for (let i = 0; i < sibling.children.length; i++) {
                 const child = sibling.children[i];
+                const childSize = childSizing(sibling, i, child.size);
                 grandParent.addChild(
                     child,
-                    childSizing(sibling, i, child.size),
+                    !isSiblingVisible && typeof childSize === 'number'
+                        ? Sizing.Invisible(childSize)
+                        : childSize,
                     parentIndex + i
                 );
             }
