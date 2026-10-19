@@ -20,6 +20,16 @@ const RELEASE_EVENT: &str = "dockview:release";
 /// Labels for the windows a tear-off creates; see `POPOUT_COUNT`.
 static TEAR_OFF_COUNT: AtomicUsize = AtomicUsize::new(0);
 
+/// Set in the environment to run the measurement harness: a second window
+/// opens at a known position, and the frontend reports its geometry and the
+/// hub's log as JSON lines on stdout for `scripts/measure-cross-window-drag.py`
+/// to drive. See the README's "Dragging between windows".
+const AUTOTEST_ENV: &str = "DOCKVIEW_DEMO_AUTOTEST";
+
+fn autotest() -> bool {
+    std::env::var_os(AUTOTEST_ENV).is_some()
+}
+
 /// Labels for the windows `window.open` creates; a label must be unique for
 /// the life of the app, so this only ever counts up.
 static POPOUT_COUNT: AtomicUsize = AtomicUsize::new(0);
@@ -92,34 +102,65 @@ fn claim_drop(
     Ok(claim.envelope)
 }
 
-/// The source window reports the end of its drag. An unclaimed session is
-/// dropped, or, when the source asks and nothing claimed it, turned into a
-/// new window holding the group: the hub's replacement for a popout.
+/// How long a drag stays claimable after its source reported it over. The
+/// source's `dragend` fires the instant the drop lands in another window,
+/// and that window's claim is a separate IPC message that routinely arrives
+/// later.
+const DRAG_END_GRACE: std::time::Duration = std::time::Duration::from_millis(1500);
+
+/// The source window reports the end of its drag. Nothing happens yet: the
+/// drag stays claimable for `DRAG_END_GRACE`, after which an unclaimed one
+/// is discarded, or, when the source asked, turned into a new window holding
+/// the group: the hub's replacement for a popout. The source learns either
+/// outcome through the release event, or through silence.
 #[tauri::command]
-async fn drag_end(
+fn drag_end(
     app: AppHandle,
-    hub: State<'_, Hub>,
+    hub: State<Hub>,
     session: String,
     tear_off: bool,
-) -> Result<Option<String>, String> {
-    let ended = hub
-        .end(&session, tear_off, || {
+) -> Result<(), String> {
+    let in_flight = hub.end(&session, tear_off).map_err(|err| err.to_string())?;
+    if !in_flight {
+        return Ok(());
+    }
+
+    std::thread::spawn(move || {
+        std::thread::sleep(DRAG_END_GRACE);
+        let ended = app.state::<Hub>().expire(&session, || {
             format!(
                 "dock-torn-{}",
                 TEAR_OFF_COUNT.fetch_add(1, Ordering::Relaxed)
             )
-        })
-        .map_err(|err| err.to_string())?;
-
-    match ended {
-        DragEnd::Settled | DragEnd::Discarded => Ok(None),
-        DragEnd::TornOff { label, release } => {
-            build_dock_window(&app, &label, &format!("dockview — {label}"), (900.0, 600.0))
-                .map_err(|err| err.to_string())?;
-            deliver(&app, release)?;
-            Ok(Some(label))
+        });
+        match ended {
+            Ok(DragEnd::TornOff { label, release }) => {
+                let handle = app.clone();
+                let result = app.run_on_main_thread(move || {
+                    match build_dock_window(
+                        &handle,
+                        &label,
+                        &format!("dockview — {label}"),
+                        (900.0, 600.0),
+                    ) {
+                        Ok(_) => {
+                            if let Err(err) = deliver(&handle, release) {
+                                eprintln!("tear-off: could not release the source: {err}");
+                            }
+                        }
+                        Err(err) => eprintln!("tear-off: could not open {label}: {err}"),
+                    }
+                });
+                if let Err(err) = result {
+                    eprintln!("tear-off: {err}");
+                }
+            }
+            Ok(DragEnd::Settled | DragEnd::Discarded) => {}
+            Err(err) => eprintln!("drag_end: {err}"),
         }
-    }
+    });
+
+    Ok(())
 }
 
 /// A freshly loaded window asks whether a group is waiting for it; the
@@ -245,14 +286,30 @@ fn build_dock_window(
     size: (f64, f64),
 ) -> tauri::Result<WebviewWindow> {
     let handle = app.clone();
-    WebviewWindowBuilder::new(app, label, WebviewUrl::App("index.html".into()))
+    let mut builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App("index.html".into()))
         .title(title)
         .inner_size(size.0, size.1)
         // Tauri's own drag-drop interception is the documented reason HTML5
         // drag-and-drop misbehaves in WebView2; the demo takes no file drops.
         .disable_drag_drop_handler()
-        .on_new_window(move |url, features| open_related_window(&handle, url, features))
-        .build()
+        .on_new_window(move |url, features| open_related_window(&handle, url, features));
+
+    if autotest() {
+        builder = builder.initialization_script("window.__DOCKVIEW_AUTOTEST__ = true;");
+    }
+
+    builder.build()
+}
+
+/// The frontend's side of the measurement harness: one JSON line per report
+/// on stdout, where the driver script reads them.
+#[tauri::command]
+fn autotest_report(label: String, kind: String, payload: serde_json::Value) {
+    use std::io::Write;
+    let line = serde_json::json!({ "label": label, "kind": kind, "payload": payload });
+    let mut stdout = std::io::stdout().lock();
+    let _ = writeln!(stdout, "{line}");
+    let _ = stdout.flush();
 }
 
 /// Builds another native window running the same frontend. The new webview is
@@ -285,6 +342,18 @@ pub fn run() {
         .manage(Hub::default())
         .setup(|app| {
             build_dock_window(app.handle(), "main", "dockview + Tauri", (1280.0, 820.0))?;
+
+            // The harness needs two windows at known places from the start.
+            if autotest() {
+                eprintln!("{AUTOTEST_ENV} is set: opening dock-2 and reporting on stdout");
+                let second = build_dock_window(
+                    app.handle(),
+                    "dock-2",
+                    "dockview — dock-2",
+                    (1000.0, 700.0),
+                )?;
+                second.set_position(tauri::PhysicalPosition::new(1300, 0))?;
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -296,7 +365,8 @@ pub fn run() {
             peek_drag,
             claim_drop,
             drag_end,
-            take_pending_group
+            take_pending_group,
+            autotest_report
         ])
         .run(tauri::generate_context!())
         .expect("error while running the dockview tauri demo");

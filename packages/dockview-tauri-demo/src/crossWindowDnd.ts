@@ -56,10 +56,12 @@ export interface DragTransport {
     /** Claim a drop. Rejects if another window claimed it first. */
     claim(session: string, to: string): Promise<void>;
     /**
-     * Report a drag over. With `tearOff`, an unclaimed drag becomes a new
-     * window holding the group; resolves to that window's label.
+     * Report a drag over. The hub keeps it claimable for a grace period,
+     * since the destination's claim may arrive after this. With `tearOff`,
+     * an unclaimed drag then becomes a new window holding the group, which
+     * the source learns of through `onRelease`.
      */
-    dragEnd(session: string, tearOff: boolean): Promise<string | null>;
+    dragEnd(session: string, tearOff: boolean): Promise<void>;
     /** Delivered to the source window once another window took its group. */
     onRelease(handler: (notice: ReleaseNotice) => void): Promise<() => void>;
     /** A window created by a tear-off collects the group waiting for it. */
@@ -72,6 +74,13 @@ export interface DragTransport {
  * what the destination accepts on; the session id is read at the drop.
  */
 export const HUB_DRAG_TYPE = 'application/x-dockview-hub';
+
+/**
+ * How long after its drag ended a source keeps the record it needs to act on
+ * a release. Longer than the hub's own grace period, so a late claim is
+ * still honoured here.
+ */
+const LOCAL_SESSION_TTL_MS = 3000;
 
 /**
  * A random id for groups, panels and drag sessions. `randomUUID` is only
@@ -185,26 +194,22 @@ export function installCrossWindowDnd(
                 'dragend',
                 (end) => {
                     const dropped = end.dataTransfer?.dropEffect ?? 'none';
-                    // A session another window claimed has already been
-                    // released from `local`; what is left is unclaimed.
                     const tearOff = hub.tearOff && dropped === 'none';
-                    void transport.dragEnd(session, tearOff).then(
-                        (opened) => {
-                            if (opened) {
-                                counters.tearOffs += 1;
-                                log(
-                                    `drag ${session.slice(0, 8)} torn off into ${opened}`
-                                );
-                            } else if (local.has(session)) {
-                                local.delete(session);
-                                log(
-                                    `drag ${session.slice(0, 8)} ended here (${dropped})`
-                                );
-                            }
-                        },
-                        (err: unknown) =>
-                            log(`drag_end failed — ${String(err)}`)
-                    );
+                    void transport
+                        .dragEnd(session, tearOff)
+                        .catch((err: unknown) =>
+                            log(`dragEnd failed — ${String(err)}`)
+                        );
+                    // The hub keeps the drag claimable for a while after
+                    // this, so only conclude it stayed here once a claim
+                    // would have shown up as a release.
+                    setTimeout(() => {
+                        if (local.delete(session)) {
+                            log(
+                                `drag ${session.slice(0, 8)} stayed here (${dropped})`
+                            );
+                        }
+                    }, LOCAL_SESSION_TTL_MS);
                 },
                 { once: true }
             );
@@ -298,6 +303,9 @@ export function installCrossWindowDnd(
                 return;
             }
             counters.releases += 1;
+            if (notice.to.startsWith('dock-torn-')) {
+                counters.tearOffs += 1;
+            }
             release(api, session);
             log(`released ${session.kind} ${session.id} to ${notice.to}`);
         })

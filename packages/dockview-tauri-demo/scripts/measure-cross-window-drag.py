@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+"""
+Drives a real drag of a tab from one native window into another and judges
+it from the hub's own log. Needs an X display (Xvfb will do), xdotool, the
+Vite dev server on port 1420 (start it with VITE_DND=html5: under Xvfb there
+is no pointing device, WebKit reports a coarse pointer, and dockview's 'auto'
+would pick the pointer backend, which cannot leave a window), and a debug
+build of the shell. Example:
+
+    Xvfb :99 -screen 0 2400x1000x24 &
+    VITE_DND=html5 yarn dev &
+    cargo build --manifest-path src-tauri/Cargo.toml
+    DISPLAY=:99 python3 scripts/measure-cross-window-drag.py
+
+The shell is started with DOCKVIEW_DEMO_AUTOTEST set, which opens a second
+window at a known position and makes each window report its geometry and
+the cross-window drag log as JSON lines on stdout. Those lines are the only
+thing this script reads; it never looks at pixels.
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import threading
+import time
+from queue import Empty, Queue
+
+MAIN_TITLE = "dockview + Tauri"
+SECOND_TITLE = "dockview — dock-2"
+
+
+def xdotool(*args):
+    return subprocess.run(
+        ["xdotool", *args], check=True, capture_output=True, text=True
+    ).stdout
+
+
+def window_origin(title):
+    """Screen position of the window with exactly this title. Titles are
+    matched in Python: xdotool's --name is a regex, and "+" would quantify."""
+    for wid in xdotool("search", "--name", ".").split():
+        try:
+            name = xdotool("getwindowname", wid).strip()
+        except subprocess.CalledProcessError:
+            continue
+        if name == title:
+            shell = xdotool("getwindowgeometry", "--shell", wid)
+            values = dict(line.split("=") for line in shell.split())
+            return int(values["X"]), int(values["Y"])
+    raise SystemExit(f"no window titled {title!r}")
+
+
+def drag(src, dst, steps=24):
+    """A pointer drag with enough intermediate motion to start an HTML5 drag."""
+    sx, sy = src
+    dx, dy = dst
+    xdotool("mousemove", str(sx), str(sy))
+    time.sleep(0.2)
+    xdotool("mousedown", "1")
+    time.sleep(0.2)
+    for i in range(1, steps + 1):
+        x = round(sx + (dx - sx) * i / steps)
+        y = round(sy + (dy - sy) * i / steps)
+        xdotool("mousemove", str(x), str(y))
+        time.sleep(0.05)
+    # Settle on the target so the drop overlay has resolved its position.
+    for _ in range(4):
+        xdotool("mousemove", str(dx), str(dy))
+        time.sleep(0.1)
+    xdotool("mouseup", "1")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    parser.add_argument(
+        "--binary",
+        default=os.path.join(
+            os.path.dirname(__file__), "..", "src-tauri", "target", "debug",
+            "dockview-tauri-demo",
+        ),
+    )
+    parser.add_argument("--panel", default="scratch", help="tab to drag, in main")
+    parser.add_argument("--target", default="host", help="panel to drop on, in dock-2")
+    parser.add_argument(
+        "--where",
+        default="right",
+        choices=["center", "left", "right", "top", "bottom"],
+        help="where on the target's content to drop",
+    )
+    parser.add_argument("--screenshot", help="write a PNG of the screen after the drop")
+    parser.add_argument("--timeout", type=float, default=40.0)
+    args = parser.parse_args()
+
+    env = dict(os.environ, DOCKVIEW_DEMO_AUTOTEST="1")
+    app = subprocess.Popen(
+        [args.binary], env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    lines = Queue()
+
+    def pump():
+        for line in app.stdout:
+            lines.put(line)
+
+    threading.Thread(target=pump, daemon=True).start()
+
+    rects = {}
+    log = []
+    deadline = time.monotonic() + args.timeout
+
+    def take(until):
+        """Consume report lines until `until()` holds or the deadline passes."""
+        while not until():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            try:
+                line = lines.get(timeout=min(remaining, 0.5))
+            except Empty:
+                continue
+            try:
+                report = json.loads(line)
+            except ValueError:
+                continue
+            if report["kind"] == "rects":
+                rects[report["label"]] = report["payload"]
+            elif report["kind"] == "log":
+                log.append((report["label"], report["payload"]))
+                print(f"  [{report['label']}] {report['payload']}")
+        return True
+
+    try:
+        def find(label, name):
+            """A panel id in `label`'s layout: exact, or suffixed with the
+            window label as every window but main names its own panels."""
+            panels = rects.get(label, {}).get("panels", {})
+            for candidate in (name, f"{name}-{label}"):
+                if candidate in panels:
+                    return candidate
+            return None
+
+        ready = lambda: find("main", args.panel) and find("dock-2", args.target)
+        if not take(ready):
+            raise SystemExit("timed out waiting for both windows to report geometry")
+        panel_id = find("main", args.panel)
+        target_id = find("dock-2", args.target)
+
+        for label in ("main", "dock-2"):
+            dnd = rects[label]["dnd"]
+            print(f"{label}: dnd html5={dnd['html5']} pointer={dnd['pointer']}")
+            if not dnd["html5"]:
+                raise SystemExit(f"{label} has no HTML5 drag backend; start vite with VITE_DND=html5")
+
+        mx, my = window_origin(MAIN_TITLE)
+        sx2, sy2 = window_origin(SECOND_TITLE)
+        tab = rects["main"]["panels"][panel_id]["tab"]
+        content = rects["dock-2"]["panels"][target_id]["content"]
+        src = (mx + tab["x"] + tab["width"] // 2, my + tab["y"] + tab["height"] // 2)
+        fx, fy = {
+            "center": (0.5, 0.5), "left": (0.08, 0.5), "right": (0.92, 0.5),
+            "top": (0.5, 0.08), "bottom": (0.5, 0.92),
+        }[args.where]
+        dst = (
+            sx2 + content["x"] + round(content["width"] * fx),
+            sy2 + content["y"] + round(content["height"] * fy),
+        )
+        print(f"dragging {panel_id} tab at {src} to {target_id} content ({args.where}) at {dst}")
+        before = len(log)
+        drag(src, dst)
+
+        placed = lambda: any(
+            label == "dock-2" and "placed" in line for label, line in log[before:]
+        )
+        released = lambda: any(
+            label == "main" and "released" in line for label, line in log[before:]
+        )
+        take(lambda: placed() and released())
+        # Give the destination's layout a moment to report, for the summary.
+        time.sleep(1.0)
+        while True:
+            try:
+                line = lines.get_nowait()
+            except Empty:
+                break
+            try:
+                report = json.loads(line)
+            except ValueError:
+                continue
+            if report["kind"] == "rects":
+                rects[report["label"]] = report["payload"]
+
+        if args.screenshot:
+            subprocess.run(["import", "-window", "root", args.screenshot], check=False)
+
+        ok = placed() and released()
+        print()
+        print("main panels:  ", sorted(rects["main"]["panels"]))
+        print("dock-2 panels:", sorted(rects["dock-2"]["panels"]))
+        print("RESULT:", "the tab crossed windows" if ok else "the tab did not cross")
+        return 0 if ok else 1
+    finally:
+        app.terminate()
+        try:
+            app.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            app.kill()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

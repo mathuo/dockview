@@ -156,18 +156,20 @@ export async function claimDrop(session: string, to: string): Promise<unknown> {
 }
 
 /**
- * The source window reports its drag over. With `tearOff`, an unclaimed drag
- * becomes a new window holding the group; resolves to that window's label.
+ * The source window reports its drag over. The shell keeps the drag
+ * claimable for a grace period first; with `tearOff`, an unclaimed drag
+ * then becomes a new window holding the group, which the source learns
+ * through the release event.
  */
 export async function dragEnd(
     session: string,
     tearOff: boolean
-): Promise<string | null> {
+): Promise<void> {
     if (!isTauri()) {
-        return null;
+        return;
     }
     const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<string | null>('drag_end', { session, tearOff });
+    await invoke('drag_end', { session, tearOff });
 }
 
 /** Delivered to the source window once another window has taken its group. */
@@ -192,4 +194,23 @@ export async function takePendingGroup(label: string): Promise<unknown | null> {
     }
     const { invoke } = await import('@tauri-apps/api/core');
     return invoke<unknown | null>('take_pending_group', { label });
+}
+
+/**
+ * The measurement harness: a JSON line on the shell's stdout, read by
+ * `scripts/measure-cross-window-drag.py`. No-op outside the shell.
+ */
+export async function autotestReport(
+    kind: string,
+    payload: unknown
+): Promise<void> {
+    if (!isTauri()) {
+        return;
+    }
+    const { invoke } = await import('@tauri-apps/api/core');
+    await invoke('autotest_report', {
+        label: await windowLabel(),
+        kind,
+        payload,
+    });
 }

@@ -27,6 +27,13 @@ not a published package and not a supported example.
   `addGroupFromJSON`. It reaches the hub only through the `DragTransport`
   it is given, so it knows nothing about Tauri.
 - `src/hub.ts` — the Tauri `DragTransport`, over the commands in `bridge.ts`.
+- `src/autotest.ts` and `scripts/measure-cross-window-drag.py` — the
+  measurement harness. With `DOCKVIEW_DEMO_AUTOTEST` in the shell's
+  environment a second window opens at a known position and each window
+  reports panel geometry and the drag log as JSON lines on stdout; the
+  driver turns that into an xdotool drag and judges it from the log. It
+  reads geometry through the public api (`panel.view.tab.element`), never
+  by querying dockview's DOM.
 - `popout.html` — dockview opens `/popout.html` by default, so the host has to
   serve it. It is a second Vite entry point.
 
@@ -44,7 +51,9 @@ not a published package and not a supported example.
   build this.
 - `typecheck` — `tsc --noEmit`. There is no JavaScript test target: what
   the frontend verifies cannot be asserted in jsdom. `cargo test --locked`
-  in `src-tauri/` covers the orchestrator.
+  in `src-tauri/` covers the orchestrator, and
+  `scripts/measure-cross-window-drag.py` measures the real gesture between
+  two windows under Xvfb (see the README).
 
 ## Conventions
 

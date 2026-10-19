@@ -191,12 +191,43 @@ from its serialized `params`, so scroll position, half-typed text and focus
 do not survive the crossing. A panel that wants to keep state across windows
 has to put it in `params`.
 
-Not yet measured: whether each webview engine delivers a cross-process HTML5
-drop with its custom type intact. The Cross-window drag panel's counters say
-where a drag stops: `drags started` rising with nothing on the other side
-means the drag never reached the second window; `drag-overs accepted` rising
-with `drops claimed` at zero means the drop landed but the shell refused it,
-and the log says why.
+The shell keeps a drag claimable for 1.5 s after its source reports it
+over. That is not a nicety: the source's `dragend` fires the instant the
+drop lands in the other window, and the destination's claim is a separate
+IPC message that routinely arrives after it. Measured before the grace
+period existed, the claim lost that race and was refused as "not in flight".
+
+Measured on Linux (WebKitGTK 2.52.6, debug build, two windows under Xvfb
+driven by `scripts/measure-cross-window-drag.py`): dragging the Scratch tab
+from the main window onto the right edge of the Host panel in the second
+window announced the drag, placed one panel right of the target group in the
+second window, and released the panel from the main window, in that order;
+a centre drop merged it into the target group instead. Both windows ran the
+HTML5 backend, forced with `VITE_DND=html5` since Xvfb reports a coarse
+pointer. Every window but the main one names its probe panels with its own
+label as a suffix, because a window that already holds a panel of the same
+id refuses the drop, by design, before anything is claimed. Not measured:
+WKWebView and WebView2, and a group-header drag, which the driver does not
+yet perform.
+
+To repeat it, with xdotool and Xvfb installed and the workspace packages
+built (`yarn build && yarn build:bundle` at the root):
+
+```sh
+Xvfb :99 -screen 0 2400x1000x24 &
+VITE_DND=html5 yarn dev &
+cargo build --manifest-path src-tauri/Cargo.toml
+DISPLAY=:99 python3 scripts/measure-cross-window-drag.py --screenshot after.png
+```
+
+The driver starts the shell with `DOCKVIEW_DEMO_AUTOTEST` set, which opens
+the second window at a known position and makes each window report its
+panel geometry and the drag log as JSON lines on stdout; the driver turns
+the geometry into a pointer drag and judges the result from the log alone.
+The Cross-window drag panel's counters tell the same story interactively:
+`drags started` rising with nothing on the other side means the drag never
+reached the second window; `drag-overs accepted` rising with `drops claimed`
+at zero means the drop landed but was refused, and the log says why.
 
 ### Measured in a release build
 
@@ -270,6 +301,8 @@ src/            frontend
   panels.ts     the five probe panels plus a scratch panel
   crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
   hub.ts        the Tauri transport that interceptor reaches the shell through
+  autotest.ts   geometry and log reporting for the measurement driver
+scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface

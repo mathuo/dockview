@@ -35,6 +35,15 @@ pub struct DragSession {
     pub envelope: Value,
 }
 
+/// A session with what the source said when its drag ended, if it has.
+#[derive(Clone, Debug, PartialEq)]
+struct Tracked {
+    drag: DragSession,
+    /// `Some` once the source reported the drag over, with whether it asked
+    /// for an unclaimed drag to become a new window.
+    ended: Option<bool>,
+}
+
 /// Tells the source window that another window has taken its group.
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub struct Release {
@@ -53,11 +62,12 @@ pub struct Claim {
     pub release: Release,
 }
 
-/// What became of a drag the source reported over.
+/// What became of a drag the source reported over, once its grace period
+/// ran out.
 #[derive(Clone, Debug, PartialEq)]
 pub enum DragEnd {
-    /// Nothing was in flight under that id: a window claimed it already, or
-    /// the drag was never announced.
+    /// Nothing was in flight under that id: a window claimed it (before or
+    /// during the grace period), or the drag was never announced.
     Settled,
     /// The drag was unclaimed and has been forgotten.
     Discarded,
@@ -99,8 +109,9 @@ impl<T> From<PoisonError<T>> for HubError {
 #[derive(Default)]
 pub struct Hub {
     /// Drags in flight, keyed by the session id the source put on the
-    /// drag's `DataTransfer`. Removed on claim or when the drag ends.
-    sessions: Mutex<HashMap<String, DragSession>>,
+    /// drag's `DataTransfer`. Removed on claim, or on expiry after the drag
+    /// ended.
+    sessions: Mutex<HashMap<String, Tracked>>,
     /// Groups waiting for a window that has not loaded yet, keyed by that
     /// window's label.
     pending: Mutex<HashMap<String, Value>>,
@@ -111,7 +122,9 @@ impl Hub {
     /// drop can be completed from here alone, even if the source is busy or
     /// gone by then.
     pub fn start(&self, session: String, drag: DragSession) -> Result<(), HubError> {
-        self.sessions.lock()?.insert(session, drag);
+        self.sessions
+            .lock()?
+            .insert(session, Tracked { drag, ended: None });
         Ok(())
     }
 
@@ -121,7 +134,7 @@ impl Hub {
         self.sessions
             .lock()?
             .get(session)
-            .map(|drag| drag.envelope.clone())
+            .map(|tracked| tracked.drag.envelope.clone())
             .ok_or_else(|| HubError::NotInFlight(session.to_string()))
     }
 
@@ -135,40 +148,61 @@ impl Hub {
             .ok_or_else(|| HubError::NotInFlight(session.to_string()))?;
 
         Ok(Claim {
-            envelope: taken.envelope,
+            envelope: taken.drag.envelope,
             release: Release {
-                from: taken.from,
+                from: taken.drag.from,
                 session: session.to_string(),
                 to,
             },
         })
     }
 
-    /// The source reports its drag over. An unclaimed drag is discarded, or,
-    /// when `tear_off` is set, parked under the label `new_label` yields for
-    /// a new window to collect.
-    pub fn end(
+    /// The source reports its drag over. The drag stays claimable: the
+    /// source's `dragend` fires the instant the drop lands, and the
+    /// destination's claim is a separate message from another process that
+    /// may well arrive after it. The host calls [`Hub::expire`] once a grace
+    /// period has passed; `tear_off` is remembered until then. Returns
+    /// whether anything was still in flight to wait for.
+    pub fn end(&self, session: &str, tear_off: bool) -> Result<bool, HubError> {
+        Ok(match self.sessions.lock()?.get_mut(session) {
+            Some(tracked) => {
+                tracked.ended = Some(tear_off);
+                true
+            }
+            None => false,
+        })
+    }
+
+    /// The grace period after [`Hub::end`] is over. An unclaimed drag is
+    /// discarded, or, if the source asked, parked under the label
+    /// `new_label` yields for a new window to collect.
+    pub fn expire(
         &self,
         session: &str,
-        tear_off: bool,
         new_label: impl FnOnce() -> String,
     ) -> Result<DragEnd, HubError> {
-        let Some(unclaimed) = self.sessions.lock()?.remove(session) else {
-            return Ok(DragEnd::Settled);
+        let unclaimed = {
+            let mut sessions = self.sessions.lock()?;
+            match sessions.get(session) {
+                // Still in flight and the source has not reported it over:
+                // not ours to expire.
+                Some(Tracked { ended: None, .. }) | None => return Ok(DragEnd::Settled),
+                Some(_) => sessions.remove(session).expect("present under the lock"),
+            }
         };
 
-        if !tear_off {
+        if unclaimed.ended != Some(true) {
             return Ok(DragEnd::Discarded);
         }
 
         let label = new_label();
         self.pending
             .lock()?
-            .insert(label.clone(), unclaimed.envelope);
+            .insert(label.clone(), unclaimed.drag.envelope);
 
         Ok(DragEnd::TornOff {
             release: Release {
-                from: unclaimed.from,
+                from: unclaimed.drag.from,
                 session: session.to_string(),
                 to: label.clone(),
             },
@@ -247,26 +281,43 @@ mod tests {
     }
 
     #[test]
-    fn ending_a_claimed_drag_is_settled() {
+    fn a_claim_during_the_grace_period_still_wins() {
+        let hub = Hub::default();
+        hub.start("s1".into(), drag("main")).unwrap();
+
+        // The source's dragend beats the destination's claim to the hub.
+        assert!(hub.end("s1", false).unwrap());
+        assert!(hub.claim("s1", "dock-2".into()).is_ok());
+
+        assert_eq!(hub.expire("s1", || "x".into()).unwrap(), DragEnd::Settled);
+    }
+
+    #[test]
+    fn ending_a_claimed_drag_has_nothing_to_wait_for() {
         let hub = Hub::default();
         hub.start("s1".into(), drag("main")).unwrap();
         hub.claim("s1", "dock-2".into()).unwrap();
 
-        assert_eq!(
-            hub.end("s1", true, || "x".into()).unwrap(),
-            DragEnd::Settled
-        );
+        assert!(!hub.end("s1", true).unwrap());
+        assert_eq!(hub.expire("s1", || "x".into()).unwrap(), DragEnd::Settled);
     }
 
     #[test]
-    fn ending_an_unclaimed_drag_discards_it() {
+    fn expiring_a_drag_still_in_flight_leaves_it_alone() {
         let hub = Hub::default();
         hub.start("s1".into(), drag("main")).unwrap();
 
-        assert_eq!(
-            hub.end("s1", false, || "x".into()).unwrap(),
-            DragEnd::Discarded
-        );
+        assert_eq!(hub.expire("s1", || "x".into()).unwrap(), DragEnd::Settled);
+        assert!(hub.peek("s1").is_ok());
+    }
+
+    #[test]
+    fn an_unclaimed_drag_is_discarded_on_expiry() {
+        let hub = Hub::default();
+        hub.start("s1".into(), drag("main")).unwrap();
+        hub.end("s1", false).unwrap();
+
+        assert_eq!(hub.expire("s1", || "x".into()).unwrap(), DragEnd::Discarded);
         assert_eq!(hub.peek("s1"), Err(HubError::NotInFlight("s1".into())));
     }
 
@@ -274,8 +325,9 @@ mod tests {
     fn a_tear_off_parks_the_group_for_the_new_window() {
         let hub = Hub::default();
         hub.start("s1".into(), drag("main")).unwrap();
+        hub.end("s1", true).unwrap();
 
-        let ended = hub.end("s1", true, || "dock-torn-0".into()).unwrap();
+        let ended = hub.expire("s1", || "dock-torn-0".into()).unwrap();
 
         assert_eq!(
             ended,

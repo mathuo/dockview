@@ -6,7 +6,8 @@ import './styles.css';
 import 'dockview-enterprise';
 
 import { type IContentRenderer, createDockview, themeAbyss } from 'dockview';
-import { closeNativePopout } from './bridge';
+import { installAutotest } from './autotest';
+import { closeNativePopout, windowLabel } from './bridge';
 import { resolveDndStrategy } from './dnd';
 import { type Hub, installHub, randomId } from './hub';
 import {
@@ -51,6 +52,7 @@ const api = createDockview(container, {
 });
 
 hub = installHub(api);
+installAutotest(api, hub);
 
 /**
  * wry's macOS UI delegate has no `webViewDidClose:`, so the `close()` dockview
@@ -67,44 +69,55 @@ const width = (fraction: number) =>
 const height = (fraction: number) =>
     Math.round(container.clientHeight * fraction);
 
-api.addPanel({ id: 'host', component: 'host', title: 'Host' });
+/**
+ * Every window builds the same probe panels. Panel ids have to be unique
+ * across the windows a group can move between, so every window but the
+ * main one suffixes its ids with its label; a panel that crosses keeps the
+ * id it was born with.
+ */
+void windowLabel().then((label) => {
+    const id = (name: string) =>
+        label === 'main' || label === 'browser' ? name : `${name}-${label}`;
 
-api.addPanel({
-    id: 'popout',
-    component: 'popout',
-    title: 'Popouts',
-    position: { referencePanel: 'host', direction: 'right' },
-    initialWidth: width(0.62),
-});
+    api.addPanel({ id: id('host'), component: 'host', title: 'Host' });
 
-api.addPanel({
-    id: 'native',
-    component: 'native',
-    title: 'Native windows',
-    position: { referencePanel: 'popout', direction: 'below' },
-    initialHeight: height(0.45),
-});
+    api.addPanel({
+        id: id('popout'),
+        component: 'popout',
+        title: 'Popouts',
+        position: { referencePanel: id('host'), direction: 'right' },
+        initialWidth: width(0.62),
+    });
 
-api.addPanel({
-    id: 'sync',
-    component: 'sync',
-    title: 'Layout sync',
-    position: { referencePanel: 'native', direction: 'within' },
-    inactive: true,
-});
+    api.addPanel({
+        id: id('native'),
+        component: 'native',
+        title: 'Native windows',
+        position: { referencePanel: id('popout'), direction: 'below' },
+        initialHeight: height(0.45),
+    });
 
-api.addPanel({
-    id: 'hub',
-    component: 'hub',
-    title: 'Cross-window drag',
-    position: { referencePanel: 'native', direction: 'within' },
-    inactive: true,
-});
+    api.addPanel({
+        id: id('sync'),
+        component: 'sync',
+        title: 'Layout sync',
+        position: { referencePanel: id('native'), direction: 'within' },
+        inactive: true,
+    });
 
-api.addPanel({
-    id: 'scratch',
-    component: 'scratch',
-    title: 'Scratch',
-    position: { referencePanel: 'host', direction: 'below' },
-    initialHeight: height(0.3),
+    api.addPanel({
+        id: id('hub'),
+        component: 'hub',
+        title: 'Cross-window drag',
+        position: { referencePanel: id('native'), direction: 'within' },
+        inactive: true,
+    });
+
+    api.addPanel({
+        id: id('scratch'),
+        component: 'scratch',
+        title: 'Scratch',
+        position: { referencePanel: id('host'), direction: 'below' },
+        initialHeight: height(0.3),
+    });
 });
