@@ -458,6 +458,18 @@ export interface DockviewOptions {
      * (rendering the watermark) until it is closed explicitly.
      */
     closeEmptyGroups?: boolean;
+    /**
+     * Supplies the id for every group dockview creates without an explicit
+     * id: a panel added at a new position, a drop that splits the layout, a
+     * group popped out or floated, `addGroup()` without an `id`. Defaults to
+     * a sequential counter starting at `"1"`, which is unique only within one
+     * instance. Supply your own generator, for example
+     * `() => crypto.randomUUID()`, when groups move between instances such
+     * as separate windows, so a group keeps its id wherever it lands. An id
+     * already in use is retried; a generator that keeps returning live ids
+     * throws.
+     */
+    groupIdGenerator?: () => string;
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
     /**
@@ -814,6 +826,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         className: undefined,
         noPanelsOverlay: undefined,
         closeEmptyGroups: undefined,
+        groupIdGenerator: undefined,
         dndEdges: undefined,
         dropPositionResolver: undefined,
         dndCompass: undefined,
