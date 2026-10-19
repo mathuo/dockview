@@ -272,6 +272,7 @@ src/            frontend
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface
-src-tauri/      Rust shell: host info, native window creation, layout broadcast, drag hub
+src-tauri/      Rust shell: host info, native window creation, layout broadcast
+  src/hub.rs    the drag orchestrator, Tauri-free and unit tested
 popout.html     served at /popout.html, dockview's default popout target
 ```

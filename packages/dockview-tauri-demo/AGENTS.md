@@ -13,6 +13,12 @@ not a published package and not a supported example.
   `broadcast_layout`, `close_popout`, and the hub's `drag_start`,
   `peek_drag`, `claim_drop`, `drag_end`, `take_pending_group`. Window creation lives in
   Rust so the capability set stays at `core:default`.
+- `src-tauri/src/hub.rs` — the orchestrator: which drag is in flight between
+  windows and who claimed it. It imports nothing from Tauri and returns the
+  release notices for the shell to deliver, so it can one day be lifted into
+  a crate of its own behind any host. Keep it that way: no `AppHandle`, no
+  window handling, no event emission in this module. `cargo test` covers it;
+  the commands in `lib.rs` are thin wrappers over it.
 - `src/hub.ts` — cross-window drag and drop. The shell is the hub: it holds
   the serialized group for the drag in flight, the OS drag carries only a
   session id, and the window the drop lands in rebuilds the group with
@@ -32,8 +38,9 @@ not a published package and not a supported example.
   builds. Anyone building the shell already needs a Rust toolchain, so the CLI
   costs them nothing extra. Needs Tauri's platform prerequisites; CI does not
   build this.
-- `typecheck` — `tsc --noEmit`. There is no test target: what this package
-  verifies cannot be asserted in jsdom.
+- `typecheck` — `tsc --noEmit`. There is no JavaScript test target: what
+  the frontend verifies cannot be asserted in jsdom. `cargo test --locked`
+  in `src-tauri/` covers the orchestrator.
 
 ## Conventions
 
