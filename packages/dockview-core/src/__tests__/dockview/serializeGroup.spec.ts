@@ -156,7 +156,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
                 direction: 'right',
             });
 
-            expect(target.groups.length).toBe(2);
+            expect(target.groups).toHaveLength(2);
             expect(target.panels.map((p) => p.id)).toEqual([
                 'local',
                 'p1',
@@ -193,7 +193,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
                 { direction: 'left' }
             );
             expect(absolute.id).toBe('absolute');
-            expect(target.groups.length).toBe(3);
+            expect(target.groups).toHaveLength(3);
         });
 
         test('preserves locked, hidden header and header position', () => {
@@ -278,7 +278,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
             );
 
             expect(events).toEqual([]);
-            expect(target.groups.length).toBe(1);
+            expect(target.groups).toHaveLength(1);
             expect(target.panels.map((p) => p.id)).toEqual(['p2']);
         });
 
@@ -291,7 +291,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
             ).toThrow(
                 'dockview: serialized group g is missing panel state for b'
             );
-            expect(target.groups.length).toBe(0);
+            expect(target.groups).toHaveLength(0);
         });
 
         test('throws on a malformed envelope', () => {
@@ -375,7 +375,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
             source.removeGroup(group);
             const moved = target.addGroupFromJSON(envelope);
 
-            expect(source.panels.length).toBe(0);
+            expect(source.panels).toHaveLength(0);
             expect(moved.panels.map((p: IDockviewPanel) => p.id)).toEqual([
                 'p1',
                 'p2',
@@ -392,7 +392,7 @@ describe('serializeGroup / addGroupFromJSON', () => {
                 direction: 'right',
             });
 
-            expect(group.panels.length).toBe(2);
+            expect(group.panels).toHaveLength(2);
             expect(origins).toEqual(['api']);
         });
     });
