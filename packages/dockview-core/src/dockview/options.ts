@@ -997,6 +997,19 @@ export type AddGroupOptions = (
 ) &
     GroupOptions;
 
+/**
+ * Placement for `addGroupFromJSON`: where the rehydrated group goes in the
+ * grid, as for `addGroup`. The group's own shape (id, locked, hidden header,
+ * header position) comes from the serialized state, so it is not repeated
+ * here. Omit the options to append the group to the layout.
+ */
+export type AddGroupFromJSONOptions = (
+    | AddGroupOptionsWithGroup
+    | AddGroupOptionsWithPanel
+    | AbsolutePosition
+) &
+    Pick<GroupOptions, 'skipSetActive' | 'initialWidth' | 'initialHeight'>;
+
 export function isGroupOptionsWithPanel(
     data: AddGroupOptions
 ): data is AddGroupOptionsWithPanel {
