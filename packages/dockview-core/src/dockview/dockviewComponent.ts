@@ -577,6 +577,9 @@ const NO_EVENT: Event<any> = () => ({
  *  returns when the LayoutHistory module is absent. */
 const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = NO_EVENT;
 
+/** How many live ids a custom `groupIdGenerator` may return before giving up. */
+const MAX_GROUP_ID_ATTEMPTS = 100;
+
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
     implements
@@ -6307,13 +6310,41 @@ export class DockviewComponent
         }
     }
 
+    /**
+     * The id for a group created without one: from `groupIdGenerator` when
+     * the option is set, else the sequential counter. An id already in use is
+     * skipped. The counter never repeats, so it can skip any number of live
+     * ids (a restored layout may hold many); a custom generator is given a
+     * bounded number of tries so a broken one cannot hang the call.
+     */
     private getNextGroupId(): string {
-        let id = this.nextGroupId.next();
-        while (this._groups.has(id)) {
-            id = this.nextGroupId.next();
+        const generate = this.options.groupIdGenerator;
+
+        if (!generate) {
+            let id = this.nextGroupId.next();
+            while (this._groups.has(id)) {
+                id = this.nextGroupId.next();
+            }
+            return id;
         }
 
-        return id;
+        for (let attempt = 0; attempt < MAX_GROUP_ID_ATTEMPTS; attempt++) {
+            const id = generate();
+
+            if (typeof id !== 'string' || id.length === 0) {
+                throw new TypeError(
+                    'dockview: groupIdGenerator must return a non-empty string'
+                );
+            }
+
+            if (!this._groups.has(id)) {
+                return id;
+            }
+        }
+
+        throw new Error(
+            `dockview: groupIdGenerator returned an id already in use ${MAX_GROUP_ID_ATTEMPTS} times in a row`
+        );
     }
 
     createGroup(options?: GroupOptions): DockviewGroupPanel {
@@ -6329,10 +6360,7 @@ export class DockviewComponent
         }
 
         if (!id) {
-            id = this.nextGroupId.next();
-            while (this._groups.has(id)) {
-                id = this.nextGroupId.next();
-            }
+            id = this.getNextGroupId();
         }
 
         const view = new DockviewGroupPanel(this, id, options);

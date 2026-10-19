@@ -263,6 +263,7 @@ export {
     createDismissableLayer,
     type DismissableLayerOptions,
 } from './dismissableLayer';
+export { generateId } from './id';
 export { type IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
 export {
