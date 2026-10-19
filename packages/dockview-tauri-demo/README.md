@@ -62,8 +62,13 @@ reports whether every panel came back visible. Both run in a plain browser, so
 the macOS/Linux release behaviour can be checked without packaging anything.
 
 **Native windows** — asks Rust to build a second native window running the same
-frontend. That webview has its own JavaScript context, so nothing can be moved
+frontend. That webview has its own JavaScript context, so no DOM can be moved
 into it from here.
+
+**Cross-window drag** — drags a tab or a group from one native window's
+dockview into another's, with the shell as the hub. Reports the drag backend
+in use, counts each stage of a drag, and logs what crossed. See
+[Dragging between windows](#dragging-between-windows).
 
 **Layout sync** — serializes the layout and fans it out over Tauri's event bus,
 so windows on either side of the process boundary converge on the same
@@ -146,6 +151,53 @@ primary pointer, and `'auto'` therefore resolves to the pointer backend, so
 those runs force `VITE_DND=html5`; on a desktop `'auto'` gives HTML5 for the
 mouse.
 
+### Dragging between windows
+
+Two native windows are two dockview instances in two JavaScript contexts, so
+a tab cannot be dragged between them the way it is dragged between groups.
+What does cross a window boundary is an OS drag session, and only an HTML5
+drag rides one. The demo builds on that, with the shell as a hub and no
+window owning any other:
+
+1. **Drag start.** `onWillDragPanel` / `onWillDragGroup` put a session id on
+   the drag's `DataTransfer` under `application/x-dockview-hub`, serialize
+   the group (`api.serializeGroup`, or a one-panel group for a single tab)
+   and hand it to the shell with `drag_start`. Serializing up front means the
+   drop can be completed even if the source window is busy by then.
+2. **Drag over.** The destination's dockview sees a drag it did not start
+   and asks through `onUnhandledDragOver`; the demo accepts it when the hub
+   type is present, so the normal drop overlay and compass show. A browser
+   exposes a drag's types but not its data until the drop, which is why the
+   type carries the meaning and the session id waits.
+3. **Drop.** `onDidDrop` reads the session id, reads the group with
+   `peek_drag` to refuse one whose panel ids it already holds, claims it
+   with `claim_drop`, and rebuilds the group where the drop landed: `addGroupFromJSON` next to
+   the target group or at a layout edge, or, for a drop on a group's centre
+   or tab bar, `addPanel` into that group. A group's id travels with it;
+   every window uses `groupIdGenerator` with random ids so it does not
+   collide on arrival.
+4. **Release.** The first claim wins. The shell removes the session and
+   emits `dockview:release` to the source window, which removes its copy of
+   the panel or group. A second claim, or a claim for a drag the shell never
+   saw, is refused and nothing is added.
+5. **Drag end.** The source reports `drag_end`. With the panel's tear-off
+   box ticked, an unclaimed drag becomes a new window that starts with the
+   group (`take_pending_group` on load), the hub's replacement for a popout.
+   It is off by default because HTML5 cannot tell a drop on the desktop from
+   an Escape-cancelled drag.
+
+What the whole gesture loses is renderer-held state: the panel is rebuilt
+from its serialized `params`, so scroll position, half-typed text and focus
+do not survive the crossing. A panel that wants to keep state across windows
+has to put it in `params`.
+
+Not yet measured: whether each webview engine delivers a cross-process HTML5
+drop with its custom type intact. The Cross-window drag panel's counters say
+where a drag stops: `drags started` rising with nothing on the other side
+means the drag never reached the second window; `drag-overs accepted` rising
+with `drops claimed` at zero means the drop landed but the shell refused it,
+and the log says why.
+
 ### Measured in a release build
 
 Running a packaged build on Linux (WebKitGTK, tauri 2.11.5, webview 2.52.6),
@@ -215,10 +267,11 @@ Enterprise features are governed by a licence key; set one with
 docs/           design notes
 src/            frontend
   main.ts       builds the dockview instance and its panels
-  panels.ts     the four probe panels plus a scratch panel
+  panels.ts     the five probe panels plus a scratch panel
+  hub.ts        cross-window drag and drop through the shell
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface
-src-tauri/      Rust shell: host info, native window creation, layout broadcast
+src-tauri/      Rust shell: host info, native window creation, layout broadcast, drag hub
 popout.html     served at /popout.html, dockview's default popout target
 ```

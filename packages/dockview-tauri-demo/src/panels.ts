@@ -15,6 +15,7 @@ import {
 import { resolveDndStrategy } from './dnd';
 import { LogView, button, el, field, verdict } from './dom';
 import { diagnosePopoutUrl, readHostReport } from './host';
+import type { Hub } from './hub';
 import { describe, probeWindowOpen } from './probes';
 import { RELEASE_ORIGIN_URL, simulateReleaseOriginRestore } from './simulate';
 
@@ -349,7 +350,7 @@ export class NativeWindowPanel extends DemoPanel {
                 el(
                     'p',
                     { class: 'demo-note' },
-                    'The second window runs a separate webview with its own dockview instance. Panels cannot be dragged between the two — share layout state over IPC instead.'
+                    'The second window runs a separate webview with its own dockview instance, so no DOM can move between the two. Tabs and groups can still be dragged across: the Cross-window drag panel explains how.'
                 ),
                 log.element
             )
@@ -403,6 +404,116 @@ export class LayoutSyncPanel extends DemoPanel {
                                 )
                         );
                     })
+                ),
+                log.element
+            )
+        );
+    }
+}
+
+/**
+ * Drag between native windows, brokered by the shell. The OS drag carries a
+ * session id; the shell holds the serialized group; the window the drop
+ * lands in rebuilds it with `addGroupFromJSON` and the source removes its
+ * copy. Only an HTML5 drag can leave a window, so the pointer backend is
+ * the first thing to rule out when nothing crosses.
+ */
+export class HubPanel extends DemoPanel {
+    constructor(private readonly hub: () => Hub | undefined) {
+        super();
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        const log = new LogView();
+        const api = parameters.containerApi;
+        const status = el('div');
+        const tearOff = el('input', { type: 'checkbox' }) as HTMLInputElement;
+
+        const render = () => {
+            const hub = this.hub();
+            const caps = api.dndCapabilities;
+            status.replaceChildren(
+                field('window label', hub?.label ?? 'not installed'),
+                verdict(
+                    caps.html5,
+                    caps.html5
+                        ? 'HTML5 drag active — a drag can leave this window.'
+                        : 'Pointer backend only — a drag stops at the window edge. Force ?dnd=html5.'
+                ),
+                ...(hub
+                    ? [
+                          field(
+                              'drags started',
+                              String(hub.counters.dragsStarted)
+                          ),
+                          field(
+                              'drag-overs accepted',
+                              String(hub.counters.dragOversAccepted)
+                          ),
+                          field(
+                              'drops claimed',
+                              String(hub.counters.dropsClaimed)
+                          ),
+                          field(
+                              'drops refused',
+                              String(hub.counters.dropsRefused)
+                          ),
+                          field('releases', String(hub.counters.releases)),
+                          field('tear-offs', String(hub.counters.tearOffs)),
+                      ]
+                    : [])
+            );
+        };
+
+        tearOff.addEventListener('change', () => {
+            const hub = this.hub();
+            if (hub) {
+                hub.tearOff = tearOff.checked;
+            }
+        });
+
+        const subscribe = () => {
+            const hub = this.hub();
+            if (!hub) {
+                return false;
+            }
+            tearOff.checked = hub.tearOff;
+            this.onDispose(
+                hub.onLog((line) => {
+                    log.append(line);
+                    render();
+                })
+            );
+            return true;
+        };
+
+        // The hub is installed right after the instance is created, which
+        // is after dockview has asked for this panel.
+        if (!subscribe()) {
+            const retry = setTimeout(() => {
+                subscribe();
+                render();
+            }, 0);
+            this.onDispose(() => clearTimeout(retry));
+        }
+
+        render();
+        this.onDispose(api.onDidLayoutChange(render).dispose);
+
+        this.root.append(
+            section(
+                'Cross-window drag',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds the serialized group and tells the source to let go once the drop is claimed.'
+                ),
+                status,
+                el(
+                    'label',
+                    { class: 'demo-field' },
+                    tearOff,
+                    ' open a new window when a drag ends outside every window (an Escape-cancelled drag looks the same to HTML5, so off by default)'
                 ),
                 log.element
             )

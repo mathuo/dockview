@@ -1,13 +1,22 @@
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Mutex;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{
     webview::{NewWindowFeatures, NewWindowResponse},
-    AppHandle, Emitter, Manager, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
+    AppHandle, Emitter, Manager, State, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
 };
 
 /// Event carrying a serialized dockview layout between native windows.
 const LAYOUT_EVENT: &str = "dockview:layout";
+
+/// Event telling the window a drag started in that another window has taken
+/// the dragged group, so it can remove its own copy.
+const RELEASE_EVENT: &str = "dockview:release";
+
+/// Labels for the windows a tear-off creates; see `POPOUT_COUNT`.
+static TEAR_OFF_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// Labels for the windows `window.open` creates; a label must be unique for
 /// the life of the app, so this only ever counts up.
@@ -29,6 +38,165 @@ struct HostInfo {
 struct LayoutBroadcast {
     from: String,
     layout: serde_json::Value,
+}
+
+/// One group in flight between windows. The source window serializes the
+/// group when the drag starts, so the drop can be completed from here alone
+/// even if the source has become unresponsive by then.
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DragSession {
+    from: String,
+    /// `panel` for a single tab, `group` for a whole group.
+    kind: String,
+    /// A `SerializedDockviewGroup`, opaque to the shell.
+    envelope: serde_json::Value,
+}
+
+/// The hub: the one place that knows which drag is in flight and which
+/// window has claimed it. Windows are peers; none of them owns the others.
+#[derive(Default)]
+struct Hub {
+    /// Drags in flight, keyed by the session id the source put on the
+    /// drag's `DataTransfer`. Removed on claim or when the drag ends.
+    sessions: Mutex<HashMap<String, DragSession>>,
+    /// Groups waiting for a window that has not loaded yet, keyed by that
+    /// window's label; see `open_window_with_group`.
+    pending: Mutex<HashMap<String, serde_json::Value>>,
+}
+
+#[derive(Serialize, Clone)]
+struct ReleaseNotice {
+    session: String,
+    to: String,
+}
+
+/// The source window announces a drag. Called from `onWillDragPanel` /
+/// `onWillDragGroup`, before the pointer can have left the window.
+#[tauri::command]
+fn drag_start(
+    hub: State<Hub>,
+    session: String,
+    from: String,
+    kind: String,
+    envelope: serde_json::Value,
+) -> Result<(), String> {
+    let mut sessions = hub.sessions.lock().map_err(|err| err.to_string())?;
+    sessions.insert(
+        session,
+        DragSession {
+            from,
+            kind,
+            envelope,
+        },
+    );
+    Ok(())
+}
+
+/// The destination window looks at a drag before claiming it, to refuse a
+/// group whose panel ids it already holds without taking it from the source.
+#[tauri::command]
+fn peek_drag(hub: State<Hub>, session: String) -> Result<serde_json::Value, String> {
+    let sessions = hub.sessions.lock().map_err(|err| err.to_string())?;
+    sessions
+        .get(&session)
+        .map(|taken| taken.envelope.clone())
+        .ok_or_else(|| format!("drag session {session} is not in flight"))
+}
+
+/// The destination window claims the drag it just received a drop for. The
+/// first claim wins: the session is removed, its envelope returned to the
+/// claimant, and the source told to release its copy. A second claim for the
+/// same session, or a claim for a drag the shell never saw, is refused.
+#[tauri::command]
+fn claim_drop(
+    app: AppHandle,
+    hub: State<Hub>,
+    session: String,
+    to: String,
+) -> Result<serde_json::Value, String> {
+    let taken = {
+        let mut sessions = hub.sessions.lock().map_err(|err| err.to_string())?;
+        sessions.remove(&session)
+    };
+
+    let Some(taken) = taken else {
+        return Err(format!("drag session {session} is not in flight"));
+    };
+
+    app.emit_to(&taken.from, RELEASE_EVENT, ReleaseNotice { session, to })
+        .map_err(|err| err.to_string())?;
+
+    Ok(taken.envelope)
+}
+
+/// The source window reports the end of its drag. An unclaimed session is
+/// dropped, or, when the source asks and nothing claimed it, turned into a
+/// new window holding the group: the hub's replacement for a popout.
+#[tauri::command]
+async fn drag_end(
+    app: AppHandle,
+    hub: State<'_, Hub>,
+    session: String,
+    tear_off: bool,
+) -> Result<Option<String>, String> {
+    let unclaimed = {
+        let mut sessions = hub.sessions.lock().map_err(|err| err.to_string())?;
+        sessions.remove(&session)
+    };
+
+    let Some(unclaimed) = unclaimed else {
+        return Ok(None);
+    };
+
+    if !tear_off {
+        return Ok(None);
+    }
+
+    let label = format!("dock-torn-{}", TEAR_OFF_COUNT.fetch_add(1, Ordering::Relaxed));
+    open_window_with_group(&app, &hub, &label, unclaimed.envelope)?;
+
+    app.emit_to(
+        &unclaimed.from,
+        RELEASE_EVENT,
+        ReleaseNotice {
+            session,
+            to: label.clone(),
+        },
+    )
+    .map_err(|err| err.to_string())?;
+
+    Ok(Some(label))
+}
+
+/// Builds a window that will start with `envelope` as its only group. The
+/// window's frontend collects it with `take_pending_group` once dockview is
+/// ready, since nothing can be pushed into a webview before it has loaded.
+fn open_window_with_group(
+    app: &AppHandle,
+    hub: &Hub,
+    label: &str,
+    envelope: serde_json::Value,
+) -> Result<(), String> {
+    {
+        let mut pending = hub.pending.lock().map_err(|err| err.to_string())?;
+        pending.insert(label.to_string(), envelope);
+    }
+
+    build_dock_window(app, label, &format!("dockview — {label}"), (900.0, 600.0))
+        .map_err(|err| err.to_string())?;
+
+    Ok(())
+}
+
+/// A freshly loaded window asks whether a group is waiting for it.
+#[tauri::command]
+fn take_pending_group(
+    hub: State<Hub>,
+    label: String,
+) -> Result<Option<serde_json::Value>, String> {
+    let mut pending = hub.pending.lock().map_err(|err| err.to_string())?;
+    Ok(pending.remove(&label))
 }
 
 #[tauri::command]
@@ -183,6 +351,7 @@ fn broadcast_layout(app: AppHandle, from: String, layout: serde_json::Value) -> 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(Hub::default())
         .setup(|app| {
             build_dock_window(app.handle(), "main", "dockview + Tauri", (1280.0, 820.0))?;
             Ok(())
@@ -191,7 +360,12 @@ pub fn run() {
             host_info,
             open_dock_window,
             broadcast_layout,
-            close_popout
+            close_popout,
+            drag_start,
+            peek_drag,
+            claim_drop,
+            drag_end,
+            take_pending_group
         ])
         .run(tauri::generate_context!())
         .expect("error while running the dockview tauri demo");

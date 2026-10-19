@@ -9,9 +9,14 @@ not a published package and not a supported example.
 - `src/` — vanilla TypeScript against `dockview`, deliberately without a
   framework binding so the probes sit directly on the layer that popouts and
   window handling live in. `dockview-enterprise` is imported for its features.
-- `src-tauri/` — the Rust shell. Three commands: `host_info`,
-  `open_dock_window`, `broadcast_layout`. Window creation lives in Rust so the
-  capability set stays at `core:default`.
+- `src-tauri/` — the Rust shell. Commands: `host_info`, `open_dock_window`,
+  `broadcast_layout`, `close_popout`, and the hub's `drag_start`,
+  `peek_drag`, `claim_drop`, `drag_end`, `take_pending_group`. Window creation lives in
+  Rust so the capability set stays at `core:default`.
+- `src/hub.ts` — cross-window drag and drop. The shell is the hub: it holds
+  the serialized group for the drag in flight, the OS drag carries only a
+  session id, and the window the drop lands in rebuilds the group with
+  `addGroupFromJSON`. Windows are peers; none owns another.
 - `popout.html` — dockview opens `/popout.html` by default, so the host has to
   serve it. It is a second Vite entry point.
 
@@ -47,6 +52,10 @@ not a published package and not a supported example.
 - `host.ts` asks dockview's exported `getPopoutUrlError` for its verdict rather
   than restating the rules, so the panel cannot drift from the library while
   still explaining *why* a popout would be refused.
+- The hub hangs off dockview's public drag hooks only: `onWillDragPanel` /
+  `onWillDragGroup` to mark the drag and serialize the group,
+  `onUnhandledDragOver` to accept it, `onDidDrop` to place it. It never
+  reads dockview's DOM or its internal transfer object.
 - Closing popout windows goes through `api.onWillClosePopoutWindow` in
   `src/main.ts`, registered once: it covers every popout the component opens,
   including the ones dockview opens for itself (the group context menu, a
