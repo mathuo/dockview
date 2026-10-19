@@ -3,6 +3,7 @@
 ActiveEvent
 AddEdgeGroupOptions
 AddGridviewComponentOptions
+AddGroupFromJSONOptions
 AddGroupOptions
 AddPanelOptions
 AddPanelPositionOptions
@@ -267,6 +268,7 @@ PositionResolverResult
 RendererChangedEvent
 SashState
 SerializedDockview
+SerializedDockviewGroup
 SerializedEdgeGroups
 SerializedFloatingGroup
 SerializedGridObject
