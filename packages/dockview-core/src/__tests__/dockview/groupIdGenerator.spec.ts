@@ -1,6 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import type { IContentRenderer } from '../../dockview/types';
-import { generateId } from '../../id';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -156,8 +155,9 @@ describe('groupIdGenerator', () => {
     });
 
     test('keeps a group id when it moves between two instances', () => {
-        dockview = createDockview(generateId);
-        const target = createDockview(generateId);
+        const randomId = () => crypto.randomUUID();
+        dockview = createDockview(randomId);
+        const target = createDockview(randomId);
 
         const panel = dockview.addPanel({ id: 'p1', component: 'default' });
         const envelope = dockview.serializeGroup(panel.group);

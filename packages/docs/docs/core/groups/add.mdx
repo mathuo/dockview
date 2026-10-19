@@ -65,18 +65,16 @@ The serialized object carries the group's tab order, active tab, locked state, h
 
 Panel ids must be unique within the receiving instance. `addGroupFromJSON` throws before changing anything if a panel id is already in use, as `addPanel` does. A group id that is already in use is reassigned with a warning, as `addGroup` does, so give groups unique ids when they move between instances.
 
-By default every instance numbers its groups from `"1"`, so two instances collide on nearly every move. The `groupIdGenerator` option replaces that counter for every group Dockview creates on its own, and `generateId` is a dependency-free random id you can hand to it:
+By default every instance numbers its groups from `"1"`, so two instances collide on nearly every move. The `groupIdGenerator` option replaces that counter for every group Dockview creates on its own, so ids can be unique across instances. Dockview only asks for a fresh id and retries one that is already in use; how the id is made is yours to choose:
 
 ```ts
-import { createDockview, generateId } from 'dockview';
-
 const api = createDockview(element, {
-    groupIdGenerator: generateId,
+    groupIdGenerator: () => crypto.randomUUID(),
     // ...
 });
 ```
 
-Panel ids are always yours to choose, so the same `generateId` serves there too.
+Panel ids are always yours to choose, so the same generator serves there too.
 
 ## Removing a group
 

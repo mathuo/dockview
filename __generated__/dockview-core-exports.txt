@@ -325,7 +325,6 @@ createSplitview
 defineModule
 directionToPosition
 findRelativeZIndexParent
-generateId
 getActiveElement
 getDirectionOrientation
 getGridLocation
