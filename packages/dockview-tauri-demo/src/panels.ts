@@ -5,6 +5,7 @@ import type {
     IContentRenderer,
     SerializedDockview,
 } from 'dockview';
+import type { HistoryStepInfo, MultiWindow } from 'dockview-enterprise';
 import {
     broadcastLayout,
     nativeHostInfo,
@@ -414,15 +415,13 @@ export class LayoutSyncPanel extends DemoPanel {
 
 /**
  * Drag between native windows, brokered by the shell. The OS drag carries a
- * session id; the shell holds the serialized group; the window the drop
- * lands in rebuilds it with `addGroupFromJSON` and the source removes its
- * copy. Only an HTML5 drag can leave a window, so the pointer backend is
- * the first thing to rule out when nothing crosses.
+ * session id; the shell holds what the drag carries; the window the drop
+ * lands in rebuilds it and the source removes its copy. Only an HTML5 drag
+ * can leave a window, so the pointer backend is the first thing to rule out
+ * when nothing crosses.
  */
 export class CrossWindowDragPanel extends DemoPanel {
-    constructor(
-        private readonly multiWindow: () => ShellMultiWindow | undefined
-    ) {
+    constructor(private readonly shell: Promise<ShellMultiWindow>) {
         super();
     }
 
@@ -431,76 +430,47 @@ export class CrossWindowDragPanel extends DemoPanel {
         const api = parameters.containerApi;
         const status = el('div');
         const detach = el('input', { type: 'checkbox' }) as HTMLInputElement;
+        let shell: ShellMultiWindow | undefined;
 
         const render = () => {
-            const multiWindow = this.multiWindow();
             const caps = api.dndCapabilities;
+            const counters = shell?.counters;
             status.replaceChildren(
-                field('window id', multiWindow?.windowId ?? 'not installed'),
+                field('window id', shell?.multiWindow.windowId ?? 'starting'),
                 verdict(
                     caps.html5,
                     caps.html5
                         ? 'HTML5 drag active — a drag can leave this window.'
                         : 'Pointer backend only — a drag stops at the window edge. Force ?dnd=html5.'
                 ),
-                ...(multiWindow
+                ...(counters
                     ? [
-                          field(
-                              'drags started',
-                              String(multiWindow.counters.dragsStarted)
-                          ),
-                          field(
-                              'drag-overs accepted',
-                              String(multiWindow.counters.dragOversAccepted)
-                          ),
+                          field('drags started', String(counters.dragsStarted)),
                           field(
                               'drops accepted',
-                              String(multiWindow.counters.dropsAccepted)
+                              String(counters.dropsAccepted)
                           ),
-                          field(
-                              'drops refused',
-                              String(multiWindow.counters.dropsRefused)
-                          ),
-                          field(
-                              'releases',
-                              String(multiWindow.counters.releases)
-                          ),
+                          field('drops refused', String(counters.dropsRefused)),
+                          field('releases', String(counters.releases)),
                       ]
                     : [])
             );
         };
 
         detach.addEventListener('change', () => {
-            const multiWindow = this.multiWindow();
-            if (multiWindow) {
-                multiWindow.detach = detach.checked;
-            }
+            shell?.multiWindow.updateOptions({ detach: detach.checked });
         });
 
-        const subscribe = () => {
-            const multiWindow = this.multiWindow();
-            if (!multiWindow) {
-                return false;
-            }
-            detach.checked = multiWindow.detach;
+        void this.shell.then((ready) => {
+            shell = ready;
             this.onDispose(
-                multiWindow.onLog((line) => {
+                ready.onLog((line) => {
                     log.append(line);
                     render();
                 })
             );
-            return true;
-        };
-
-        // The multiWindow is installed right after the instance is created, which
-        // is after dockview has asked for this panel.
-        if (!subscribe()) {
-            const retry = setTimeout(() => {
-                subscribe();
-                render();
-            }, 0);
-            this.onDispose(() => clearTimeout(retry));
-        }
+            render();
+        });
 
         render();
         this.onDispose(api.onDidLayoutChange(render).dispose);
@@ -511,7 +481,7 @@ export class CrossWindowDragPanel extends DemoPanel {
                 el(
                     'p',
                     { class: 'demo-note' },
-                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds the serialized group and tells the source to let go once the drop is accepted.'
+                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds what it carries and tells the source to let go once the drop is accepted.'
                 ),
                 status,
                 el(
@@ -605,51 +575,37 @@ export class WorkspacePanel extends DemoPanel {
  * to the shell.
  */
 export class HistoryPanel extends DemoPanel {
-    constructor(
-        private readonly multiWindow: () => ShellMultiWindow | undefined
-    ) {
+    constructor(private readonly shell: Promise<ShellMultiWindow>) {
         super();
     }
 
     init(): void {
         const log = new LogView();
         const status = el('div');
+        let multiWindow: MultiWindow | undefined;
 
         const render = () => {
-            const info = this.multiWindow()?.history;
+            const info = multiWindow?.history;
             status.replaceChildren(
                 field('undo steps', String(info?.undoCount ?? 0)),
-                field('next undo', info?.nextUndo ?? 'nothing'),
+                field('next undo', describeStep(info?.nextUndo)),
                 field('redo steps', String(info?.redoCount ?? 0)),
-                field('next redo', info?.nextRedo ?? 'nothing')
+                field('next redo', describeStep(info?.nextRedo))
             );
         };
 
-        const subscribe = () => {
-            const multiWindow = this.multiWindow();
-            if (!multiWindow) {
-                return false;
-            }
+        void this.shell.then((shell) => {
+            multiWindow = shell.multiWindow;
             const history = multiWindow.onDidChangeHistory(render);
             this.onDispose(() => history.dispose());
-            const moves = multiWindow.onDidMoveAcrossWindows((notice) => {
+            const moves = multiWindow.onDidMoveAcrossWindows((event) => {
                 log.append(
-                    `${notice.reason}: ${notice.panels.join(', ')} ${notice.from} → ${notice.to}`
+                    `${event.reason}: ${event.panels.join(', ')} ${event.from} → ${event.to}`
                 );
             });
             this.onDispose(() => moves.dispose());
-            return true;
-        };
-
-        // Installed right after the instance is created, which is after
-        // dockview has asked for this panel.
-        if (!subscribe()) {
-            const retry = setTimeout(() => {
-                subscribe();
-                render();
-            }, 0);
-            this.onDispose(() => clearTimeout(retry));
-        }
+            render();
+        });
         render();
 
         this.root.append(
@@ -664,13 +620,23 @@ export class HistoryPanel extends DemoPanel {
                 el(
                     'div',
                     { class: 'demo-buttons' },
-                    button('Undo', () => this.multiWindow()?.undo()),
-                    button('Redo', () => this.multiWindow()?.redo())
+                    button('Undo', () => multiWindow?.undo()),
+                    button('Redo', () => multiWindow?.redo())
                 ),
                 log.element
             )
         );
     }
+}
+
+function describeStep(step: HistoryStepInfo | undefined): string {
+    if (!step) {
+        return 'nothing';
+    }
+    if (step.type === 'local') {
+        return `a step in ${step.windowId}`;
+    }
+    return `move of ${step.panels.join(', ')} from ${step.from ?? '?'} to ${step.to ?? '?'}`;
 }
 
 /** Plain content, so the layout has something ordinary to dock around. */

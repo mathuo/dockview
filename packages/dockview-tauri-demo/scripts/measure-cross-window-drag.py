@@ -227,7 +227,7 @@ def main():
             )
         else:
             placed = lambda: any(
-                label == "dock-2" and "placed" in line for label, line in log[before:]
+                label == "dock-2" and " placed " in line for label, line in log[before:]
             )
         released = lambda: any(
             label == "main" and "released" in line for label, line in log[before:]

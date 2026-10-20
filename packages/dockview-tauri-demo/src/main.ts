@@ -35,18 +35,21 @@ function randomId(): string {
     ).join('');
 }
 
-// Assigned once the instance exists; the multiWindow panel is created lazily by
-// dockview, after that.
-let multiWindow: ShellMultiWindow | undefined;
+// Resolved once the multi-window install is in place. Panels can be built
+// before that (the restore itself builds them), so they wait on it.
+let resolveMultiWindow: (shell: ShellMultiWindow) => void = () => undefined;
+const multiWindow = new Promise<ShellMultiWindow>((resolve) => {
+    resolveMultiWindow = resolve;
+});
 
 const renderers: Record<string, () => IContentRenderer> = {
     host: () => new HostPanel(),
     popout: () => new PopoutPanel(),
     native: () => new NativeWindowPanel(),
     sync: () => new LayoutSyncPanel(),
-    crossWindowDrag: () => new CrossWindowDragPanel(() => multiWindow),
+    crossWindowDrag: () => new CrossWindowDragPanel(multiWindow),
     workspace: () => new WorkspacePanel(),
-    history: () => new HistoryPanel(() => multiWindow),
+    history: () => new HistoryPanel(multiWindow),
     scratch: () => new ScratchPanel(),
 };
 
@@ -63,7 +66,7 @@ const api = createDockview(container, {
     dndStrategy,
     // Every window numbers its groups from "1" by default, so a group
     // moved between windows would collide on arrival. Random ids let a
-    // group keep its id wherever the multiWindow lands it.
+    // group keep its id wherever it lands.
     groupIdGenerator: randomId,
     // Each window keeps its own undo stack; the shell sequences them with
     // the moves between windows. An applied layout arrives through
@@ -73,8 +76,10 @@ const api = createDockview(container, {
         renderers[options.name]?.() ?? new ScratchPanel(),
 });
 
-multiWindow = installShellMultiWindow(api, { buildDefaults });
-installAutotest(api, multiWindow);
+void installShellMultiWindow(api, { buildDefaults }).then((shell) => {
+    resolveMultiWindow(shell);
+    installAutotest(api, shell);
+});
 
 /**
  * wry's macOS UI delegate has no `webViewDidClose:`, so the `close()` dockview

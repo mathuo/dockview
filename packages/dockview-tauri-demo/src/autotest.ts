@@ -45,7 +45,7 @@ function describe(panel: IDockviewPanel) {
 
 export function installAutotest(
     api: DockviewApi,
-    multiWindow: ShellMultiWindow
+    shell: ShellMultiWindow
 ): void {
     if (!isAutotest()) {
         return;
@@ -57,10 +57,19 @@ export function installAutotest(
         });
     };
 
-    multiWindow.onLog((line) => report('log', line));
+    shell.onLog((line) => report('log', line));
+    // dockview reports its failures on the console, which the harness cannot
+    // read; mirror them into the log.
+    for (const level of ['warn', 'error'] as const) {
+        const original = console[level].bind(console);
+        console[level] = (...args: unknown[]) => {
+            original(...args);
+            report('log', `console.${level}: ${args.map(String).join(' ')}`);
+        };
+    }
     void onAutotestCommand((command) => {
         if (command === 'detach') {
-            multiWindow.detach = true;
+            shell.multiWindow.updateOptions({ detach: true });
             report('log', 'detach on');
         }
     });

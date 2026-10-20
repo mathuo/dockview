@@ -13,6 +13,9 @@
 //! A move is recorded in two halves, one from each window, since each sees
 //! only its own layout before and after. Like `drags.rs` and `workspace.rs`
 //! this knows nothing about Tauri; layouts are opaque `serde_json::Value`s.
+//!
+//! Mirrors `historySequencer.ts` in `dockview-enterprise`; keep the two in
+//! step.
 
 use std::fmt;
 use std::sync::{Mutex, PoisonError};
@@ -54,30 +57,40 @@ pub enum Entry {
 }
 
 impl Entry {
-    fn describe(&self) -> String {
+    fn summarize(&self) -> StepInfo {
         match self {
-            Entry::Local { window } => format!("step in {window}"),
+            Entry::Local { window } => StepInfo::Local {
+                window_id: window.clone(),
+            },
             Entry::Move {
                 panels, from, to, ..
-            } => format!(
-                "move of {} from {} to {}",
-                panels.join(", "),
-                from.as_ref().map_or("?", |half| half.window.as_str()),
-                to.as_ref().map_or("?", |half| half.window.as_str()),
-            ),
+            } => StepInfo::Move {
+                panels: panels.clone(),
+                from: from.as_ref().map(|half| half.window.clone()),
+                to: to.as_ref().map(|half| half.window.clone()),
+            },
         }
     }
 }
 
-/// What the host does to carry out an undo or redo, in order.
-#[derive(Clone, Debug, PartialEq)]
-pub enum Action {
-    /// Tell the window to undo its own top step.
-    UndoLocal { window: String },
-    /// Tell the window to redo its own top step.
-    RedoLocal { window: String },
+/// What the orchestrator asks of one window: the `HistoryRequest` of
+/// `dockview-enterprise`.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum Request {
+    /// Undo the window's own top step.
+    Undo,
+    /// Redo the window's own top step.
+    Redo,
     /// Replace the window's layout with one the orchestrator holds.
-    ApplyLayout { window: String, layout: Value },
+    ApplyLayout { layout: Value },
+}
+
+/// A request for one window, in the order the host carries them out.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Action {
+    pub window: String,
+    pub request: Request,
 }
 
 /// What was undone or redone, for the host to announce.
@@ -97,13 +110,37 @@ pub struct Moved {
     pub to: String,
 }
 
+/// The step an undo or redo would take next: the `HistoryStepInfo` of
+/// `dockview-enterprise`.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum StepInfo {
+    Local {
+        #[serde(rename = "windowId")]
+        window_id: String,
+    },
+    Move {
+        panels: Vec<String>,
+        /// Unset until that window has reported its half of the move.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        from: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        to: Option<String>,
+    },
+}
+
+/// The history's state: the `HistoryInfo` of `dockview-enterprise`.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
+    pub can_undo: bool,
+    pub can_redo: bool,
     pub undo_count: usize,
     pub redo_count: usize,
-    pub next_undo: Option<String>,
-    pub next_redo: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_undo: Option<StepInfo>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_redo: Option<StepInfo>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -200,8 +237,9 @@ impl History {
         let entry = stacks.undo.last().ok_or(HistoryError::Nothing)?;
         let step = match entry {
             Entry::Local { window } => Step {
-                actions: vec![Action::UndoLocal {
+                actions: vec![Action {
                     window: window.clone(),
+                    request: Request::Undo,
                 }],
                 moved: None,
             },
@@ -216,14 +254,8 @@ impl History {
                 // back in the source, so no two windows hold them at once.
                 Step {
                     actions: vec![
-                        Action::ApplyLayout {
-                            window: to.window.clone(),
-                            layout: to.before.clone(),
-                        },
-                        Action::ApplyLayout {
-                            window: from.window.clone(),
-                            layout: from.before.clone(),
-                        },
+                        apply(&to.window, &to.before),
+                        apply(&from.window, &from.before),
                     ],
                     moved: Some(Moved {
                         session: session.clone(),
@@ -245,8 +277,9 @@ impl History {
         let entry = stacks.redo.last().ok_or(HistoryError::Nothing)?;
         let step = match entry {
             Entry::Local { window } => Step {
-                actions: vec![Action::RedoLocal {
+                actions: vec![Action {
                     window: window.clone(),
+                    request: Request::Redo,
                 }],
                 moved: None,
             },
@@ -259,14 +292,8 @@ impl History {
                 let (from, to) = complete(session, from, to)?;
                 Step {
                     actions: vec![
-                        Action::ApplyLayout {
-                            window: from.window.clone(),
-                            layout: from.after.clone(),
-                        },
-                        Action::ApplyLayout {
-                            window: to.window.clone(),
-                            layout: to.after.clone(),
-                        },
+                        apply(&from.window, &from.after),
+                        apply(&to.window, &to.after),
                     ],
                     moved: Some(Moved {
                         session: session.clone(),
@@ -285,10 +312,12 @@ impl History {
     pub fn info(&self) -> Result<Info, HistoryError> {
         let stacks = self.stacks.lock()?;
         Ok(Info {
+            can_undo: !stacks.undo.is_empty(),
+            can_redo: !stacks.redo.is_empty(),
             undo_count: stacks.undo.len(),
             redo_count: stacks.redo.len(),
-            next_undo: stacks.undo.last().map(Entry::describe),
-            next_redo: stacks.redo.last().map(Entry::describe),
+            next_undo: stacks.undo.last().map(Entry::summarize),
+            next_redo: stacks.redo.last().map(Entry::summarize),
         })
     }
 
@@ -305,6 +334,15 @@ impl History {
         stacks.undo.retain(|entry| !involves(entry));
         stacks.redo.retain(|entry| !involves(entry));
         Ok(())
+    }
+}
+
+fn apply(window: &str, layout: &Value) -> Action {
+    Action {
+        window: window.to_string(),
+        request: Request::ApplyLayout {
+            layout: layout.clone(),
+        },
     }
 }
 
@@ -354,14 +392,16 @@ mod tests {
 
         assert_eq!(
             history.undo().unwrap().actions,
-            vec![Action::UndoLocal {
-                window: "main".into()
+            vec![Action {
+                window: "main".into(),
+                request: Request::Undo,
             }]
         );
         assert_eq!(
             history.redo().unwrap().actions,
-            vec![Action::RedoLocal {
-                window: "main".into()
+            vec![Action {
+                window: "main".into(),
+                request: Request::Redo,
             }]
         );
     }
@@ -376,14 +416,8 @@ mod tests {
         assert_eq!(
             step.actions,
             vec![
-                Action::ApplyLayout {
-                    window: "dock-2".into(),
-                    layout: json!({ "state": "B0" })
-                },
-                Action::ApplyLayout {
-                    window: "main".into(),
-                    layout: json!({ "state": "A0" })
-                },
+                apply("dock-2", &json!({ "state": "B0" })),
+                apply("main", &json!({ "state": "A0" })),
             ]
         );
         assert_eq!(
@@ -408,14 +442,8 @@ mod tests {
         assert_eq!(
             step.actions,
             vec![
-                Action::ApplyLayout {
-                    window: "main".into(),
-                    layout: json!({ "state": "A1" })
-                },
-                Action::ApplyLayout {
-                    window: "dock-2".into(),
-                    layout: json!({ "state": "B1" })
-                },
+                apply("main", &json!({ "state": "A1" })),
+                apply("dock-2", &json!({ "state": "B1" })),
             ]
         );
         assert_eq!(step.moved.unwrap().to, "dock-2");
@@ -456,15 +484,17 @@ mod tests {
 
         assert_eq!(
             history.undo().unwrap().actions,
-            vec![Action::UndoLocal {
-                window: "dock-2".into()
+            vec![Action {
+                window: "dock-2".into(),
+                request: Request::Undo,
             }]
         );
         assert!(history.undo().unwrap().moved.is_some());
         assert_eq!(
             history.undo().unwrap().actions,
-            vec![Action::UndoLocal {
-                window: "main".into()
+            vec![Action {
+                window: "main".into(),
+                request: Request::Undo,
             }]
         );
         assert_eq!(history.undo(), Err(HistoryError::Nothing));
@@ -503,21 +533,45 @@ mod tests {
 
         let info = history.info().unwrap();
         assert_eq!(info.undo_count, 1);
-        assert_eq!(info.next_undo.as_deref(), Some("step in main"));
+        assert_eq!(
+            info.next_undo,
+            Some(StepInfo::Local {
+                window_id: "main".into()
+            })
+        );
     }
 
     #[test]
-    fn info_describes_the_next_steps() {
+    fn info_summarizes_the_next_steps_in_the_frontend_shape() {
         let history = History::default();
         moved(&history);
-        assert_eq!(
-            history.info().unwrap().next_undo.as_deref(),
-            Some("move of p from main to dock-2")
-        );
+        let summary = StepInfo::Move {
+            panels: vec!["p".into()],
+            from: Some("main".into()),
+            to: Some("dock-2".into()),
+        };
+        assert_eq!(history.info().unwrap().next_undo, Some(summary.clone()));
         history.undo().unwrap();
+        let info = history.info().unwrap();
+        assert_eq!(info.next_redo, Some(summary));
         assert_eq!(
-            history.info().unwrap().next_redo.as_deref(),
-            Some("move of p from main to dock-2")
+            serde_json::to_value(&info).unwrap(),
+            json!({
+                "canUndo": false,
+                "canRedo": true,
+                "undoCount": 0,
+                "redoCount": 1,
+                "nextRedo": {
+                    "type": "move",
+                    "panels": ["p"],
+                    "from": "main",
+                    "to": "dock-2"
+                }
+            })
+        );
+        assert_eq!(
+            serde_json::to_value(apply("main", &json!({})).request).unwrap(),
+            json!({ "type": "apply-layout", "layout": {} })
         );
     }
 }

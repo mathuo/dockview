@@ -15,7 +15,7 @@ use tauri::{
 };
 
 use drags::{DragEnd, DragSession, DragSessions, Release};
-use history::{Action, History, Role, Step};
+use history::{History, Request, Role, Step};
 use workspace::{FileStore, Geometry, Store, Workspace, WorkspaceState};
 
 /// Event carrying a serialized dockview layout between native windows.
@@ -30,11 +30,9 @@ const RELEASE_EVENT: &str = "dockview:release";
 const MOVED_EVENT: &str = "dockview:moved";
 /// Broadcast whenever the global history changes.
 const HISTORY_EVENT: &str = "dockview:history";
-/// Sent to one window: replace your layout with this one.
-const APPLY_EVENT: &str = "dockview:apply";
-/// Sent to one window: undo, or redo, your own top step.
-const UNDO_REQUEST_EVENT: &str = "dockview:undo-request";
-const REDO_REQUEST_EVENT: &str = "dockview:redo-request";
+/// Sent to one window: a `HistoryRequest` (undo or redo your own top step,
+/// or take this layout).
+const HISTORY_REQUEST_EVENT: &str = "dockview:history-request";
 
 /// Labels for the windows a detach creates; see `POPOUT_COUNT`.
 static DETACH_COUNT: AtomicUsize = AtomicUsize::new(0);
@@ -43,14 +41,14 @@ static DETACH_COUNT: AtomicUsize = AtomicUsize::new(0);
 /// `group.group.views` (the `DragPayload` of `dockview-enterprise`). The one
 /// thing the shell reads out of a payload, for move events and for the
 /// workspace's reconciliation of the two windows' reports.
-fn envelope_panels(envelope: &serde_json::Value) -> Vec<String> {
-    if let Some(id) = envelope
+fn payload_panels(payload: &serde_json::Value) -> Vec<String> {
+    if let Some(id) = payload
         .pointer("/panel/id")
         .and_then(serde_json::Value::as_str)
     {
         return vec![id.to_string()];
     }
-    envelope
+    payload
         .pointer("/group/group/views")
         .and_then(serde_json::Value::as_array)
         .map(|views| {
@@ -88,37 +86,23 @@ fn broadcast_history(app: &AppHandle) {
 /// Carries out an undo or redo step the history handed back.
 fn carry_out(app: &AppHandle, step: Step, reason: &'static str) -> Result<(), String> {
     for action in step.actions {
-        match action {
-            // Every payload names its window: a listener registered for
-            // "any" target hears events emitted to every window, so the
-            // receiver filters as well as the sender targeting.
-            Action::UndoLocal { window } => app
-                .emit_to(
-                    &window,
-                    UNDO_REQUEST_EVENT,
-                    serde_json::json!({ "window": window }),
-                )
-                .map_err(|err| err.to_string())?,
-            Action::RedoLocal { window } => app
-                .emit_to(
-                    &window,
-                    REDO_REQUEST_EVENT,
-                    serde_json::json!({ "window": window }),
-                )
-                .map_err(|err| err.to_string())?,
-            Action::ApplyLayout { window, layout } => {
-                app.state::<Workspace>()
-                    .set_layout_unchecked(&window, layout.clone())
-                    .map_err(|err| err.to_string())?;
-                app.state::<Persistence>().mark_dirty();
-                app.emit_to(
-                    &window,
-                    APPLY_EVENT,
-                    serde_json::json!({ "window": window, "layout": layout }),
-                )
+        if let Request::ApplyLayout { layout } = &action.request {
+            // Stored before it is applied, so the window's own report
+            // afterwards never reads as a duplicate.
+            app.state::<Workspace>()
+                .set_layout_unchecked(&action.window, layout.clone())
                 .map_err(|err| err.to_string())?;
-            }
+            app.state::<Persistence>().mark_dirty();
         }
+        // The payload names its window: a listener registered for "any"
+        // target hears events emitted to every window, so the receiver
+        // filters as well as the sender targeting.
+        app.emit_to(
+            &action.window,
+            HISTORY_REQUEST_EVENT,
+            serde_json::json!({ "window": action.window, "request": action.request }),
+        )
+        .map_err(|err| err.to_string())?;
     }
     if let Some(moved) = step.moved {
         app.emit(
@@ -153,10 +137,20 @@ fn perform_redo(app: &AppHandle) -> Result<(), String> {
     carry_out(app, step, "redo")
 }
 
+// The commands below are the `MultiWindowTransport` of `dockview-enterprise`,
+// one per call, named after it. A call never names its window: it is the
+// window the call arrived from.
+
 /// A window recorded a step in its own history.
 #[tauri::command]
-fn history_push(app: AppHandle, history: State<History>, label: String) -> Result<(), String> {
-    history.push_local(&label).map_err(|err| err.to_string())?;
+fn report_local_step(
+    app: AppHandle,
+    window: tauri::Window,
+    history: State<History>,
+) -> Result<(), String> {
+    history
+        .push_local(window.label())
+        .map_err(|err| err.to_string())?;
     broadcast_history(&app);
     Ok(())
 }
@@ -170,11 +164,11 @@ enum MoveRole {
 
 /// A window reports its half of a move: its layout before and after.
 #[tauri::command]
-fn move_recorded(
+fn report_move(
     app: AppHandle,
+    window: tauri::Window,
     history: State<History>,
     session: String,
-    label: String,
     role: MoveRole,
     panels: Vec<String>,
     before: serde_json::Value,
@@ -190,7 +184,7 @@ fn move_recorded(
             &panels,
             role,
             history::Half {
-                window: label,
+                window: window.label().to_string(),
                 before,
                 after,
             },
@@ -213,7 +207,7 @@ fn redo(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn history_info(history: State<History>) -> Result<history::Info, String> {
+fn get_history(history: State<History>) -> Result<history::Info, String> {
     history.info().map_err(|err| err.to_string())
 }
 
@@ -331,14 +325,14 @@ fn record_geometry(app: &AppHandle, window: &tauri::Window) {
 /// writes the workspace shortly after. Refused, and nothing recorded, if the
 /// layout names a panel another window holds.
 #[tauri::command]
-fn layout_changed(
+fn report_layout(
+    window: tauri::Window,
     workspace: State<Workspace>,
     persistence: State<Persistence>,
-    label: String,
     layout: serde_json::Value,
 ) -> Result<(), String> {
     workspace
-        .set_layout(&label, layout)
+        .set_layout(window.label(), layout)
         .map_err(|err| err.to_string())?;
     persistence.mark_dirty();
     Ok(())
@@ -348,12 +342,12 @@ fn layout_changed(
 /// reported, or the one the workspace file held for it. `None` means build
 /// the defaults.
 #[tauri::command]
-fn initial_layout(
+fn load_layout(
+    window: tauri::Window,
     workspace: State<Workspace>,
-    label: String,
 ) -> Result<Option<serde_json::Value>, String> {
     workspace
-        .initial_layout(&label)
+        .load_layout(window.label())
         .map_err(|err| err.to_string())
 }
 
@@ -394,7 +388,7 @@ fn workspace_info(
             .windows
             .into_iter()
             .map(|window| WorkspaceWindowInfo {
-                label: window.label,
+                label: window.id,
                 geometry: window.geometry,
                 has_layout: window.layout.is_some(),
             })
@@ -433,47 +427,46 @@ fn deliver(app: &AppHandle, release: Release) -> Result<(), String> {
 /// The source window announces a drag. Called from `onWillDragPanel` /
 /// `onWillDragGroup`, before the pointer can have left the window.
 #[tauri::command]
-fn drag_start(
+fn start_drag(
+    window: tauri::Window,
     drags: State<DragSessions>,
     session: String,
-    from: String,
-    kind: String,
-    envelope: serde_json::Value,
+    payload: serde_json::Value,
 ) -> Result<(), String> {
     drags
         .start(
             session,
             DragSession {
-                from,
-                kind,
-                envelope,
+                from: window.label().to_string(),
+                payload,
             },
         )
         .map_err(|err| err.to_string())
 }
 
 /// The destination window looks at a drag before accepting it, to refuse a
-/// group whose panel ids it already holds without taking it from the source.
+/// payload whose panel ids it already holds without taking it from the
+/// source.
 #[tauri::command]
 fn peek_drag(drags: State<DragSessions>, session: String) -> Result<serde_json::Value, String> {
     drags.peek(&session).map_err(|err| err.to_string())
 }
 
 /// The destination window accepts the drag it just received a drop for. The
-/// first accept wins: the accepting window gets the group and the source is told to
-/// release its copy. A second accept, or a accept for a drag the shell never
-/// saw, is refused.
+/// first accept wins: the source is told to release its copy. A second
+/// accept, or an accept for a drag the shell never saw, is refused.
 #[tauri::command]
-fn accept_drop(
+fn accept_drag(
     app: AppHandle,
+    window: tauri::Window,
     drags: State<DragSessions>,
     session: String,
-    to: String,
-) -> Result<serde_json::Value, String> {
+) -> Result<(), String> {
+    let to = window.label().to_string();
     let accept = drags
         .accept(&session, to.clone())
         .map_err(|err| err.to_string())?;
-    let panels = envelope_panels(&accept.envelope);
+    let panels = payload_panels(&accept.payload);
     let from = accept.release.from.clone();
     app.state::<Workspace>()
         .expect_move(&panels, &from, &to)
@@ -489,23 +482,23 @@ fn accept_drop(
             reason: "drop",
         },
     )
-    .map_err(|err| err.to_string())?;
-    Ok(accept.envelope)
+    .map_err(|err| err.to_string())
 }
 
 /// How long a drag stays acceptable after its source reported it over. The
 /// source's `dragend` fires the instant the drop lands in another window,
 /// and that window's accept is a separate IPC message that routinely arrives
-/// later.
+/// later. `DRAG_END_GRACE_MS` in `dockview-enterprise`: the windows assume
+/// it is no longer than that.
 const DRAG_END_GRACE: std::time::Duration = std::time::Duration::from_millis(1500);
 
 /// The source window reports the end of its drag. Nothing happens yet: the
 /// drag stays acceptable for `DRAG_END_GRACE`, after which an unaccepted one
 /// is discarded, or, when the source asked, turned into a new window holding
-/// the group: the drag sessions's replacement for a popout. The source learns either
-/// outcome through the release event, or through silence.
+/// the payload: the shell's replacement for a popout. The source learns
+/// either outcome through the release event, or through silence.
 #[tauri::command]
-fn drag_end(
+fn end_drag(
     app: AppHandle,
     drags: State<DragSessions>,
     session: String,
@@ -525,14 +518,17 @@ fn drag_end(
             )
         });
         match ended {
-            Ok(DragEnd::Detached { label, release }) => {
+            Ok(DragEnd::Detached {
+                window_id: label,
+                release,
+            }) => {
                 let handle = app.clone();
                 let panels = app
                     .state::<DragSessions>()
-                    .peek_pending(&label)
+                    .peek_detached_drag(&label)
                     .ok()
                     .flatten()
-                    .map(|envelope| envelope_panels(&envelope))
+                    .map(|payload| payload_panels(&payload))
                     .unwrap_or_default();
                 let result = app.run_on_main_thread(move || {
                     match build_dock_window(
@@ -543,7 +539,7 @@ fn drag_end(
                         None,
                     ) {
                         Ok(_) => {
-                            // As for a accept: the new window may report the
+                            // As for an accept: the new window may report the
                             // panels before the source reports them gone.
                             if let Err(err) = handle.state::<Workspace>().expect_move(
                                 &panels,
@@ -574,22 +570,24 @@ fn drag_end(
                 }
             }
             Ok(DragEnd::Settled | DragEnd::Discarded) => {}
-            Err(err) => eprintln!("drag_end: {err}"),
+            Err(err) => eprintln!("end_drag: {err}"),
         }
     });
 
     Ok(())
 }
 
-/// A freshly loaded window asks whether a group is waiting for it; the
-/// window's frontend collects it once dockview is ready, since nothing can be
-/// pushed into a webview before it has loaded.
+/// A freshly loaded window asks whether a detached drag is waiting for it;
+/// the window's frontend collects it once dockview is ready, since nothing
+/// can be pushed into a webview before it has loaded.
 #[tauri::command]
-fn take_pending_group(
+fn take_detached_drag(
+    window: tauri::Window,
     drags: State<DragSessions>,
-    label: String,
 ) -> Result<Option<serde_json::Value>, String> {
-    drags.take_pending(&label).map_err(|err| err.to_string())
+    drags
+        .take_detached_drag(window.label())
+        .map_err(|err| err.to_string())
 }
 
 #[tauri::command]
@@ -800,8 +798,8 @@ pub fn run() {
             let recorded: Vec<(String, Option<Geometry>)> = restored
                 .windows
                 .iter()
-                .filter(|window| is_dock_window(&window.label))
-                .map(|window| (window.label.clone(), window.geometry))
+                .filter(|window| is_dock_window(&window.id))
+                .map(|window| (window.id.clone(), window.geometry))
                 .collect();
             app.manage(Workspace::restore(restored));
             app.manage(Persistence {
@@ -918,19 +916,19 @@ pub fn run() {
             open_dock_window,
             broadcast_layout,
             close_popout,
-            drag_start,
+            start_drag,
             peek_drag,
-            accept_drop,
-            drag_end,
-            take_pending_group,
-            layout_changed,
-            initial_layout,
+            accept_drag,
+            end_drag,
+            take_detached_drag,
+            report_move,
+            load_layout,
+            report_layout,
             workspace_info,
-            history_push,
-            move_recorded,
+            report_local_step,
             undo,
             redo,
-            history_info,
+            get_history,
             autotest_report
         ])
         .build(tauri::generate_context!())

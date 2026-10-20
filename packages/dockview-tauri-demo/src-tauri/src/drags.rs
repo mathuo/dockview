@@ -11,9 +11,11 @@
 //! deliberate, so the module can one day be lifted into a crate of its own
 //! and sit behind any host, not only Tauri.
 //!
-//! The serialized group is opaque here: a `serde_json::Value` that the
-//! frontend produces with `serializeGroup` and consumes with
-//! `addGroupFromJSON`. The orchestrator never looks inside it.
+//! The payload is opaque here: a `serde_json::Value`, the `DragPayload` of
+//! `dockview-enterprise` (a tab's `toJSON()` or a group's `serializeGroup`
+//! output). The orchestrator never looks inside it.
+//!
+//! Mirrors `dragSessions.ts` in `dockview-enterprise`; keep the two in step.
 
 use std::collections::HashMap;
 use std::fmt;
@@ -22,17 +24,14 @@ use std::sync::{Mutex, PoisonError};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// One group in flight between windows.
+/// One drag in flight between windows.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct DragSession {
-    /// The window the drag started in; the one told to let go on a accept.
+    /// The window the drag started in; the one told to let go on an accept.
     pub from: String,
-    /// `panel` for a single tab, `group` for a whole group. The frontend
-    /// uses it to know what to remove on release; the orchestrator does not.
-    pub kind: String,
-    /// A `SerializedDockviewGroup`, opaque here.
-    pub envelope: Value,
+    /// What the drag carries, opaque here.
+    pub payload: Value,
 }
 
 /// A session with what the source said when its drag ended, if it has.
@@ -44,25 +43,25 @@ struct Tracked {
     ended: Option<bool>,
 }
 
-/// Tells the source window that another window has taken its group.
+/// Tells the source window that another window has taken its drag.
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub struct Release {
     /// The window to deliver this to.
     pub from: String,
     pub session: String,
-    /// The window that took the group.
+    /// The window that took the payload.
     pub to: String,
-    /// `accept` by a window the drop landed in, or `detach` into a window
-    /// the shell opened for an unaccepted drag. Only a accept is a move the
-    /// shared history records.
+    /// `drop` on a window that accepted it, or `detach` into a window the
+    /// shell opened for an unaccepted drag. Only a drop is a move the shared
+    /// history records.
     pub reason: &'static str,
 }
 
-/// A successful accept: the group for the accepting window, and the notice for the
-/// source.
+/// A successful accept: the payload for the accepting window, and the notice
+/// for the source.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Accept {
-    pub envelope: Value,
+    pub payload: Value,
     pub release: Release,
 }
 
@@ -76,9 +75,10 @@ pub enum DragEnd {
     /// The drag was unaccepted and has been forgotten.
     Discarded,
     /// The drag was unaccepted and the source asked for it to live on: the
-    /// group now waits under `label` for a window of that name to collect
-    /// it with [`DragSessions::take_pending`], and the source is told to let go.
-    Detached { label: String, release: Release },
+    /// payload now waits under `window_id` for a window of that id to
+    /// collect it with [`DragSessions::take_detached_drag`], and the source
+    /// is told to let go.
+    Detached { window_id: String, release: Release },
 }
 
 #[derive(Debug, PartialEq)]
@@ -96,7 +96,7 @@ impl fmt::Display for DragError {
             DragError::NotInFlight(session) => {
                 write!(f, "drag session {session} is not in flight")
             }
-            DragError::Poisoned => write!(f, "the drag drag sessions' state is poisoned"),
+            DragError::Poisoned => write!(f, "the drag sessions' state is poisoned"),
         }
     }
 }
@@ -116,15 +116,15 @@ pub struct DragSessions {
     /// drag's `DataTransfer`. Removed on accept, or on expiry after the drag
     /// ended.
     sessions: Mutex<HashMap<String, Tracked>>,
-    /// Groups waiting for a window that has not loaded yet, keyed by that
-    /// window's label.
-    pending: Mutex<HashMap<String, Value>>,
+    /// Payloads of detached drags, waiting for a window that has not loaded
+    /// yet, keyed by that window's id.
+    detached: Mutex<HashMap<String, Value>>,
 }
 
 impl DragSessions {
-    /// The source announces a drag, handing over the serialized group so the
-    /// drop can be completed from here alone, even if the source is busy or
-    /// gone by then.
+    /// The source announces a drag, handing over the payload so the drop can
+    /// be completed from here alone, even if the source is busy or gone by
+    /// then.
     pub fn start(&self, session: String, drag: DragSession) -> Result<(), DragError> {
         self.sessions
             .lock()?
@@ -132,13 +132,13 @@ impl DragSessions {
         Ok(())
     }
 
-    /// A destination reads the group before deciding to accept it, so it can
-    /// refuse one it cannot take without the source letting go.
+    /// A destination reads the payload before deciding to accept it, so it
+    /// can refuse one it cannot take without the source letting go.
     pub fn peek(&self, session: &str) -> Result<Value, DragError> {
         self.sessions
             .lock()?
             .get(session)
-            .map(|tracked| tracked.drag.envelope.clone())
+            .map(|tracked| tracked.drag.payload.clone())
             .ok_or_else(|| DragError::NotInFlight(session.to_string()))
     }
 
@@ -152,7 +152,7 @@ impl DragSessions {
             .ok_or_else(|| DragError::NotInFlight(session.to_string()))?;
 
         Ok(Accept {
-            envelope: taken.drag.envelope,
+            payload: taken.drag.payload,
             release: Release {
                 from: taken.drag.from,
                 session: session.to_string(),
@@ -179,12 +179,12 @@ impl DragSessions {
     }
 
     /// The grace period after [`DragSessions::end`] is over. An unaccepted drag is
-    /// discarded, or, if the source asked, parked under the label
-    /// `new_label` yields for a new window to collect.
+    /// discarded, or, if the source asked, parked under the window id
+    /// `new_window_id` yields for a new window to collect.
     pub fn expire(
         &self,
         session: &str,
-        new_label: impl FnOnce() -> String,
+        new_window_id: impl FnOnce() -> String,
     ) -> Result<DragEnd, DragError> {
         let unaccepted = {
             let mut sessions = self.sessions.lock()?;
@@ -200,30 +200,30 @@ impl DragSessions {
             return Ok(DragEnd::Discarded);
         }
 
-        let label = new_label();
-        self.pending
+        let window_id = new_window_id();
+        self.detached
             .lock()?
-            .insert(label.clone(), unaccepted.drag.envelope);
+            .insert(window_id.clone(), unaccepted.drag.payload);
 
         Ok(DragEnd::Detached {
             release: Release {
                 from: unaccepted.drag.from,
                 session: session.to_string(),
-                to: label.clone(),
+                to: window_id.clone(),
                 reason: "detach",
             },
-            label,
+            window_id,
         })
     }
 
-    /// A freshly loaded window collects the group parked for it, if any.
-    /// The envelope parked for a detached window, left in place.
-    pub fn peek_pending(&self, label: &str) -> Result<Option<Value>, DragError> {
-        Ok(self.pending.lock()?.get(label).cloned())
+    /// The payload parked for a detached window, left in place.
+    pub fn peek_detached_drag(&self, window_id: &str) -> Result<Option<Value>, DragError> {
+        Ok(self.detached.lock()?.get(window_id).cloned())
     }
 
-    pub fn take_pending(&self, label: &str) -> Result<Option<Value>, DragError> {
-        Ok(self.pending.lock()?.remove(label))
+    /// A freshly loaded window collects the payload parked for it, if any.
+    pub fn take_detached_drag(&self, window_id: &str) -> Result<Option<Value>, DragError> {
+        Ok(self.detached.lock()?.remove(window_id))
     }
 }
 
@@ -235,19 +235,18 @@ mod tests {
     fn drag(from: &str) -> DragSession {
         DragSession {
             from: from.to_string(),
-            kind: "panel".to_string(),
-            envelope: json!({ "group": { "id": "g", "views": ["p"] }, "panels": {} }),
+            payload: json!({ "kind": "panel", "panel": { "id": "p" } }),
         }
     }
 
     #[test]
-    fn an_accept_returns_the_group_and_releases_the_source() {
+    fn an_accept_returns_the_payload_and_releases_the_source() {
         let drags = DragSessions::default();
         drags.start("s1".into(), drag("main")).unwrap();
 
         let accept = drags.accept("s1", "dock-2".into()).unwrap();
 
-        assert_eq!(accept.envelope, drag("main").envelope);
+        assert_eq!(accept.payload, drag("main").payload);
         assert_eq!(
             accept.release,
             Release {
@@ -277,7 +276,7 @@ mod tests {
         let drags = DragSessions::default();
         drags.start("s1".into(), drag("main")).unwrap();
 
-        assert_eq!(drags.peek("s1").unwrap(), drag("main").envelope);
+        assert_eq!(drags.peek("s1").unwrap(), drag("main").payload);
         assert!(drags.accept("s1", "dock-2".into()).is_ok());
     }
 
@@ -340,7 +339,7 @@ mod tests {
     }
 
     #[test]
-    fn a_detach_parks_the_group_for_the_new_window() {
+    fn a_detach_parks_the_payload_for_the_new_window() {
         let drags = DragSessions::default();
         drags.start("s1".into(), drag("main")).unwrap();
         drags.end("s1", true).unwrap();
@@ -350,7 +349,7 @@ mod tests {
         assert_eq!(
             ended,
             DragEnd::Detached {
-                label: "dock-detached-0".into(),
+                window_id: "dock-detached-0".into(),
                 release: Release {
                     from: "main".into(),
                     session: "s1".into(),
@@ -360,16 +359,16 @@ mod tests {
             }
         );
         assert_eq!(
-            drags.take_pending("dock-detached-0").unwrap(),
-            Some(drag("main").envelope)
+            drags.take_detached_drag("dock-detached-0").unwrap(),
+            Some(drag("main").payload)
         );
         // Collected once.
-        assert_eq!(drags.take_pending("dock-detached-0").unwrap(), None);
+        assert_eq!(drags.take_detached_drag("dock-detached-0").unwrap(), None);
     }
 
     #[test]
     fn a_window_with_nothing_parked_gets_none() {
         let drags = DragSessions::default();
-        assert_eq!(drags.take_pending("main").unwrap(), None);
+        assert_eq!(drags.take_detached_drag("main").unwrap(), None);
     }
 }

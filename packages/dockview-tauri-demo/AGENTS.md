@@ -10,9 +10,13 @@ not a published package and not a supported example.
   framework binding so the probes sit directly on the layer that popouts and
   window handling live in. `dockview-enterprise` is imported for its features.
 - `src-tauri/` — the Rust shell. Commands: `host_info`, `open_dock_window`,
-  `broadcast_layout`, `close_popout`, and the orchestrator's `drag_start`,
-  `peek_drag`, `accept_drop`, `drag_end`, `take_pending_group`. Window creation lives in
-  Rust so the capability set stays at `core:default`.
+  `broadcast_layout`, `close_popout`, `workspace_info`, `autotest_report`,
+  and one per `MultiWindowTransport` call, named after it (`start_drag`,
+  `peek_drag`, `accept_drag`, `end_drag`, `take_detached_drag`,
+  `report_move`, `load_layout`, `report_layout`, `report_local_step`,
+  `undo`, `redo`, `get_history`). Those take the calling `tauri::Window`
+  rather than a window id argument. Window creation lives in Rust so the
+  capability set stays at `core:default`.
 - `src-tauri/src/drags.rs` — the orchestrator: which drag is in flight between
   windows and who accepted it. It imports nothing from Tauri and returns the
   release notices for the shell to deliver, so it can one day be lifted into
@@ -22,12 +26,17 @@ not a published package and not a supported example.
 - The window side (cross-window drag, workspace, shared undo) is
   `installMultiWindow` from `dockview-enterprise`
   (`packages/dockview-enterprise/src/multiWindow/`). Its in-memory
-  orchestrator mirrors the three Rust modules here; keep the two in step,
-  including the `DragPayload` shape (`panel` or `group`) and the release
-  notice's `reason` (`accept` or `detach`).
-- `src/transport.ts` — the Tauri `MultiWindowTransport`, over the commands and
-  events in `bridge.ts`, plus the `ShellMultiWindow` wrapper the panels and the harness
-  read the log from.
+  orchestrator mirrors the three Rust modules here (`drags.rs` /
+  `dragSessions.ts`, `workspace.rs` / `workspaceRegistry.ts`, `history.rs` /
+  `historySequencer.ts`); keep the two in step, including the shapes that
+  cross: `DragPayload` (`panel` or `group`), the release's `reason` (`drop`
+  or `detach`), `HistoryRequest`, `HistoryInfo` and the workspace file's
+  `WindowRecord` (`id`, read as `label` from older files).
+- `src/transport.ts` — the Tauri `MultiWindowTransport` over those commands
+  and events, created before installing since the Tauri api loads lazily,
+  plus the `ShellMultiWindow` wrapper whose log and counters the panels and
+  the harness read. The package reports only failures, on the console;
+  `src/autotest.ts` mirrors those into the harness log.
 - `src-tauri/src/workspace.rs` — the workspace: which windows exist, their
   frames, and each one's dockview layout as opaque JSON, plus the atomic
   `FileStore`. Tauri-free and unit tested like `drags.rs`. The one field of a
@@ -41,8 +50,8 @@ not a published package and not a supported example.
   return the actions for the shell to carry out. Tauri-free and unit
   tested. Windows keep dockview's own `layoutHistory` for their local steps;
   this only sequences.
-- Events the shell addresses to one window (`dockview:apply`, the undo and
-  redo requests, `dockview:release`) name that window in the payload and
+- Events the shell addresses to one window (`dockview:history-request`,
+  `dockview:release`) name that window in the payload and
   are listened for on the window's own target, never with the global
   `listen`: a listener for "any" target hears events emitted to every
   window. Broadcasts (`dockview:moved`, `dockview:history`) use `listen`.

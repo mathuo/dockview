@@ -171,36 +171,40 @@ and the shell itself. What follows describes the mechanism as it runs here.
 Two native windows are two dockview instances in two JavaScript contexts, so
 a tab cannot be dragged between them the way it is dragged between groups.
 What does cross a window boundary is an OS drag session, and only an HTML5
-drag rides one. The demo builds on that, with the shell as a orchestrator and no
-window owning any other:
+drag rides one. The window side is `installMultiWindow` from
+`dockview-enterprise`; the shell is the orchestrator, with one command per
+call of the package's `MultiWindowTransport` (`src/transport.ts` maps them).
+No call names its window: the shell reads it from the window the call arrived
+on. No window owns any other:
 
 1. **Drag start.** `onWillDragPanel` / `onWillDragGroup` put a session id on
-   the drag's `DataTransfer` under `application/x-dockview-orchestrator`, serialize
-   the group (`api.serializeGroup`, or a one-panel group for a single tab)
-   and hand it to the shell with `drag_start`. Serializing up front means the
-   drop can be completed even if the source window is busy by then.
+   the drag's `DataTransfer` under `application/x-dockview-multi-window`,
+   serialize what is dragged (a tab's `toJSON()`, or `api.serializeGroup`
+   for a group) and hand it to the shell with `start_drag`. Serializing up
+   front means the drop can be completed even if the source window is busy
+   by then.
 2. **Drag over.** The destination's dockview sees a drag it did not start
-   and asks through `onUnhandledDragOver`; the demo accepts it when the orchestrator
-   type is present, so the normal drop overlay and compass show. A browser
-   exposes a drag's types but not its data until the drop, which is why the
-   type carries the meaning and the session id waits.
-3. **Drop.** `onDidDrop` reads the session id, reads the group with
+   and asks through `onUnhandledDragOver`; it is accepted when that type is
+   present, so the normal drop overlay and compass show. A browser exposes a
+   drag's types but not its data until the drop, which is why the type
+   carries the meaning and the session id waits.
+3. **Drop.** `onDidDrop` reads the session id, reads the payload with
    `peek_drag` to refuse one whose panel ids it already holds, accepts it
-   with `accept_drop`, and rebuilds the group where the drop landed with
-   `addGroupFromJSON`: next to the target group or at a layout edge, or,
-   for a drop on a group's centre or tab bar, `direction: 'within'` that
-   group at the tab index the drop reports. A group's id travels with it;
-   every window uses `groupIdGenerator` with random ids so it does not
+   with `accept_drag`, and rebuilds it where the drop landed with
+   `addPanelFromJSON` or `addGroupFromJSON`: next to the target group or at
+   a layout edge, or merged into the target group at the tab index the drop
+   reports for a drop on its centre or tab bar. A group's id travels with
+   it; every window uses `groupIdGenerator` with random ids so it does not
    collide on arrival.
 4. **Release.** The first accept wins. The shell removes the session and
    emits `dockview:release` to the source window, which removes its copy of
-   the panel or group. A second accept, or a accept for a drag the shell never
-   saw, is refused and nothing is added.
-5. **Drag end.** The source reports `drag_end`. With the panel's detach
-   box ticked, an unaccepted drag becomes a new window that starts with the
-   group (`take_pending_group` on load), the orchestrator's replacement for a popout.
-   It is off by default because HTML5 cannot tell a drop on the desktop from
-   an Escape-cancelled drag.
+   the panel or group. A second accept, or an accept for a drag the shell
+   never saw, is refused and nothing is added.
+5. **Drag end.** The source reports `end_drag`. With the panel's detach
+   box ticked, an unaccepted drag becomes a new window that starts with what
+   was dragged instead of its default panels (`take_detached_drag` on load),
+   the orchestrator's replacement for a popout. It is off by default because
+   HTML5 cannot tell a drop on the desktop from an Escape-cancelled drag.
 
 What the whole gesture loses is renderer-held state: the panel is rebuilt
 from its serialized `params`, so scroll position, half-typed text and focus
@@ -235,7 +239,7 @@ VITE_DND=html5 yarn dev &
 cargo build --manifest-path src-tauri/Cargo.toml
 DISPLAY=:99 python3 scripts/measure-cross-window-drag.py --screenshot after.png
 # --where center|left|right|top|bottom|tab chooses the landing;
-# --where off releases the drag outside every window with detach on, so
+# --where detach releases the drag outside every window with detach on, so
 # the shell opens a new window holding the tab; --undo and --restart extend
 # the run.
 ```
@@ -244,10 +248,13 @@ The driver starts the shell with `DOCKVIEW_DEMO_AUTOTEST` set, which opens
 the second window at a known position and makes each window report its
 panel geometry and the drag log as JSON lines on stdout; the driver turns
 the geometry into a pointer drag and judges the result from the log alone.
-The Cross-window drag panel's counters tell the same story interactively:
-`drags started` rising with nothing on the other side means the drag never
-reached the second window; `drag-overs accepted` rising with `drops accepted`
-at zero means the drop landed but was refused, and the log says why.
+The log is the demo's: `src/transport.ts` wraps the transport and logs and
+counts what passes through it, and the harness mirrors the console warnings
+and errors dockview reports its failures with. The Cross-window drag panel's
+counters tell the same story interactively: `drags started` rising with
+nothing on the other side means the drag never reached the second window;
+`drops refused` rising means the drop landed but was refused, and the log
+says why.
 
 ### Persisting the workspace
 
@@ -261,12 +268,12 @@ between them relies on never happening.
 
 - **Load.** On start the shell reads the file, creates each recorded window
   at its saved position and size, and each window, once dockview is ready,
-  asks `initial_layout` for its layout and applies it with `fromJSON`. A
+  asks `load_layout` for its layout and applies it with `fromJSON`. A
   window with nothing on record builds its default panels. The data flows
   from the shell to the window, but the window makes the call: nothing can
   be pushed into a webview before it has loaded, and a reloaded window
   simply asks again.
-- **Save.** Each window reports `layout_changed` with `api.toJSON()` on a
+- **Save.** Each window reports `report_layout` with `api.toJSON()` on a
   debounce; the shell records native moves and resizes itself; a background
   thread writes the file half a second after the last change, to a sibling
   file renamed over the old one, so a crash mid-write leaves the previous

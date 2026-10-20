@@ -110,100 +110,6 @@ export async function closeNativePopout(win: Window): Promise<void> {
     await invoke('close_popout', { label });
 }
 
-/*
- * The multiWindow: one drag in flight at a time, brokered by the shell so a group can
- * cross from one native window's dockview to another's. The shell holds the
- * serialized group; the OS drag carries only the session id.
- */
-
-export const RELEASE_EVENT = 'dockview:release';
-
-import type { DragPayload, MoveEvent, ReleaseEvent } from 'dockview-enterprise';
-
-/** The source window announces a drag, handing the shell the serialized group. */
-export async function dragStart(
-    session: string,
-    from: string,
-    kind: DragPayload['kind'],
-    envelope: unknown
-): Promise<void> {
-    if (!isTauri()) {
-        return;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke('drag_start', { session, from, kind, envelope });
-}
-
-/** The destination window reads a drag's serialized group without accepting it. */
-export async function peekDrag(session: string): Promise<unknown> {
-    if (!isTauri()) {
-        throw new Error('reading a drag requires the Tauri shell');
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<unknown>('peek_drag', { session });
-}
-
-/**
- * The destination window accepts a drop. Resolves to the serialized group;
- * rejects when another window accepted it first or the shell never saw it.
- */
-export async function acceptDrop(
-    session: string,
-    to: string
-): Promise<unknown> {
-    if (!isTauri()) {
-        throw new Error('accepting a drop requires the Tauri shell');
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<unknown>('accept_drop', { session, to });
-}
-
-/**
- * The source window reports its drag over. The shell keeps the drag
- * acceptable for a grace period first; with `detach`, an unaccepted drag
- * then becomes a new window holding the group, which the source learns
- * through the release event.
- */
-export async function dragEnd(session: string, detach: boolean): Promise<void> {
-    if (!isTauri()) {
-        return;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke('drag_end', { session, detach });
-}
-
-/** Delivered to the source window once another window has taken its group. */
-export async function onRelease(
-    handler: (notice: ReleaseEvent) => void
-): Promise<() => void> {
-    if (!isTauri()) {
-        return () => {
-            /* nothing subscribed */
-        };
-    }
-    const { getCurrentWebviewWindow } = await import(
-        '@tauri-apps/api/webviewWindow'
-    );
-    const current = getCurrentWebviewWindow();
-    return current.listen<ReleaseEvent & { from: string }>(
-        RELEASE_EVENT,
-        (event) => {
-            if (event.payload.from === current.label) {
-                handler(event.payload);
-            }
-        }
-    );
-}
-
-/** A window created by a detach collects the group waiting for it. */
-export async function takePendingGroup(label: string): Promise<unknown | null> {
-    if (!isTauri()) {
-        return null;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<unknown | null>('take_pending_group', { label });
-}
-
 /**
  * The measurement harness: a JSON line on the shell's stdout, read by
  * `scripts/measure-cross-window-drag.py`. No-op outside the shell.
@@ -224,9 +130,8 @@ export async function autotestReport(
 }
 
 /*
- * The workspace: the shell owns the file that says which windows exist and
- * what each holds. A window receives its layout from the shell at start and
- * reports changes back; it never touches storage itself.
+ * The workspace as the shell keeps it, for the Workspace panel. The
+ * multi-window calls themselves are the transport's, in `transport.ts`.
  */
 
 export interface WorkspaceWindowInfo {
@@ -242,60 +147,12 @@ export interface WorkspaceInfo {
     windows: WorkspaceWindowInfo[];
 }
 
-/** The layout this window should start with, or null to build the defaults. */
-export async function initialLayout(label: string): Promise<unknown | null> {
-    if (!isTauri()) {
-        return null;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<unknown | null>('initial_layout', { label });
-}
-
-/** Reports this window's layout. Rejects if it names a panel another window holds. */
-export async function layoutChanged(
-    label: string,
-    layout: unknown
-): Promise<void> {
-    if (!isTauri()) {
-        return;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke('layout_changed', { label, layout });
-}
-
 export async function workspaceInfo(): Promise<WorkspaceInfo | null> {
     if (!isTauri()) {
         return null;
     }
     const { invoke } = await import('@tauri-apps/api/core');
     return invoke<WorkspaceInfo>('workspace_info');
-}
-
-/*
- * One undo history across every window. Each window keeps dockview's own
- * stack for its local steps; the shell sequences them with the moves between
- * windows, and tells a window when to undo or redo its own top step or to
- * take a layout the shell holds.
- */
-
-export interface HistoryInfo {
-    undoCount: number;
-    redoCount: number;
-    nextUndo: string | null;
-    nextRedo: string | null;
-}
-
-export type MovedNotice = MoveEvent;
-
-async function invokeOrIgnore(
-    command: string,
-    args?: Record<string, unknown>
-): Promise<void> {
-    if (!isTauri()) {
-        return;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke(command, args);
 }
 
 async function listenOrIgnore<T>(
@@ -310,83 +167,6 @@ async function listenOrIgnore<T>(
     const { listen } = await import('@tauri-apps/api/event');
     return listen<T>(event, (e) => handler(e.payload));
 }
-
-/**
- * An event the shell addresses to one window. A listener registered for
- * "any" target hears events emitted to every window, so this registers on
- * this window's own target and, belt and braces, drops payloads naming
- * another window.
- */
-async function listenToThisWindow<T extends { window: string }>(
-    event: string,
-    handler: (payload: T) => void
-): Promise<() => void> {
-    if (!isTauri()) {
-        return () => {
-            /* nothing subscribed */
-        };
-    }
-    const { getCurrentWebviewWindow } = await import(
-        '@tauri-apps/api/webviewWindow'
-    );
-    const current = getCurrentWebviewWindow();
-    return current.listen<T>(event, (e) => {
-        if (e.payload.window === current.label) {
-            handler(e.payload);
-        }
-    });
-}
-
-/** This window recorded a step in its own history. */
-export const historyPush = (label: string) =>
-    invokeOrIgnore('history_push', { label });
-
-/** This window's half of a move: its layout before and after. */
-export const moveRecorded = (
-    session: string,
-    label: string,
-    role: 'from' | 'to',
-    panels: string[],
-    before: unknown,
-    after: unknown
-) =>
-    invokeOrIgnore('move_recorded', {
-        session,
-        label,
-        role,
-        panels,
-        before,
-        after,
-    });
-
-export const undo = () => invokeOrIgnore('undo');
-export const redo = () => invokeOrIgnore('redo');
-
-export async function historyInfo(): Promise<HistoryInfo | null> {
-    if (!isTauri()) {
-        return null;
-    }
-    const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<HistoryInfo>('history_info');
-}
-
-export const onApplyLayout = (handler: (layout: unknown) => void) =>
-    listenToThisWindow<{ window: string; layout: unknown }>(
-        'dockview:apply',
-        (payload) => handler(payload.layout)
-    );
-export const onUndoRequest = (handler: () => void) =>
-    listenToThisWindow<{ window: string }>('dockview:undo-request', () =>
-        handler()
-    );
-export const onRedoRequest = (handler: () => void) =>
-    listenToThisWindow<{ window: string }>('dockview:redo-request', () =>
-        handler()
-    );
-export const onHistoryChanged = (handler: (info: HistoryInfo) => void) =>
-    listenOrIgnore<HistoryInfo>('dockview:history', handler);
-export const onMoved = (handler: (notice: MovedNotice) => void) =>
-    listenOrIgnore<MovedNotice>('dockview:moved', handler);
 
 /** A harness command to every window (`detach` switches detach on). */
 export const onAutotestCommand = (handler: (command: string) => void) =>

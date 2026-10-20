@@ -12,6 +12,9 @@
 //!
 //! Like `drags.rs`, this knows nothing about Tauri. The host decides when to
 //! load and save, feeds in native geometry, and creates the windows.
+//!
+//! Mirrors `workspaceRegistry.ts` in `dockview-enterprise`; keep the two in
+//! step.
 
 use std::fmt;
 use std::fs;
@@ -34,13 +37,20 @@ pub struct Geometry {
     pub height: u32,
 }
 
+/// One window: the `WindowRecord` of `dockview-enterprise`, so the file has
+/// the shape `MemoryOrchestrator.snapshot()` writes. The id is the Tauri
+/// window label.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct WindowRecord {
-    pub label: String,
+    /// Read as `label` too, the name files written before used.
+    #[serde(alias = "label")]
+    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub geometry: Option<Geometry>,
     /// The window's `SerializedDockview`, opaque here. `None` until the
     /// window first reports one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub layout: Option<Value>,
 }
 
@@ -144,13 +154,13 @@ impl Workspace {
 
     /// The labels of the windows on record, in creation order.
     #[allow(dead_code)] // part of the module's api; the shell reads snapshots
-    pub fn labels(&self) -> Result<Vec<String>, WorkspaceError> {
+    pub fn window_ids(&self) -> Result<Vec<String>, WorkspaceError> {
         Ok(self
             .state
             .lock()?
             .windows
             .iter()
-            .map(|window| window.label.clone())
+            .map(|window| window.id.clone())
             .collect())
     }
 
@@ -161,7 +171,7 @@ impl Workspace {
             .lock()?
             .windows
             .iter()
-            .find(|window| window.label == label)
+            .find(|window| window.id == label)
             .cloned())
     }
 
@@ -169,9 +179,9 @@ impl Workspace {
     /// already on record is left alone.
     pub fn ensure_window(&self, label: &str) -> Result<(), WorkspaceError> {
         let mut state = self.state.lock()?;
-        if !state.windows.iter().any(|window| window.label == label) {
+        if !state.windows.iter().any(|window| window.id == label) {
             state.windows.push(WindowRecord {
-                label: label.to_string(),
+                id: label.to_string(),
                 ..WindowRecord::default()
             });
         }
@@ -193,18 +203,18 @@ impl Workspace {
         let mut pending = self.pending.lock()?;
 
         let incoming = panel_ids(&layout);
-        for other in state.windows.iter().filter(|window| window.label != label) {
+        for other in state.windows.iter().filter(|window| window.id != label) {
             if let Some(theirs) = other.layout.as_ref() {
                 let theirs = panel_ids(theirs);
                 if let Some(panel) = incoming.iter().find(|id| {
                     theirs.contains(id)
                         && !pending.iter().any(|entry| {
-                            entry.panel == **id && entry.from == other.label && entry.to == label
+                            entry.panel == **id && entry.from == other.id && entry.to == label
                         })
                 }) {
                     return Err(WorkspaceError::DuplicatePanel {
                         panel: panel.clone(),
-                        window: other.label.clone(),
+                        window: other.id.clone(),
                     });
                 }
             }
@@ -232,36 +242,29 @@ impl Workspace {
 
     /// The layout a window should start with: what it last reported, or what
     /// the file held for it. Not consumed, so a reloaded window gets it again.
-    pub fn initial_layout(&self, label: &str) -> Result<Option<Value>, WorkspaceError> {
+    pub fn load_layout(&self, label: &str) -> Result<Option<Value>, WorkspaceError> {
         Ok(self
             .state
             .lock()?
             .windows
             .iter()
-            .find(|window| window.label == label)
+            .find(|window| window.id == label)
             .and_then(|window| window.layout.clone()))
     }
 
     pub fn remove_window(&self, label: &str) -> Result<Option<WindowRecord>, WorkspaceError> {
         let mut state = self.state.lock()?;
-        let index = state
-            .windows
-            .iter()
-            .position(|window| window.label == label);
+        let index = state.windows.iter().position(|window| window.id == label);
         Ok(index.map(|index| state.windows.remove(index)))
     }
 }
 
 fn entry<'a>(state: &'a mut WorkspaceState, label: &str) -> &'a mut WindowRecord {
-    if let Some(index) = state
-        .windows
-        .iter()
-        .position(|window| window.label == label)
-    {
+    if let Some(index) = state.windows.iter().position(|window| window.id == label) {
         return &mut state.windows[index];
     }
     state.windows.push(WindowRecord {
-        label: label.to_string(),
+        id: label.to_string(),
         ..WindowRecord::default()
     });
     state.windows.last_mut().expect("just pushed")
@@ -352,16 +355,10 @@ mod tests {
         let workspace = Workspace::default();
         workspace.set_layout("main", layout(&["a"])).unwrap();
 
-        assert_eq!(
-            workspace.initial_layout("main").unwrap(),
-            Some(layout(&["a"]))
-        );
+        assert_eq!(workspace.load_layout("main").unwrap(), Some(layout(&["a"])));
         // Not consumed: a reloaded window asks again.
-        assert_eq!(
-            workspace.initial_layout("main").unwrap(),
-            Some(layout(&["a"]))
-        );
-        assert_eq!(workspace.initial_layout("dock-2").unwrap(), None);
+        assert_eq!(workspace.load_layout("main").unwrap(), Some(layout(&["a"])));
+        assert_eq!(workspace.load_layout("dock-2").unwrap(), None);
     }
 
     #[test]
@@ -377,7 +374,7 @@ mod tests {
             })
         );
         // Nothing recorded for the refused window.
-        assert_eq!(workspace.initial_layout("dock-2").unwrap(), None);
+        assert_eq!(workspace.load_layout("dock-2").unwrap(), None);
     }
 
     #[test]
@@ -430,7 +427,7 @@ mod tests {
             .set_layout_unchecked("dock-2", layout(&["b"]))
             .is_ok());
         assert_eq!(
-            workspace.initial_layout("dock-2").unwrap(),
+            workspace.load_layout("dock-2").unwrap(),
             Some(layout(&["b"]))
         );
     }
@@ -453,12 +450,9 @@ mod tests {
         workspace.set_layout("main", layout(&["a"])).unwrap();
         workspace.set_layout("dock-2", layout(&["c", "b"])).unwrap();
 
+        assert_eq!(workspace.load_layout("main").unwrap(), Some(layout(&["a"])));
         assert_eq!(
-            workspace.initial_layout("main").unwrap(),
-            Some(layout(&["a"]))
-        );
-        assert_eq!(
-            workspace.initial_layout("dock-2").unwrap(),
+            workspace.load_layout("dock-2").unwrap(),
             Some(layout(&["c", "b"]))
         );
     }
@@ -480,7 +474,7 @@ mod tests {
             .unwrap();
         workspace.ensure_window("main").unwrap();
 
-        assert_eq!(workspace.labels().unwrap(), vec!["main", "dock-2"]);
+        assert_eq!(workspace.window_ids().unwrap(), vec!["main", "dock-2"]);
         assert_eq!(
             workspace.window("dock-2").unwrap().unwrap().geometry,
             Some(Geometry {
@@ -499,8 +493,8 @@ mod tests {
 
         let removed = workspace.remove_window("dock-2").unwrap();
 
-        assert_eq!(removed.map(|window| window.label), Some("dock-2".into()));
-        assert_eq!(workspace.labels().unwrap(), Vec::<String>::new());
+        assert_eq!(removed.map(|window| window.id), Some("dock-2".into()));
+        assert_eq!(workspace.window_ids().unwrap(), Vec::<String>::new());
         assert_eq!(workspace.remove_window("dock-2").unwrap(), None);
     }
 
@@ -541,7 +535,7 @@ mod tests {
 
         let mut state = WorkspaceState::default();
         state.windows.push(WindowRecord {
-            label: "main".into(),
+            id: "main".into(),
             geometry: None,
             layout: Some(layout(&["a"])),
         });
@@ -564,5 +558,20 @@ mod tests {
 
         assert_eq!(err.kind(), io::ErrorKind::InvalidData);
         fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn a_record_has_the_enterprise_shape_and_reads_the_old_one() {
+        let record = WindowRecord {
+            id: "main".into(),
+            geometry: None,
+            layout: None,
+        };
+        assert_eq!(
+            serde_json::to_value(&record).unwrap(),
+            json!({ "id": "main" })
+        );
+        let old: WindowRecord = serde_json::from_value(json!({ "label": "dock-2" })).unwrap();
+        assert_eq!(old.id, "dock-2");
     }
 }
