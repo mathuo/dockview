@@ -6,19 +6,14 @@
  * instance keeps working as before.
  */
 
-import type { DockviewApi } from 'dockview';
+import type { DockviewApi, DockviewEvent, DockviewIDisposable } from 'dockview';
 import {
     type CrossWindowDnd,
     type CrossWindowDndCounters,
     installCrossWindowDnd,
 } from './crossWindowDnd';
 import { installSharedHistory, type SharedHistory } from './sharedHistory';
-import type {
-    HistoryInfo,
-    MovedNotice,
-    MultiWindowTransport,
-    Unsubscribe,
-} from './types';
+import type { HistoryInfo, MoveEvent, MultiWindowTransport } from './types';
 import { installWindowWorkspace } from './windowWorkspace';
 
 export interface MultiWindowOptions {
@@ -26,7 +21,7 @@ export interface MultiWindowOptions {
      * Builds the window's default layout when the orchestrator has none for
      * it. Without the workspace (`workspace: false`) it is never called.
      */
-    buildDefaults?(label: string): void;
+    buildDefaults?(windowId: string): void;
     /**
      * Restore this window's layout from the orchestrator at start and report
      * every change back. Default true.
@@ -53,17 +48,15 @@ export interface MultiWindowOptions {
 }
 
 export interface MultiWindow {
-    /** This window's label once the transport has answered; `''` before. */
-    readonly label: string;
+    /** This window's windowId once the transport has answered; `''` before. */
+    readonly windowId: string;
     /** Resolves once the window holds its initial layout, restored or default. */
-    readonly ready: Promise<{ label: string; restored: boolean }>;
+    readonly ready: Promise<{ windowId: string; restored: boolean }>;
     readonly counters: Readonly<CrossWindowDndCounters>;
     /** See {@link MultiWindowOptions.tearOff}. */
     tearOff: boolean;
     /** Panels moved between any two windows: by a drop, or by undo or redo. */
-    onDidMoveAcrossWindows(
-        listener: (notice: MovedNotice) => void
-    ): Unsubscribe;
+    onDidMoveAcrossWindows: DockviewEvent<MoveEvent>;
     /**
      * Undo, or redo, the most recent step in any window. With
      * `history: false` these fall back to this window's own history.
@@ -72,7 +65,7 @@ export interface MultiWindow {
     redo(): void;
     /** The shared history's state; all zeros with `history: false`. */
     readonly history: HistoryInfo;
-    onDidChangeHistory(listener: (info: HistoryInfo) => void): Unsubscribe;
+    onDidChangeHistory: DockviewEvent<HistoryInfo>;
     dispose(): void;
 }
 
@@ -81,11 +74,11 @@ export function installMultiWindow(
     transport: MultiWindowTransport,
     options: MultiWindowOptions = {}
 ): MultiWindow {
-    // One label lookup for every part. Every other call is forwarded to
+    // One windowId lookup for every part. Every other call is forwarded to
     // the given transport with itself as `this`, so one written as a class
     // keeps its prototype methods and its state.
-    const label = transport.label();
-    const shared = forwarding(transport, () => label);
+    const windowId = transport.windowId();
+    const shared = forwarding(transport, () => windowId);
     const onLog = options.onLog;
 
     const dnd: CrossWindowDnd = installCrossWindowDnd(api, shared, {
@@ -104,9 +97,9 @@ export function installMultiWindow(
               });
     const ready =
         workspace?.ready ??
-        label.then(
-            (value) => ({ label: value, restored: false }),
-            () => ({ label: '', restored: false })
+        windowId.then(
+            (value) => ({ windowId: value, restored: false }),
+            () => ({ windowId: '', restored: false })
         );
 
     const history: SharedHistory | undefined =
@@ -128,8 +121,8 @@ export function installMultiWindow(
     };
 
     return {
-        get label() {
-            return dnd.label;
+        get windowId() {
+            return dnd.windowId;
         },
         ready,
         counters: dnd.counters,
@@ -147,7 +140,9 @@ export function installMultiWindow(
             return history?.info ?? none;
         },
         onDidChangeHistory: (listener) =>
-            history ? history.onDidChange(listener) : () => undefined,
+            history
+                ? history.onDidChange(listener)
+                : { dispose: () => undefined },
         dispose() {
             history?.dispose();
             workspace?.dispose();
@@ -157,31 +152,31 @@ export function installMultiWindow(
 }
 
 const TRANSPORT_METHODS = [
-    'dragStart',
-    'peek',
-    'claim',
-    'dragEnd',
-    'onRelease',
-    'takePending',
-    'moveRecorded',
-    'onMoved',
-    'initialLayout',
-    'layoutChanged',
-    'historyPush',
+    'startDrag',
+    'peekDrag',
+    'claimDrag',
+    'endDrag',
+    'onDidRelease',
+    'takePendingDrag',
+    'reportMove',
+    'onDidMove',
+    'loadLayout',
+    'reportLayout',
+    'reportLocalStep',
     'undo',
     'redo',
-    'historyInfo',
-    'onApplyLayout',
-    'onUndoRequest',
-    'onRedoRequest',
-    'onHistoryChanged',
-] as const satisfies readonly Exclude<keyof MultiWindowTransport, 'label'>[];
+    'getHistory',
+    'onRequestApplyLayout',
+    'onRequestUndo',
+    'onRequestRedo',
+    'onDidChangeHistory',
+] as const satisfies readonly Exclude<keyof MultiWindowTransport, 'windowId'>[];
 
 function forwarding(
     transport: MultiWindowTransport,
-    label: () => Promise<string>
+    windowId: () => Promise<string>
 ): MultiWindowTransport {
-    const shared = { label } as Record<string, unknown>;
+    const shared = { windowId } as Record<string, unknown>;
     for (const method of TRANSPORT_METHODS) {
         shared[method] = (...args: unknown[]) =>
             (transport[method] as (...a: unknown[]) => unknown).apply(

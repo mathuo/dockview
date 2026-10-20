@@ -11,17 +11,16 @@
  * message bus and nothing is re-entrant.
  */
 
-import type { SerializedDockview } from 'dockview';
+import type { DockviewIDisposable, SerializedDockview } from 'dockview';
 import { DragHub } from './dragHub';
 import { HistorySequencer, type HistoryStep } from './historySequencer';
 import type {
     DragPayload,
     HistoryInfo,
-    MovedNotice,
+    MoveEvent,
     MoveRole,
     MultiWindowTransport,
-    ReleaseNotice,
-    Unsubscribe,
+    ReleaseEvent,
 } from './types';
 import { payloadPanels } from './types';
 import {
@@ -44,15 +43,15 @@ export interface MemoryOrchestratorOptions {
     historyDepth?: number;
     /**
      * Called when an unclaimed drag ended with `tearOff`: the host opens a
-     * window with this label and connects it; its cross-window drag then
-     * collects the payload with `takePending`. Without this, a torn-off
+     * window with this windowId and connects it; its cross-window drag then
+     * collects the payload with `takePendingDrag`. Without this, a torn-off
      * drag is discarded like any other.
      */
-    createWindow?(label: string, payload: DragPayload): void;
+    createWindow?(windowId: string, payload: DragPayload): void;
 }
 
 interface Listeners {
-    release: Set<(notice: ReleaseNotice) => void>;
+    release: Set<(event: ReleaseEvent) => void>;
     apply: Set<(layout: SerializedDockview) => void>;
     undo: Set<() => void>;
     redo: Set<() => void>;
@@ -63,7 +62,7 @@ export class MemoryOrchestrator {
     private readonly _workspace: WorkspaceRegistry;
     private readonly _history: HistorySequencer;
     private readonly _windows = new Map<string, Listeners>();
-    private readonly _moved = new Set<(notice: MovedNotice) => void>();
+    private readonly _moved = new Set<(event: MoveEvent) => void>();
     private readonly _historyChanged = new Set<(info: HistoryInfo) => void>();
     private readonly _workspaceChanged = new Set<
         (state: WorkspaceState) => void
@@ -78,62 +77,65 @@ export class MemoryOrchestrator {
     }
 
     /** The windows this orchestrator knows, connected or restored. */
-    get labels(): string[] {
-        return this._workspace.labels();
+    get windowIds(): string[] {
+        return this._workspace.windowIds();
     }
 
     /** The transport for a window, which the orchestrator knows from now on. */
-    connect(label: string): MultiWindowTransport {
-        this._workspace.ensureWindow(label);
-        const listeners = this._listeners(label);
+    connect(windowId: string): MultiWindowTransport {
+        this._workspace.ensureWindow(windowId);
+        const listeners = this._listeners(windowId);
         const subscribe = <T>(
             set: Set<T>,
             handler: T
-        ): Promise<Unsubscribe> => {
+        ): Promise<DockviewIDisposable> => {
             set.add(handler);
-            return Promise.resolve(() => {
-                set.delete(handler);
+            return Promise.resolve({
+                dispose: () => {
+                    set.delete(handler);
+                },
             });
         };
 
         return {
-            label: () => Promise.resolve(label),
+            windowId: () => Promise.resolve(windowId),
 
-            dragStart: (session, from, payload) =>
+            startDrag: (session, from, payload) =>
                 settle(() => this._hub.start(session, { from, payload })),
-            peek: (session) => settle(() => this._hub.peek(session)),
-            claim: (session, to) => settle(() => this._claim(session, to)),
-            dragEnd: (session, tearOff) =>
+            peekDrag: (session) => settle(() => this._hub.peek(session)),
+            claimDrag: (session, to) => settle(() => this._claim(session, to)),
+            endDrag: (session, tearOff) =>
                 settle(() => this._dragEnd(session, tearOff)),
-            onRelease: (handler) => subscribe(listeners.release, handler),
-            takePending: (forLabel) =>
-                settle(() => this._hub.takePending(forLabel)),
-            moveRecorded: (session, from, role, panels, before, after) =>
+            onDidRelease: (handler) => subscribe(listeners.release, handler),
+            takePendingDrag: (forWindow) =>
+                settle(() => this._hub.takePendingDrag(forWindow)),
+            reportMove: (session, from, role, panels, before, after) =>
                 settle(() =>
                     this._recordMove(session, from, role, panels, before, after)
                 ),
-            onMoved: (handler) => subscribe(this._moved, handler),
+            onDidMove: (handler) => subscribe(this._moved, handler),
 
-            initialLayout: (forLabel) =>
-                settle(() => this._workspace.initialLayout(forLabel)),
-            layoutChanged: (forLabel, layout) =>
+            loadLayout: (forWindow) =>
+                settle(() => this._workspace.loadLayout(forWindow)),
+            reportLayout: (forWindow, layout) =>
                 settle(() => {
-                    this._workspace.setLayout(forLabel, layout);
+                    this._workspace.setLayout(forWindow, layout);
                     this._workspaceDidChange();
                 }),
 
-            historyPush: (forLabel) =>
+            reportLocalStep: (forWindow) =>
                 settle(() => {
-                    this._history.pushLocal(forLabel);
+                    this._history.pushLocal(forWindow);
                     this._historyDidChange();
                 }),
             undo: () => settle(() => this.undo()),
             redo: () => settle(() => this.redo()),
-            historyInfo: () => settle(() => this._history.info()),
-            onApplyLayout: (handler) => subscribe(listeners.apply, handler),
-            onUndoRequest: (handler) => subscribe(listeners.undo, handler),
-            onRedoRequest: (handler) => subscribe(listeners.redo, handler),
-            onHistoryChanged: (handler) =>
+            getHistory: () => settle(() => this._history.info()),
+            onRequestApplyLayout: (handler) =>
+                subscribe(listeners.apply, handler),
+            onRequestUndo: (handler) => subscribe(listeners.undo, handler),
+            onRequestRedo: (handler) => subscribe(listeners.redo, handler),
+            onDidChangeHistory: (handler) =>
                 subscribe(this._historyChanged, handler),
         };
     }
@@ -142,10 +144,10 @@ export class MemoryOrchestrator {
      * Forget a window that closed: its listeners, its workspace record and
      * every history entry that involves it.
      */
-    disconnect(label: string): void {
-        this._windows.delete(label);
-        this._workspace.removeWindow(label);
-        this._history.forgetWindow(label);
+    disconnect(windowId: string): void {
+        this._windows.delete(windowId);
+        this._workspace.removeWindow(windowId);
+        this._history.forgetWindow(windowId);
         this._workspaceDidChange();
         this._historyDidChange();
     }
@@ -159,7 +161,7 @@ export class MemoryOrchestrator {
         this._carryOut(this._history.redo(), 'redo');
     }
 
-    get historyInfo(): HistoryInfo {
+    get history(): HistoryInfo {
         return this._history.info();
     }
 
@@ -169,32 +171,40 @@ export class MemoryOrchestrator {
     }
 
     /** Record where the host put a window, for the next start. */
-    setGeometry(label: string, geometry: WindowGeometry): void {
-        this._workspace.setGeometry(label, geometry);
+    setGeometry(windowId: string, geometry: WindowGeometry): void {
+        this._workspace.setGeometry(windowId, geometry);
         this._workspaceDidChange();
     }
 
     /** The workspace changed: a layout or frame was reported, or a window left. */
     onDidChangeWorkspace(
         listener: (state: WorkspaceState) => void
-    ): Unsubscribe {
+    ): DockviewIDisposable {
         this._workspaceChanged.add(listener);
-        return () => {
-            this._workspaceChanged.delete(listener);
+        return {
+            dispose: () => {
+                this._workspaceChanged.delete(listener);
+            },
         };
     }
 
-    onDidChangeHistory(listener: (info: HistoryInfo) => void): Unsubscribe {
+    onDidChangeHistory(
+        listener: (info: HistoryInfo) => void
+    ): DockviewIDisposable {
         this._historyChanged.add(listener);
-        return () => {
-            this._historyChanged.delete(listener);
+        return {
+            dispose: () => {
+                this._historyChanged.delete(listener);
+            },
         };
     }
 
-    onDidMove(listener: (notice: MovedNotice) => void): Unsubscribe {
+    onDidMove(listener: (event: MoveEvent) => void): DockviewIDisposable {
         this._moved.add(listener);
-        return () => {
-            this._moved.delete(listener);
+        return {
+            dispose: () => {
+                this._moved.delete(listener);
+            },
         };
     }
 
@@ -226,8 +236,8 @@ export class MemoryOrchestrator {
         );
     }
 
-    private _listeners(label: string): Listeners {
-        let listeners = this._windows.get(label);
+    private _listeners(windowId: string): Listeners {
+        let listeners = this._windows.get(windowId);
         if (!listeners) {
             listeners = {
                 release: new Set(),
@@ -235,7 +245,7 @@ export class MemoryOrchestrator {
                 undo: new Set(),
                 redo: new Set(),
             };
-            this._windows.set(label, listeners);
+            this._windows.set(windowId, listeners);
         }
         return listeners;
     }
@@ -251,10 +261,10 @@ export class MemoryOrchestrator {
         const createWindow = this._options.createWindow;
         if (!createWindow) {
             // Nobody to open a window: the parked payload is dropped.
-            this._hub.takePending(ended.label);
+            this._hub.takePendingDrag(ended.windowId);
             return;
         }
-        const payload = this._hub.peekPending(ended.label);
+        const payload = this._hub.peekPending(ended.windowId);
         if (!payload) {
             return;
         }
@@ -262,18 +272,18 @@ export class MemoryOrchestrator {
         const from = ended.release.from;
         // As for a claim: the new window may report the panels before the
         // source reports them gone.
-        this._workspace.expectMove(panels, from, ended.label);
-        createWindow(ended.label, payload);
+        this._workspace.expectMove(panels, from, ended.windowId);
+        createWindow(ended.windowId, payload);
         this._deliver(from, 'release', {
             session,
-            to: ended.label,
+            to: ended.windowId,
             reason: 'tear-off',
         });
         this._broadcast(this._moved, {
             session,
             panels,
             from,
-            to: ended.label,
+            to: ended.windowId,
             reason: 'tear-off',
         });
     }
@@ -322,11 +332,11 @@ export class MemoryOrchestrator {
     }
 
     private _deliver<K extends keyof Listeners>(
-        label: string,
+        windowId: string,
         kind: K,
         payload: Listeners[K] extends Set<(arg: infer A) => void> ? A : never
     ): void {
-        const listeners = this._windows.get(label)?.[kind];
+        const listeners = this._windows.get(windowId)?.[kind];
         if (!listeners) {
             return;
         }

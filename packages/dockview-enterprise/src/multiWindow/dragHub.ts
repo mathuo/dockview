@@ -30,7 +30,7 @@ export interface Claim {
 export type DragEnd =
     | { outcome: 'settled' }
     | { outcome: 'discarded' }
-    | { outcome: 'torn-off'; label: string; release: Release };
+    | { outcome: 'torn-off'; windowId: string; release: Release };
 
 export class DragHub {
     private readonly sessions = new Map<string, Tracked>();
@@ -71,10 +71,10 @@ export class DragHub {
 
     /**
      * Settle an ended drag nobody claimed: discard it, or, when the source
-     * asked for a tear-off, park its payload under a new window label from
-     * `newLabel` for that window to collect with {@link takePending}.
+     * asked for a tear-off, park its payload under a new window windowId from
+     * `newWindowId` for that window to collect with {@link takePendingDrag}.
      */
-    expire(session: string, newLabel: () => string): DragEnd {
+    expire(session: string, newWindowId: () => string): DragEnd {
         const tracked = this.sessions.get(session);
         if (tracked?.ended === undefined) {
             return { outcome: 'settled' };
@@ -83,23 +83,23 @@ export class DragHub {
         if (!tracked.ended) {
             return { outcome: 'discarded' };
         }
-        const label = newLabel();
-        this.pending.set(label, tracked.payload);
+        const windowId = newWindowId();
+        this.pending.set(windowId, tracked.payload);
         return {
             outcome: 'torn-off',
-            label,
-            release: { from: tracked.from, session, to: label },
+            windowId,
+            release: { from: tracked.from, session, to: windowId },
         };
     }
 
     /** The payload parked for a torn-off window, left in place. */
-    peekPending(label: string): DragPayload | null {
-        return this.pending.get(label) ?? null;
+    peekPending(windowId: string): DragPayload | null {
+        return this.pending.get(windowId) ?? null;
     }
 
-    takePending(label: string): DragPayload | null {
-        const payload = this.pending.get(label) ?? null;
-        this.pending.delete(label);
+    takePendingDrag(windowId: string): DragPayload | null {
+        const payload = this.pending.get(windowId) ?? null;
+        this.pending.delete(windowId);
         return payload;
     }
 

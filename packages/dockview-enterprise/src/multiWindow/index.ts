@@ -7,11 +7,10 @@ export { installMultiWindow } from './multiWindow';
 export type {
     DragPayload,
     HistoryInfo,
-    MovedNotice,
+    MoveEvent,
     MoveRole,
     MultiWindowTransport,
-    ReleaseNotice,
-    Unsubscribe,
+    ReleaseEvent,
 } from './types';
 export { payloadPanels } from './types';
 export type {

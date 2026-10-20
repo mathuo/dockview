@@ -17,7 +17,7 @@ export interface WindowGeometry {
 }
 
 export interface WindowRecord {
-    label: string;
+    id: string;
     geometry?: WindowGeometry;
     layout?: SerializedDockview;
 }
@@ -59,17 +59,17 @@ export class WorkspaceRegistry {
         };
     }
 
-    labels(): string[] {
-        return this.windows.map((window) => window.label);
+    windowIds(): string[] {
+        return this.windows.map((window) => window.id);
     }
 
-    window(label: string): WindowRecord | undefined {
-        const record = this.windows.find((window) => window.label === label);
+    window(windowId: string): WindowRecord | undefined {
+        const record = this.windows.find((window) => window.id === windowId);
         return record ? clone(record) : undefined;
     }
 
-    ensureWindow(label: string): void {
-        this.entry(label);
+    ensureWindow(windowId: string): void {
+        this.entry(windowId);
     }
 
     expectMove(panels: string[], from: string, to: string): void {
@@ -84,8 +84,8 @@ export class WorkspaceRegistry {
         }
     }
 
-    setGeometry(label: string, geometry: WindowGeometry): void {
-        this.entry(label).geometry = { ...geometry };
+    setGeometry(windowId: string, geometry: WindowGeometry): void {
+        this.entry(windowId).geometry = { ...geometry };
     }
 
     /**
@@ -93,10 +93,10 @@ export class WorkspaceRegistry {
      * another window's stored layout holds, unless an announced move
      * explains it.
      */
-    setLayout(label: string, layout: SerializedDockview): void {
+    setLayout(windowId: string, layout: SerializedDockview): void {
         const incoming = panelIds(layout);
         for (const other of this.windows) {
-            if (other.label === label || !other.layout) {
+            if (other.id === windowId || !other.layout) {
                 continue;
             }
             const theirs = new Set(panelIds(other.layout));
@@ -106,37 +106,37 @@ export class WorkspaceRegistry {
                     !this.pending.some(
                         (entry) =>
                             entry.panel === id &&
-                            entry.from === other.label &&
-                            entry.to === label
+                            entry.from === other.id &&
+                            entry.to === windowId
                     )
             );
             if (duplicate) {
                 throw new Error(
-                    `panel ${duplicate} is already held by window ${other.label}`
+                    `panel ${duplicate} is already held by window ${other.id}`
                 );
             }
         }
         // A source reporting without the panel completes the move.
         const kept = this.pending.filter(
-            (entry) => entry.from !== label || incoming.includes(entry.panel)
+            (entry) => entry.from !== windowId || incoming.includes(entry.panel)
         );
         this.pending.splice(0, this.pending.length, ...kept);
-        this.entry(label).layout = clone(layout);
+        this.entry(windowId).layout = clone(layout);
     }
 
     /** Store a layout the orchestrator itself applied, which it trusts. */
-    setLayoutUnchecked(label: string, layout: SerializedDockview): void {
-        this.entry(label).layout = clone(layout);
+    setLayoutUnchecked(windowId: string, layout: SerializedDockview): void {
+        this.entry(windowId).layout = clone(layout);
     }
 
-    initialLayout(label: string): SerializedDockview | null {
-        const record = this.windows.find((window) => window.label === label);
+    loadLayout(windowId: string): SerializedDockview | null {
+        const record = this.windows.find((window) => window.id === windowId);
         return record?.layout ? clone(record.layout) : null;
     }
 
-    removeWindow(label: string): WindowRecord | undefined {
+    removeWindow(windowId: string): WindowRecord | undefined {
         const index = this.windows.findIndex(
-            (window) => window.label === label
+            (window) => window.id === windowId
         );
         if (index === -1) {
             return undefined;
@@ -144,10 +144,10 @@ export class WorkspaceRegistry {
         return this.windows.splice(index, 1)[0];
     }
 
-    private entry(label: string): WindowRecord {
-        let record = this.windows.find((window) => window.label === label);
+    private entry(windowId: string): WindowRecord {
+        let record = this.windows.find((window) => window.id === windowId);
         if (!record) {
-            record = { label };
+            record = { id: windowId };
             this.windows.push(record);
         }
         return record;

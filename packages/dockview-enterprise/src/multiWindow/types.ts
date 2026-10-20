@@ -10,6 +10,7 @@
  */
 
 import type {
+    DockviewIDisposable,
     GroupviewPanelState,
     SerializedDockview,
     SerializedDockviewGroup,
@@ -31,12 +32,10 @@ export function payloadPanels(payload: DragPayload): string[] {
         : payload.group.group.views;
 }
 
-export type Unsubscribe = () => void;
-
 /** Delivered to the source window once another window took its drag. */
-export interface ReleaseNotice {
+export interface ReleaseEvent {
     session: string;
-    /** The window label that took the payload. */
+    /** The window windowId that took the payload. */
     to: string;
     /**
      * A claim by a window the drop landed in, or a tear-off into a window
@@ -48,7 +47,7 @@ export interface ReleaseNotice {
 }
 
 /** Broadcast after panels moved between any two windows. */
-export interface MovedNotice {
+export interface MoveEvent {
     session: string;
     panels: string[];
     from: string;
@@ -74,69 +73,73 @@ export interface HistoryInfo {
  */
 export interface MultiWindowTransport {
     /** This window's identity, as the orchestrator and other windows name it. */
-    label(): Promise<string>;
+    windowId(): Promise<string>;
 
     // Drags.
 
     /** Announce a drag, handing the orchestrator what it carries. */
-    dragStart(
+    startDrag(
         session: string,
         from: string,
         payload: DragPayload
     ): Promise<void>;
     /** Read a drag's payload without claiming it. Rejects if not in flight. */
-    peek(session: string): Promise<DragPayload>;
+    peekDrag(session: string): Promise<DragPayload>;
     /** Claim a drop. Rejects if another window claimed it first. */
-    claim(session: string, to: string): Promise<void>;
+    claimDrag(session: string, to: string): Promise<void>;
     /**
      * Report a drag over. The orchestrator keeps it claimable for a grace
      * period, since the destination's claim may arrive after this. With
      * `tearOff`, an unclaimed drag may then become a new window holding the
-     * payload, which the source learns of through `onRelease`.
+     * payload, which the source learns of through `onDidRelease`.
      */
-    dragEnd(session: string, tearOff: boolean): Promise<void>;
+    endDrag(session: string, tearOff: boolean): Promise<void>;
     /** Delivered to the source window once another window took its drag. */
-    onRelease(handler: (notice: ReleaseNotice) => void): Promise<Unsubscribe>;
+    onDidRelease(
+        handler: (event: ReleaseEvent) => void
+    ): Promise<DockviewIDisposable>;
     /** A window created by a tear-off collects the payload waiting for it. */
-    takePending(label: string): Promise<DragPayload | null>;
+    takePendingDrag(windowId: string): Promise<DragPayload | null>;
     /**
      * This window's half of a completed move, for the shared undo history:
      * its layout just before and just after it gave up, or took, the panels.
      */
-    moveRecorded(
+    reportMove(
         session: string,
-        label: string,
+        windowId: string,
         role: MoveRole,
         panels: string[],
         before: SerializedDockview,
         after: SerializedDockview
     ): Promise<void>;
     /** Broadcast after panels moved between any two windows. */
-    onMoved(handler: (notice: MovedNotice) => void): Promise<Unsubscribe>;
+    onDidMove(
+        handler: (event: MoveEvent) => void
+    ): Promise<DockviewIDisposable>;
 
     // The workspace.
 
     /** The layout to start with, or null to build the window's defaults. */
-    initialLayout(label: string): Promise<SerializedDockview | null>;
+    loadLayout(windowId: string): Promise<SerializedDockview | null>;
     /** Report the layout. Rejects if it names a panel another window holds. */
-    layoutChanged(label: string, layout: SerializedDockview): Promise<void>;
+    reportLayout(windowId: string, layout: SerializedDockview): Promise<void>;
 
     // The shared history.
 
     /** This window recorded a step of its own. */
-    historyPush(label: string): Promise<void>;
+    reportLocalStep(windowId: string): Promise<void>;
     /** Undo, or redo, the most recent step anywhere. */
     undo(): Promise<void>;
     redo(): Promise<void>;
-    historyInfo(): Promise<HistoryInfo | null>;
+    getHistory(): Promise<HistoryInfo | null>;
     /** The orchestrator replaces this window's layout. */
-    onApplyLayout(
+    onRequestApplyLayout(
         handler: (layout: SerializedDockview) => void
-    ): Promise<Unsubscribe>;
+    ): Promise<DockviewIDisposable>;
     /** The orchestrator asks this window to undo, or redo, its own top step. */
-    onUndoRequest(handler: () => void): Promise<Unsubscribe>;
-    onRedoRequest(handler: () => void): Promise<Unsubscribe>;
-    onHistoryChanged(
+    onRequestUndo(handler: () => void): Promise<DockviewIDisposable>;
+    onRequestRedo(handler: () => void): Promise<DockviewIDisposable>;
+    onDidChangeHistory(
         handler: (info: HistoryInfo) => void
-    ): Promise<Unsubscribe>;
+    ): Promise<DockviewIDisposable>;
 }

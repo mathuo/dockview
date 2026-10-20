@@ -20,12 +20,14 @@ import {
     type Direction,
     type DockviewApi,
     type DockviewDidDropEvent,
+    type DockviewEvent,
     type DockviewGroupPanel,
+    type DockviewIDisposable,
     positionToDirection,
 } from 'dockview';
 import {
     type DragPayload,
-    type MovedNotice,
+    type MoveEvent,
     type MultiWindowTransport,
     payloadPanels,
 } from './types';
@@ -68,11 +70,11 @@ export interface CrossWindowDndOptions {
 }
 
 export interface CrossWindowDnd {
-    /** This window's label once the transport has answered; `''` before. */
-    readonly label: string;
+    /** This window's windowId once the transport has answered; `''` before. */
+    readonly windowId: string;
     readonly counters: Readonly<CrossWindowDndCounters>;
     /** Panels moved between any two windows: by a drop, or by undo or redo. */
-    onDidMoveAcrossWindows(listener: (notice: MovedNotice) => void): () => void;
+    onDidMoveAcrossWindows: DockviewEvent<MoveEvent>;
     tearOff: boolean;
     dispose(): void;
 }
@@ -113,20 +115,20 @@ export function installCrossWindowDnd(
     };
     const log = options.onLog ?? (() => undefined);
     const sessionId = options.sessionId ?? randomSessionId;
-    const moveListeners = new Set<(notice: MovedNotice) => void>();
+    const moveListeners = new Set<(event: MoveEvent) => void>();
     const local = new Map<string, LocalSession>();
     const teardown: (() => void)[] = [];
-    let label = '';
+    let windowId = '';
     let disposed = false;
 
     /** Keep a transport subscription until dispose, even one that answers after it. */
-    const subscribe = (subscription: Promise<() => void>) => {
+    const subscribe = (subscription: Promise<DockviewIDisposable>) => {
         void subscription.then(
-            (unlisten) => {
+            (subscription) => {
                 if (disposed) {
-                    unlisten();
+                    subscription.dispose();
                 } else {
-                    teardown.push(unlisten);
+                    teardown.push(() => subscription.dispose());
                 }
             },
             (err: unknown) => log(`subscription failed: ${String(err)}`)
@@ -134,14 +136,18 @@ export function installCrossWindowDnd(
     };
 
     const hub: CrossWindowDnd = {
-        get label() {
-            return label;
+        get windowId() {
+            return windowId;
         },
         counters,
         tearOff: options.tearOff ?? false,
         onDidMoveAcrossWindows(listener) {
             moveListeners.add(listener);
-            return () => moveListeners.delete(listener);
+            return {
+                dispose: () => {
+                    moveListeners.delete(listener);
+                },
+            };
         },
         dispose() {
             disposed = true;
@@ -151,9 +157,9 @@ export function installCrossWindowDnd(
         },
     };
 
-    const ready = transport.label().then((value) => {
-        label = value;
-        log(`cross-window drag ready in window ${label}`);
+    const ready = transport.windowId().then((value) => {
+        windowId = value;
+        log(`cross-window drag ready in window ${windowId}`);
     });
 
     /**
@@ -177,15 +183,15 @@ export function installCrossWindowDnd(
         counters.dragsStarted += 1;
 
         // The session id has to be on the drag now, inside `dragstart`; the
-        // announcement can wait for this window's label.
+        // announcement can wait for this window's windowId.
         void ready
-            .then(() => transport.dragStart(session, label, payload))
+            .then(() => transport.startDrag(session, windowId, payload))
             .then(
                 () =>
                     log(
                         `drag ${short(session)} announced (${payload.kind} ${id})`
                     ),
-                (err: unknown) => log(`dragStart failed: ${String(err)}`)
+                (err: unknown) => log(`startDrag failed: ${String(err)}`)
             );
 
         const source = nativeEvent.target;
@@ -196,9 +202,9 @@ export function installCrossWindowDnd(
                     const dropped = end.dataTransfer?.dropEffect ?? 'none';
                     const tearOff = hub.tearOff && dropped === 'none';
                     void transport
-                        .dragEnd(session, tearOff)
+                        .endDrag(session, tearOff)
                         .catch((err: unknown) =>
-                            log(`dragEnd failed: ${String(err)}`)
+                            log(`endDrag failed: ${String(err)}`)
                         );
                     // The orchestrator keeps the drag claimable for a while
                     // after this, so only conclude it stayed here once a
@@ -261,14 +267,14 @@ export function installCrossWindowDnd(
         let payload: DragPayload;
         try {
             await ready;
-            payload = await transport.peek(session);
+            payload = await transport.peekDrag(session);
             const held = payloadPanels(payload).filter((id) =>
                 api.getPanel(id)
             );
             if (held.length > 0) {
                 throw new Error(`this window already holds ${held.join(', ')}`);
             }
-            await transport.claim(session, label);
+            await transport.claimDrag(session, windowId);
         } catch (err: unknown) {
             counters.dropsRefused += 1;
             log(`drop ${short(session)} refused: ${String(err)}`);
@@ -292,21 +298,19 @@ export function installCrossWindowDnd(
             );
         }
         void transport
-            .moveRecorded(
+            .reportMove(
                 session,
-                label,
+                windowId,
                 'to',
                 payloadPanels(payload),
                 before,
                 api.toJSON()
             )
-            .catch((err: unknown) =>
-                log(`moveRecorded failed: ${String(err)}`)
-            );
+            .catch((err: unknown) => log(`reportMove failed: ${String(err)}`));
     };
 
     subscribe(
-        transport.onRelease((notice) => {
+        transport.onDidRelease((notice) => {
             const session = local.get(notice.session);
             local.delete(notice.session);
             if (!session) {
@@ -323,22 +327,22 @@ export function installCrossWindowDnd(
                 return;
             }
             void transport
-                .moveRecorded(
+                .reportMove(
                     notice.session,
-                    label,
+                    windowId,
                     'from',
                     panels,
                     before,
                     api.toJSON()
                 )
                 .catch((err: unknown) =>
-                    log(`moveRecorded failed: ${String(err)}`)
+                    log(`reportMove failed: ${String(err)}`)
                 );
         })
     );
 
     subscribe(
-        transport.onMoved((notice) => {
+        transport.onDidMove((notice) => {
             for (const listener of moveListeners) {
                 listener(notice);
             }
@@ -347,14 +351,14 @@ export function installCrossWindowDnd(
 
     // A window a tear-off created starts with what was dragged.
     void ready
-        .then(() => transport.takePending(label))
+        .then(() => transport.takePendingDrag(windowId))
         .then((pending) => {
             if (pending) {
                 place(api, pending);
                 log(`started with torn-off ${pending.kind}`);
             }
         })
-        .catch((err: unknown) => log(`takePending failed: ${String(err)}`));
+        .catch((err: unknown) => log(`takePendingDrag failed: ${String(err)}`));
 
     return hub;
 }
