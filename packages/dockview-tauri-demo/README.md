@@ -181,9 +181,10 @@ window owning any other:
    type carries the meaning and the session id waits.
 3. **Drop.** `onDidDrop` reads the session id, reads the group with
    `peek_drag` to refuse one whose panel ids it already holds, claims it
-   with `claim_drop`, and rebuilds the group where the drop landed: `addGroupFromJSON` next to
-   the target group or at a layout edge, or, for a drop on a group's centre
-   or tab bar, `addPanel` into that group. A group's id travels with it;
+   with `claim_drop`, and rebuilds the group where the drop landed with
+   `addGroupFromJSON`: next to the target group or at a layout edge, or,
+   for a drop on a group's centre or tab bar, `direction: 'within'` that
+   group at the tab index the drop reports. A group's id travels with it;
    every window uses `groupIdGenerator` with random ids so it does not
    collide on arrival.
 4. **Release.** The first claim wins. The shell removes the session and

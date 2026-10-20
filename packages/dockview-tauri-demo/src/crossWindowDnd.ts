@@ -18,11 +18,9 @@
  */
 
 import {
-    type AddPanelOptions,
     type DockviewApi,
     type DockviewDidDropEvent,
     type DockviewGroupPanel,
-    type GroupviewPanelState,
     type IDockviewPanel,
     type SerializedDockview,
     type SerializedDockviewGroup,
@@ -419,8 +417,8 @@ function serializePanelAsGroup(panel: IDockviewPanel): SerializedDockviewGroup {
  * Where the drop landed decides how the group is rebuilt. An edge of a grid
  * group or of the layout becomes a new group there. The centre of a group,
  * its tab bar, or any edge of a floating or edge group (which has no grid
- * neighbours) merges the panels into that group, since a group cannot be
- * placed "within" another.
+ * neighbours) merges the panels into that group, at the tab index the drop
+ * reports for a tab-bar landing.
  */
 function place(
     api: DockviewApi,
@@ -444,48 +442,11 @@ function place(
         return;
     }
 
-    // A tab-bar drop names the tab it landed on; insert before it.
-    const at = event.panel ? target.panels.indexOf(event.panel) : -1;
-    envelope.group.views.forEach((id, offset) => {
-        const state = envelope.panels[id];
-        api.addPanel({
-            ...panelOptions(state),
-            position: {
-                referenceGroup: target,
-                ...(at >= 0 ? { index: at + offset } : {}),
-            },
-            inactive: id !== envelope.group.activeView,
-        });
+    api.addGroupFromJSON(envelope, {
+        referenceGroup: target,
+        direction: 'within',
+        index: event.index,
     });
-}
-
-type PanelBase = Pick<
-    AddPanelOptions,
-    | 'id'
-    | 'component'
-    | 'tabComponent'
-    | 'title'
-    | 'params'
-    | 'renderer'
-    | 'minimumWidth'
-    | 'minimumHeight'
-    | 'maximumWidth'
-    | 'maximumHeight'
->;
-
-function panelOptions(state: GroupviewPanelState): PanelBase {
-    return {
-        id: state.id,
-        component: state.contentComponent ?? 'unknown',
-        tabComponent: state.tabComponent,
-        title: state.title,
-        params: state.params,
-        renderer: state.renderer,
-        minimumWidth: state.minimumWidth,
-        minimumHeight: state.minimumHeight,
-        maximumWidth: state.maximumWidth,
-        maximumHeight: state.maximumHeight,
-    };
 }
 
 /** The panel ids a release will take out of this window. */
@@ -516,9 +477,9 @@ function describePlacement(event: DockviewDidDropEvent): string {
         return `at the layout's ${event.position} edge`;
     }
     if (event.position === 'center') {
-        return event.panel
-            ? `into group ${event.group.id} before ${event.panel.id}`
-            : `into group ${event.group.id}`;
+        return event.index === undefined
+            ? `into group ${event.group.id}`
+            : `into group ${event.group.id} at tab ${event.index}`;
     }
     return `${event.position} of group ${event.group.id}`;
 }

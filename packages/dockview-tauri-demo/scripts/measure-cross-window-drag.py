@@ -91,8 +91,9 @@ def main():
     parser.add_argument(
         "--where",
         default="right",
-        choices=["center", "left", "right", "top", "bottom"],
-        help="where on the target's content to drop",
+        choices=["center", "left", "right", "top", "bottom", "tab"],
+        help="where on the target's content to drop; 'tab' drops on the "
+        "left half of the target's own tab, which lands before it",
     )
     parser.add_argument("--screenshot", help="write a PNG of the screen after the drop")
     parser.add_argument("--timeout", type=float, default=40.0)
@@ -190,17 +191,21 @@ def main():
         mx, my = window_origin(MAIN_TITLE)
         sx2, sy2 = window_origin(SECOND_TITLE)
         tab = rects["main"]["panels"][panel_id]["tab"]
-        content = rects["dock-2"]["panels"][target_id]["content"]
+        target = rects["dock-2"]["panels"][target_id]
         src = (mx + tab["x"] + tab["width"] // 2, my + tab["y"] + tab["height"] // 2)
-        fx, fy = {
-            "center": (0.5, 0.5), "left": (0.08, 0.5), "right": (0.92, 0.5),
-            "top": (0.5, 0.08), "bottom": (0.5, 0.92),
-        }[args.where]
+        if args.where == "tab":
+            box, fx, fy = target["tab"], 0.25, 0.5
+        else:
+            box = target["content"]
+            fx, fy = {
+                "center": (0.5, 0.5), "left": (0.08, 0.5), "right": (0.92, 0.5),
+                "top": (0.5, 0.08), "bottom": (0.5, 0.92),
+            }[args.where]
         dst = (
-            sx2 + content["x"] + round(content["width"] * fx),
-            sy2 + content["y"] + round(content["height"] * fy),
+            sx2 + box["x"] + round(box["width"] * fx),
+            sy2 + box["y"] + round(box["height"] * fy),
         )
-        print(f"dragging {panel_id} tab at {src} to {target_id} content ({args.where}) at {dst}")
+        print(f"dragging {panel_id} tab at {src} to {target_id} ({args.where}) at {dst}")
         before = len(log)
         drag(src, dst)
 
