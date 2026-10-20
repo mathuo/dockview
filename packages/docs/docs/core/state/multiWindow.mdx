@@ -22,7 +22,7 @@ against a Tauri shell, an Electron main process, a `BroadcastChannel`, or the
 in-memory orchestrator this package includes.
 
 ```ts
-import { installMultiWindow } from 'dockview-enterprise';
+import { installMultiWindow, randomSessionId } from 'dockview-enterprise';
 
 const api = createDockview(element, {
     components,
@@ -31,8 +31,10 @@ const api = createDockview(element, {
     // fromJSON and must not wipe the stack.
     layoutHistory: { enabled: true, clearOnFromJSON: false },
     // Every window numbers its groups from "1" by default, so a group moved
-    // between windows would collide on arrival.
-    groupIdGenerator: () => crypto.randomUUID(),
+    // between windows would collide on arrival. `randomSessionId` is a
+    // random id that also works where `crypto.randomUUID` is undefined, as
+    // on a custom-scheme origin such as `tauri://localhost`.
+    groupIdGenerator: randomSessionId,
 });
 
 const transport = connectToYourOrchestrator(); // a MultiWindowTransport
@@ -83,6 +85,14 @@ multiWindow.counters; // drags started, drops claimed and refused, releases
 // ended outside every window) becomes a new window holding the tab.
 multiWindow.tearOff = true;
 ```
+
+A tear-off is reported through `onDidMoveAcrossWindows` with reason
+`'tear-off'`, but it is not a step the shared history can undo: the new window
+is the host's to create.
+
+If the destination cannot place a claimed payload (a component it does not
+register, for instance), the source has already let go. The move is still
+recorded, so a shared undo brings the panels back to the source.
 
 Only the HTML5 backend can leave a window. A pointer-backend drag (touch and
 pen, see [strategies](/docs/core/dnd/strategy)) is left alone.
@@ -214,6 +224,20 @@ orchestrator.disconnect('main'); // the window closed
 Every notice an orchestrator sends arrives on a later microtask, never inside
 the call that caused it, so a window's handlers run as they would with a real
 message bus.
+
+## Limitations
+
+- **Layout edges between dockviews on one page.** When two dockviews share
+  a page, a tab dragged from one can be dropped on the other's groups but
+  not on its layout edges: the root drop target refuses an in-page drag that
+  belongs to another dockview. Separate windows are unaffected, since the
+  other window never sees that data.
+- **A resize still being coalesced when a shared undo arrives.** Dockview's
+  history coalesces a run of sash drags into one step when the next step
+  begins. A shared undo that reaches the window inside that interval
+  finalises the resize first and undoes it, rather than the step the
+  orchestrator meant, and the resize is never reported. Give a resize its
+  coalescing interval before undoing.
 
 ## See also
 

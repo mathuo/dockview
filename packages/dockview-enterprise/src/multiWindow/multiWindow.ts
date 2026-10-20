@@ -81,9 +81,11 @@ export function installMultiWindow(
     transport: MultiWindowTransport,
     options: MultiWindowOptions = {}
 ): MultiWindow {
-    // One label lookup for every part.
+    // One label lookup for every part. Every other call is forwarded to
+    // the given transport with itself as `this`, so one written as a class
+    // keeps its prototype methods and its state.
     const label = transport.label();
-    const shared: MultiWindowTransport = { ...transport, label: () => label };
+    const shared = forwarding(transport, () => label);
     const onLog = options.onLog;
 
     const dnd: CrossWindowDnd = installCrossWindowDnd(api, shared, {
@@ -102,7 +104,10 @@ export function installMultiWindow(
               });
     const ready =
         workspace?.ready ??
-        label.then((value) => ({ label: value, restored: false }));
+        label.then(
+            (value) => ({ label: value, restored: false }),
+            () => ({ label: '', restored: false })
+        );
 
     const history: SharedHistory | undefined =
         options.history === false
@@ -149,4 +154,40 @@ export function installMultiWindow(
             dnd.dispose();
         },
     };
+}
+
+const TRANSPORT_METHODS = [
+    'dragStart',
+    'peek',
+    'claim',
+    'dragEnd',
+    'onRelease',
+    'takePending',
+    'moveRecorded',
+    'onMoved',
+    'initialLayout',
+    'layoutChanged',
+    'historyPush',
+    'undo',
+    'redo',
+    'historyInfo',
+    'onApplyLayout',
+    'onUndoRequest',
+    'onRedoRequest',
+    'onHistoryChanged',
+] as const satisfies readonly Exclude<keyof MultiWindowTransport, 'label'>[];
+
+function forwarding(
+    transport: MultiWindowTransport,
+    label: () => Promise<string>
+): MultiWindowTransport {
+    const shared = { label } as Record<string, unknown>;
+    for (const method of TRANSPORT_METHODS) {
+        shared[method] = (...args: unknown[]) =>
+            (transport[method] as (...a: unknown[]) => unknown).apply(
+                transport,
+                args
+            );
+    }
+    return shared as unknown as MultiWindowTransport;
 }

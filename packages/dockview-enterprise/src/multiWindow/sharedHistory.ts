@@ -63,9 +63,28 @@ export function installSharedHistory(
         }
     };
 
-    void transport.label().then((value) => {
-        label = value;
-    });
+    let disposed = false;
+
+    /** Keep a transport subscription until dispose, even one that answers after it. */
+    const subscribe = (subscription: Promise<() => void>) => {
+        void subscription.then(
+            (unlisten) => {
+                if (disposed) {
+                    unlisten();
+                } else {
+                    teardown.push(unlisten);
+                }
+            },
+            (err: unknown) => log(`subscription failed: ${String(err)}`)
+        );
+    };
+
+    void transport.label().then(
+        (value) => {
+            label = value;
+        },
+        (err: unknown) => log(`label failed: ${String(err)}`)
+    );
 
     // A rise in the local undo count outside an instruction is a step the
     // user made here; the orchestrator needs it in the global order.
@@ -95,38 +114,39 @@ export function installSharedHistory(
         }
     };
 
-    void transport
-        .onApplyLayout((layout) => {
+    subscribe(
+        transport.onApplyLayout((layout) => {
             guarded('apply', () => {
                 api.fromJSON(layout, { reuseExistingPanels: true });
                 log(`applied a layout with ${api.panels.length} panel(s)`);
             });
         })
-        .then((unlisten) => teardown.push(unlisten));
-    void transport
-        .onUndoRequest(() => {
+    );
+    subscribe(
+        transport.onUndoRequest(() => {
             guarded('local undo', () => {
                 api.undo();
                 log('undid a local step');
             });
         })
-        .then((unlisten) => teardown.push(unlisten));
-    void transport
-        .onRedoRequest(() => {
+    );
+    subscribe(
+        transport.onRedoRequest(() => {
             guarded('local redo', () => {
                 api.redo();
                 log('redid a local step');
             });
         })
-        .then((unlisten) => teardown.push(unlisten));
-    void transport
-        .onHistoryChanged((next) => setInfo(next))
-        .then((unlisten) => teardown.push(unlisten));
-    void transport.historyInfo().then((next) => {
-        if (next) {
-            setInfo(next);
-        }
-    });
+    );
+    subscribe(transport.onHistoryChanged((next) => setInfo(next)));
+    void transport.historyInfo().then(
+        (next) => {
+            if (next && !disposed) {
+                setInfo(next);
+            }
+        },
+        (err: unknown) => log(`historyInfo failed: ${String(err)}`)
+    );
 
     const undo = () => {
         void transport
@@ -142,7 +162,13 @@ export function installSharedHistory(
     if (options.bindKeys) {
         const onKeyDown = (event: KeyboardEvent) => {
             const modifier = event.ctrlKey || event.metaKey;
-            if (!modifier || event.altKey) {
+            if (
+                !modifier ||
+                event.altKey ||
+                event.defaultPrevented ||
+                isEditable(event.target)
+            ) {
+                // Text undo in an editor inside a panel is the editor's.
                 return;
             }
             const key = event.key.toLowerCase();
@@ -169,9 +195,23 @@ export function installSharedHistory(
             return () => listeners.delete(listener);
         },
         dispose() {
+            disposed = true;
             for (const fn of teardown.splice(0)) {
                 fn();
             }
         },
     };
+}
+
+/** Whether a key event's target takes text, so its undo is not the layout's. */
+function isEditable(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) {
+        return false;
+    }
+    return (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target.isContentEditable
+    );
 }

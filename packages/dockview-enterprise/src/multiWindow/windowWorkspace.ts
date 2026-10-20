@@ -6,7 +6,7 @@
  * orchestrator stores the result without reading it.
  */
 
-import type { DockviewApi } from 'dockview';
+import type { DockviewApi, SerializedDockview } from 'dockview';
 import type { MultiWindowTransport } from './types';
 
 export interface WindowWorkspaceOptions {
@@ -33,9 +33,13 @@ export function installWindowWorkspace(
     const teardown: (() => void)[] = [];
     let label = '';
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
 
     const report = () => {
         clearTimeout(timer);
+        if (disposed) {
+            return;
+        }
         timer = setTimeout(() => {
             void transport
                 .layoutChanged(label, api.toJSON())
@@ -46,9 +50,22 @@ export function installWindowWorkspace(
     };
 
     const ready = (async () => {
-        label = await transport.label();
-        const layout = await transport.initialLayout(label);
+        let layout: SerializedDockview | null = null;
+        try {
+            label = await transport.label();
+            layout = await transport.initialLayout(label);
+        } catch (err: unknown) {
+            // The orchestrator could not be reached: the window still has to
+            // show something, and may reach it later.
+            log(
+                `no layout from the orchestrator: ${String(err)}; building defaults`
+            );
+        }
         let restored = false;
+
+        if (disposed) {
+            return { label, restored };
+        }
 
         if (layout) {
             try {
@@ -69,8 +86,10 @@ export function installWindowWorkspace(
         // Only report from here on, so a half-built default layout and the
         // restore itself are not written back over what the orchestrator
         // held.
-        teardown.push(api.onDidLayoutChange(report).dispose);
-        report();
+        if (!disposed) {
+            teardown.push(api.onDidLayoutChange(report).dispose);
+            report();
+        }
 
         return { label, restored };
     })();
@@ -78,6 +97,7 @@ export function installWindowWorkspace(
     return {
         ready,
         dispose() {
+            disposed = true;
             clearTimeout(timer);
             for (const fn of teardown.splice(0)) {
                 fn();

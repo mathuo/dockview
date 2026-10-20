@@ -66,7 +66,7 @@ export class HistorySequencer {
         const existing = this.undoStack.find(
             (entry) => entry.type === 'move' && entry.session === session
         );
-        if (existing && existing.type === 'move') {
+        if (existing?.type === 'move') {
             existing[role] = half;
             return;
         }

@@ -99,55 +99,37 @@ export class MemoryOrchestrator {
         return {
             label: () => Promise.resolve(label),
 
-            dragStart: async (session, from, payload) => {
-                this._hub.start(session, { from, payload });
-            },
-            peek: async (session) => this._hub.peek(session),
-            claim: async (session, to) => {
-                const claim = this._hub.claim(session, to);
-                const panels = payloadPanels(claim.payload);
-                this._workspace.expectMove(panels, claim.release.from, to);
-                this._deliver(claim.release.from, 'release', {
-                    session,
-                    to,
-                });
-                this._broadcast(this._moved, {
-                    session,
-                    panels,
-                    from: claim.release.from,
-                    to,
-                    reason: 'drop',
-                });
-            },
-            dragEnd: async (session, tearOff) => {
-                if (!this._hub.end(session, tearOff)) {
-                    return;
-                }
-                setTimeout(
-                    () => this._expire(session),
-                    this._options.dragEndGraceMs ?? 1500
-                );
-            },
+            dragStart: (session, from, payload) =>
+                settle(() => this._hub.start(session, { from, payload })),
+            peek: (session) => settle(() => this._hub.peek(session)),
+            claim: (session, to) => settle(() => this._claim(session, to)),
+            dragEnd: (session, tearOff) =>
+                settle(() => this._dragEnd(session, tearOff)),
             onRelease: (handler) => subscribe(listeners.release, handler),
-            takePending: async (forLabel) => this._hub.takePending(forLabel),
-            moveRecorded: async (session, from, role, panels, before, after) =>
-                this._recordMove(session, from, role, panels, before, after),
+            takePending: (forLabel) =>
+                settle(() => this._hub.takePending(forLabel)),
+            moveRecorded: (session, from, role, panels, before, after) =>
+                settle(() =>
+                    this._recordMove(session, from, role, panels, before, after)
+                ),
             onMoved: (handler) => subscribe(this._moved, handler),
 
-            initialLayout: async (forLabel) =>
-                this._workspace.initialLayout(forLabel),
-            layoutChanged: async (forLabel, layout) => {
-                this._workspace.setLayout(forLabel, layout);
-                this._workspaceDidChange();
-            },
+            initialLayout: (forLabel) =>
+                settle(() => this._workspace.initialLayout(forLabel)),
+            layoutChanged: (forLabel, layout) =>
+                settle(() => {
+                    this._workspace.setLayout(forLabel, layout);
+                    this._workspaceDidChange();
+                }),
 
-            historyPush: async (forLabel) => {
-                this._history.pushLocal(forLabel);
-                this._historyDidChange();
-            },
-            undo: async () => this._carryOut(this._history.undo(), 'undo'),
-            redo: async () => this._carryOut(this._history.redo(), 'redo'),
-            historyInfo: async () => this._history.info(),
+            historyPush: (forLabel) =>
+                settle(() => {
+                    this._history.pushLocal(forLabel);
+                    this._historyDidChange();
+                }),
+            undo: () => settle(() => this.undo()),
+            redo: () => settle(() => this.redo()),
+            historyInfo: () => settle(() => this._history.info()),
             onApplyLayout: (handler) => subscribe(listeners.apply, handler),
             onUndoRequest: (handler) => subscribe(listeners.undo, handler),
             onRedoRequest: (handler) => subscribe(listeners.redo, handler),
@@ -216,6 +198,34 @@ export class MemoryOrchestrator {
         };
     }
 
+    private _claim(session: string, to: string): void {
+        const claim = this._hub.claim(session, to);
+        const panels = payloadPanels(claim.payload);
+        this._workspace.expectMove(panels, claim.release.from, to);
+        this._deliver(claim.release.from, 'release', {
+            session,
+            to,
+            reason: 'claim',
+        });
+        this._broadcast(this._moved, {
+            session,
+            panels,
+            from: claim.release.from,
+            to,
+            reason: 'drop',
+        });
+    }
+
+    private _dragEnd(session: string, tearOff: boolean): void {
+        if (!this._hub.end(session, tearOff)) {
+            return;
+        }
+        setTimeout(
+            () => this._expire(session),
+            this._options.dragEndGraceMs ?? 1500
+        );
+    }
+
     private _listeners(label: string): Listeners {
         let listeners = this._windows.get(label);
         if (!listeners) {
@@ -245,12 +255,26 @@ export class MemoryOrchestrator {
             return;
         }
         const payload = this._hub.peekPending(ended.label);
-        if (payload) {
-            createWindow(ended.label, payload);
+        if (!payload) {
+            return;
         }
-        this._deliver(ended.release.from, 'release', {
+        const panels = payloadPanels(payload);
+        const from = ended.release.from;
+        // As for a claim: the new window may report the panels before the
+        // source reports them gone.
+        this._workspace.expectMove(panels, from, ended.label);
+        createWindow(ended.label, payload);
+        this._deliver(from, 'release', {
             session,
             to: ended.label,
+            reason: 'tear-off',
+        });
+        this._broadcast(this._moved, {
+            session,
+            panels,
+            from,
+            to: ended.label,
+            reason: 'tear-off',
         });
     }
 
@@ -332,5 +356,18 @@ export class MemoryOrchestrator {
 
     private _historyDidChange(): void {
         this._broadcast(this._historyChanged, this._history.info());
+    }
+}
+
+/**
+ * Run a synchronous orchestrator step as a transport call: its result, or
+ * the error it throws, arrives as a settled promise, as it would over a
+ * message bus.
+ */
+function settle<T>(step: () => T): Promise<T> {
+    try {
+        return Promise.resolve(step());
+    } catch (err: unknown) {
+        return Promise.reject(err);
     }
 }
