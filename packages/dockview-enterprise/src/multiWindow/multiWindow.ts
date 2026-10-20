@@ -6,7 +6,7 @@
  * instance keeps working as before.
  */
 
-import type { DockviewApi, DockviewEvent, DockviewIDisposable } from 'dockview';
+import type { DockviewApi, DockviewEvent } from 'dockview';
 import {
     type CrossWindowDnd,
     type CrossWindowDndCounters,
@@ -37,11 +37,11 @@ export interface MultiWindowOptions {
      */
     history?: boolean | { bindKeys?: boolean };
     /**
-     * Turn an unclaimed drag into a new window, where the orchestrator
+     * Turn an unaccepted drag into a new window, where the orchestrator
      * supports it. Off by default: an HTML5 drag cannot tell a drop on the
      * desktop from a cancelled drag.
      */
-    tearOff?: boolean;
+    detach?: boolean;
     /** Makes the session id a drag carries. Random by default. */
     sessionId?: () => string;
     onLog?(line: string): void;
@@ -53,8 +53,8 @@ export interface MultiWindow {
     /** Resolves once the window holds its initial layout, restored or default. */
     readonly ready: Promise<{ windowId: string; restored: boolean }>;
     readonly counters: Readonly<CrossWindowDndCounters>;
-    /** See {@link MultiWindowOptions.tearOff}. */
-    tearOff: boolean;
+    /** See {@link MultiWindowOptions.detach}. */
+    detach: boolean;
     /** Panels moved between any two windows: by a drop, or by undo or redo. */
     onDidMoveAcrossWindows: DockviewEvent<MoveEvent>;
     /**
@@ -82,7 +82,7 @@ export function installMultiWindow(
     const onLog = options.onLog;
 
     const dnd: CrossWindowDnd = installCrossWindowDnd(api, shared, {
-        tearOff: options.tearOff,
+        detach: options.detach,
         sessionId: options.sessionId,
         onLog,
     });
@@ -126,11 +126,11 @@ export function installMultiWindow(
         },
         ready,
         counters: dnd.counters,
-        get tearOff() {
-            return dnd.tearOff;
+        get detach() {
+            return dnd.detach;
         },
-        set tearOff(value: boolean) {
-            dnd.tearOff = value;
+        set detach(value: boolean) {
+            dnd.detach = value;
         },
         onDidMoveAcrossWindows: (listener) =>
             dnd.onDidMoveAcrossWindows(listener),
@@ -154,10 +154,10 @@ export function installMultiWindow(
 const TRANSPORT_METHODS = [
     'startDrag',
     'peekDrag',
-    'claimDrag',
+    'acceptDrag',
     'endDrag',
     'onDidRelease',
-    'takePendingDrag',
+    'takeDetachedDrag',
     'reportMove',
     'onDidMove',
     'loadLayout',

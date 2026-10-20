@@ -50,7 +50,7 @@ several windows or processes, reaching an orchestrator only through the
 - `sharedHistory.ts`: reports local steps, carries out "undo your top step" /
   "take this layout".
 - `memoryOrchestrator.ts` (`MemoryOrchestrator`, exported): an orchestrator
-  for one heap, composed from the pure `dragHub.ts`, `workspaceState.ts` and
+  for one heap, composed from the pure `dragSessions.ts`, `workspaceState.ts` and
   `historySequencer.ts` (not exported; tests import them directly), which
   mirror the Rust modules in `packages/dockview-tauri-demo/src-tauri/src/`.
   Keep the two in step.

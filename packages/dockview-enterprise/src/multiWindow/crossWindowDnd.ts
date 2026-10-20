@@ -38,12 +38,12 @@ import {
  * this is what the destination accepts on; the session id is read at the
  * drop.
  */
-export const HUB_DRAG_TYPE = 'application/x-dockview-hub';
+export const MULTI_WINDOW_DRAG_TYPE = 'application/x-dockview-multi-window';
 
 /**
  * How long after its drag ended a source keeps the record it needs to act
  * on a release. Longer than an orchestrator's own grace period should be,
- * so a late claim is still honoured here.
+ * so a late accept is still honoured here.
  */
 const LOCAL_SESSION_TTL_MS = 3000;
 
@@ -52,18 +52,18 @@ export type DragKind = DragPayload['kind'];
 export interface CrossWindowDndCounters {
     dragsStarted: number;
     dragOversAccepted: number;
-    dropsClaimed: number;
+    dropsAccepted: number;
     dropsRefused: number;
     releases: number;
 }
 
 export interface CrossWindowDndOptions {
     /**
-     * Turn an unclaimed drag into a new window, where the orchestrator
+     * Turn an unaccepted drag into a new window, where the orchestrator
      * supports it. Off by default: an HTML5 drag cannot tell a drop on the
      * desktop from a cancelled drag.
      */
-    tearOff?: boolean;
+    detach?: boolean;
     /** Makes the session id a drag carries. Random by default. */
     sessionId?: () => string;
     onLog?(line: string): void;
@@ -75,7 +75,7 @@ export interface CrossWindowDnd {
     readonly counters: Readonly<CrossWindowDndCounters>;
     /** Panels moved between any two windows: by a drop, or by undo or redo. */
     onDidMoveAcrossWindows: DockviewEvent<MoveEvent>;
-    tearOff: boolean;
+    detach: boolean;
     dispose(): void;
 }
 
@@ -109,7 +109,7 @@ export function installCrossWindowDnd(
     const counters: CrossWindowDndCounters = {
         dragsStarted: 0,
         dragOversAccepted: 0,
-        dropsClaimed: 0,
+        dropsAccepted: 0,
         dropsRefused: 0,
         releases: 0,
     };
@@ -135,12 +135,12 @@ export function installCrossWindowDnd(
         );
     };
 
-    const hub: CrossWindowDnd = {
+    const dnd: CrossWindowDnd = {
         get windowId() {
             return windowId;
         },
         counters,
-        tearOff: options.tearOff ?? false,
+        detach: options.detach ?? false,
         onDidMoveAcrossWindows(listener) {
             moveListeners.add(listener);
             return {
@@ -165,7 +165,7 @@ export function installCrossWindowDnd(
     /**
      * Announce a drag: put the session id on the drag, hand the orchestrator
      * the payload, and remember what to remove if another window takes it.
-     * The drag's own end reports back whether anything claimed it.
+     * The drag's own end reports back whether anything accepted it.
      */
     const announce = (
         nativeEvent: DragEvent | PointerEvent,
@@ -178,7 +178,7 @@ export function installCrossWindowDnd(
         }
 
         const session = sessionId();
-        nativeEvent.dataTransfer.setData(HUB_DRAG_TYPE, session);
+        nativeEvent.dataTransfer.setData(MULTI_WINDOW_DRAG_TYPE, session);
         local.set(session, { kind: payload.kind, id });
         counters.dragsStarted += 1;
 
@@ -200,15 +200,15 @@ export function installCrossWindowDnd(
                 'dragend',
                 (end) => {
                     const dropped = end.dataTransfer?.dropEffect ?? 'none';
-                    const tearOff = hub.tearOff && dropped === 'none';
+                    const detach = dnd.detach && dropped === 'none';
                     void transport
-                        .endDrag(session, tearOff)
+                        .endDrag(session, detach)
                         .catch((err: unknown) =>
                             log(`endDrag failed: ${String(err)}`)
                         );
-                    // The orchestrator keeps the drag claimable for a while
+                    // The orchestrator keeps the drag acceptable for a while
                     // after this, so only conclude it stayed here once a
-                    // claim would have shown up as a release.
+                    // accept would have shown up as a release.
                     setTimeout(() => {
                         if (local.delete(session)) {
                             log(
@@ -259,9 +259,9 @@ export function installCrossWindowDnd(
 
     /**
      * Rebuild the payload where the drop landed. It is read before the
-     * claim so one this window cannot take, because it already holds a
+     * accept so one this window cannot take, because it already holds a
      * panel of the same id, is refused without the source letting go of it;
-     * only then is the drag claimed, which releases the source.
+     * only then is the drag accepted, which releases the source.
      */
     const receive = async (session: string, event: DockviewDidDropEvent) => {
         let payload: DragPayload;
@@ -274,7 +274,7 @@ export function installCrossWindowDnd(
             if (held.length > 0) {
                 throw new Error(`this window already holds ${held.join(', ')}`);
             }
-            await transport.claimDrag(session, windowId);
+            await transport.acceptDrag(session, windowId);
         } catch (err: unknown) {
             counters.dropsRefused += 1;
             log(`drop ${short(session)} refused: ${String(err)}`);
@@ -287,7 +287,7 @@ export function installCrossWindowDnd(
         const before = api.toJSON();
         try {
             place(api, payload, event);
-            counters.dropsClaimed += 1;
+            counters.dropsAccepted += 1;
             log(
                 `drop ${short(session)} placed ${payloadPanels(payload).length} panel(s) ${describePlacement(event)}`
             );
@@ -321,8 +321,8 @@ export function installCrossWindowDnd(
             const panels = releasedPanels(api, session);
             release(api, session);
             log(`released ${session.kind} ${session.id} to ${notice.to}`);
-            if (notice.reason === 'tear-off') {
-                // The new window is the host's to create; a tear-off is not
+            if (notice.reason === 'detach') {
+                // The new window is the host's to create; a detach is not
                 // a move the shared history can undo.
                 return;
             }
@@ -349,18 +349,20 @@ export function installCrossWindowDnd(
         })
     );
 
-    // A window a tear-off created starts with what was dragged.
+    // A window a detach created starts with what was dragged.
     void ready
-        .then(() => transport.takePendingDrag(windowId))
+        .then(() => transport.takeDetachedDrag(windowId))
         .then((pending) => {
             if (pending) {
                 place(api, pending);
-                log(`started with torn-off ${pending.kind}`);
+                log(`started with detached ${pending.kind}`);
             }
         })
-        .catch((err: unknown) => log(`takePendingDrag failed: ${String(err)}`));
+        .catch((err: unknown) =>
+            log(`takeDetachedDrag failed: ${String(err)}`)
+        );
 
-    return hub;
+    return dnd;
 }
 
 function short(session: string): string {
@@ -381,7 +383,8 @@ function hasDataTransfer(
 function isHubDrag(nativeEvent: DragEvent | PointerEvent): boolean {
     return (
         hasDataTransfer(nativeEvent) &&
-        (nativeEvent.dataTransfer?.types.includes(HUB_DRAG_TYPE) ?? false)
+        (nativeEvent.dataTransfer?.types.includes(MULTI_WINDOW_DRAG_TYPE) ??
+            false)
     );
 }
 
@@ -389,7 +392,7 @@ function readSession(nativeEvent: DragEvent | PointerEvent): string | null {
     if (!hasDataTransfer(nativeEvent)) {
         return null;
     }
-    const session = nativeEvent.dataTransfer?.getData(HUB_DRAG_TYPE);
+    const session = nativeEvent.dataTransfer?.getData(MULTI_WINDOW_DRAG_TYPE);
     return session || null;
 }
 
@@ -398,7 +401,7 @@ function readSession(nativeEvent: DragEvent | PointerEvent): string | null {
  * grid group or of the layout becomes a new group there. The centre of a
  * group, its tab bar, or any edge of a floating or edge group (which has no
  * grid neighbours) merges into that group, at the tab index the drop
- * reports for a tab-bar landing. Without a drop event (a tear-off) the
+ * reports for a tab-bar landing. Without a drop event (a detach) the
  * payload is appended to the layout.
  */
 function place(
