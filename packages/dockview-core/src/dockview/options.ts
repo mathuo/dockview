@@ -1011,6 +1011,15 @@ export type AddGroupOptions = (
     GroupOptions;
 
 /**
+ * Placement for `addPanelFromJSON`: everything `addPanel` takes beyond what
+ * the serialized panel state already carries.
+ */
+export type AddPanelFromJSONOptions = Pick<
+    AddPanelOptions,
+    'position' | 'floating' | 'inactive' | 'initialWidth' | 'initialHeight'
+>;
+
+/**
  * Placement for `addGroupFromJSON`: where the rehydrated group goes in the
  * grid, as for `addGroup`. The group's own shape (id, locked, hidden header,
  * header position) comes from the serialized state, so it is not repeated

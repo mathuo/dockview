@@ -77,9 +77,15 @@ targetApi.onDidDrop((event) => {
 });
 ```
 
-A single tab moves as a group of its own: `api.serializePanel(panel)` serializes one panel in the same shape, with a fresh group id.
+A single tab travels as `panel.toJSON()` and lands with `addPanelFromJSON`, which places it as `addPanel` would (a `position`, or `floating`) and takes the drop index the same way:
 
-<DocRef declaration="DockviewApi" methods={['serializePanel']} />
+```ts
+targetApi.addPanelFromJSON(state, {
+    position: { referenceGroup: event.group, index: event.index },
+});
+```
+
+<DocRef declaration="DockviewApi" methods={['addPanelFromJSON']} />
 
 Panel ids must be unique within the receiving instance. `addGroupFromJSON` throws before changing anything if a panel id is already in use, as `addPanel` does. A group id that is already in use is reassigned with a warning, as `addGroup` does, so give groups unique ids when they move between instances.
 

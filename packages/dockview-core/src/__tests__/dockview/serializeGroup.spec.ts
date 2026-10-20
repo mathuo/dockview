@@ -382,24 +382,43 @@ describe('serializeGroup / addGroupFromJSON', () => {
             ]);
         });
 
-        test('serializePanel yields a one-panel group with a fresh id', () => {
+        test('addPanelFromJSON places a panel from its toJSON state', () => {
             const p1 = seedGroup(source).panels[0];
+            const state = p1.toJSON();
+            const a = target.addPanel({ id: 'a', component: 'default' });
 
-            const envelope = source.serializePanel(p1);
+            const panel = new DockviewApi(target).addPanelFromJSON(state, {
+                position: { referenceGroup: a.group, index: 0 },
+                inactive: true,
+            });
 
-            expect(envelope.group.views).toEqual(['p1']);
-            expect(envelope.group.activeView).toBe('p1');
-            expect(envelope.group.id).not.toBe(p1.group.id);
-            expect(Object.keys(envelope.panels)).toEqual(['p1']);
-            expect(envelope.panels.p1).toEqual(
-                expect.objectContaining({ id: 'p1', title: 'First' })
+            expect(panel.id).toBe('p1');
+            expect(panel.title).toBe('First');
+            expect(panel.params).toEqual({ counter: 7 });
+            expect(panel.toJSON()).toEqual(state);
+            expect(a.group.panels.map((p) => p.id)).toEqual(['p1', 'a']);
+            expect(a.group.activePanel?.id).toBe('a');
+
+            const beside = target.addPanelFromJSON(
+                { ...state, id: 'p1-copy' },
+                { position: { referencePanel: 'a', direction: 'right' } }
             );
-            expect(new DockviewApi(source).serializePanel(p1)).toEqual(
-                expect.objectContaining({ panels: envelope.panels })
-            );
+            expect(target.groups).toHaveLength(2);
+            expect(beside.group).not.toBe(a.group);
+            expect(target.activePanel).toBe(beside);
+        });
 
-            const group = target.addGroupFromJSON(envelope);
-            expect(group.panels.map((p) => p.id)).toEqual(['p1']);
+        test('addPanelFromJSON refuses a live panel id and an unknown component', () => {
+            const state = seedGroup(source).panels[0].toJSON();
+            target.addPanel({ id: 'p1', component: 'default' });
+
+            expect(() => target.addPanelFromJSON(state)).toThrow(
+                'dockview: panel with id p1 already exists'
+            );
+            expect(() =>
+                target.addPanelFromJSON({ id: 'x', title: 'x' })
+            ).toThrow('dockview: serialized panel x has no contentComponent');
+            expect(target.panels.map((p) => p.id)).toEqual(['p1']);
         });
 
         test('a reference with direction within merges into that group at an index', () => {
