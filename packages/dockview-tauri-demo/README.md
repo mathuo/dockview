@@ -62,8 +62,23 @@ reports whether every panel came back visible. Both run in a plain browser, so
 the macOS/Linux release behaviour can be checked without packaging anything.
 
 **Native windows** — asks Rust to build a second native window running the same
-frontend. That webview has its own JavaScript context, so nothing can be moved
+frontend. That webview has its own JavaScript context, so no DOM can be moved
 into it from here.
+
+**Cross-window drag** — drags a tab or a group from one native window's
+dockview into another's, with the shell as the hub. Reports the drag backend
+in use, counts each stage of a drag, and logs what crossed. See
+[Dragging between windows](#dragging-between-windows).
+
+**Workspace** — what the shell has on record: the workspace file, when it was
+last written, and every window with its frame and whether it has reported a
+layout. Close the app and reopen it to see every window return. See
+[Persisting the workspace](#persisting-the-workspace).
+
+**Undo** — one undo history across every window. Ctrl+Z in any window undoes
+the most recent step wherever it happened, a tab that crossed to another
+window included, and the panel logs every move between windows. See
+[Undo across windows](#undo-across-windows).
 
 **Layout sync** — serializes the layout and fans it out over Tauri's event bus,
 so windows on either side of the process boundary converge on the same
@@ -146,6 +161,175 @@ primary pointer, and `'auto'` therefore resolves to the pointer backend, so
 those runs force `VITE_DND=html5`; on a desktop `'auto'` gives HTML5 for the
 mouse.
 
+### Dragging between windows
+
+Two native windows are two dockview instances in two JavaScript contexts, so
+a tab cannot be dragged between them the way it is dragged between groups.
+What does cross a window boundary is an OS drag session, and only an HTML5
+drag rides one. The demo builds on that, with the shell as a hub and no
+window owning any other:
+
+1. **Drag start.** `onWillDragPanel` / `onWillDragGroup` put a session id on
+   the drag's `DataTransfer` under `application/x-dockview-hub`, serialize
+   the group (`api.serializeGroup`, or a one-panel group for a single tab)
+   and hand it to the shell with `drag_start`. Serializing up front means the
+   drop can be completed even if the source window is busy by then.
+2. **Drag over.** The destination's dockview sees a drag it did not start
+   and asks through `onUnhandledDragOver`; the demo accepts it when the hub
+   type is present, so the normal drop overlay and compass show. A browser
+   exposes a drag's types but not its data until the drop, which is why the
+   type carries the meaning and the session id waits.
+3. **Drop.** `onDidDrop` reads the session id, reads the group with
+   `peek_drag` to refuse one whose panel ids it already holds, claims it
+   with `claim_drop`, and rebuilds the group where the drop landed with
+   `addGroupFromJSON`: next to the target group or at a layout edge, or,
+   for a drop on a group's centre or tab bar, `direction: 'within'` that
+   group at the tab index the drop reports. A group's id travels with it;
+   every window uses `groupIdGenerator` with random ids so it does not
+   collide on arrival.
+4. **Release.** The first claim wins. The shell removes the session and
+   emits `dockview:release` to the source window, which removes its copy of
+   the panel or group. A second claim, or a claim for a drag the shell never
+   saw, is refused and nothing is added.
+5. **Drag end.** The source reports `drag_end`. With the panel's tear-off
+   box ticked, an unclaimed drag becomes a new window that starts with the
+   group (`take_pending_group` on load), the hub's replacement for a popout.
+   It is off by default because HTML5 cannot tell a drop on the desktop from
+   an Escape-cancelled drag.
+
+What the whole gesture loses is renderer-held state: the panel is rebuilt
+from its serialized `params`, so scroll position, half-typed text and focus
+do not survive the crossing. A panel that wants to keep state across windows
+has to put it in `params`.
+
+The shell keeps a drag claimable for 1.5 s after its source reports it
+over. That is not a nicety: the source's `dragend` fires the instant the
+drop lands in the other window, and the destination's claim is a separate
+IPC message that routinely arrives after it. Measured before the grace
+period existed, the claim lost that race and was refused as "not in flight".
+
+Measured on Linux (WebKitGTK 2.52.6, debug build, two windows under Xvfb
+driven by `scripts/measure-cross-window-drag.py`): dragging the Scratch tab
+from the main window onto the right edge of the Host panel in the second
+window announced the drag, placed one panel right of the target group in the
+second window, and released the panel from the main window, in that order;
+a centre drop merged it into the target group instead. Both windows ran the
+HTML5 backend, forced with `VITE_DND=html5` since Xvfb reports a coarse
+pointer. Every window but the main one names its probe panels with its own
+label as a suffix, because a window that already holds a panel of the same
+id refuses the drop, by design, before anything is claimed. Not measured:
+WKWebView and WebView2, and a group-header drag, which the driver does not
+yet perform.
+
+To repeat it, with xdotool and Xvfb installed and the workspace packages
+built (`yarn build && yarn build:bundle` at the root):
+
+```sh
+Xvfb :99 -screen 0 2400x1000x24 &
+VITE_DND=html5 yarn dev &
+cargo build --manifest-path src-tauri/Cargo.toml
+DISPLAY=:99 python3 scripts/measure-cross-window-drag.py --screenshot after.png
+```
+
+The driver starts the shell with `DOCKVIEW_DEMO_AUTOTEST` set, which opens
+the second window at a known position and makes each window report its
+panel geometry and the drag log as JSON lines on stdout; the driver turns
+the geometry into a pointer drag and judges the result from the log alone.
+The Cross-window drag panel's counters tell the same story interactively:
+`drags started` rising with nothing on the other side means the drag never
+reached the second window; `drag-overs accepted` rising with `drops claimed`
+at zero means the drop landed but was refused, and the log says why.
+
+### Persisting the workspace
+
+Only the party that creates windows can bring them back, so the workspace
+is the shell's: one JSON file naming every window, its frame, and its
+dockview layout. The dockview part stays in each window, `toJSON` on the
+way out and `fromJSON` on the way in; the shell stores the result without
+reading it, bar one field: the keys of a layout's `panels` map, so it can
+refuse a layout that would give two windows the same panel id, which a drag
+between them relies on never happening.
+
+- **Load.** On start the shell reads the file, creates each recorded window
+  at its saved position and size, and each window, once dockview is ready,
+  asks `initial_layout` for its layout and applies it with `fromJSON`. A
+  window with nothing on record builds its default panels. The data flows
+  from the shell to the window, but the window makes the call: nothing can
+  be pushed into a webview before it has loaded, and a reloaded window
+  simply asks again.
+- **Save.** Each window reports `layout_changed` with `api.toJSON()` on a
+  debounce; the shell records native moves and resizes itself; a background
+  thread writes the file half a second after the last change, to a sibling
+  file renamed over the old one, so a crash mid-write leaves the previous
+  workspace intact. A final write runs on exit. Nothing is collected from
+  windows at shutdown, since a closing webview offers no reliable last
+  callback; the shell already holds everything.
+- **Close.** Closing the main window closes the app and keeps every window
+  on record. Closing any other window removes it, and the panels it held,
+  from the workspace.
+- **Where.** The app data directory, or the path in `DOCKVIEW_DEMO_WORKSPACE`,
+  which the measurement driver points at a fresh temporary file so a run
+  never starts from a previous run's layout. Popout windows are not on
+  record: they belong to the dockview instance that opened them and travel
+  inside its layout.
+
+Measured on Linux (WebKitGTK 2.52.6, under Xvfb) with
+`scripts/measure-cross-window-drag.py --restart`: after the Scratch tab had
+crossed from the main window into the second, the shell was closed and
+started again from the workspace file alone, and both windows came back at
+their positions with the same panels, Scratch still in the second window.
+
+### Undo across windows
+
+Each window keeps dockview's own undo history (the enterprise
+`layoutHistory` module) for the steps made in it: it records a full layout
+before and after each step and restores with `reuseExistingPanels`. What no
+window can know is the order of its steps against the moves between
+windows, so the shell sequences. Its history is one ordered stack of
+markers, "a step in window X" for every step a window reports pushing, and
+a full entry for every move between windows, assembled from two halves:
+the source's layout before and after it let go, the destination's before
+and after it took the group. Undo pops the top: a marker tells that window
+to run `api.undo()`; a move applies both windows' pre-move layouts,
+destination first so no two windows hold the panels at once. Redo is the
+mirror image. Ordering is what makes it safe: a window's older local step
+is only reachable after the move that followed it has been undone, which
+puts the moved panels back first, so a snapshot can never resurrect a
+panel that now lives elsewhere.
+
+Three things the windows do for this. They run `layoutHistory` with
+`clearOnFromJSON: false`, since a layout the shell applies arrives through
+`fromJSON` and must not wipe the local stack. They report a local push
+through `onDidChangeHistory` (a rise in the undo count outside a shell
+instruction) and ignore the changes a shell instruction causes. And they
+route Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y to the shell; dockview binds no key
+of its own. After every move, and every undo or redo of one, the shell
+broadcasts `dockview:moved` with the panels and the two windows, which the
+interceptor exposes as `onDidMoveAcrossWindows`: the one event app code
+needs to follow panels between windows.
+
+Two things learned the hard way. A move's two windows report their layouts
+independently and in either order, so the destination can report the moved
+panel before the source has reported it gone; the workspace now treats a
+duplicate as the announced move rather than a conflict until the source's
+report arrives. And a Tauri listener registered for "any" target hears
+events emitted to every window, so the first undo applied both windows'
+layouts in both windows; events the shell addresses to one window now name
+it in the payload and are heard on that window's own target.
+
+Accepted rough edge: a new step anywhere clears the global redo, and the
+matching local redo entries in other windows become unreachable from the
+shell. Harmless, and their `canRedo` is not shown.
+
+Measured on Linux (WebKitGTK 2.52.6, under Xvfb) with
+`scripts/measure-cross-window-drag.py --undo --restart`: after the Scratch
+tab had crossed into the second window, undo through the shell put it back
+in the main window and out of the second, redo moved it across again, and a
+restart from the workspace file brought both windows back with the tab in
+the second. The shell reads `undo` and `redo` lines on stdin under the
+harness flag, since synthetic key events need a focus the headless display
+does not give.
+
 ### Measured in a release build
 
 Running a packaged build on Linux (WebKitGTK, tauri 2.11.5, webview 2.52.6),
@@ -215,10 +399,19 @@ Enterprise features are governed by a licence key; set one with
 docs/           design notes
 src/            frontend
   main.ts       builds the dockview instance and its panels
-  panels.ts     the four probe panels plus a scratch panel
+  panels.ts     the five probe panels plus a scratch panel
+  crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
+  hub.ts        the Tauri transport that interceptor reaches the shell through
+  workspace.ts  a window's side of the workspace: layout in at start, reports out on change
+  history.ts    a window's side of the shared undo: report local steps, carry out the shell's
+  autotest.ts   geometry and log reporting for the measurement driver
+scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface
 src-tauri/      Rust shell: host info, native window creation, layout broadcast
+  src/hub.rs    the drag orchestrator, Tauri-free and unit tested
+  src/workspace.rs  the workspace: windows, frames and opaque layouts, with an atomic file store
+  src/history.rs  the one ordered undo history across windows, markers and move entries
 popout.html     served at /popout.html, dockview's default popout target
 ```
