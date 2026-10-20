@@ -126,6 +126,16 @@ export class DockviewDidDropEvent extends DockviewEvent {
         return this.options.panel;
     }
 
+    /**
+     * For a drop on a group's tab bar, the tab index the drop landed at:
+     * where a panel added in response belongs (`addPanel`'s `index`, or
+     * `addGroupFromJSON` with `direction: 'within'`). `undefined` for a
+     * drop on a group's content or a layout edge.
+     */
+    get index(): number | undefined {
+        return this.options.index;
+    }
+
     get group(): DockviewGroupPanel | undefined {
         return this.options.group;
     }
@@ -139,6 +149,7 @@ export class DockviewDidDropEvent extends DockviewEvent {
             readonly nativeEvent: DragEvent | PointerEvent;
             readonly position: Position;
             readonly panel?: IDockviewPanel;
+            readonly index?: number;
             getData(): PanelTransfer | undefined;
             group?: DockviewGroupPanel;
             api: DockviewApi;
@@ -163,6 +174,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
         readonly nativeEvent: DragEvent | PointerEvent;
         readonly position: Position;
         readonly panel?: IDockviewPanel;
+        readonly index?: number;
         getData(): PanelTransfer | undefined;
         kind: DockviewGroupDropLocation;
         group?: DockviewGroupPanel;
@@ -1962,6 +1974,7 @@ export class DockviewGroupPanelModel
             nativeEvent: event,
             position,
             panel,
+            index,
             getData: () => getPanelData(),
             kind: getKind(),
             group: this.groupPanel,
@@ -2052,6 +2065,7 @@ export class DockviewGroupPanelModel
                     nativeEvent: event,
                     position,
                     panel,
+                    index,
                     getData: () => getPanelData(),
                     group: this.groupPanel,
                     api: this._api,
