@@ -360,7 +360,7 @@ function readSession(nativeEvent: DragEvent | PointerEvent): string | null {
         return null;
     }
     const session = nativeEvent.dataTransfer?.getData(HUB_DRAG_TYPE);
-    return session ? session : null;
+    return session || null;
 }
 
 /**

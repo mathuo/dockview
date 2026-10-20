@@ -76,7 +76,7 @@ export class DragHub {
      */
     expire(session: string, newLabel: () => string): DragEnd {
         const tracked = this.sessions.get(session);
-        if (!tracked || tracked.ended === undefined) {
+        if (tracked?.ended === undefined) {
             return { outcome: 'settled' };
         }
         this.sessions.delete(session);
