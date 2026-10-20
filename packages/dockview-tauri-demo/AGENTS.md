@@ -19,14 +19,15 @@ not a published package and not a supported example.
   a crate of its own behind any host. Keep it that way: no `AppHandle`, no
   window handling, no event emission in this module. `cargo test` covers it;
   the commands in `lib.rs` are thin wrappers over it.
-- `src/crossWindowDnd.ts` — cross-window drag and drop as an interceptor
-  over dockview's public drag hooks: register it once and ordinary drags
-  keep working, with the addition that a drag can land in another window.
-  The OS drag carries only a session id; a hub outside every window holds
-  the serialized group; the window the drop lands in rebuilds it with
-  `addGroupFromJSON`. It reaches the hub only through the `DragTransport`
-  it is given, so it knows nothing about Tauri.
-- `src/hub.ts` — the Tauri `DragTransport`, over the commands in `bridge.ts`.
+- The window side (cross-window drag, workspace, shared undo) is
+  `installMultiWindow` from `dockview-enterprise`
+  (`packages/dockview-enterprise/src/multiWindow/`). Its in-memory
+  orchestrator mirrors the three Rust modules here; keep the two in step,
+  including the `DragPayload` shape (`panel` or `group`) and the release
+  notice's `reason` (`claim` or `tear-off`).
+- `src/hub.ts` — the Tauri `MultiWindowTransport`, over the commands and
+  events in `bridge.ts`, plus the `Hub` wrapper the panels and the harness
+  read the log from.
 - `src-tauri/src/workspace.rs` — the workspace: which windows exist, their
   frames, and each one's dockview layout as opaque JSON, plus the atomic
   `FileStore`. Tauri-free and unit tested like `hub.rs`. The one field of a
@@ -34,21 +35,12 @@ not a published package and not a supported example.
   across windows. `lib.rs` loads it before any window exists, creates the
   windows from it, records geometry from window events, and writes it on a
   debounce and on exit.
-- `src/workspace.ts` — a window's side: ask the orchestrator for the initial
-  layout (restore with `fromJSON`, else build the defaults), then report
-  `toJSON()` on every change. Reaches the shell only through its
-  `WorkspaceTransport`.
 - `src-tauri/src/history.rs` — the one ordered undo history across windows:
   a marker per step a window recorded locally, a full entry per move
   between windows (two halves, one per window), and `undo` / `redo` that
   return the actions for the shell to carry out. Tauri-free and unit
   tested. Windows keep dockview's own `layoutHistory` for their local steps;
   this only sequences.
-- `src/history.ts` — a window's side: report local pushes off
-  `onDidChangeHistory`, route Ctrl+Z to the shell, and carry out
-  `dockview:apply` / `dockview:undo-request` / `dockview:redo-request`.
-  Needs `layoutHistory: { enabled: true, clearOnFromJSON: false }`.
-  Reaches the shell only through its `HistoryTransport`.
 - Events the shell addresses to one window (`dockview:apply`, the undo and
   redo requests, `dockview:release`) name that window in the payload and
   are listened for on the window's own target, never with the global
@@ -102,11 +94,10 @@ not a published package and not a supported example.
 - `host.ts` asks dockview's exported `getPopoutUrlError` for its verdict rather
   than restating the rules, so the panel cannot drift from the library while
   still explaining *why* a popout would be refused.
-- `crossWindowDnd.ts` hangs off dockview's public drag hooks only:
-  `onWillDragPanel` / `onWillDragGroup` to mark the drag and serialize the
-  group, `onUnhandledDragOver` to accept it, `onDidDrop` to place it. It
-  never reads dockview's DOM or its internal transfer object, and it never
-  imports from `bridge.ts` or `@tauri-apps/api`: the transport is injected.
+- `hub.ts` is the only file that knows both dockview-enterprise's
+  multi-window install and Tauri: the install hangs off dockview's public
+  hooks and reaches the shell only through the transport `hub.ts` builds
+  from `bridge.ts`.
 - Closing popout windows goes through `api.onWillClosePopoutWindow` in
   `src/main.ts`, registered once: it covers every popout the component opens,
   including the ones dockview opens for itself (the group context menu, a

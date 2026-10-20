@@ -163,6 +163,11 @@ mouse.
 
 ### Dragging between windows
 
+The window side of all of this (the drag interceptor, the workspace and the
+shared undo) is `installMultiWindow` from `dockview-enterprise`; this demo
+supplies the Tauri transport it reaches the shell through (`src/hub.ts`)
+and the shell itself. What follows describes the mechanism as it runs here.
+
 Two native windows are two dockview instances in two JavaScript contexts, so
 a tab cannot be dragged between them the way it is dragged between groups.
 What does cross a window boundary is an OS drag session, and only an HTML5
@@ -229,6 +234,10 @@ Xvfb :99 -screen 0 2400x1000x24 &
 VITE_DND=html5 yarn dev &
 cargo build --manifest-path src-tauri/Cargo.toml
 DISPLAY=:99 python3 scripts/measure-cross-window-drag.py --screenshot after.png
+# --where center|left|right|top|bottom|tab chooses the landing;
+# --where off releases the drag outside every window with tear-off on, so
+# the shell opens a new window holding the tab; --undo and --restart extend
+# the run.
 ```
 
 The driver starts the shell with `DOCKVIEW_DEMO_AUTOTEST` set, which opens
@@ -400,10 +409,7 @@ docs/           design notes
 src/            frontend
   main.ts       builds the dockview instance and its panels
   panels.ts     the five probe panels plus a scratch panel
-  crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
-  hub.ts        the Tauri transport that interceptor reaches the shell through
-  workspace.ts  a window's side of the workspace: layout in at start, reports out on change
-  history.ts    a window's side of the shared undo: report local steps, carry out the shell's
+  hub.ts        the Tauri transport behind dockview-enterprise's installMultiWindow
   autotest.ts   geometry and log reporting for the measurement driver
 scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis

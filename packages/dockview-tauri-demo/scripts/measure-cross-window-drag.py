@@ -91,9 +91,11 @@ def main():
     parser.add_argument(
         "--where",
         default="right",
-        choices=["center", "left", "right", "top", "bottom", "tab"],
+        choices=["center", "left", "right", "top", "bottom", "tab", "off"],
         help="where on the target's content to drop; 'tab' drops on the "
-        "left half of the target's own tab, which lands before it",
+        "left half of the target's own tab, which lands before it; 'off' "
+        "releases the drag outside every window with tear-off on, so the "
+        "shell opens a new window holding the tab",
     )
     parser.add_argument("--screenshot", help="write a PNG of the screen after the drop")
     parser.add_argument("--timeout", type=float, default=40.0)
@@ -193,7 +195,16 @@ def main():
         tab = rects["main"]["panels"][panel_id]["tab"]
         target = rects["dock-2"]["panels"][target_id]
         src = (mx + tab["x"] + tab["width"] // 2, my + tab["y"] + tab["height"] // 2)
-        if args.where == "tab":
+        if args.where == "off":
+            # Tear-off is a checkbox in the window; the shell switches it on
+            # for every window on this command and the windows say so.
+            app.stdin.write("tearoff\n")
+            app.stdin.flush()
+            if not take(lambda: any(line == "tear-off on" for _, line in log)):
+                raise SystemExit("timed out waiting for tear-off to switch on")
+            box, fx, fy = {"x": 2300, "y": 950, "width": 0, "height": 0}, 0, 0
+            sx2, sy2 = 0, 0
+        elif args.where == "tab":
             box, fx, fy = target["tab"], 0.25, 0.5
         else:
             box = target["content"]
@@ -209,9 +220,15 @@ def main():
         before = len(log)
         drag(src, dst)
 
-        placed = lambda: any(
-            label == "dock-2" and "placed" in line for label, line in log[before:]
-        )
+        if args.where == "off":
+            placed = lambda: any(
+                label.startswith("dock-torn-") and "started with torn-off" in line
+                for label, line in log[before:]
+            )
+        else:
+            placed = lambda: any(
+                label == "dock-2" and "placed" in line for label, line in log[before:]
+            )
         released = lambda: any(
             label == "main" and "released" in line for label, line in log[before:]
         )
@@ -235,8 +252,14 @@ def main():
 
         ok = placed() and released()
         print()
-        print("main panels:  ", sorted(rects["main"]["panels"]))
-        print("dock-2 panels:", sorted(rects["dock-2"]["panels"]))
+        for label in sorted(rects):
+            print(f"{label} panels:".ljust(15), sorted(rects[label]["panels"]))
+        if args.where == "off":
+            torn = [label for label in rects if label.startswith("dock-torn-")]
+            ok = ok and any(panel_id in rects[label]["panels"] for label in torn)
+            ok = ok and panel_id not in rects["main"]["panels"]
+            print("RESULT:", "the tab tore off into a new window" if ok else "the tab did not tear off")
+            return 0 if ok else 1
         print("RESULT:", "the tab crossed windows" if ok else "the tab did not cross")
         if not ok:
             return 1

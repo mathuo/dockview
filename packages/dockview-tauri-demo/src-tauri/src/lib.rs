@@ -70,7 +70,7 @@ struct MovedNotice {
     panels: Vec<String>,
     from: String,
     to: String,
-    /// `drop`, `undo` or `redo`.
+    /// `drop`, `tear-off`, `undo` or `redo`.
     reason: &'static str,
 }
 
@@ -222,6 +222,9 @@ fn history_info(history: State<History>) -> Result<history::Info, String> {
 /// hub's log as JSON lines on stdout for `scripts/measure-cross-window-drag.py`
 /// to drive. See the README's "Dragging between windows".
 const AUTOTEST_ENV: &str = "DOCKVIEW_DEMO_AUTOTEST";
+
+/// A command from the harness to every window, such as switching tear-off on.
+const AUTOTEST_EVENT: &str = "dockview:autotest";
 
 fn autotest() -> bool {
     std::env::var_os(AUTOTEST_ENV).is_some()
@@ -523,6 +526,13 @@ fn drag_end(
         match ended {
             Ok(DragEnd::TornOff { label, release }) => {
                 let handle = app.clone();
+                let panels = app
+                    .state::<Hub>()
+                    .peek_pending(&label)
+                    .ok()
+                    .flatten()
+                    .map(|envelope| envelope_panels(&envelope))
+                    .unwrap_or_default();
                 let result = app.run_on_main_thread(move || {
                     match build_dock_window(
                         &handle,
@@ -532,8 +542,27 @@ fn drag_end(
                         None,
                     ) {
                         Ok(_) => {
+                            // As for a claim: the new window may report the
+                            // panels before the source reports them gone.
+                            if let Err(err) = handle.state::<Workspace>().expect_move(
+                                &panels,
+                                &release.from,
+                                &label,
+                            ) {
+                                eprintln!("tear-off: {err}");
+                            }
+                            let moved = MovedNotice {
+                                session: release.session.clone(),
+                                panels,
+                                from: release.from.clone(),
+                                to: label.clone(),
+                                reason: "tear-off",
+                            };
                             if let Err(err) = deliver(&handle, release) {
                                 eprintln!("tear-off: could not release the source: {err}");
+                            }
+                            if let Err(err) = handle.emit(MOVED_EVENT, moved) {
+                                eprintln!("tear-off: could not announce the move: {err}");
                             }
                         }
                         Err(err) => eprintln!("tear-off: could not open {label}: {err}"),
@@ -820,6 +849,11 @@ pub fn run() {
                         let result = match line.as_deref().map(str::trim) {
                             Ok("undo") => perform_undo(&driver),
                             Ok("redo") => perform_redo(&driver),
+                            // Turn tear-off on in every window, which the
+                            // driver cannot click for itself.
+                            Ok("tearoff") => driver
+                                .emit(AUTOTEST_EVENT, serde_json::json!({ "command": "tear-off" }))
+                                .map_err(|err| err.to_string()),
                             Ok(_) => Ok(()),
                             Err(_) => break,
                         };

@@ -6,8 +6,9 @@
 > `direction: 'within'` form that merges into an existing group at a tab
 > index), `addPanelFromJSON` for a single tab, the tab index on
 > `onDidDrop`, and the `groupIdGenerator` option (the id namespacing of
-> sub-question 2). The demo's `src/crossWindowDnd.ts`
-> builds on them to drag a group between native windows through the shell,
+> sub-question 2). `dockview-enterprise`'s `installMultiWindow` builds on
+> them, and this demo drives it through the shell to drag a group between
+> native windows,
 > which the UX consequence under sub-question 4 said could not exist: the OS
 > drag carries a session id, the shell carries the state. The measurements
 > and the reasoning below are kept as written.

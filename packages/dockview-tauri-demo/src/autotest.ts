@@ -8,7 +8,7 @@
  */
 
 import type { DockviewApi, IDockviewPanel } from 'dockview';
-import { autotestReport } from './bridge';
+import { autotestReport, onAutotestCommand } from './bridge';
 import type { Hub } from './hub';
 
 export function isAutotest(): boolean {
@@ -55,6 +55,12 @@ export function installAutotest(api: DockviewApi, hub: Hub): void {
     };
 
     hub.onLog((line) => report('log', line));
+    void onAutotestCommand((command) => {
+        if (command === 'tear-off') {
+            hub.tearOff = true;
+            report('log', 'tear-off on');
+        }
+    });
 
     const geometry = () => {
         const panels: Record<string, ReturnType<typeof describe>> = {};

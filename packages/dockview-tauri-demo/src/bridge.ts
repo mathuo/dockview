@@ -393,3 +393,9 @@ export const onHistoryChanged = (handler: (info: HistoryInfo) => void) =>
     listenOrIgnore<HistoryInfo>('dockview:history', handler);
 export const onMoved = (handler: (notice: MovedNotice) => void) =>
     listenOrIgnore<MovedNotice>('dockview:moved', handler);
+
+/** A harness command to every window (`tear-off` switches tear-off on). */
+export const onAutotestCommand = (handler: (command: string) => void) =>
+    listenOrIgnore<{ command: string }>('dockview:autotest', (payload) =>
+        handler(payload.command)
+    );

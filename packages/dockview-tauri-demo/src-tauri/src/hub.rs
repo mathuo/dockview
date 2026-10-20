@@ -52,6 +52,10 @@ pub struct Release {
     pub session: String,
     /// The window that took the group.
     pub to: String,
+    /// `claim` by a window the drop landed in, or `tear-off` into a window
+    /// the shell opened for an unclaimed drag. Only a claim is a move the
+    /// shared history records.
+    pub reason: &'static str,
 }
 
 /// A successful claim: the group for the claimant, and the notice for the
@@ -153,6 +157,7 @@ impl Hub {
                 from: taken.drag.from,
                 session: session.to_string(),
                 to,
+                reason: "claim",
             },
         })
     }
@@ -205,12 +210,18 @@ impl Hub {
                 from: unclaimed.drag.from,
                 session: session.to_string(),
                 to: label.clone(),
+                reason: "tear-off",
             },
             label,
         })
     }
 
     /// A freshly loaded window collects the group parked for it, if any.
+    /// The envelope parked for a torn-off window, left in place.
+    pub fn peek_pending(&self, label: &str) -> Result<Option<Value>, HubError> {
+        Ok(self.pending.lock()?.get(label).cloned())
+    }
+
     pub fn take_pending(&self, label: &str) -> Result<Option<Value>, HubError> {
         Ok(self.pending.lock()?.remove(label))
     }
@@ -242,7 +253,8 @@ mod tests {
             Release {
                 from: "main".into(),
                 session: "s1".into(),
-                to: "dock-2".into()
+                to: "dock-2".into(),
+                reason: "claim",
             }
         );
     }
@@ -336,7 +348,8 @@ mod tests {
                 release: Release {
                     from: "main".into(),
                     session: "s1".into(),
-                    to: "dock-torn-0".into()
+                    to: "dock-torn-0".into(),
+                    reason: "tear-off",
                 }
             }
         );
