@@ -494,6 +494,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     // lifecycle
     addGroup(options?: AddGroupOptions): DockviewGroupPanel;
     serializeGroup(group: DockviewGroupPanel): SerializedDockviewGroup;
+    serializePanel(panel: IDockviewPanel): SerializedDockviewGroup;
     addGroupFromJSON(
         data: SerializedDockviewGroup,
         options?: AddGroupFromJSONOptions
@@ -4818,10 +4819,36 @@ export class DockviewComponent
     }
 
     /**
+     * Serialize one panel as a group of its own, in the shape
+     * `addGroupFromJSON` takes: the unit of a single-tab move between
+     * layouts or instances. The group gets a fresh id, as a group created
+     * for the panel here would; nothing about the panel's current group
+     * travels with it.
+     */
+    serializePanel(panel: IDockviewPanel): SerializedDockviewGroup {
+        return {
+            group: {
+                id: this.getNextGroupId(),
+                views: [panel.id],
+                activeView: panel.id,
+            },
+            panels: { [panel.id]: panel.toJSON() },
+        };
+    }
+
+    /**
      * Rebuild a group from `serializeGroup` output and add it to the live
      * layout at `options` (as for `addGroup`), without touching the rest of
      * the layout. This is the counterpart to `fromJSON`, which replaces the
      * whole layout, for moving one group between layouts or instances.
+     *
+     * With `direction: 'within'` and a reference group or panel, no group is
+     * created: the serialized panels are merged into that group, in their
+     * order, at `index` if given, and the serialized active panel becomes
+     * the group's. The serialized group's own shape (id, locked, header,
+     * tab groups) does not apply then. This is what a drop on a group's
+     * centre or tab bar calls for, and the only form that works against a
+     * floating or edge group, which has no grid neighbours.
      *
      * A panel id that is already live throws, as `addPanel` does, before
      * anything is changed. A group id that is already live is reassigned with
@@ -4882,6 +4909,16 @@ export class DockviewComponent
             activeView,
             tabGroups,
         } = data.group;
+
+        // A reference with no direction means "within" it, as for
+        // `addPanel`; an absolute `within` has nothing to be within and
+        // falls through to appending the group.
+        if (options && (options.direction ?? 'within') === 'within') {
+            const target = this.resolveReferenceGroup(options);
+            if (target) {
+                return this.mergeGroupFromJSON(data, target, options);
+            }
+        }
 
         const groupOptions: GroupOptions = {
             id,
@@ -4955,6 +4992,85 @@ export class DockviewComponent
         }
 
         return group;
+    }
+
+    /**
+     * The group an `AddGroupOptions` placement names, or `undefined` for an
+     * absolute placement. Throws for a reference that names nothing.
+     */
+    private resolveReferenceGroup(
+        options: AddGroupFromJSONOptions
+    ): DockviewGroupPanel | undefined {
+        if (isGroupOptionsWithPanel(options)) {
+            const referencePanelId =
+                typeof options.referencePanel === 'string'
+                    ? options.referencePanel
+                    : options.referencePanel.id;
+            const referencePanel = this.getGroupPanel(referencePanelId);
+            if (!referencePanel) {
+                throw new Error(
+                    `dockview: reference panel ${referencePanelId} does not exist`
+                );
+            }
+            return referencePanel.group;
+        }
+        if (isGroupOptionsWithGroup(options)) {
+            const referenceId =
+                typeof options.referenceGroup === 'string'
+                    ? options.referenceGroup
+                    : options.referenceGroup.id;
+            const referenceGroup = this.getPanel(referenceId);
+            if (!referenceGroup) {
+                throw new Error(
+                    `dockview: reference group ${referenceId} does not exist`
+                );
+            }
+            return referenceGroup;
+        }
+        return undefined;
+    }
+
+    /**
+     * The `direction: 'within'` form of `addGroupFromJSON`: the serialized
+     * panels join `target` rather than a group of their own.
+     */
+    private mergeGroupFromJSON(
+        data: SerializedDockviewGroup,
+        target: DockviewGroupPanel,
+        options: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        const { views, activeView } = data.group;
+        const index = (options as { index?: number }).index;
+
+        // As in the group form: every panel is created before any is opened,
+        // so a corrupt panel state fails before the target has changed.
+        const panels: IDockviewPanel[] = [];
+        try {
+            for (const child of views) {
+                panels.push(
+                    this._deserializer.fromJSON(data.panels[child], target)
+                );
+            }
+        } catch (err) {
+            for (const panel of panels) {
+                panel.dispose();
+            }
+            throw err;
+        }
+
+        panels.forEach((panel, offset) => {
+            target.model.openPanel(panel, {
+                index: index === undefined ? undefined : index + offset,
+                skipSetActive: panel.id !== activeView,
+                skipSetGroupActive: true,
+            });
+        });
+
+        if (!options.skipSetActive) {
+            this.doSetGroupAndPanelActive(target);
+        }
+
+        return target;
     }
 
     private _doAddGroup(options?: AddGroupOptions): DockviewGroupPanel {

@@ -1040,6 +1040,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * Serialize one panel as a group of its own, in the shape
+     * `addGroupFromJSON` takes: the unit of a single-tab move between
+     * layouts or instances.
+     */
+    serializePanel(panel: IDockviewPanel): SerializedDockviewGroup {
+        return this.component.serializePanel(panel);
+    }
+
+    /**
      * Rebuild a group from `serializeGroup` output and add it to the live
      * layout, positioned as for `addGroup`, leaving the rest of the layout
      * untouched. Throws before changing anything if a panel id is already in
