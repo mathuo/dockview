@@ -13,7 +13,7 @@
  * to remove its copy. No window owns another.
  *
  * Nothing here knows how to reach the orchestrator. That is the
- * {@link DragTransport} the host supplies.
+ * {@link MultiWindowTransport} the host supplies.
  */
 
 import {
@@ -25,8 +25,8 @@ import {
 } from 'dockview';
 import {
     type DragPayload,
-    type DragTransport,
     type MovedNotice,
+    type MultiWindowTransport,
     payloadPanels,
 } from './types';
 
@@ -101,7 +101,7 @@ export function randomSessionId(): string {
 
 export function installCrossWindowDnd(
     api: DockviewApi,
-    transport: DragTransport,
+    transport: MultiWindowTransport,
     options: CrossWindowDndOptions = {}
 ): CrossWindowDnd {
     const counters: CrossWindowDndCounters = {

@@ -15,7 +15,7 @@
  */
 
 import type { DockviewApi } from 'dockview';
-import type { HistoryInfo, HistoryTransport } from './types';
+import type { HistoryInfo, MultiWindowTransport } from './types';
 
 export interface SharedHistoryOptions {
     /**
@@ -38,7 +38,7 @@ export interface SharedHistory {
 
 export function installSharedHistory(
     api: DockviewApi,
-    transport: HistoryTransport,
+    transport: MultiWindowTransport,
     options: SharedHistoryOptions = {}
 ): SharedHistory {
     const log = options.onLog ?? (() => undefined);

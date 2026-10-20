@@ -1,9 +1,9 @@
 /**
- * The contracts between a window's dockview and the orchestrator that sits
- * outside every window. Three transports, one per concern, each a handful of
- * asynchronous calls: the orchestrator is in another process (a Tauri or
- * Electron shell), another page (a `BroadcastChannel`), or, for tests and
- * single-page layouts, the in-memory one this package ships.
+ * The contract between a window's dockview and the orchestrator that sits
+ * outside every window: a handful of asynchronous calls, since the
+ * orchestrator is in another process (a Tauri or Electron shell), another
+ * page (a `BroadcastChannel`), or, for tests and single-page layouts, the
+ * in-memory one this package ships.
  *
  * Every call is asynchronous, and nothing an interceptor does relies on a
  * result arriving inside the DOM event that triggered the call.
@@ -53,10 +53,24 @@ export interface MovedNotice {
 /** Which half of a move a window reports. */
 export type MoveRole = 'from' | 'to';
 
-/** How a window reaches the orchestrator's drag hub. */
-export interface DragTransport {
+export interface HistoryInfo {
+    undoCount: number;
+    redoCount: number;
+    /** A description of the step `undo` would take, or null. */
+    nextUndo: string | null;
+    nextRedo: string | null;
+}
+
+/**
+ * How a window reaches the orchestrator. One object, in three parts: the
+ * drag hub, the workspace, and the shared history.
+ */
+export interface MultiWindowTransport {
     /** This window's identity, as the orchestrator and other windows name it. */
     label(): Promise<string>;
+
+    // Drags.
+
     /** Announce a drag, handing the orchestrator what it carries. */
     dragStart(
         session: string,
@@ -92,28 +106,16 @@ export interface DragTransport {
     ): Promise<void>;
     /** Broadcast after panels moved between any two windows. */
     onMoved(handler: (notice: MovedNotice) => void): Promise<Unsubscribe>;
-}
 
-/** How a window reaches the orchestrator's workspace. */
-export interface WorkspaceTransport {
-    label(): Promise<string>;
+    // The workspace.
+
     /** The layout to start with, or null to build the window's defaults. */
     initialLayout(label: string): Promise<SerializedDockview | null>;
     /** Report the layout. Rejects if it names a panel another window holds. */
     layoutChanged(label: string, layout: SerializedDockview): Promise<void>;
-}
 
-export interface HistoryInfo {
-    undoCount: number;
-    redoCount: number;
-    /** A description of the step `undo` would take, or null. */
-    nextUndo: string | null;
-    nextRedo: string | null;
-}
+    // The shared history.
 
-/** How a window reaches the orchestrator's history. */
-export interface HistoryTransport {
-    label(): Promise<string>;
     /** This window recorded a step of its own. */
     historyPush(label: string): Promise<void>;
     /** Undo, or redo, the most recent step anywhere. */
@@ -131,8 +133,3 @@ export interface HistoryTransport {
         handler: (info: HistoryInfo) => void
     ): Promise<Unsubscribe>;
 }
-
-/** All three transports on one object, which is what an orchestrator hands a window. */
-export type MultiWindowTransport = DragTransport &
-    WorkspaceTransport &
-    HistoryTransport;

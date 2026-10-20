@@ -1,17 +1,20 @@
 import { createEvent, fireEvent } from '@testing-library/dom';
 import type { IContentRenderer, SerializedDockview } from 'dockview-core';
-import { DockviewApi, DockviewComponent } from 'dockview-core';
-import type { DragPayload, MovedNotice } from '../multiWindow';
 import {
-    DragHub,
-    HistorySequencer,
+    DockviewApi,
+    DockviewComponent,
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from 'dockview-core';
+import type { DragPayload, MovedNotice, MultiWindow } from '../multiWindow';
+import {
     HUB_DRAG_TYPE,
-    installCrossWindowDnd,
-    installSharedHistory,
-    installWindowWorkspace,
+    installMultiWindow,
     MemoryOrchestrator,
-    WorkspaceRegistry,
 } from '../multiWindow';
+import { DragHub } from '../multiWindow/dragHub';
+import { HistorySequencer } from '../multiWindow/historySequencer';
+import { WorkspaceRegistry } from '../multiWindow/workspaceState';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -280,6 +283,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         label: string;
         dockview: DockviewComponent;
         api: DockviewApi;
+        mw: MultiWindow;
         log: string[];
         dispose(): void;
     }
@@ -289,7 +293,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
     const open = (
         orchestrator: MemoryOrchestrator,
         label: string,
-        options: { workspace?: boolean; buildDefaults?: () => void } = {}
+        options: { buildDefaults?: () => void; tearOff?: boolean } = {}
     ): Window => {
         const container = document.createElement('div');
         document.body.appendChild(container);
@@ -304,25 +308,20 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const api = new DockviewApi(dockview);
         const log: string[] = [];
         const onLog = (line: string) => log.push(line);
-        const transport = orchestrator.connect(label);
-        const dnd = installCrossWindowDnd(api, transport, { onLog });
-        const history = installSharedHistory(api, transport, { onLog });
-        const workspace = options.workspace
-            ? installWindowWorkspace(api, transport, {
-                  onLog,
-                  debounceMs: 0,
-                  buildDefaults: options.buildDefaults,
-              })
-            : undefined;
+        const mw = installMultiWindow(api, orchestrator.connect(label), {
+            onLog,
+            tearOff: options.tearOff,
+            debounceMs: 0,
+            buildDefaults: options.buildDefaults,
+        });
         const window: Window = {
             label,
             dockview,
             api,
+            mw,
             log,
             dispose() {
-                workspace?.dispose();
-                history.dispose();
-                dnd.dispose();
+                mw.dispose();
                 dockview.dispose();
                 container.remove();
             },
@@ -349,7 +348,8 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         onto: HTMLElement = target.dockview.element.querySelector(
             '.dv-content-container'
         ) as HTMLElement,
-        at: { clientX: number; clientY: number } = { clientX: 50, clientY: 50 }
+        at: { clientX: number; clientY: number } = { clientX: 50, clientY: 50 },
+        afterStart: () => void = () => undefined
     ) => {
         const dataTransfer = fakeDataTransfer();
         const tab = source.api.getPanel(panelId)?.view.tab.element;
@@ -361,6 +361,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         fireEvent.dragStart(tab, { dataTransfer });
         expect(dataTransfer.types).toContain(HUB_DRAG_TYPE);
         await flush();
+        afterStart();
 
         fireDrag('dragEnter', onto, dataTransfer, at);
         fireDrag('dragOver', onto, dataTransfer, at);
@@ -385,8 +386,8 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
         const moves: MovedNotice[] = [];
         orchestrator.onDidMove((notice) => moves.push(notice));
-        const main = open(orchestrator, 'main', { workspace: true });
-        const other = open(orchestrator, 'other', { workspace: true });
+        const main = open(orchestrator, 'main');
+        const other = open(orchestrator, 'other');
         await flush();
 
         main.api.addPanel({ id: 'a', component: 'default', title: 'A' });
@@ -570,18 +571,11 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 open(orchestrator, label);
             },
         });
-        const main = open(orchestrator, 'main');
+        const main = open(orchestrator, 'main', { tearOff: true });
         await flush();
         main.api.addPanel({ id: 'a', component: 'default' });
         main.api.addPanel({ id: 'b', component: 'default', title: 'Bee' });
 
-        const dnd = installCrossWindowDnd(
-            main.api,
-            orchestrator.connect('main'),
-            {
-                tearOff: true,
-            }
-        );
         const dataTransfer = fakeDataTransfer();
         const tab = main.api.getPanel('b')?.view.tab.element as HTMLElement;
         fireEvent.dragStart(tab, { dataTransfer });
@@ -596,7 +590,240 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(torn && ids(torn)).toEqual(['b']);
         expect(torn?.api.getPanel('b')?.title).toBe('Bee');
         expect(ids(main)).toEqual(['a']);
-        dnd.dispose();
+    });
+
+    test('a local step is ordered against a move, and undone through the window', async () => {
+        const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
+        const main = open(orchestrator, 'main');
+        const other = open(orchestrator, 'other');
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        main.api.addPanel({ id: 'c', component: 'default' });
+        other.api.addPanel({ id: 'x', component: 'default' });
+        await flush();
+        expect(orchestrator.historyInfo.undoCount).toBe(0);
+
+        // A user closes a tab: a local step, reported to the orchestrator.
+        const closeC = main.api
+            .getPanel('c')
+            ?.view.tab.element.querySelector(
+                '.dv-default-tab-action'
+            ) as HTMLElement;
+        fireEvent.click(closeC);
+        await flush();
+        expect(ids(main)).toEqual(['a', 'b']);
+        expect(main.dockview.canUndo).toBe(true);
+        expect(orchestrator.historyInfo).toEqual(
+            expect.objectContaining({ undoCount: 1, nextUndo: 'step in main' })
+        );
+
+        await dragAcross(main, 'b', other);
+        expect(ids(other)).toEqual(['b', 'x']);
+        expect(orchestrator.historyInfo).toEqual(
+            expect.objectContaining({
+                undoCount: 2,
+                nextUndo: 'move of b from main to other',
+            })
+        );
+
+        // Undo through a window's own shared history: the move first...
+        const infos: number[] = [];
+        main.mw.onDidChangeHistory((info) => infos.push(info.undoCount));
+        main.mw.undo();
+        await flush();
+        expect(ids(main)).toEqual(['a', 'b']);
+        expect(ids(other)).toEqual(['x']);
+        expect(main.mw.history).toEqual(
+            expect.objectContaining({ undoCount: 1, redoCount: 1 })
+        );
+        // ...then the local step, carried out by main's own history.
+        main.mw.undo();
+        await flush();
+        expect(ids(main)).toEqual(['a', 'b', 'c']);
+        expect(main.mw.history.undoCount).toBe(0);
+        expect(infos).toEqual([1, 0]);
+        // Neither instruction was reported back as a new step.
+        expect(orchestrator.historyInfo.redoCount).toBe(2);
+
+        main.mw.redo();
+        await flush();
+        expect(ids(main)).toEqual(['a', 'b']);
+        main.mw.redo();
+        await flush();
+        expect(ids(main)).toEqual(['a']);
+        expect(ids(other)).toEqual(['b', 'x']);
+        expect(orchestrator.historyInfo).toEqual(
+            expect.objectContaining({ undoCount: 2, redoCount: 0 })
+        );
+
+        // Nothing left to redo: reported, not thrown.
+        main.mw.redo();
+        await flush();
+        expect(main.log).toContain('redo: Error: nothing to redo');
+    });
+
+    test('key bindings route to the orchestrator only when asked', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const transport = orchestrator.connect('main');
+        const undo = jest.fn(async () => undefined);
+        const redo = jest.fn(async () => undefined);
+        const main = open(orchestrator, 'main');
+        const bound = installMultiWindow(
+            main.api,
+            { ...transport, undo, redo },
+            { history: { bindKeys: true }, workspace: false }
+        );
+        await flush();
+
+        const press = (init: KeyboardEventInit) =>
+            fireEvent.keyDown(document, init);
+        press({ key: 'z', ctrlKey: true });
+        press({ key: 'Z', metaKey: true, shiftKey: true });
+        press({ key: 'y', ctrlKey: true });
+        press({ key: 'z', ctrlKey: true, altKey: true });
+        press({ key: 'z' });
+        expect(undo).toHaveBeenCalledTimes(1);
+        expect(redo).toHaveBeenCalledTimes(2);
+
+        bound.dispose();
+        press({ key: 'z', ctrlKey: true });
+        expect(undo).toHaveBeenCalledTimes(1);
+    });
+
+    test('with history off, undo stays local to the window', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const main = open(orchestrator, 'main');
+        const local = installMultiWindow(
+            main.api,
+            orchestrator.connect('main'),
+            {
+                history: false,
+                workspace: false,
+            }
+        );
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        fireEvent.click(
+            main.api
+                .getPanel('b')
+                ?.view.tab.element.querySelector(
+                    '.dv-default-tab-action'
+                ) as HTMLElement
+        );
+        expect(ids(main)).toEqual(['a']);
+
+        expect(local.history).toEqual({
+            undoCount: 0,
+            redoCount: 0,
+            nextUndo: null,
+            nextRedo: null,
+        });
+        expect(typeof local.onDidChangeHistory(() => undefined)).toBe(
+            'function'
+        );
+        local.undo();
+        expect(ids(main)).toEqual(['a', 'b']);
+        local.redo();
+        expect(ids(main)).toEqual(['a']);
+        local.dispose();
+    });
+
+    test('a layout that cannot be restored falls back to the defaults', async () => {
+        const orchestrator = new MemoryOrchestrator({
+            workspace: {
+                version: 1,
+                windows: [
+                    {
+                        label: 'main',
+                        layout: {
+                            grid: { root: { type: 'leaf' } },
+                        } as unknown as SerializedDockview,
+                    },
+                ],
+            },
+        });
+        const main = open(orchestrator, 'main', {
+            buildDefaults: () =>
+                main.api.addPanel({ id: 'fallback', component: 'default' }),
+        });
+        await flush();
+        await flush();
+
+        expect(ids(main)).toEqual(['fallback']);
+        expect(main.log).toEqual(
+            expect.arrayContaining([
+                expect.stringMatching(/^could not restore layout: /),
+            ])
+        );
+        orchestrator.setGeometry('main', { x: 0, y: 0, width: 10, height: 10 });
+        expect(orchestrator.snapshot().windows[0].geometry?.width).toBe(10);
+    });
+
+    test('a drop at a layout edge opens a new group there', async () => {
+        const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
+        const main = open(orchestrator, 'main');
+        const other = open(orchestrator, 'other');
+        await flush();
+        main.api.addPanel({ id: 'b', component: 'default' });
+        other.api.addPanel({ id: 'x', component: 'default' });
+
+        // The layout-edge target refuses a drag whose in-heap transfer data
+        // names another dockview, which only exists when the two share a
+        // heap. Another window has no such data, so clear it as the drag
+        // leaves main, as a real second process would never see it.
+        const leaveHeap = () =>
+            LocalSelectionTransfer.getInstance().clearData(
+                PanelTransfer.prototype
+            );
+        await dragAcross(
+            main,
+            'b',
+            other,
+            other.dockview.element,
+            { clientX: 2, clientY: 50 },
+            leaveHeap
+        );
+
+        expect(ids(main)).toEqual([]);
+        expect(ids(other)).toEqual(['b', 'x']);
+        expect(other.api.groups).toHaveLength(2);
+        expect(other.log).toEqual(
+            expect.arrayContaining([
+                expect.stringMatching(
+                    /placed 1 panel\(s\) at the layout's left edge/
+                ),
+            ])
+        );
+    });
+
+    test('a torn-off group starts the new window with every tab', async () => {
+        const orchestrator = new MemoryOrchestrator({
+            dragEndGraceMs: 0,
+            createWindow: (label) => {
+                open(orchestrator, label);
+            },
+        });
+        const main = open(orchestrator, 'main', { tearOff: true });
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+
+        const dataTransfer = fakeDataTransfer();
+        const voidContainer = main.dockview.element.querySelector(
+            '.dv-void-container'
+        ) as HTMLElement;
+        fireEvent.dragStart(voidContainer, { dataTransfer });
+        await flush();
+        fireEvent.dragEnd(voidContainer, { dataTransfer });
+        await flush();
+        await flush();
+
+        const torn = windows.find((window) => window.label === 'torn-off-1');
+        expect(torn && ids(torn)).toEqual(['a', 'b']);
+        expect(ids(main)).toEqual([]);
+        expect(main.log).toContain('released group main-1 to torn-off-1');
     });
 
     test('the workspace restores a window from the orchestrator and reports changes back', async () => {
@@ -617,10 +844,9 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         orchestrator.onDidChangeWorkspace((state) =>
             changes.push(state.windows.map((window) => window.label))
         );
-        const main = open(orchestrator, 'main', { workspace: true });
+        const main = open(orchestrator, 'main');
         let defaultsBuilt = 0;
         const other = open(orchestrator, 'other', {
-            workspace: true,
             buildDefaults: () => {
                 defaultsBuilt += 1;
                 other.api.addPanel({ id: 'kept', component: 'default' });
