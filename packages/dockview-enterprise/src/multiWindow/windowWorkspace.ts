@@ -7,7 +7,7 @@
  */
 
 import type { DockviewApi } from 'dockview';
-import type { WorkspaceTransport } from './types';
+import type { MultiWindowTransport } from './types';
 
 export interface WindowWorkspaceOptions {
     /** Builds the window's default layout when the orchestrator has none for it. */
@@ -25,7 +25,7 @@ export interface WindowWorkspace {
 
 export function installWindowWorkspace(
     api: DockviewApi,
-    transport: WorkspaceTransport,
+    transport: MultiWindowTransport,
     options: WindowWorkspaceOptions = {}
 ): WindowWorkspace {
     const debounceMs = options.debounceMs ?? 300;

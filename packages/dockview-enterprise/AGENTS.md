@@ -34,23 +34,26 @@ calls `registerModules(Modules)` at import (a side effect — hence
 
 ## Multi-window layouts (`src/multiWindow/`)
 
-Not a module: plain functions over the public `DockviewApi`, exported from
-the index with nothing to register. The window side of a layout spread over
-several windows or processes, each reaching an orchestrator only through a
-transport interface (`types.ts`):
+Not a module: one function over the public `DockviewApi`, exported from the
+index with nothing to register. The window side of a layout spread over
+several windows or processes, reaching an orchestrator only through the
+`MultiWindowTransport` interface (`types.ts`):
 
-- `crossWindowDnd.ts` (`installCrossWindowDnd`, `DragTransport`): a drag's
-  `DataTransfer` carries a session id; the orchestrator carries the payload
-  (`DragPayload`: a panel's `toJSON()` or `serializeGroup` output); the drop
-  rebuilds it with `addPanelFromJSON` / `addGroupFromJSON`.
-- `windowWorkspace.ts` (`installWindowWorkspace`, `WorkspaceTransport`):
-  `fromJSON` in at start, `toJSON` out on every change.
-- `sharedHistory.ts` (`installSharedHistory`, `HistoryTransport`): reports
-  local steps, carries out "undo your top step" / "take this layout".
-- `memoryOrchestrator.ts` (`MemoryOrchestrator`): an orchestrator for one
-  heap, composed from the pure `dragHub.ts`, `workspaceState.ts` and
-  `historySequencer.ts`, which mirror the Rust modules in
-  `packages/dockview-tauri-demo/src-tauri/src/`. Keep the two in step.
+- `multiWindow.ts` (`installMultiWindow`): the public install, composing the
+  three internal pieces below over one transport (label resolved once) and
+  returning one `MultiWindow` handle. The pieces are not exported.
+- `crossWindowDnd.ts`: a drag's `DataTransfer` carries a session id; the
+  orchestrator carries the payload (`DragPayload`: a panel's `toJSON()` or
+  `serializeGroup` output); the drop rebuilds it with `addPanelFromJSON` /
+  `addGroupFromJSON`.
+- `windowWorkspace.ts`: `fromJSON` in at start, `toJSON` out on every change.
+- `sharedHistory.ts`: reports local steps, carries out "undo your top step" /
+  "take this layout".
+- `memoryOrchestrator.ts` (`MemoryOrchestrator`, exported): an orchestrator
+  for one heap, composed from the pure `dragHub.ts`, `workspaceState.ts` and
+  `historySequencer.ts` (not exported; tests import them directly), which
+  mirror the Rust modules in `packages/dockview-tauri-demo/src-tauri/src/`.
+  Keep the two in step.
 
 Narrow drag events with a `'dataTransfer' in event` check, not
 `instanceof DragEvent`: jsdom defines neither `DragEvent` nor `DataTransfer`,

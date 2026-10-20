@@ -6,17 +6,15 @@ import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from 'dockview-core';
-import type { DragPayload, MovedNotice } from '../multiWindow';
+import type { DragPayload, MovedNotice, MultiWindow } from '../multiWindow';
 import {
-    DragHub,
-    HistorySequencer,
     HUB_DRAG_TYPE,
-    installCrossWindowDnd,
-    installSharedHistory,
-    installWindowWorkspace,
+    installMultiWindow,
     MemoryOrchestrator,
-    WorkspaceRegistry,
 } from '../multiWindow';
+import { DragHub } from '../multiWindow/dragHub';
+import { HistorySequencer } from '../multiWindow/historySequencer';
+import { WorkspaceRegistry } from '../multiWindow/workspaceState';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -285,7 +283,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         label: string;
         dockview: DockviewComponent;
         api: DockviewApi;
-        history: ReturnType<typeof installSharedHistory>;
+        mw: MultiWindow;
         log: string[];
         dispose(): void;
     }
@@ -295,11 +293,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
     const open = (
         orchestrator: MemoryOrchestrator,
         label: string,
-        options: {
-            workspace?: boolean;
-            buildDefaults?: () => void;
-            tearOff?: boolean;
-        } = {}
+        options: { buildDefaults?: () => void; tearOff?: boolean } = {}
     ): Window => {
         const container = document.createElement('div');
         document.body.appendChild(container);
@@ -314,29 +308,20 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const api = new DockviewApi(dockview);
         const log: string[] = [];
         const onLog = (line: string) => log.push(line);
-        const transport = orchestrator.connect(label);
-        const dnd = installCrossWindowDnd(api, transport, {
+        const mw = installMultiWindow(api, orchestrator.connect(label), {
             onLog,
             tearOff: options.tearOff,
+            debounceMs: 0,
+            buildDefaults: options.buildDefaults,
         });
-        const history = installSharedHistory(api, transport, { onLog });
-        const workspace = options.workspace
-            ? installWindowWorkspace(api, transport, {
-                  onLog,
-                  debounceMs: 0,
-                  buildDefaults: options.buildDefaults,
-              })
-            : undefined;
         const window: Window = {
             label,
             dockview,
             api,
-            history,
+            mw,
             log,
             dispose() {
-                workspace?.dispose();
-                history.dispose();
-                dnd.dispose();
+                mw.dispose();
                 dockview.dispose();
                 container.remove();
             },
@@ -401,8 +386,8 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
         const moves: MovedNotice[] = [];
         orchestrator.onDidMove((notice) => moves.push(notice));
-        const main = open(orchestrator, 'main', { workspace: true });
-        const other = open(orchestrator, 'other', { workspace: true });
+        const main = open(orchestrator, 'main');
+        const other = open(orchestrator, 'other');
         await flush();
 
         main.api.addPanel({ id: 'a', component: 'default', title: 'A' });
@@ -644,27 +629,27 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
 
         // Undo through a window's own shared history: the move first...
         const infos: number[] = [];
-        main.history.onDidChange((info) => infos.push(info.undoCount));
-        main.history.undo();
+        main.mw.onDidChangeHistory((info) => infos.push(info.undoCount));
+        main.mw.undo();
         await flush();
         expect(ids(main)).toEqual(['a', 'b']);
         expect(ids(other)).toEqual(['x']);
-        expect(main.history.info).toEqual(
+        expect(main.mw.history).toEqual(
             expect.objectContaining({ undoCount: 1, redoCount: 1 })
         );
         // ...then the local step, carried out by main's own history.
-        main.history.undo();
+        main.mw.undo();
         await flush();
         expect(ids(main)).toEqual(['a', 'b', 'c']);
-        expect(main.history.info.undoCount).toBe(0);
+        expect(main.mw.history.undoCount).toBe(0);
         expect(infos).toEqual([1, 0]);
         // Neither instruction was reported back as a new step.
         expect(orchestrator.historyInfo.redoCount).toBe(2);
 
-        main.history.redo();
+        main.mw.redo();
         await flush();
         expect(ids(main)).toEqual(['a', 'b']);
-        main.history.redo();
+        main.mw.redo();
         await flush();
         expect(ids(main)).toEqual(['a']);
         expect(ids(other)).toEqual(['b', 'x']);
@@ -673,7 +658,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
 
         // Nothing left to redo: reported, not thrown.
-        main.history.redo();
+        main.mw.redo();
         await flush();
         expect(main.log).toContain('redo: Error: nothing to redo');
     });
@@ -684,10 +669,10 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const undo = jest.fn(async () => undefined);
         const redo = jest.fn(async () => undefined);
         const main = open(orchestrator, 'main');
-        const bound = installSharedHistory(
+        const bound = installMultiWindow(
             main.api,
             { ...transport, undo, redo },
-            { bindKeys: true }
+            { history: { bindKeys: true }, workspace: false }
         );
         await flush();
 
@@ -706,6 +691,45 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(undo).toHaveBeenCalledTimes(1);
     });
 
+    test('with history off, undo stays local to the window', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const main = open(orchestrator, 'main');
+        const local = installMultiWindow(
+            main.api,
+            orchestrator.connect('main'),
+            {
+                history: false,
+                workspace: false,
+            }
+        );
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        fireEvent.click(
+            main.api
+                .getPanel('b')
+                ?.view.tab.element.querySelector(
+                    '.dv-default-tab-action'
+                ) as HTMLElement
+        );
+        expect(ids(main)).toEqual(['a']);
+
+        expect(local.history).toEqual({
+            undoCount: 0,
+            redoCount: 0,
+            nextUndo: null,
+            nextRedo: null,
+        });
+        expect(typeof local.onDidChangeHistory(() => undefined)).toBe(
+            'function'
+        );
+        local.undo();
+        expect(ids(main)).toEqual(['a', 'b']);
+        local.redo();
+        expect(ids(main)).toEqual(['a']);
+        local.dispose();
+    });
+
     test('a layout that cannot be restored falls back to the defaults', async () => {
         const orchestrator = new MemoryOrchestrator({
             workspace: {
@@ -721,7 +745,6 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             },
         });
         const main = open(orchestrator, 'main', {
-            workspace: true,
             buildDefaults: () =>
                 main.api.addPanel({ id: 'fallback', component: 'default' }),
         });
@@ -821,10 +844,9 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         orchestrator.onDidChangeWorkspace((state) =>
             changes.push(state.windows.map((window) => window.label))
         );
-        const main = open(orchestrator, 'main', { workspace: true });
+        const main = open(orchestrator, 'main');
         let defaultsBuilt = 0;
         const other = open(orchestrator, 'other', {
-            workspace: true,
             buildDefaults: () => {
                 defaultsBuilt += 1;
                 other.api.addPanel({ id: 'kept', component: 'default' });
