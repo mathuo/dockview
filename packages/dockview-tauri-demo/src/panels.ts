@@ -434,7 +434,7 @@ export class HubPanel extends DemoPanel {
             const hub = this.hub();
             const caps = api.dndCapabilities;
             status.replaceChildren(
-                field('window label', hub?.label ?? 'not installed'),
+                field('window id', hub?.windowId ?? 'not installed'),
                 verdict(
                     caps.html5,
                     caps.html5
@@ -623,14 +623,14 @@ export class HistoryPanel extends DemoPanel {
             if (!hub) {
                 return false;
             }
-            this.onDispose(hub.onDidChangeHistory(render));
-            this.onDispose(
-                hub.onDidMoveAcrossWindows((notice) => {
-                    log.append(
-                        `${notice.reason}: ${notice.panels.join(', ')} ${notice.from} → ${notice.to}`
-                    );
-                })
-            );
+            const history = hub.onDidChangeHistory(render);
+            this.onDispose(() => history.dispose());
+            const moves = hub.onDidMoveAcrossWindows((notice) => {
+                log.append(
+                    `${notice.reason}: ${notice.panels.join(', ')} ${notice.from} → ${notice.to}`
+                );
+            });
+            this.onDispose(() => moves.dispose());
             return true;
         };
 

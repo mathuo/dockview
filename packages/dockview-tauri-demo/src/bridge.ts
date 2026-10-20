@@ -118,7 +118,7 @@ export async function closeNativePopout(win: Window): Promise<void> {
 
 export const RELEASE_EVENT = 'dockview:release';
 
-import type { DragPayload, ReleaseNotice } from 'dockview-enterprise';
+import type { DragPayload, MoveEvent, ReleaseEvent } from 'dockview-enterprise';
 
 /** The source window announces a drag, handing the shell the serialized group. */
 export async function dragStart(
@@ -174,7 +174,7 @@ export async function dragEnd(
 
 /** Delivered to the source window once another window has taken its group. */
 export async function onRelease(
-    handler: (notice: ReleaseNotice) => void
+    handler: (notice: ReleaseEvent) => void
 ): Promise<() => void> {
     if (!isTauri()) {
         return () => {
@@ -185,7 +185,7 @@ export async function onRelease(
         '@tauri-apps/api/webviewWindow'
     );
     const current = getCurrentWebviewWindow();
-    return current.listen<ReleaseNotice & { from: string }>(
+    return current.listen<ReleaseEvent & { from: string }>(
         RELEASE_EVENT,
         (event) => {
             if (event.payload.from === current.label) {
@@ -285,13 +285,7 @@ export interface HistoryInfo {
     nextRedo: string | null;
 }
 
-export interface MovedNotice {
-    session: string;
-    panels: string[];
-    from: string;
-    to: string;
-    reason: 'drop' | 'undo' | 'redo';
-}
+export type MovedNotice = MoveEvent;
 
 async function invokeOrIgnore(
     command: string,

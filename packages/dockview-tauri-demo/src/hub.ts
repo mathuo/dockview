@@ -37,35 +37,41 @@ import {
     windowLabel,
 } from './bridge';
 
-export const tauriTransport: MultiWindowTransport = {
-    label: windowLabel,
+/** The bridge's listeners hand back an unlisten function; dockview events hand back a disposable. */
+const disposable = (unlisten: Promise<() => void>) =>
+    unlisten.then((dispose) => ({ dispose }));
 
-    dragStart: (session, from, payload) =>
+export const tauriTransport: MultiWindowTransport = {
+    windowId: windowLabel,
+
+    startDrag: (session, from, payload) =>
         dragStart(session, from, payload.kind, payload),
-    peek: (session) => peekDrag(session) as Promise<DragPayload>,
-    claim: async (session, to) => {
+    peekDrag: (session) => peekDrag(session) as Promise<DragPayload>,
+    claimDrag: async (session, to) => {
         await claimDrop(session, to);
     },
-    dragEnd,
-    onRelease,
-    takePending: (label) =>
-        takePendingGroup(label) as Promise<DragPayload | null>,
-    moveRecorded,
-    onMoved,
+    endDrag: dragEnd,
+    onDidRelease: (handler) => disposable(onRelease(handler)),
+    takePendingDrag: (windowId) =>
+        takePendingGroup(windowId) as Promise<DragPayload | null>,
+    reportMove: moveRecorded,
+    onDidMove: (handler) => disposable(onMoved(handler)),
 
-    initialLayout: (label) =>
-        initialLayout(label) as Promise<SerializedDockview | null>,
-    layoutChanged,
+    loadLayout: (windowId) =>
+        initialLayout(windowId) as Promise<SerializedDockview | null>,
+    reportLayout: layoutChanged,
 
-    historyPush,
+    reportLocalStep: historyPush,
     undo,
     redo,
-    historyInfo,
-    onApplyLayout: (handler) =>
-        onApplyLayout((layout) => handler(layout as SerializedDockview)),
-    onUndoRequest,
-    onRedoRequest,
-    onHistoryChanged,
+    getHistory: historyInfo,
+    onRequestApplyLayout: (handler) =>
+        disposable(
+            onApplyLayout((layout) => handler(layout as SerializedDockview))
+        ),
+    onRequestUndo: (handler) => disposable(onUndoRequest(handler)),
+    onRequestRedo: (handler) => disposable(onRedoRequest(handler)),
+    onDidChangeHistory: (handler) => disposable(onHistoryChanged(handler)),
 };
 
 /** The multi-window handle, plus the log the demo's panels and harness read. */
@@ -88,8 +94,8 @@ export function installHub(
         },
     });
     return {
-        get label() {
-            return multiWindow.label;
+        get windowId() {
+            return multiWindow.windowId;
         },
         ready: multiWindow.ready,
         counters: multiWindow.counters,
