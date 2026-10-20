@@ -1,0 +1,229 @@
+---
+title: Multi-window layouts
+description: Drag tabs and groups between dockviews in separate windows or processes, persist the whole workspace, and undo across windows, through an orchestrator you supply.
+sidebar_position: 4
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+A desktop application built on Tauri, Electron or a browser with several
+top-level windows runs one dockview per window, each in its own JavaScript
+context. Nothing can move between them as DOM, no window is the root that owns
+the others, and a popout window has no meaning. What can cross a window
+boundary is an OS drag session, and only an HTML5 drag rides one.
+
+`dockview-enterprise` ships the window side of that setup as three
+**interceptors** over the public api. Install them and the instance keeps
+working exactly as before; a drag can now also land in another window, the
+layout of every window is kept together, and Ctrl+Z works across windows.
+Each interceptor reaches the outside world only through a **transport** you
+supply, so the same code runs against a Tauri shell, an Electron main process,
+a `BroadcastChannel`, or the in-memory orchestrator this package includes.
+
+```ts
+import {
+    installCrossWindowDnd,
+    installSharedHistory,
+    installWindowWorkspace,
+} from 'dockview-enterprise';
+
+const api = createDockview(element, {
+    components,
+    // Each window keeps its own undo stack; the orchestrator sequences them
+    // with the moves between windows. An applied layout arrives through
+    // fromJSON and must not wipe the stack.
+    layoutHistory: { enabled: true, clearOnFromJSON: false },
+    // Every window numbers its groups from "1" by default, so a group moved
+    // between windows would collide on arrival.
+    groupIdGenerator: () => crypto.randomUUID(),
+});
+
+const transport = connectToYourOrchestrator(); // a MultiWindowTransport
+
+installCrossWindowDnd(api, transport);
+installWindowWorkspace(api, transport, {
+    buildDefaults: (label) => api.addPanel({ id: `${label}-home`, component: 'home' }),
+});
+installSharedHistory(api, transport, { bindKeys: true });
+```
+
+Panel ids must be unique across every window a tab can move between, as they
+must be within one instance: a panel keeps its id wherever it lands.
+
+## Dragging between windows
+
+`installCrossWindowDnd` hooks `onWillDragPanel` and `onWillDragGroup` to put
+a session id on the drag's `DataTransfer` under `application/x-dockview-hub`
+and hand the orchestrator what the drag carries: one tab as its `toJSON()`
+state, or one group as `serializeGroup` output. Serializing up front means the
+drop can complete even if the source window is busy by then.
+
+The destination's dockview sees a drag it did not start and asks through
+`onUnhandledDragOver`; the interceptor accepts it when the type is present, so
+the normal drop overlay shows. A browser exposes a drag's types but not its
+data until the drop, which is why the type carries the meaning and the session
+id waits.
+
+On `onDidDrop` the interceptor reads the payload, refuses it if this window
+already holds a panel of the same id, and otherwise claims it. The first claim
+wins: the orchestrator tells the source window to remove its copy, and the
+destination rebuilds the payload where the drop landed, with
+[`addPanelFromJSON`](/docs/core/groups/add) or
+[`addGroupFromJSON`](/docs/core/groups/add): a new group beside the target or
+at a layout edge, or merged into the target for a drop on its centre or its
+tab bar, at the tab index the drop reports.
+
+The source's `dragend` fires the instant the drop lands, and the destination's
+claim is a separate message that routinely arrives later, so the orchestrator
+keeps an ended drag claimable for a grace period before discarding it.
+
+```ts
+const dnd = installCrossWindowDnd(api, transport, {
+    onLog: (line) => console.info(line),
+});
+
+dnd.onDidMoveAcrossWindows(({ panels, from, to, reason }) => {
+    // reason is 'drop', 'undo' or 'redo'
+});
+
+// With an orchestrator that can open windows, an unclaimed drag (one that
+// ended outside every window) becomes a new window holding the tab.
+dnd.tearOff = true;
+```
+
+Only the HTML5 backend can leave a window. A pointer-backend drag (touch and
+pen, see [strategies](/docs/core/dnd/strategy)) is left alone.
+
+## Persisting the workspace
+
+Only the party that creates windows can bring them back, so the workspace
+belongs to the orchestrator: every window, its frame if the host records one,
+and its dockview layout as opaque JSON. `installWindowWorkspace` asks the
+orchestrator for this window's layout once, restores it with `fromJSON` or
+builds the defaults you give it, and from then on reports every layout change
+back on a debounce. The orchestrator stores the result without reading it,
+save for the panel ids, to refuse giving two windows the same panel.
+
+```ts
+const workspace = installWindowWorkspace(api, transport, {
+    buildDefaults: (label) => { /* addPanel ... */ },
+    debounceMs: 300,
+});
+
+const { label, restored } = await workspace.ready;
+```
+
+## Undo across windows
+
+Dockview's own [layout history](/docs/core/state/history) keeps a window's
+local steps and knows how to restore them. What it cannot know is the order
+of those steps against the moves between windows. `installSharedHistory`
+reports each local step to the orchestrator as it is pushed, forwards undo and
+redo to it, and carries out what comes back: either "undo your own top step"
+or "take this layout".
+
+The orchestrator keeps one ordered stack across windows. An entry is a marker,
+"a step in window X", or a move, which carries each window's layout before and
+after. Undoing a move applies both pre-move layouts, destination first, so no
+two windows hold the panels at once. Ordering is what makes it safe: an older
+local step is only reachable after the move that followed it has been undone.
+
+```ts
+const history = installSharedHistory(api, transport, {
+    // Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y on the document (Cmd on macOS).
+    // Off by default, as dockview's own history binds no key either.
+    bindKeys: true,
+});
+
+history.undo();
+history.info; // { undoCount, redoCount, nextUndo, nextRedo }
+history.onDidChange((info) => { /* ... */ });
+```
+
+## The transports
+
+A window reaches the orchestrator through three interfaces, which one object
+can implement together as a `MultiWindowTransport`. Every call is asynchronous
+and nothing relies on a result arriving inside the DOM event that caused it.
+
+```ts
+interface DragTransport {
+    label(): Promise<string>;
+    dragStart(session: string, from: string, payload: DragPayload): Promise<void>;
+    peek(session: string): Promise<DragPayload>;
+    claim(session: string, to: string): Promise<void>;
+    dragEnd(session: string, tearOff: boolean): Promise<void>;
+    onRelease(handler: (notice: ReleaseNotice) => void): Promise<Unsubscribe>;
+    takePending(label: string): Promise<DragPayload | null>;
+    moveRecorded(session, label, role: 'from' | 'to', panels, before, after): Promise<void>;
+    onMoved(handler: (notice: MovedNotice) => void): Promise<Unsubscribe>;
+}
+
+interface WorkspaceTransport {
+    label(): Promise<string>;
+    initialLayout(label: string): Promise<SerializedDockview | null>;
+    layoutChanged(label: string, layout: SerializedDockview): Promise<void>;
+}
+
+interface HistoryTransport {
+    label(): Promise<string>;
+    historyPush(label: string): Promise<void>;
+    undo(): Promise<void>;
+    redo(): Promise<void>;
+    historyInfo(): Promise<HistoryInfo | null>;
+    onApplyLayout(handler: (layout: SerializedDockview) => void): Promise<Unsubscribe>;
+    onUndoRequest(handler: () => void): Promise<Unsubscribe>;
+    onRedoRequest(handler: () => void): Promise<Unsubscribe>;
+    onHistoryChanged(handler: (info: HistoryInfo) => void): Promise<Unsubscribe>;
+}
+```
+
+`DragPayload` is `{ kind: 'panel', panel: GroupviewPanelState }` or
+`{ kind: 'group', group: SerializedDockviewGroup }`; `payloadPanels(payload)`
+lists the panel ids it moves, which is all an orchestrator needs to read.
+
+## The orchestrator
+
+The orchestrator is the one party outside every window. It tracks drag
+sessions (first claim wins, a grace period after the drag ends), the workspace
+(every window's layout, refusing a duplicate panel unless an announced move
+explains it) and the shared history (the ordered stack above). It also has to
+tell each window what to do: release its copy of a payload, take a layout, or
+undo its own top step.
+
+`MemoryOrchestrator` is that, for windows that share one JavaScript heap:
+several dockviews on one page, a test, or a host that runs the orchestrator in
+the page and bridges windows some other way. It is built from three pure
+pieces, `DragHub`, `WorkspaceRegistry` and `HistorySequencer`, which a shell in
+another language can mirror; the
+[Tauri demo](https://github.com/dockview/dockview/tree/master/packages/dockview-tauri-demo)
+in the repository does exactly that in Rust.
+
+```ts
+import { MemoryOrchestrator } from 'dockview-enterprise';
+
+const orchestrator = new MemoryOrchestrator({
+    workspace: JSON.parse(localStorage.getItem('workspace') ?? 'null') ?? undefined,
+});
+orchestrator.onDidChangeWorkspace((state) =>
+    localStorage.setItem('workspace', JSON.stringify(state))
+);
+
+// One transport per window; the same object serves all three installs.
+const transport = orchestrator.connect('main');
+
+orchestrator.undo();
+orchestrator.historyInfo;
+orchestrator.disconnect('main'); // the window closed
+```
+
+Every notice an orchestrator sends arrives on a later microtask, never inside
+the call that caused it, so a window's handlers run as they would with a real
+message bus.
+
+## See also
+
+- [Adding groups](/docs/core/groups/add): `serializeGroup`, `addGroupFromJSON` and `addPanelFromJSON`, the envelope a move travels in.
+- [External drag and drop](/docs/core/dnd/external): the hooks the interceptors build on.
+- [Layout history](/docs/core/state/history): the per-window stack the shared history sequences.
