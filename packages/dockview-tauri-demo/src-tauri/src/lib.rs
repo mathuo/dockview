@@ -1,3 +1,4 @@
+mod history;
 mod hub;
 mod workspace;
 
@@ -6,13 +7,14 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{
     webview::{NewWindowFeatures, NewWindowResponse},
     AppHandle, Emitter, Manager, RunEvent, State, Url, WebviewUrl, WebviewWindow,
     WebviewWindowBuilder, WindowEvent,
 };
 
+use history::{Action, History, Role, Step};
 use hub::{DragEnd, DragSession, Hub, Release};
 use workspace::{FileStore, Geometry, Store, Workspace, WorkspaceState};
 
@@ -23,8 +25,190 @@ const LAYOUT_EVENT: &str = "dockview:layout";
 /// the dragged group, so it can remove its own copy.
 const RELEASE_EVENT: &str = "dockview:release";
 
+/// Broadcast after panels moved between windows, by a drop or by undo or
+/// redo of one, so app code has one event for it.
+const MOVED_EVENT: &str = "dockview:moved";
+/// Broadcast whenever the global history changes.
+const HISTORY_EVENT: &str = "dockview:history";
+/// Sent to one window: replace your layout with this one.
+const APPLY_EVENT: &str = "dockview:apply";
+/// Sent to one window: undo, or redo, your own top step.
+const UNDO_REQUEST_EVENT: &str = "dockview:undo-request";
+const REDO_REQUEST_EVENT: &str = "dockview:redo-request";
+
 /// Labels for the windows a tear-off creates; see `POPOUT_COUNT`.
 static TEAR_OFF_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+/// The panel ids a `SerializedDockviewGroup` carries: its `group.views`. The
+/// one field of an envelope the shell reads, for move events and for the
+/// workspace's reconciliation of the two windows' reports.
+fn envelope_panels(envelope: &serde_json::Value) -> Vec<String> {
+    envelope
+        .pointer("/group/views")
+        .and_then(serde_json::Value::as_array)
+        .map(|views| {
+            views
+                .iter()
+                .filter_map(serde_json::Value::as_str)
+                .map(str::to_string)
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+struct MovedNotice {
+    session: String,
+    panels: Vec<String>,
+    from: String,
+    to: String,
+    /// `drop`, `undo` or `redo`.
+    reason: &'static str,
+}
+
+fn broadcast_history(app: &AppHandle) {
+    match app.state::<History>().info() {
+        Ok(info) => {
+            if let Err(err) = app.emit(HISTORY_EVENT, info) {
+                eprintln!("history: could not broadcast: {err}");
+            }
+        }
+        Err(err) => eprintln!("history: {err}"),
+    }
+}
+
+/// Carries out an undo or redo step the history handed back.
+fn carry_out(app: &AppHandle, step: Step, reason: &'static str) -> Result<(), String> {
+    for action in step.actions {
+        match action {
+            // Every payload names its window: a listener registered for
+            // "any" target hears events emitted to every window, so the
+            // receiver filters as well as the sender targeting.
+            Action::UndoLocal { window } => app
+                .emit_to(
+                    &window,
+                    UNDO_REQUEST_EVENT,
+                    serde_json::json!({ "window": window }),
+                )
+                .map_err(|err| err.to_string())?,
+            Action::RedoLocal { window } => app
+                .emit_to(
+                    &window,
+                    REDO_REQUEST_EVENT,
+                    serde_json::json!({ "window": window }),
+                )
+                .map_err(|err| err.to_string())?,
+            Action::ApplyLayout { window, layout } => {
+                app.state::<Workspace>()
+                    .set_layout_unchecked(&window, layout.clone())
+                    .map_err(|err| err.to_string())?;
+                app.state::<Persistence>().mark_dirty();
+                app.emit_to(
+                    &window,
+                    APPLY_EVENT,
+                    serde_json::json!({ "window": window, "layout": layout }),
+                )
+                .map_err(|err| err.to_string())?;
+            }
+        }
+    }
+    if let Some(moved) = step.moved {
+        app.emit(
+            MOVED_EVENT,
+            MovedNotice {
+                session: moved.session,
+                panels: moved.panels,
+                from: moved.from,
+                to: moved.to,
+                reason,
+            },
+        )
+        .map_err(|err| err.to_string())?;
+    }
+    broadcast_history(app);
+    Ok(())
+}
+
+fn perform_undo(app: &AppHandle) -> Result<(), String> {
+    let step = app
+        .state::<History>()
+        .undo()
+        .map_err(|err| err.to_string())?;
+    carry_out(app, step, "undo")
+}
+
+fn perform_redo(app: &AppHandle) -> Result<(), String> {
+    let step = app
+        .state::<History>()
+        .redo()
+        .map_err(|err| err.to_string())?;
+    carry_out(app, step, "redo")
+}
+
+/// A window recorded a step in its own history.
+#[tauri::command]
+fn history_push(app: AppHandle, history: State<History>, label: String) -> Result<(), String> {
+    history.push_local(&label).map_err(|err| err.to_string())?;
+    broadcast_history(&app);
+    Ok(())
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum MoveRole {
+    From,
+    To,
+}
+
+/// A window reports its half of a move: its layout before and after.
+#[tauri::command]
+fn move_recorded(
+    app: AppHandle,
+    history: State<History>,
+    session: String,
+    label: String,
+    role: MoveRole,
+    panels: Vec<String>,
+    before: serde_json::Value,
+    after: serde_json::Value,
+) -> Result<(), String> {
+    let role = match role {
+        MoveRole::From => Role::From,
+        MoveRole::To => Role::To,
+    };
+    history
+        .record_move(
+            &session,
+            &panels,
+            role,
+            history::Half {
+                window: label,
+                before,
+                after,
+            },
+        )
+        .map_err(|err| err.to_string())?;
+    broadcast_history(&app);
+    Ok(())
+}
+
+/// Undo the most recent step anywhere.
+#[tauri::command]
+fn undo(app: AppHandle) -> Result<(), String> {
+    perform_undo(&app)
+}
+
+/// Redo the most recently undone step anywhere.
+#[tauri::command]
+fn redo(app: AppHandle) -> Result<(), String> {
+    perform_redo(&app)
+}
+
+#[tauri::command]
+fn history_info(history: State<History>) -> Result<history::Info, String> {
+    history.info().map_err(|err| err.to_string())
+}
 
 /// Set in the environment to run the measurement harness: a second window
 /// opens at a known position, and the frontend reports its geometry and the
@@ -275,8 +459,26 @@ fn claim_drop(
     session: String,
     to: String,
 ) -> Result<serde_json::Value, String> {
-    let claim = hub.claim(&session, to).map_err(|err| err.to_string())?;
+    let claim = hub
+        .claim(&session, to.clone())
+        .map_err(|err| err.to_string())?;
+    let panels = envelope_panels(&claim.envelope);
+    let from = claim.release.from.clone();
+    app.state::<Workspace>()
+        .expect_move(&panels, &from, &to)
+        .map_err(|err| err.to_string())?;
     deliver(&app, claim.release)?;
+    app.emit(
+        MOVED_EVENT,
+        MovedNotice {
+            session,
+            panels,
+            from,
+            to,
+            reason: "drop",
+        },
+    )
+    .map_err(|err| err.to_string())?;
     Ok(claim.envelope)
 }
 
@@ -537,6 +739,7 @@ fn broadcast_layout(app: AppHandle, from: String, layout: serde_json::Value) -> 
 pub fn run() {
     let app = tauri::Builder::default()
         .manage(Hub::default())
+        .manage(History::default())
         .setup(|app| {
             let handle = app.handle().clone();
 
@@ -599,6 +802,27 @@ pub fn run() {
                 }
             }
 
+            // The harness drives undo and redo over stdin, since it cannot
+            // reach the commands and synthetic key events need a focus the
+            // headless display does not give.
+            if autotest() {
+                let driver = handle.clone();
+                std::thread::spawn(move || {
+                    use std::io::BufRead;
+                    for line in std::io::stdin().lock().lines() {
+                        let result = match line.as_deref().map(str::trim) {
+                            Ok("undo") => perform_undo(&driver),
+                            Ok("redo") => perform_redo(&driver),
+                            Ok(_) => Ok(()),
+                            Err(_) => break,
+                        };
+                        if let Err(err) = result {
+                            eprintln!("autotest: {err}");
+                        }
+                    }
+                });
+            }
+
             // Writes coalesce here rather than on every event.
             std::thread::spawn(move || loop {
                 std::thread::sleep(SAVE_DEBOUNCE);
@@ -634,7 +858,11 @@ pub fn run() {
                         if let Err(err) = app.state::<Workspace>().remove_window(&label) {
                             eprintln!("workspace: {err}");
                         }
+                        if let Err(err) = app.state::<History>().forget_window(&label) {
+                            eprintln!("history: {err}");
+                        }
                         persistence.mark_dirty();
+                        broadcast_history(app);
                     }
                 }
                 _ => {}
@@ -653,6 +881,11 @@ pub fn run() {
             layout_changed,
             initial_layout,
             workspace_info,
+            history_push,
+            move_recorded,
+            undo,
+            redo,
+            history_info,
             autotest_report
         ])
         .build(tauri::generate_context!())

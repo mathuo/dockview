@@ -75,6 +75,11 @@ last written, and every window with its frame and whether it has reported a
 layout. Close the app and reopen it to see every window return. See
 [Persisting the workspace](#persisting-the-workspace).
 
+**Undo** — one undo history across every window. Ctrl+Z in any window undoes
+the most recent step wherever it happened, a tab that crossed to another
+window included, and the panel logs every move between windows. See
+[Undo across windows](#undo-across-windows).
+
 **Layout sync** — serializes the layout and fans it out over Tauri's event bus,
 so windows on either side of the process boundary converge on the same
 arrangement without sharing a DOM. What that whole-layout resync costs, and
@@ -273,6 +278,57 @@ crossed from the main window into the second, the shell was closed and
 started again from the workspace file alone, and both windows came back at
 their positions with the same panels, Scratch still in the second window.
 
+### Undo across windows
+
+Each window keeps dockview's own undo history (the enterprise
+`layoutHistory` module) for the steps made in it: it records a full layout
+before and after each step and restores with `reuseExistingPanels`. What no
+window can know is the order of its steps against the moves between
+windows, so the shell sequences. Its history is one ordered stack of
+markers, "a step in window X" for every step a window reports pushing, and
+a full entry for every move between windows, assembled from two halves:
+the source's layout before and after it let go, the destination's before
+and after it took the group. Undo pops the top: a marker tells that window
+to run `api.undo()`; a move applies both windows' pre-move layouts,
+destination first so no two windows hold the panels at once. Redo is the
+mirror image. Ordering is what makes it safe: a window's older local step
+is only reachable after the move that followed it has been undone, which
+puts the moved panels back first, so a snapshot can never resurrect a
+panel that now lives elsewhere.
+
+Three things the windows do for this. They run `layoutHistory` with
+`clearOnFromJSON: false`, since a layout the shell applies arrives through
+`fromJSON` and must not wipe the local stack. They report a local push
+through `onDidChangeHistory` (a rise in the undo count outside a shell
+instruction) and ignore the changes a shell instruction causes. And they
+route Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y to the shell; dockview binds no key
+of its own. After every move, and every undo or redo of one, the shell
+broadcasts `dockview:moved` with the panels and the two windows, which the
+interceptor exposes as `onDidMoveAcrossWindows`: the one event app code
+needs to follow panels between windows.
+
+Two things learned the hard way. A move's two windows report their layouts
+independently and in either order, so the destination can report the moved
+panel before the source has reported it gone; the workspace now treats a
+duplicate as the announced move rather than a conflict until the source's
+report arrives. And a Tauri listener registered for "any" target hears
+events emitted to every window, so the first undo applied both windows'
+layouts in both windows; events the shell addresses to one window now name
+it in the payload and are heard on that window's own target.
+
+Accepted rough edge: a new step anywhere clears the global redo, and the
+matching local redo entries in other windows become unreachable from the
+shell. Harmless, and their `canRedo` is not shown.
+
+Measured on Linux (WebKitGTK 2.52.6, under Xvfb) with
+`scripts/measure-cross-window-drag.py --undo --restart`: after the Scratch
+tab had crossed into the second window, undo through the shell put it back
+in the main window and out of the second, redo moved it across again, and a
+restart from the workspace file brought both windows back with the tab in
+the second. The shell reads `undo` and `redo` lines on stdin under the
+harness flag, since synthetic key events need a focus the headless display
+does not give.
+
 ### Measured in a release build
 
 Running a packaged build on Linux (WebKitGTK, tauri 2.11.5, webview 2.52.6),
@@ -346,6 +402,7 @@ src/            frontend
   crossWindowDnd.ts  cross-window drag and drop, an interceptor over dockview's drag hooks
   hub.ts        the Tauri transport that interceptor reaches the shell through
   workspace.ts  a window's side of the workspace: layout in at start, reports out on change
+  history.ts    a window's side of the shared undo: report local steps, carry out the shell's
   autotest.ts   geometry and log reporting for the measurement driver
 scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis
@@ -354,5 +411,6 @@ scripts/        measure-cross-window-drag.py drives a real drag between two wind
 src-tauri/      Rust shell: host info, native window creation, layout broadcast
   src/hub.rs    the drag orchestrator, Tauri-free and unit tested
   src/workspace.rs  the workspace: windows, frames and opaque layouts, with an atomic file store
+  src/history.rs  the one ordered undo history across windows, markers and move entries
 popout.html     served at /popout.html, dockview's default popout target
 ```

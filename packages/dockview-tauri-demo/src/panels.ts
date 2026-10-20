@@ -16,6 +16,7 @@ import {
 import { resolveDndStrategy } from './dnd';
 import { LogView, button, el, field, verdict } from './dom';
 import { diagnosePopoutUrl, readHostReport } from './host';
+import type { WindowHistory } from './history';
 import type { Hub } from './hub';
 import { describe, probeWindowOpen } from './probes';
 import { RELEASE_ORIGIN_URL, simulateReleaseOriginRestore } from './simulate';
@@ -589,6 +590,83 @@ export class WorkspacePanel extends DemoPanel {
                 ),
                 body,
                 button('Re-read', refresh)
+            )
+        );
+    }
+}
+
+/**
+ * The one undo history across every window. Each window keeps dockview's
+ * own stack for its local steps; the shell orders them with the moves
+ * between windows and says which window undoes next. Ctrl+Z anywhere goes
+ * to the shell.
+ */
+export class HistoryPanel extends DemoPanel {
+    constructor(
+        private readonly history: () => WindowHistory | undefined,
+        private readonly hub: () => Hub | undefined
+    ) {
+        super();
+    }
+
+    init(): void {
+        const log = new LogView();
+        const status = el('div');
+
+        const render = () => {
+            const info = this.history()?.info;
+            status.replaceChildren(
+                field('undo steps', String(info?.undoCount ?? 0)),
+                field('next undo', info?.nextUndo ?? 'nothing'),
+                field('redo steps', String(info?.redoCount ?? 0)),
+                field('next redo', info?.nextRedo ?? 'nothing')
+            );
+        };
+
+        const subscribe = () => {
+            const history = this.history();
+            const hub = this.hub();
+            if (!history || !hub) {
+                return false;
+            }
+            this.onDispose(history.onChange(render));
+            this.onDispose(
+                hub.onDidMoveAcrossWindows((notice) => {
+                    log.append(
+                        `${notice.reason}: ${notice.panels.join(', ')} ${notice.from} → ${notice.to}`
+                    );
+                })
+            );
+            return true;
+        };
+
+        // Installed right after the instance is created, which is after
+        // dockview has asked for this panel.
+        if (!subscribe()) {
+            const retry = setTimeout(() => {
+                subscribe();
+                render();
+            }, 0);
+            this.onDispose(() => clearTimeout(retry));
+        }
+        render();
+
+        this.root.append(
+            section(
+                'Undo across windows',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'One history for every window. Ctrl+Z here undoes the most recent step wherever it happened, including a tab that crossed to another window.'
+                ),
+                status,
+                el(
+                    'div',
+                    { class: 'demo-buttons' },
+                    button('Undo', () => this.history()?.undo()),
+                    button('Redo', () => this.history()?.redo())
+                ),
+                log.element
             )
         );
     }

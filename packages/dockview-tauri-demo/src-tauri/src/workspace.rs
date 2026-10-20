@@ -90,17 +90,52 @@ impl<T> From<PoisonError<T>> for WorkspaceError {
     }
 }
 
+/// A panel on its way between two windows. While it is pending, the
+/// destination may report a layout holding it although the source's stored
+/// layout still does too: the two windows report independently and in
+/// either order, so the duplicate is the move itself, not a conflict.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct PendingMove {
+    panel: String,
+    from: String,
+    to: String,
+}
+
 /// The live workspace. One per host process.
 #[derive(Default)]
 pub struct Workspace {
     state: Mutex<WorkspaceState>,
+    pending: Mutex<Vec<PendingMove>>,
 }
 
 impl Workspace {
     pub fn restore(state: WorkspaceState) -> Self {
         Workspace {
             state: Mutex::new(state),
+            pending: Mutex::new(Vec::new()),
         }
+    }
+
+    /// Announce that `panels` are moving from one window to another, so the
+    /// two windows' next reports are reconciled rather than refused. A
+    /// pending move is forgotten once the source reports a layout without
+    /// the panel.
+    pub fn expect_move(
+        &self,
+        panels: &[String],
+        from: &str,
+        to: &str,
+    ) -> Result<(), WorkspaceError> {
+        let mut pending = self.pending.lock()?;
+        for panel in panels {
+            pending.retain(|entry| entry.panel != *panel);
+            pending.push(PendingMove {
+                panel: panel.clone(),
+                from: from.to_string(),
+                to: to.to_string(),
+            });
+        }
+        Ok(())
     }
 
     pub fn snapshot(&self) -> Result<WorkspaceState, WorkspaceError> {
@@ -151,15 +186,22 @@ impl Workspace {
     }
 
     /// A window reports its layout. Refused if it names a panel another
-    /// window holds, in which case nothing is recorded.
+    /// window holds, in which case nothing is recorded, unless that panel is
+    /// on its way from that window to this one (see [`Workspace::expect_move`]).
     pub fn set_layout(&self, label: &str, layout: Value) -> Result<(), WorkspaceError> {
         let mut state = self.state.lock()?;
+        let mut pending = self.pending.lock()?;
 
         let incoming = panel_ids(&layout);
         for other in state.windows.iter().filter(|window| window.label != label) {
             if let Some(theirs) = other.layout.as_ref() {
                 let theirs = panel_ids(theirs);
-                if let Some(panel) = incoming.iter().find(|id| theirs.contains(id)) {
+                if let Some(panel) = incoming.iter().find(|id| {
+                    theirs.contains(id)
+                        && !pending.iter().any(|entry| {
+                            entry.panel == **id && entry.from == other.label && entry.to == label
+                        })
+                }) {
                     return Err(WorkspaceError::DuplicatePanel {
                         panel: panel.clone(),
                         window: other.label.clone(),
@@ -168,6 +210,21 @@ impl Workspace {
             }
         }
 
+        // A source that no longer holds a panel has completed its half of
+        // the move; the panel needs no further allowance.
+        pending.retain(|entry| entry.from != label || incoming.contains(&entry.panel));
+
+        let window = entry(&mut state, label);
+        window.layout = Some(layout);
+        Ok(())
+    }
+
+    /// Records a layout the orchestrator itself is applying to a window, as
+    /// an undo or redo does. It is trusted as is: the orchestrator computed
+    /// it from layouts it already held, and applies the two windows' halves
+    /// in an order that never leaves a panel in both.
+    pub fn set_layout_unchecked(&self, label: &str, layout: Value) -> Result<(), WorkspaceError> {
+        let mut state = self.state.lock()?;
         let window = entry(&mut state, label);
         window.layout = Some(layout);
         Ok(())
@@ -321,6 +378,61 @@ mod tests {
         );
         // Nothing recorded for the refused window.
         assert_eq!(workspace.initial_layout("dock-2").unwrap(), None);
+    }
+
+    #[test]
+    fn a_panel_on_its_way_may_be_reported_by_the_destination_first() {
+        let workspace = Workspace::default();
+        workspace.set_layout("main", layout(&["a", "b"])).unwrap();
+        workspace.set_layout("dock-2", layout(&["c"])).unwrap();
+
+        workspace
+            .expect_move(&["b".into()], "main", "dock-2")
+            .unwrap();
+
+        // The destination's report lands before the source's.
+        assert!(workspace.set_layout("dock-2", layout(&["c", "b"])).is_ok());
+        assert!(workspace.set_layout("main", layout(&["a"])).is_ok());
+
+        // The allowance is spent: a third window may not claim `b` now.
+        assert_eq!(
+            workspace.set_layout("dock-3", layout(&["b"])),
+            Err(WorkspaceError::DuplicatePanel {
+                panel: "b".into(),
+                window: "dock-2".into()
+            })
+        );
+    }
+
+    #[test]
+    fn an_allowance_is_only_for_the_announced_destination() {
+        let workspace = Workspace::default();
+        workspace.set_layout("main", layout(&["a", "b"])).unwrap();
+        workspace
+            .expect_move(&["b".into()], "main", "dock-2")
+            .unwrap();
+
+        assert_eq!(
+            workspace.set_layout("dock-3", layout(&["b"])),
+            Err(WorkspaceError::DuplicatePanel {
+                panel: "b".into(),
+                window: "main".into()
+            })
+        );
+    }
+
+    #[test]
+    fn an_unchecked_layout_is_taken_as_is() {
+        let workspace = Workspace::default();
+        workspace.set_layout("main", layout(&["a", "b"])).unwrap();
+
+        assert!(workspace
+            .set_layout_unchecked("dock-2", layout(&["b"]))
+            .is_ok());
+        assert_eq!(
+            workspace.initial_layout("dock-2").unwrap(),
+            Some(layout(&["b"]))
+        );
     }
 
     #[test]

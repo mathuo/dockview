@@ -102,6 +102,11 @@ def main():
         action="store_true",
         help="after the drag, close the shell and start it again from the workspace file",
     )
+    parser.add_argument(
+        "--undo",
+        action="store_true",
+        help="after the drag, undo it through the shell and check the tab is back, then redo",
+    )
     args = parser.parse_args()
 
     workspace = args.workspace or os.path.join(
@@ -117,8 +122,8 @@ def main():
 
     def launch():
         app = subprocess.Popen(
-            [args.binary], env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-            text=True,
+            [args.binary], env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL, text=True,
         )
 
         def pump():
@@ -228,8 +233,40 @@ def main():
         print("main panels:  ", sorted(rects["main"]["panels"]))
         print("dock-2 panels:", sorted(rects["dock-2"]["panels"]))
         print("RESULT:", "the tab crossed windows" if ok else "the tab did not cross")
-        if not ok or not args.restart:
-            return 0 if ok else 1
+        if not ok:
+            return 1
+
+        if args.undo:
+            # The shell reads "undo" and "redo" lines on stdin under the
+            # harness flag; the windows report their geometry afterwards.
+            holds = lambda label, panel: panel in rects.get(label, {}).get("panels", {})
+
+            def drive(command, expect_main, expect_dock2, verdict):
+                rects.clear()
+                nonlocal_deadline[0] = time.monotonic() + args.timeout
+                print()
+                print(f"{command} through the shell")
+                app.stdin.write(f"{command}\n")
+                app.stdin.flush()
+                settled = lambda: (
+                    holds("main", panel_id) == expect_main
+                    and holds("dock-2", panel_id) == expect_dock2
+                    and rects.get("main", {}).get("panels")
+                    and rects.get("dock-2", {}).get("panels")
+                )
+                done = take(settled)
+                print("main panels:  ", sorted(rects.get("main", {}).get("panels", {})))
+                print("dock-2 panels:", sorted(rects.get("dock-2", {}).get("panels", {})))
+                print("RESULT:", verdict if done else f"{command} did not take effect")
+                return done
+
+            if not drive("undo", True, False, "undo brought the tab back"):
+                return 1
+            if not drive("redo", False, True, "redo moved the tab across again"):
+                return 1
+
+        if not args.restart:
+            return 0
 
         # Let the shell's debounced save run, then close it the way the
         # user would and bring it back from the file alone.

@@ -19,8 +19,10 @@ import {
     windowLabel,
 } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import { type Hub, installHub, randomId } from './hub';
+import { type Hub, installHub, installSharedHistory, randomId } from './hub';
+import type { WindowHistory } from './history';
 import {
+    HistoryPanel,
     HostPanel,
     HubPanel,
     LayoutSyncPanel,
@@ -34,6 +36,7 @@ import { installWorkspace } from './workspace';
 // Assigned once the instance exists; the hub panel is created lazily by
 // dockview, after that.
 let hub: Hub | undefined;
+let history: WindowHistory | undefined;
 
 const renderers: Record<string, () => IContentRenderer> = {
     host: () => new HostPanel(),
@@ -42,6 +45,11 @@ const renderers: Record<string, () => IContentRenderer> = {
     sync: () => new LayoutSyncPanel(),
     hub: () => new HubPanel(() => hub),
     workspace: () => new WorkspacePanel(),
+    history: () =>
+        new HistoryPanel(
+            () => history,
+            () => hub
+        ),
     scratch: () => new ScratchPanel(),
 };
 
@@ -60,11 +68,16 @@ const api = createDockview(container, {
     // moved between windows would collide on arrival. Random ids let a
     // group keep its id wherever the hub lands it.
     groupIdGenerator: randomId,
+    // Each window keeps its own undo stack; the shell sequences them with
+    // the moves between windows. An applied layout arrives through
+    // fromJSON and must not wipe the stack.
+    layoutHistory: { enabled: true, clearOnFromJSON: false },
     createComponent: (options) =>
         renderers[options.name]?.() ?? new ScratchPanel(),
 });
 
 hub = installHub(api);
+history = installSharedHistory(api, (line) => console.info(`history: ${line}`));
 installAutotest(api, hub);
 
 /**
@@ -130,6 +143,14 @@ function buildDefaults(label: string): void {
         id: id('workspace'),
         component: 'workspace',
         title: 'Workspace',
+        position: { referencePanel: id('native'), direction: 'within' },
+        inactive: true,
+    });
+
+    api.addPanel({
+        id: id('history'),
+        component: 'history',
+        title: 'Undo',
         position: { referencePanel: id('native'), direction: 'within' },
         inactive: true,
     });

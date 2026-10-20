@@ -38,6 +38,22 @@ not a published package and not a supported example.
   layout (restore with `fromJSON`, else build the defaults), then report
   `toJSON()` on every change. Reaches the shell only through its
   `WorkspaceTransport`.
+- `src-tauri/src/history.rs` — the one ordered undo history across windows:
+  a marker per step a window recorded locally, a full entry per move
+  between windows (two halves, one per window), and `undo` / `redo` that
+  return the actions for the shell to carry out. Tauri-free and unit
+  tested. Windows keep dockview's own `layoutHistory` for their local steps;
+  this only sequences.
+- `src/history.ts` — a window's side: report local pushes off
+  `onDidChangeHistory`, route Ctrl+Z to the shell, and carry out
+  `dockview:apply` / `dockview:undo-request` / `dockview:redo-request`.
+  Needs `layoutHistory: { enabled: true, clearOnFromJSON: false }`.
+  Reaches the shell only through its `HistoryTransport`.
+- Events the shell addresses to one window (`dockview:apply`, the undo and
+  redo requests, `dockview:release`) name that window in the payload and
+  are listened for on the window's own target, never with the global
+  `listen`: a listener for "any" target hears events emitted to every
+  window. Broadcasts (`dockview:moved`, `dockview:history`) use `listen`.
 - `src/autotest.ts` and `scripts/measure-cross-window-drag.py` — the
   measurement harness. With `DOCKVIEW_DEMO_AUTOTEST` in the shell's
   environment a second window opens at a known position and each window

@@ -181,9 +181,17 @@ export async function onRelease(
             /* nothing subscribed */
         };
     }
-    const { listen } = await import('@tauri-apps/api/event');
-    return listen<ReleaseNotice>(RELEASE_EVENT, (event) =>
-        handler(event.payload)
+    const { getCurrentWebviewWindow } = await import(
+        '@tauri-apps/api/webviewWindow'
+    );
+    const current = getCurrentWebviewWindow();
+    return current.listen<ReleaseNotice & { from: string }>(
+        RELEASE_EVENT,
+        (event) => {
+            if (event.payload.from === current.label) {
+                handler(event.payload);
+            }
+        }
     );
 }
 
@@ -262,3 +270,126 @@ export async function workspaceInfo(): Promise<WorkspaceInfo | null> {
     const { invoke } = await import('@tauri-apps/api/core');
     return invoke<WorkspaceInfo>('workspace_info');
 }
+
+/*
+ * One undo history across every window. Each window keeps dockview's own
+ * stack for its local steps; the shell sequences them with the moves between
+ * windows, and tells a window when to undo or redo its own top step or to
+ * take a layout the shell holds.
+ */
+
+export interface HistoryInfo {
+    undoCount: number;
+    redoCount: number;
+    nextUndo: string | null;
+    nextRedo: string | null;
+}
+
+export interface MovedNotice {
+    session: string;
+    panels: string[];
+    from: string;
+    to: string;
+    reason: 'drop' | 'undo' | 'redo';
+}
+
+async function invokeOrIgnore(
+    command: string,
+    args?: Record<string, unknown>
+): Promise<void> {
+    if (!isTauri()) {
+        return;
+    }
+    const { invoke } = await import('@tauri-apps/api/core');
+    await invoke(command, args);
+}
+
+async function listenOrIgnore<T>(
+    event: string,
+    handler: (payload: T) => void
+): Promise<() => void> {
+    if (!isTauri()) {
+        return () => {
+            /* nothing subscribed */
+        };
+    }
+    const { listen } = await import('@tauri-apps/api/event');
+    return listen<T>(event, (e) => handler(e.payload));
+}
+
+/**
+ * An event the shell addresses to one window. A listener registered for
+ * "any" target hears events emitted to every window, so this registers on
+ * this window's own target and, belt and braces, drops payloads naming
+ * another window.
+ */
+async function listenToThisWindow<T extends { window: string }>(
+    event: string,
+    handler: (payload: T) => void
+): Promise<() => void> {
+    if (!isTauri()) {
+        return () => {
+            /* nothing subscribed */
+        };
+    }
+    const { getCurrentWebviewWindow } = await import(
+        '@tauri-apps/api/webviewWindow'
+    );
+    const current = getCurrentWebviewWindow();
+    return current.listen<T>(event, (e) => {
+        if (e.payload.window === current.label) {
+            handler(e.payload);
+        }
+    });
+}
+
+/** This window recorded a step in its own history. */
+export const historyPush = (label: string) =>
+    invokeOrIgnore('history_push', { label });
+
+/** This window's half of a move: its layout before and after. */
+export const moveRecorded = (
+    session: string,
+    label: string,
+    role: 'from' | 'to',
+    panels: string[],
+    before: unknown,
+    after: unknown
+) =>
+    invokeOrIgnore('move_recorded', {
+        session,
+        label,
+        role,
+        panels,
+        before,
+        after,
+    });
+
+export const undo = () => invokeOrIgnore('undo');
+export const redo = () => invokeOrIgnore('redo');
+
+export async function historyInfo(): Promise<HistoryInfo | null> {
+    if (!isTauri()) {
+        return null;
+    }
+    const { invoke } = await import('@tauri-apps/api/core');
+    return invoke<HistoryInfo>('history_info');
+}
+
+export const onApplyLayout = (handler: (layout: unknown) => void) =>
+    listenToThisWindow<{ window: string; layout: unknown }>(
+        'dockview:apply',
+        (payload) => handler(payload.layout)
+    );
+export const onUndoRequest = (handler: () => void) =>
+    listenToThisWindow<{ window: string }>('dockview:undo-request', () =>
+        handler()
+    );
+export const onRedoRequest = (handler: () => void) =>
+    listenToThisWindow<{ window: string }>('dockview:redo-request', () =>
+        handler()
+    );
+export const onHistoryChanged = (handler: (info: HistoryInfo) => void) =>
+    listenOrIgnore<HistoryInfo>('dockview:history', handler);
+export const onMoved = (handler: (notice: MovedNotice) => void) =>
+    listenOrIgnore<MovedNotice>('dockview:moved', handler);
