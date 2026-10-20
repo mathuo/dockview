@@ -148,8 +148,12 @@ describe('multi-window: DragSessions', () => {
             windowId: 'detached-1',
             release: { from: 'main', session: 's2', to: 'detached-1' },
         });
-        expect(sessions.peekDetachedDrag('detached-1')).toEqual(panelPayload('q'));
-        expect(sessions.takeDetachedDrag('detached-1')).toEqual(panelPayload('q'));
+        expect(sessions.peekDetachedDrag('detached-1')).toEqual(
+            panelPayload('q')
+        );
+        expect(sessions.takeDetachedDrag('detached-1')).toEqual(
+            panelPayload('q')
+        );
         expect(sessions.takeDetachedDrag('detached-1')).toBeNull();
 
         // An accept that arrived during the grace period wins over the end.
