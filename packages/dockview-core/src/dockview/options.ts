@@ -1011,14 +1011,40 @@ export type AddGroupOptions = (
     GroupOptions;
 
 /**
+ * Placement for `addPanelFromJSON`: everything `addPanel` takes beyond what
+ * the serialized panel state already carries.
+ */
+export type AddPanelFromJSONOptions = Pick<
+    AddPanelOptions,
+    'position' | 'floating' | 'inactive' | 'initialWidth' | 'initialHeight'
+>;
+
+/**
  * Placement for `addGroupFromJSON`: where the rehydrated group goes in the
  * grid, as for `addGroup`. The group's own shape (id, locked, hidden header,
  * header position) comes from the serialized state, so it is not repeated
  * here. Omit the options to append the group to the layout.
+ *
+ * A reference group or panel with `direction: 'within'`, or with no
+ * direction, merges the serialized panels into that group instead of
+ * creating one, as `addPanel` does; `index` then says where in its tab bar
+ * they go.
  */
 export type AddGroupFromJSONOptions = (
-    | AddGroupOptionsWithGroup
-    | AddGroupOptionsWithPanel
+    | {
+          referenceGroup: string | DockviewGroupPanel;
+          /** Defaults to `'within'`: merge into the reference group. */
+          direction?: Direction;
+          /** Tab index to merge at; only with `'within'`. */
+          index?: number;
+      }
+    | {
+          referencePanel: string | IDockviewPanel;
+          /** Defaults to `'within'`: merge into the reference panel's group. */
+          direction?: Direction;
+          /** Tab index to merge at; only with `'within'`. */
+          index?: number;
+      }
     | AbsolutePosition
 ) &
     Pick<GroupOptions, 'skipSetActive' | 'initialWidth' | 'initialHeight'>;

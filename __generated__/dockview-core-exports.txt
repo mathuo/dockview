@@ -5,6 +5,7 @@ AddEdgeGroupOptions
 AddGridviewComponentOptions
 AddGroupFromJSONOptions
 AddGroupOptions
+AddPanelFromJSONOptions
 AddPanelOptions
 AddPanelPositionOptions
 AddPaneviewComponentOptions
