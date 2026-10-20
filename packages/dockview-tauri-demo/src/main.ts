@@ -5,22 +5,18 @@ import './styles.css';
 // dockview instance in this webview.
 import 'dockview-enterprise';
 
-import {
-    type IContentRenderer,
-    type SerializedDockview,
-    createDockview,
-    themeAbyss,
-} from 'dockview';
+import { createDockview, type IContentRenderer, themeAbyss } from 'dockview';
+import type { SharedHistory } from 'dockview-enterprise';
 import { installAutotest } from './autotest';
-import {
-    closeNativePopout,
-    initialLayout,
-    layoutChanged,
-    windowLabel,
-} from './bridge';
+import { closeNativePopout } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import { type Hub, installHub, installSharedHistory, randomId } from './hub';
-import type { WindowHistory } from './history';
+import {
+    type Hub,
+    installHistory,
+    installHub,
+    installWorkspace,
+    randomId,
+} from './hub';
 import {
     HistoryPanel,
     HostPanel,
@@ -31,12 +27,11 @@ import {
     ScratchPanel,
     WorkspacePanel,
 } from './panels';
-import { installWorkspace } from './workspace';
 
 // Assigned once the instance exists; the hub panel is created lazily by
 // dockview, after that.
 let hub: Hub | undefined;
-let history: WindowHistory | undefined;
+let history: SharedHistory | undefined;
 
 const renderers: Record<string, () => IContentRenderer> = {
     host: () => new HostPanel(),
@@ -77,7 +72,7 @@ const api = createDockview(container, {
 });
 
 hub = installHub(api);
-history = installSharedHistory(api, (line) => console.info(`history: ${line}`));
+history = installHistory(api, (line) => console.info(`history: ${line}`));
 installAutotest(api, hub);
 
 /**
@@ -169,16 +164,7 @@ function buildDefaults(label: string): void {
  * held for this label, or nothing, in which case the defaults are built.
  * From then on every layout change is reported back to it.
  */
-installWorkspace(
-    api,
-    {
-        label: windowLabel,
-        initialLayout: (label) =>
-            initialLayout(label) as Promise<SerializedDockview | null>,
-        layoutChanged,
-    },
-    {
-        buildDefaults,
-        onLog: (line) => console.info(`workspace: ${line}`),
-    }
-);
+installWorkspace(api, {
+    buildDefaults,
+    onLog: (line) => console.info(`workspace: ${line}`),
+});

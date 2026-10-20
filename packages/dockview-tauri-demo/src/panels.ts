@@ -5,6 +5,7 @@ import type {
     IContentRenderer,
     SerializedDockview,
 } from 'dockview';
+import type { SharedHistory } from 'dockview-enterprise';
 import {
     broadcastLayout,
     nativeHostInfo,
@@ -14,9 +15,8 @@ import {
     workspaceInfo,
 } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import { LogView, button, el, field, verdict } from './dom';
+import { button, el, field, LogView, verdict } from './dom';
 import { diagnosePopoutUrl, readHostReport } from './host';
-import type { WindowHistory } from './history';
 import type { Hub } from './hub';
 import { describe, probeWindowOpen } from './probes';
 import { RELEASE_ORIGIN_URL, simulateReleaseOriginRestore } from './simulate';
@@ -461,7 +461,6 @@ export class HubPanel extends DemoPanel {
                               String(hub.counters.dropsRefused)
                           ),
                           field('releases', String(hub.counters.releases)),
-                          field('tear-offs', String(hub.counters.tearOffs)),
                       ]
                     : [])
             );
@@ -603,7 +602,7 @@ export class WorkspacePanel extends DemoPanel {
  */
 export class HistoryPanel extends DemoPanel {
     constructor(
-        private readonly history: () => WindowHistory | undefined,
+        private readonly history: () => SharedHistory | undefined,
         private readonly hub: () => Hub | undefined
     ) {
         super();
@@ -629,7 +628,7 @@ export class HistoryPanel extends DemoPanel {
             if (!history || !hub) {
                 return false;
             }
-            this.onDispose(history.onChange(render));
+            this.onDispose(history.onDidChange(render));
             this.onDispose(
                 hub.onDidMoveAcrossWindows((notice) => {
                     log.append(

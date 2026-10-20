@@ -39,12 +39,19 @@ const REDO_REQUEST_EVENT: &str = "dockview:redo-request";
 /// Labels for the windows a tear-off creates; see `POPOUT_COUNT`.
 static TEAR_OFF_COUNT: AtomicUsize = AtomicUsize::new(0);
 
-/// The panel ids a `SerializedDockviewGroup` carries: its `group.views`. The
-/// one field of an envelope the shell reads, for move events and for the
+/// The panel ids a drag payload carries: one tab's `panel.id`, or a group's
+/// `group.group.views` (the `DragPayload` of `dockview-enterprise`). The one
+/// thing the shell reads out of a payload, for move events and for the
 /// workspace's reconciliation of the two windows' reports.
 fn envelope_panels(envelope: &serde_json::Value) -> Vec<String> {
+    if let Some(id) = envelope
+        .pointer("/panel/id")
+        .and_then(serde_json::Value::as_str)
+    {
+        return vec![id.to_string()];
+    }
     envelope
-        .pointer("/group/views")
+        .pointer("/group/group/views")
         .and_then(serde_json::Value::as_array)
         .map(|views| {
             views
