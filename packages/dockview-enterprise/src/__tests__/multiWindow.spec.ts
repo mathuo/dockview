@@ -17,11 +17,11 @@ import type {
     MultiWindowTransport,
 } from '../multiWindow';
 import {
-    HUB_DRAG_TYPE,
     installMultiWindow,
     MemoryOrchestrator,
+    MULTI_WINDOW_DRAG_TYPE,
 } from '../multiWindow';
-import { DragHub } from '../multiWindow/dragHub';
+import { DragSessions } from '../multiWindow/dragSessions';
 import { HistorySequencer } from '../multiWindow/historySequencer';
 import { WorkspaceRegistry } from '../multiWindow/workspaceState';
 
@@ -95,64 +95,70 @@ function fakeDataTransfer(): DataTransfer {
     return transfer as unknown as DataTransfer;
 }
 
-describe('multi-window: DragHub', () => {
-    test('a claim returns the payload and names the source to release', () => {
-        const hub = new DragHub();
-        hub.start('s1', { from: 'main', payload: panelPayload('p') });
+describe('multi-window: DragSessions', () => {
+    test('an accept returns the payload and names the source to release', () => {
+        const sessions = new DragSessions();
+        sessions.start('s1', { from: 'main', payload: panelPayload('p') });
 
-        const claim = hub.claim('s1', 'dock-2');
+        const accept = sessions.accept('s1', 'dock-2');
 
-        expect(claim.payload).toEqual(panelPayload('p'));
-        expect(claim.release).toEqual({
+        expect(accept.payload).toEqual(panelPayload('p'));
+        expect(accept.release).toEqual({
             from: 'main',
             session: 's1',
             to: 'dock-2',
         });
     });
 
-    test('the first claim wins and a peek leaves the drag in flight', () => {
-        const hub = new DragHub();
-        hub.start('s1', { from: 'main', payload: panelPayload('p') });
+    test('the first accept wins and a peek leaves the drag in flight', () => {
+        const sessions = new DragSessions();
+        sessions.start('s1', { from: 'main', payload: panelPayload('p') });
 
-        expect(hub.peek('s1')).toEqual(panelPayload('p'));
-        hub.claim('s1', 'dock-2');
+        expect(sessions.peek('s1')).toEqual(panelPayload('p'));
+        sessions.accept('s1', 'dock-2');
 
-        expect(() => hub.claim('s1', 'dock-3')).toThrow(
+        expect(() => sessions.accept('s1', 'dock-3')).toThrow(
             'drag session s1 is not in flight'
         );
-        expect(() => hub.peek('nope')).toThrow(
+        expect(() => sessions.peek('nope')).toThrow(
             'drag session nope is not in flight'
         );
     });
 
-    test('an ended drag is discarded, or parked for a torn-off window', () => {
-        const hub = new DragHub();
-        hub.start('s1', { from: 'main', payload: panelPayload('p') });
-        hub.start('s2', { from: 'main', payload: panelPayload('q') });
-        hub.start('s3', { from: 'main', payload: panelPayload('r') });
+    test('an ended drag is discarded, or parked for a detached window', () => {
+        const sessions = new DragSessions();
+        sessions.start('s1', { from: 'main', payload: panelPayload('p') });
+        sessions.start('s2', { from: 'main', payload: panelPayload('q') });
+        sessions.start('s3', { from: 'main', payload: panelPayload('r') });
 
         // Still in flight: nothing to settle.
-        expect(hub.expire('s1', () => 'x')).toEqual({ outcome: 'settled' });
-
-        expect(hub.end('s1', false)).toBe(true);
-        expect(hub.expire('s1', () => 'x')).toEqual({ outcome: 'discarded' });
-        expect(() => hub.peek('s1')).toThrow();
-
-        expect(hub.end('s2', true)).toBe(true);
-        expect(hub.expire('s2', () => 'torn-1')).toEqual({
-            outcome: 'torn-off',
-            windowId: 'torn-1',
-            release: { from: 'main', session: 's2', to: 'torn-1' },
+        expect(sessions.expire('s1', () => 'x')).toEqual({
+            outcome: 'settled',
         });
-        expect(hub.peekPending('torn-1')).toEqual(panelPayload('q'));
-        expect(hub.takePendingDrag('torn-1')).toEqual(panelPayload('q'));
-        expect(hub.takePendingDrag('torn-1')).toBeNull();
 
-        // A claim that arrived during the grace period wins over the end.
-        hub.end('s3', true);
-        hub.claim('s3', 'dock-2');
-        expect(hub.expire('s3', () => 'x')).toEqual({ outcome: 'settled' });
-        expect(hub.end('s3', true)).toBe(false);
+        expect(sessions.end('s1', false)).toBe(true);
+        expect(sessions.expire('s1', () => 'x')).toEqual({
+            outcome: 'discarded',
+        });
+        expect(() => sessions.peek('s1')).toThrow();
+
+        expect(sessions.end('s2', true)).toBe(true);
+        expect(sessions.expire('s2', () => 'detached-1')).toEqual({
+            outcome: 'detached',
+            windowId: 'detached-1',
+            release: { from: 'main', session: 's2', to: 'detached-1' },
+        });
+        expect(sessions.peekPending('detached-1')).toEqual(panelPayload('q'));
+        expect(sessions.takePending('detached-1')).toEqual(panelPayload('q'));
+        expect(sessions.takePending('detached-1')).toBeNull();
+
+        // An accept that arrived during the grace period wins over the end.
+        sessions.end('s3', true);
+        sessions.accept('s3', 'dock-2');
+        expect(sessions.expire('s3', () => 'x')).toEqual({
+            outcome: 'settled',
+        });
+        expect(sessions.end('s3', true)).toBe(false);
     });
 });
 
@@ -302,7 +308,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
     const open = (
         orchestrator: MemoryOrchestrator,
         label: string,
-        options: { buildDefaults?: () => void; tearOff?: boolean } = {}
+        options: { buildDefaults?: () => void; detach?: boolean } = {}
     ): Window => {
         const container = document.createElement('div');
         document.body.appendChild(container);
@@ -319,7 +325,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const onLog = (line: string) => log.push(line);
         const mw = installMultiWindow(api, orchestrator.connect(label), {
             onLog,
-            tearOff: options.tearOff,
+            detach: options.detach,
             debounceMs: 0,
             buildDefaults: options.buildDefaults,
         });
@@ -368,7 +374,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         sized(onto);
 
         fireEvent.dragStart(tab, { dataTransfer });
-        expect(dataTransfer.types).toContain(HUB_DRAG_TYPE);
+        expect(dataTransfer.types).toContain(MULTI_WINDOW_DRAG_TYPE);
         await flush();
         afterStart();
 
@@ -571,7 +577,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
     });
 
-    test('an unclaimed drag with tearOff becomes a new window holding the tab', async () => {
+    test('an unaccepted drag with detach becomes a new window holding the tab', async () => {
         const created: string[] = [];
         const orchestrator = new MemoryOrchestrator({
             dragEndGraceMs: 0,
@@ -580,7 +586,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 open(orchestrator, label);
             },
         });
-        const main = open(orchestrator, 'main', { tearOff: true });
+        const main = open(orchestrator, 'main', { detach: true });
         await flush();
         main.api.addPanel({ id: 'a', component: 'default' });
         main.api.addPanel({ id: 'b', component: 'default', title: 'Bee' });
@@ -594,10 +600,12 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
         await flush();
 
-        expect(created).toEqual(['torn-off-1']);
-        const torn = windows.find((window) => window.label === 'torn-off-1');
-        expect(torn && ids(torn)).toEqual(['b']);
-        expect(torn?.api.getPanel('b')?.title).toBe('Bee');
+        expect(created).toEqual(['detached-1']);
+        const detached = windows.find(
+            (window) => window.label === 'detached-1'
+        );
+        expect(detached && ids(detached)).toEqual(['b']);
+        expect(detached?.api.getPanel('b')?.title).toBe('Bee');
         expect(ids(main)).toEqual(['a']);
     });
 
@@ -807,14 +815,14 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
     });
 
-    test('a torn-off group starts the new window with every tab', async () => {
+    test('a detached group starts the new window with every tab', async () => {
         const orchestrator = new MemoryOrchestrator({
             dragEndGraceMs: 0,
             createWindow: (label) => {
                 open(orchestrator, label);
             },
         });
-        const main = open(orchestrator, 'main', { tearOff: true });
+        const main = open(orchestrator, 'main', { detach: true });
         await flush();
         main.api.addPanel({ id: 'a', component: 'default' });
         main.api.addPanel({ id: 'b', component: 'default' });
@@ -829,13 +837,15 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
         await flush();
 
-        const torn = windows.find((window) => window.label === 'torn-off-1');
-        expect(torn && ids(torn)).toEqual(['a', 'b']);
+        const detached = windows.find(
+            (window) => window.label === 'detached-1'
+        );
+        expect(detached && ids(detached)).toEqual(['a', 'b']);
         expect(ids(main)).toEqual([]);
-        expect(main.log).toContain('released group main-1 to torn-off-1');
+        expect(main.log).toContain('released group main-1 to detached-1');
     });
 
-    test('a tear-off is not a move the shared history records, and the new window reports cleanly', async () => {
+    test('a detach is not a move the shared history records, and the new window reports cleanly', async () => {
         const orchestrator = new MemoryOrchestrator({
             dragEndGraceMs: 0,
             createWindow: (label) => {
@@ -844,7 +854,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         });
         const moves: MoveEvent[] = [];
         orchestrator.onDidMove((notice) => moves.push(notice));
-        const main = open(orchestrator, 'main', { tearOff: true });
+        const main = open(orchestrator, 'main', { detach: true });
         await flush();
         main.api.addPanel({ id: 'a', component: 'default' });
         main.api.addPanel({ id: 'b', component: 'default' });
@@ -858,20 +868,22 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
         await flush();
 
-        const torn = windows.find((window) => window.label === 'torn-off-1');
-        expect(torn && ids(torn)).toEqual(['b']);
+        const detached = windows.find(
+            (window) => window.label === 'detached-1'
+        );
+        expect(detached && ids(detached)).toEqual(['b']);
         expect(ids(main)).toEqual(['a']);
         expect(moves).toEqual([
             expect.objectContaining({
                 panels: ['b'],
                 from: 'main',
-                to: 'torn-off-1',
-                reason: 'tear-off',
+                to: 'detached-1',
+                reason: 'detach',
             }),
         ]);
         // Neither window's layout report was refused as a duplicate...
         await flush();
-        expect(main.log.concat(torn?.log ?? []).join('\n')).not.toMatch(
+        expect(main.log.concat(detached?.log ?? []).join('\n')).not.toMatch(
             /refused/
         );
         // ...and the history holds no half-recorded move: undo has nothing
@@ -901,19 +913,19 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             peekDrag(session: string) {
                 return this.count(this.inner.peekDrag(session));
             }
-            claimDrag(session: string, to: string) {
-                return this.count(this.inner.claimDrag(session, to));
+            acceptDrag(session: string, to: string) {
+                return this.count(this.inner.acceptDrag(session, to));
             }
-            endDrag(session: string, tearOff: boolean) {
-                return this.count(this.inner.endDrag(session, tearOff));
+            endDrag(session: string, detach: boolean) {
+                return this.count(this.inner.endDrag(session, detach));
             }
             onDidRelease(
                 ...args: Parameters<MultiWindowTransport['onDidRelease']>
             ) {
                 return this.count(this.inner.onDidRelease(...args));
             }
-            takePendingDrag(label: string) {
-                return this.count(this.inner.takePendingDrag(label));
+            takeDetachedDrag(label: string) {
+                return this.count(this.inner.takeDetachedDrag(label));
             }
             reportMove(
                 ...args: Parameters<MultiWindowTransport['reportMove']>

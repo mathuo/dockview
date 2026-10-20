@@ -38,12 +38,12 @@ export interface ReleaseEvent {
     /** The window windowId that took the payload. */
     to: string;
     /**
-     * A claim by a window the drop landed in, or a tear-off into a window
-     * the orchestrator opened for an unclaimed drag. Only a claim is a move
-     * the shared history records: the torn-off window is the host's to
+     * An accept by a window the drop landed in, or a detach into a window
+     * the orchestrator opened for an unaccepted drag. Only an accept is a move
+     * the shared history records: the detached window is the host's to
      * create, and its creation is not undone.
      */
-    reason: 'claim' | 'tear-off';
+    reason: 'drop' | 'detach';
 }
 
 /** Broadcast after panels moved between any two windows. */
@@ -52,8 +52,8 @@ export interface MoveEvent {
     panels: string[];
     from: string;
     to: string;
-    /** A drop, a tear-off into a new window, or the undo or redo of a drop. */
-    reason: 'drop' | 'tear-off' | 'undo' | 'redo';
+    /** A drop, a detach into a new window, or the undo or redo of a drop. */
+    reason: 'drop' | 'detach' | 'undo' | 'redo';
 }
 
 /** Which half of a move a window reports. */
@@ -69,7 +69,7 @@ export interface HistoryInfo {
 
 /**
  * How a window reaches the orchestrator. One object, in three parts: the
- * drag hub, the workspace, and the shared history.
+ * drags, the workspace, and the shared history.
  */
 export interface MultiWindowTransport {
     /** This window's identity, as the orchestrator and other windows name it. */
@@ -83,23 +83,23 @@ export interface MultiWindowTransport {
         from: string,
         payload: DragPayload
     ): Promise<void>;
-    /** Read a drag's payload without claiming it. Rejects if not in flight. */
+    /** Read a drag's payload without accepting it. Rejects if not in flight. */
     peekDrag(session: string): Promise<DragPayload>;
-    /** Claim a drop. Rejects if another window claimed it first. */
-    claimDrag(session: string, to: string): Promise<void>;
+    /** Accept a drop. Rejects if another window accepted it first. */
+    acceptDrag(session: string, to: string): Promise<void>;
     /**
-     * Report a drag over. The orchestrator keeps it claimable for a grace
-     * period, since the destination's claim may arrive after this. With
-     * `tearOff`, an unclaimed drag may then become a new window holding the
+     * Report a drag over. The orchestrator keeps it acceptable for a grace
+     * period, since the destination's accept may arrive after this. With
+     * `detach`, an unaccepted drag may then become a new window holding the
      * payload, which the source learns of through `onDidRelease`.
      */
-    endDrag(session: string, tearOff: boolean): Promise<void>;
+    endDrag(session: string, detach: boolean): Promise<void>;
     /** Delivered to the source window once another window took its drag. */
     onDidRelease(
         handler: (event: ReleaseEvent) => void
     ): Promise<DockviewIDisposable>;
-    /** A window created by a tear-off collects the payload waiting for it. */
-    takePendingDrag(windowId: string): Promise<DragPayload | null>;
+    /** A window created by a detach collects the payload waiting for it. */
+    takeDetachedDrag(windowId: string): Promise<DragPayload | null>;
     /**
      * This window's half of a completed move, for the shared undo history:
      * its layout just before and just after it gave up, or took, the panels.

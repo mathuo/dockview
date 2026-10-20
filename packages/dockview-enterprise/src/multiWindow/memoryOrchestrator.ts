@@ -2,7 +2,7 @@
  * An orchestrator for windows that share one JavaScript heap: several
  * dockview instances on one page, a test, or a host that runs the
  * orchestrator in the page and bridges windows some other way. It composes
- * the three pure pieces, {@link DragHub}, {@link WorkspaceRegistry} and
+ * the three pure pieces, {@link DragSessions}, {@link WorkspaceRegistry} and
  * {@link HistorySequencer}, the way a shell in another process would, and
  * hands each window a {@link MultiWindowTransport}.
  *
@@ -12,7 +12,7 @@
  */
 
 import type { DockviewIDisposable, SerializedDockview } from 'dockview';
-import { DragHub } from './dragHub';
+import { DragSessions } from './dragSessions';
 import { HistorySequencer, type HistoryStep } from './historySequencer';
 import type {
     DragPayload,
@@ -33,18 +33,18 @@ export interface MemoryOrchestratorOptions {
     /** The workspace to start from, as a previous {@link MemoryOrchestrator.snapshot}. */
     workspace?: WorkspaceState;
     /**
-     * How long a drag stays claimable after its source reported it over.
+     * How long a drag stays acceptable after its source reported it over.
      * The source's `dragend` fires the instant the drop lands in another
-     * window, and that window's claim routinely arrives later. Default
+     * window, and that window's accept routinely arrives later. Default
      * 1500 ms.
      */
     dragEndGraceMs?: number;
     /** How many steps the shared history keeps. Default 50. */
     historyDepth?: number;
     /**
-     * Called when an unclaimed drag ended with `tearOff`: the host opens a
+     * Called when an unaccepted drag ended with `detach`: the host opens a
      * window with this windowId and connects it; its cross-window drag then
-     * collects the payload with `takePendingDrag`. Without this, a torn-off
+     * collects the payload with `takeDetachedDrag`. Without this, a detached
      * drag is discarded like any other.
      */
     createWindow?(windowId: string, payload: DragPayload): void;
@@ -58,7 +58,7 @@ interface Listeners {
 }
 
 export class MemoryOrchestrator {
-    private readonly _hub = new DragHub();
+    private readonly _drags = new DragSessions();
     private readonly _workspace: WorkspaceRegistry;
     private readonly _history: HistorySequencer;
     private readonly _windows = new Map<string, Listeners>();
@@ -68,7 +68,7 @@ export class MemoryOrchestrator {
         (state: WorkspaceState) => void
     >();
     private readonly _options: MemoryOrchestratorOptions;
-    private _tearOffs = 0;
+    private _detached = 0;
 
     constructor(options: MemoryOrchestratorOptions = {}) {
         this._options = options;
@@ -101,14 +101,15 @@ export class MemoryOrchestrator {
             windowId: () => Promise.resolve(windowId),
 
             startDrag: (session, from, payload) =>
-                settle(() => this._hub.start(session, { from, payload })),
-            peekDrag: (session) => settle(() => this._hub.peek(session)),
-            claimDrag: (session, to) => settle(() => this._claim(session, to)),
-            endDrag: (session, tearOff) =>
-                settle(() => this._dragEnd(session, tearOff)),
+                settle(() => this._drags.start(session, { from, payload })),
+            peekDrag: (session) => settle(() => this._drags.peek(session)),
+            acceptDrag: (session, to) =>
+                settle(() => this._accept(session, to)),
+            endDrag: (session, detach) =>
+                settle(() => this._dragEnd(session, detach)),
             onDidRelease: (handler) => subscribe(listeners.release, handler),
-            takePendingDrag: (forWindow) =>
-                settle(() => this._hub.takePendingDrag(forWindow)),
+            takeDetachedDrag: (forWindow) =>
+                settle(() => this._drags.takeDetachedDrag(forWindow)),
             reportMove: (session, from, role, panels, before, after) =>
                 settle(() =>
                     this._recordMove(session, from, role, panels, before, after)
@@ -208,26 +209,26 @@ export class MemoryOrchestrator {
         };
     }
 
-    private _claim(session: string, to: string): void {
-        const claim = this._hub.claim(session, to);
-        const panels = payloadPanels(claim.payload);
-        this._workspace.expectMove(panels, claim.release.from, to);
-        this._deliver(claim.release.from, 'release', {
+    private _accept(session: string, to: string): void {
+        const accept = this._drags.accept(session, to);
+        const panels = payloadPanels(accept.payload);
+        this._workspace.expectMove(panels, accept.release.from, to);
+        this._deliver(accept.release.from, 'release', {
             session,
             to,
-            reason: 'claim',
+            reason: 'drop',
         });
         this._broadcast(this._moved, {
             session,
             panels,
-            from: claim.release.from,
+            from: accept.release.from,
             to,
             reason: 'drop',
         });
     }
 
-    private _dragEnd(session: string, tearOff: boolean): void {
-        if (!this._hub.end(session, tearOff)) {
+    private _dragEnd(session: string, detach: boolean): void {
+        if (!this._drags.end(session, detach)) {
             return;
         }
         setTimeout(
@@ -251,40 +252,40 @@ export class MemoryOrchestrator {
     }
 
     private _expire(session: string): void {
-        const ended = this._hub.expire(session, () => {
-            this._tearOffs += 1;
-            return `torn-off-${this._tearOffs}`;
+        const ended = this._drags.expire(session, () => {
+            this._detached += 1;
+            return `detached-${this._detached}`;
         });
-        if (ended.outcome !== 'torn-off') {
+        if (ended.outcome !== 'detached') {
             return;
         }
         const createWindow = this._options.createWindow;
         if (!createWindow) {
             // Nobody to open a window: the parked payload is dropped.
-            this._hub.takePendingDrag(ended.windowId);
+            this._drags.takeDetachedDrag(ended.windowId);
             return;
         }
-        const payload = this._hub.peekPending(ended.windowId);
+        const payload = this._drags.peekPending(ended.windowId);
         if (!payload) {
             return;
         }
         const panels = payloadPanels(payload);
         const from = ended.release.from;
-        // As for a claim: the new window may report the panels before the
+        // As for an accept: the new window may report the panels before the
         // source reports them gone.
         this._workspace.expectMove(panels, from, ended.windowId);
         createWindow(ended.windowId, payload);
         this._deliver(from, 'release', {
             session,
             to: ended.windowId,
-            reason: 'tear-off',
+            reason: 'detach',
         });
         this._broadcast(this._moved, {
             session,
             panels,
             from,
             to: ended.windowId,
-            reason: 'tear-off',
+            reason: 'detach',
         });
     }
 

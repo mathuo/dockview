@@ -1,6 +1,6 @@
 /**
  * The drag sessions an orchestrator tracks: announced by a source window,
- * claimed by at most one destination, or ended unclaimed. Pure state; the
+ * accepted by at most one destination, or ended unaccepted. Pure state; the
  * orchestrator decides what to do with each outcome.
  */
 
@@ -12,7 +12,7 @@ export interface DragSession {
 }
 
 interface Tracked extends DragSession {
-    /** Set once the source reported its drag over; the value is `tearOff`. */
+    /** Set once the source reported its drag over; the value is `detach`. */
     ended?: boolean;
 }
 
@@ -22,7 +22,7 @@ export interface Release {
     to: string;
 }
 
-export interface Claim {
+export interface Accept {
     payload: DragPayload;
     release: Release;
 }
@@ -30,9 +30,9 @@ export interface Claim {
 export type DragEnd =
     | { outcome: 'settled' }
     | { outcome: 'discarded' }
-    | { outcome: 'torn-off'; windowId: string; release: Release };
+    | { outcome: 'detached'; windowId: string; release: Release };
 
-export class DragHub {
+export class DragSessions {
     private readonly sessions = new Map<string, Tracked>();
     private readonly pending = new Map<string, DragPayload>();
 
@@ -45,8 +45,8 @@ export class DragHub {
         return this.inFlight(session).payload;
     }
 
-    /** Take the drag for `to`. The first claim wins; a second throws. */
-    claim(session: string, to: string): Claim {
+    /** Take the drag for `to`. The first accept wins; a second throws. */
+    accept(session: string, to: string): Accept {
         const taken = this.inFlight(session);
         this.sessions.delete(session);
         return {
@@ -57,22 +57,22 @@ export class DragHub {
 
     /**
      * The source reported its drag over. Nothing happens yet; the drag
-     * stays claimable until {@link expire}. Returns whether it was in
-     * flight, so an already-claimed drag needs no expiry.
+     * stays acceptable until {@link expire}. Returns whether it was in
+     * flight, so an already-accepted drag needs no expiry.
      */
-    end(session: string, tearOff: boolean): boolean {
+    end(session: string, detach: boolean): boolean {
         const tracked = this.sessions.get(session);
         if (!tracked) {
             return false;
         }
-        tracked.ended = tearOff;
+        tracked.ended = detach;
         return true;
     }
 
     /**
-     * Settle an ended drag nobody claimed: discard it, or, when the source
-     * asked for a tear-off, park its payload under a new window windowId from
-     * `newWindowId` for that window to collect with {@link takePendingDrag}.
+     * Settle an ended drag nobody accepted: discard it, or, when the source
+     * asked for a detach, park its payload under a new window windowId from
+     * `newWindowId` for that window to collect with {@link takeDetachedDrag}.
      */
     expire(session: string, newWindowId: () => string): DragEnd {
         const tracked = this.sessions.get(session);
@@ -86,18 +86,18 @@ export class DragHub {
         const windowId = newWindowId();
         this.pending.set(windowId, tracked.payload);
         return {
-            outcome: 'torn-off',
+            outcome: 'detached',
             windowId,
             release: { from: tracked.from, session, to: windowId },
         };
     }
 
-    /** The payload parked for a torn-off window, left in place. */
+    /** The payload parked for a detached window, left in place. */
     peekPending(windowId: string): DragPayload | null {
         return this.pending.get(windowId) ?? null;
     }
 
-    takePendingDrag(windowId: string): DragPayload | null {
+    takeDetachedDrag(windowId: string): DragPayload | null {
         const payload = this.pending.get(windowId) ?? null;
         this.pending.delete(windowId);
         return payload;
