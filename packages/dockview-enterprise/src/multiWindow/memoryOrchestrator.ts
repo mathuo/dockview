@@ -265,7 +265,7 @@ export class MemoryOrchestrator {
             this._drags.takeDetachedDrag(ended.windowId);
             return;
         }
-        const payload = this._drags.peekPending(ended.windowId);
+        const payload = this._drags.peekDetachedDrag(ended.windowId);
         if (!payload) {
             return;
         }

@@ -93,7 +93,7 @@ export class DragSessions {
     }
 
     /** The payload parked for a detached window, left in place. */
-    peekPending(windowId: string): DragPayload | null {
+    peekDetachedDrag(windowId: string): DragPayload | null {
         return this.pending.get(windowId) ?? null;
     }
 
