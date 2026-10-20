@@ -11,7 +11,7 @@ import type { MultiWindowTransport } from './types';
 
 export interface WindowWorkspaceOptions {
     /** Builds the window's default layout when the orchestrator has none for it. */
-    buildDefaults?(label: string): void;
+    buildDefaults?(windowId: string): void;
     /** How long after a change the layout is reported. Default 300 ms. */
     debounceMs?: number;
     onLog?(line: string): void;
@@ -19,7 +19,7 @@ export interface WindowWorkspaceOptions {
 
 export interface WindowWorkspace {
     /** Resolves once the window holds its initial layout, restored or default. */
-    readonly ready: Promise<{ label: string; restored: boolean }>;
+    readonly ready: Promise<{ windowId: string; restored: boolean }>;
     dispose(): void;
 }
 
@@ -31,7 +31,7 @@ export function installWindowWorkspace(
     const debounceMs = options.debounceMs ?? 300;
     const log = options.onLog ?? (() => undefined);
     const teardown: (() => void)[] = [];
-    let label = '';
+    let windowId = '';
     let timer: ReturnType<typeof setTimeout> | undefined;
     let disposed = false;
 
@@ -42,7 +42,7 @@ export function installWindowWorkspace(
         }
         timer = setTimeout(() => {
             void transport
-                .layoutChanged(label, api.toJSON())
+                .reportLayout(windowId, api.toJSON())
                 .catch((err: unknown) => {
                     log(`layout refused: ${String(err)}`);
                 });
@@ -52,8 +52,8 @@ export function installWindowWorkspace(
     const ready = (async () => {
         let layout: SerializedDockview | null = null;
         try {
-            label = await transport.label();
-            layout = await transport.initialLayout(label);
+            windowId = await transport.windowId();
+            layout = await transport.loadLayout(windowId);
         } catch (err: unknown) {
             // The orchestrator could not be reached: the window still has to
             // show something, and may reach it later.
@@ -64,7 +64,7 @@ export function installWindowWorkspace(
         let restored = false;
 
         if (disposed) {
-            return { label, restored };
+            return { windowId, restored };
         }
 
         if (layout) {
@@ -77,10 +77,10 @@ export function installWindowWorkspace(
                     `could not restore layout: ${String(err)}; building defaults`
                 );
                 api.clear();
-                options.buildDefaults?.(label);
+                options.buildDefaults?.(windowId);
             }
         } else {
-            options.buildDefaults?.(label);
+            options.buildDefaults?.(windowId);
         }
 
         // Only report from here on, so a half-built default layout and the
@@ -91,7 +91,7 @@ export function installWindowWorkspace(
             report();
         }
 
-        return { label, restored };
+        return { windowId, restored };
     })();
 
     return {

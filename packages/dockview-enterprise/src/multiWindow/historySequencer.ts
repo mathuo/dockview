@@ -10,7 +10,7 @@
  */
 
 import type { SerializedDockview } from 'dockview';
-import type { HistoryInfo, MovedNotice, MoveRole } from './types';
+import type { HistoryInfo, MoveEvent, MoveRole } from './types';
 
 export const HISTORY_DEPTH = 50;
 
@@ -37,7 +37,7 @@ export type HistoryAction =
 
 export interface HistoryStep {
     actions: HistoryAction[];
-    moved?: Omit<MovedNotice, 'reason'>;
+    moved?: Omit<MoveEvent, 'reason'>;
 }
 
 export class HistorySequencer {

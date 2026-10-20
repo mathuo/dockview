@@ -40,7 +40,7 @@ several windows or processes, reaching an orchestrator only through the
 `MultiWindowTransport` interface (`types.ts`):
 
 - `multiWindow.ts` (`installMultiWindow`): the public install, composing the
-  three internal pieces below over one transport (label resolved once) and
+  three internal pieces below over one transport (window id resolved once) and
   returning one `MultiWindow` handle. The pieces are not exported.
 - `crossWindowDnd.ts`: a drag's `DataTransfer` carries a session id; the
   orchestrator carries the payload (`DragPayload`: a panel's `toJSON()` or

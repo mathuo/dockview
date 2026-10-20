@@ -1,5 +1,9 @@
 import { createEvent, fireEvent } from '@testing-library/dom';
-import type { IContentRenderer, SerializedDockview } from 'dockview-core';
+import type {
+    DockviewIDisposable,
+    IContentRenderer,
+    SerializedDockview,
+} from 'dockview-core';
 import {
     DockviewApi,
     DockviewComponent,
@@ -8,7 +12,7 @@ import {
 } from 'dockview-core';
 import type {
     DragPayload,
-    MovedNotice,
+    MoveEvent,
     MultiWindow,
     MultiWindowTransport,
 } from '../multiWindow';
@@ -137,12 +141,12 @@ describe('multi-window: DragHub', () => {
         expect(hub.end('s2', true)).toBe(true);
         expect(hub.expire('s2', () => 'torn-1')).toEqual({
             outcome: 'torn-off',
-            label: 'torn-1',
+            windowId: 'torn-1',
             release: { from: 'main', session: 's2', to: 'torn-1' },
         });
         expect(hub.peekPending('torn-1')).toEqual(panelPayload('q'));
-        expect(hub.takePending('torn-1')).toEqual(panelPayload('q'));
-        expect(hub.takePending('torn-1')).toBeNull();
+        expect(hub.takePendingDrag('torn-1')).toEqual(panelPayload('q'));
+        expect(hub.takePendingDrag('torn-1')).toBeNull();
 
         // A claim that arrived during the grace period wins over the end.
         hub.end('s3', true);
@@ -181,7 +185,7 @@ describe('multi-window: WorkspaceRegistry', () => {
 
         const snapshot = registry.snapshot();
         expect(snapshot.version).toBe(1);
-        expect(snapshot.windows.map((window) => window.label)).toEqual([
+        expect(snapshot.windows.map((window) => window.id)).toEqual([
             'main',
             'dock-2',
         ]);
@@ -193,10 +197,10 @@ describe('multi-window: WorkspaceRegistry', () => {
         });
 
         const restored = new WorkspaceRegistry(snapshot);
-        expect(restored.initialLayout('main')).toEqual(layoutWith('a'));
-        expect(restored.initialLayout('nobody')).toBeNull();
-        expect(restored.removeWindow('dock-2')?.label).toBe('dock-2');
-        expect(restored.labels()).toEqual(['main']);
+        expect(restored.loadLayout('main')).toEqual(layoutWith('a'));
+        expect(restored.loadLayout('nobody')).toBeNull();
+        expect(restored.removeWindow('dock-2')?.id).toBe('dock-2');
+        expect(restored.windowIds()).toEqual(['main']);
 
         expect(
             () => new WorkspaceRegistry({ version: 2, windows: [] })
@@ -389,7 +393,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
 
     test('a tab dropped on another window moves there, with undo and redo through the orchestrator', async () => {
         const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
-        const moves: MovedNotice[] = [];
+        const moves: MoveEvent[] = [];
         orchestrator.onDidMove((notice) => moves.push(notice));
         const main = open(orchestrator, 'main');
         const other = open(orchestrator, 'other');
@@ -434,13 +438,13 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             Object.keys(
                 orchestrator
                     .snapshot()
-                    .windows.find((window) => window.label === label)?.layout
+                    .windows.find((window) => window.id === label)?.layout
                     ?.panels ?? {}
             ).sort();
         expect(held('main')).toEqual(['a']);
         expect(held('other')).toEqual(['b', 'x']);
 
-        expect(orchestrator.historyInfo).toEqual(
+        expect(orchestrator.history).toEqual(
             expect.objectContaining({
                 undoCount: 1,
                 nextUndo: 'move of b from main to other',
@@ -459,7 +463,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             })
         );
         // Undo via a window's own shared history reaches the same stack.
-        expect(orchestrator.historyInfo.redoCount).toBe(1);
+        expect(orchestrator.history.redoCount).toBe(1);
 
         orchestrator.redo();
         await flush();
@@ -493,7 +497,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 line.includes('refused: Error: this window already holds same')
             )
         ).toBe(true);
-        expect(orchestrator.historyInfo.undoCount).toBe(0);
+        expect(orchestrator.history.undoCount).toBe(0);
     });
 
     test('a group drag carries every tab of the group', async () => {
@@ -607,7 +611,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         main.api.addPanel({ id: 'c', component: 'default' });
         other.api.addPanel({ id: 'x', component: 'default' });
         await flush();
-        expect(orchestrator.historyInfo.undoCount).toBe(0);
+        expect(orchestrator.history.undoCount).toBe(0);
 
         // A user closes a tab: a local step, reported to the orchestrator.
         const closeC = main.api
@@ -619,13 +623,13 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
         expect(ids(main)).toEqual(['a', 'b']);
         expect(main.dockview.canUndo).toBe(true);
-        expect(orchestrator.historyInfo).toEqual(
+        expect(orchestrator.history).toEqual(
             expect.objectContaining({ undoCount: 1, nextUndo: 'step in main' })
         );
 
         await dragAcross(main, 'b', other);
         expect(ids(other)).toEqual(['b', 'x']);
-        expect(orchestrator.historyInfo).toEqual(
+        expect(orchestrator.history).toEqual(
             expect.objectContaining({
                 undoCount: 2,
                 nextUndo: 'move of b from main to other',
@@ -649,7 +653,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(main.mw.history.undoCount).toBe(0);
         expect(infos).toEqual([1, 0]);
         // Neither instruction was reported back as a new step.
-        expect(orchestrator.historyInfo.redoCount).toBe(2);
+        expect(orchestrator.history.redoCount).toBe(2);
 
         main.mw.redo();
         await flush();
@@ -658,7 +662,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
         expect(ids(main)).toEqual(['a']);
         expect(ids(other)).toEqual(['b', 'x']);
-        expect(orchestrator.historyInfo).toEqual(
+        expect(orchestrator.history).toEqual(
             expect.objectContaining({ undoCount: 2, redoCount: 0 })
         );
 
@@ -725,7 +729,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             nextUndo: null,
             nextRedo: null,
         });
-        expect(typeof local.onDidChangeHistory(() => undefined)).toBe(
+        expect(typeof local.onDidChangeHistory(() => undefined).dispose).toBe(
             'function'
         );
         local.undo();
@@ -741,7 +745,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 version: 1,
                 windows: [
                     {
-                        label: 'main',
+                        id: 'main',
                         layout: {
                             grid: { root: { type: 'leaf' } },
                         } as unknown as SerializedDockview,
@@ -838,7 +842,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 open(orchestrator, label);
             },
         });
-        const moves: MovedNotice[] = [];
+        const moves: MoveEvent[] = [];
         orchestrator.onDidMove((notice) => moves.push(notice));
         const main = open(orchestrator, 'main', { tearOff: true });
         await flush();
@@ -872,7 +876,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
         // ...and the history holds no half-recorded move: undo has nothing
         // to do and says so, rather than failing on an incomplete entry.
-        expect(orchestrator.historyInfo.undoCount).toBe(0);
+        expect(orchestrator.history.undoCount).toBe(0);
         main.mw.undo();
         await flush();
         expect(main.log).toContain('undo: Error: nothing to undo');
@@ -888,45 +892,47 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 this.calls += 1;
                 return value;
             }
-            label() {
-                return this.count(this.inner.label());
+            windowId() {
+                return this.count(this.inner.windowId());
             }
-            dragStart(...args: Parameters<MultiWindowTransport['dragStart']>) {
-                return this.count(this.inner.dragStart(...args));
+            startDrag(...args: Parameters<MultiWindowTransport['startDrag']>) {
+                return this.count(this.inner.startDrag(...args));
             }
-            peek(session: string) {
-                return this.count(this.inner.peek(session));
+            peekDrag(session: string) {
+                return this.count(this.inner.peekDrag(session));
             }
-            claim(session: string, to: string) {
-                return this.count(this.inner.claim(session, to));
+            claimDrag(session: string, to: string) {
+                return this.count(this.inner.claimDrag(session, to));
             }
-            dragEnd(session: string, tearOff: boolean) {
-                return this.count(this.inner.dragEnd(session, tearOff));
+            endDrag(session: string, tearOff: boolean) {
+                return this.count(this.inner.endDrag(session, tearOff));
             }
-            onRelease(...args: Parameters<MultiWindowTransport['onRelease']>) {
-                return this.count(this.inner.onRelease(...args));
-            }
-            takePending(label: string) {
-                return this.count(this.inner.takePending(label));
-            }
-            moveRecorded(
-                ...args: Parameters<MultiWindowTransport['moveRecorded']>
+            onDidRelease(
+                ...args: Parameters<MultiWindowTransport['onDidRelease']>
             ) {
-                return this.count(this.inner.moveRecorded(...args));
+                return this.count(this.inner.onDidRelease(...args));
             }
-            onMoved(...args: Parameters<MultiWindowTransport['onMoved']>) {
-                return this.count(this.inner.onMoved(...args));
+            takePendingDrag(label: string) {
+                return this.count(this.inner.takePendingDrag(label));
             }
-            initialLayout(label: string) {
-                return this.count(this.inner.initialLayout(label));
-            }
-            layoutChanged(
-                ...args: Parameters<MultiWindowTransport['layoutChanged']>
+            reportMove(
+                ...args: Parameters<MultiWindowTransport['reportMove']>
             ) {
-                return this.count(this.inner.layoutChanged(...args));
+                return this.count(this.inner.reportMove(...args));
             }
-            historyPush(label: string) {
-                return this.count(this.inner.historyPush(label));
+            onDidMove(...args: Parameters<MultiWindowTransport['onDidMove']>) {
+                return this.count(this.inner.onDidMove(...args));
+            }
+            loadLayout(label: string) {
+                return this.count(this.inner.loadLayout(label));
+            }
+            reportLayout(
+                ...args: Parameters<MultiWindowTransport['reportLayout']>
+            ) {
+                return this.count(this.inner.reportLayout(...args));
+            }
+            reportLocalStep(label: string) {
+                return this.count(this.inner.reportLocalStep(label));
             }
             undo() {
                 return this.count(this.inner.undo());
@@ -934,28 +940,30 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             redo() {
                 return this.count(this.inner.redo());
             }
-            historyInfo() {
-                return this.count(this.inner.historyInfo());
+            getHistory() {
+                return this.count(this.inner.getHistory());
             }
-            onApplyLayout(
-                ...args: Parameters<MultiWindowTransport['onApplyLayout']>
+            onRequestApplyLayout(
+                ...args: Parameters<
+                    MultiWindowTransport['onRequestApplyLayout']
+                >
             ) {
-                return this.count(this.inner.onApplyLayout(...args));
+                return this.count(this.inner.onRequestApplyLayout(...args));
             }
-            onUndoRequest(
-                ...args: Parameters<MultiWindowTransport['onUndoRequest']>
+            onRequestUndo(
+                ...args: Parameters<MultiWindowTransport['onRequestUndo']>
             ) {
-                return this.count(this.inner.onUndoRequest(...args));
+                return this.count(this.inner.onRequestUndo(...args));
             }
-            onRedoRequest(
-                ...args: Parameters<MultiWindowTransport['onRedoRequest']>
+            onRequestRedo(
+                ...args: Parameters<MultiWindowTransport['onRequestRedo']>
             ) {
-                return this.count(this.inner.onRedoRequest(...args));
+                return this.count(this.inner.onRequestRedo(...args));
             }
-            onHistoryChanged(
-                ...args: Parameters<MultiWindowTransport['onHistoryChanged']>
+            onDidChangeHistory(
+                ...args: Parameters<MultiWindowTransport['onDidChangeHistory']>
             ) {
-                return this.count(this.inner.onHistoryChanged(...args));
+                return this.count(this.inner.onDidChangeHistory(...args));
             }
         }
         const bridge = new Bridge(orchestrator.connect('main'));
@@ -973,7 +981,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
 
         await dragAcross(main, 'b', other);
         expect(ids(other)).toEqual(['b', 'x']);
-        expect(handle.label).toBe('main');
+        expect(handle.windowId).toBe('main');
         handle.dispose();
     });
 
@@ -981,18 +989,18 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const orchestrator = new MemoryOrchestrator();
         const transport = orchestrator.connect('main');
         const unlisten = jest.fn();
-        let answer: (value: () => void) => void = () => undefined;
-        const late = new Promise<() => void>((resolve) => {
+        let answer: (value: DockviewIDisposable) => void = () => undefined;
+        const late = new Promise<DockviewIDisposable>((resolve) => {
             answer = resolve;
         });
         const main = open(orchestrator, 'main');
         const handle = installMultiWindow(
             main.api,
-            { ...transport, onRelease: () => late },
+            { ...transport, onDidRelease: () => late },
             { workspace: false, history: false }
         );
         handle.dispose();
-        answer(unlisten);
+        answer({ dispose: unlisten });
         await flush();
         expect(unlisten).toHaveBeenCalledTimes(1);
     });
@@ -1034,7 +1042,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             main.api,
             {
                 ...transport,
-                initialLayout: () => Promise.reject(new Error('not yet')),
+                loadLayout: () => Promise.reject(new Error('not yet')),
             },
             {
                 buildDefaults: () =>
@@ -1043,7 +1051,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             }
         );
         await expect(handle.ready).resolves.toEqual({
-            label: 'main',
+            windowId: 'main',
             restored: false,
         });
         expect(ids(main)).toEqual(['home']);
@@ -1066,12 +1074,12 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         const orchestrator = new MemoryOrchestrator({
             workspace: {
                 version: 1,
-                windows: [{ label: 'main', layout }],
+                windows: [{ id: 'main', layout }],
             },
         });
         const changes: string[][] = [];
         orchestrator.onDidChangeWorkspace((state) =>
-            changes.push(state.windows.map((window) => window.label))
+            changes.push(state.windows.map((window) => window.id))
         );
         const main = open(orchestrator, 'main');
         let defaultsBuilt = 0;
@@ -1095,9 +1103,9 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             )
         ).toBe(true);
         expect(changes.length).toBeGreaterThan(0);
-        expect(orchestrator.labels).toEqual(['main', 'other']);
+        expect(orchestrator.windowIds).toEqual(['main', 'other']);
 
         orchestrator.disconnect('other');
-        expect(orchestrator.labels).toEqual(['main']);
+        expect(orchestrator.windowIds).toEqual(['main']);
     });
 });

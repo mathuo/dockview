@@ -40,7 +40,7 @@ const api = createDockview(element, {
 const transport = connectToYourOrchestrator(); // a MultiWindowTransport
 
 const multiWindow = installMultiWindow(api, transport, {
-    buildDefaults: (label) => api.addPanel({ id: `${label}-home`, component: 'home' }),
+    buildDefaults: (windowId) => api.addPanel({ id: `${windowId}-home`, component: 'home' }),
     history: { bindKeys: true },
 });
 ```
@@ -109,7 +109,7 @@ without reading it, save for the panel ids, to refuse giving two windows the
 same panel.
 
 ```ts
-const { label, restored } = await multiWindow.ready;
+const { windowId, restored } = await multiWindow.ready;
 ```
 
 Pass `workspace: false` to leave restoring and reporting to your own code.
@@ -152,31 +152,31 @@ arriving inside the DOM event that caused it.
 
 ```ts
 interface MultiWindowTransport {
-    label(): Promise<string>;
+    windowId(): Promise<string>;
 
     // Drags.
-    dragStart(session: string, from: string, payload: DragPayload): Promise<void>;
-    peek(session: string): Promise<DragPayload>;
-    claim(session: string, to: string): Promise<void>;
-    dragEnd(session: string, tearOff: boolean): Promise<void>;
-    onRelease(handler: (notice: ReleaseNotice) => void): Promise<Unsubscribe>;
-    takePending(label: string): Promise<DragPayload | null>;
-    moveRecorded(session, label, role: 'from' | 'to', panels, before, after): Promise<void>;
-    onMoved(handler: (notice: MovedNotice) => void): Promise<Unsubscribe>;
+    startDrag(session: string, from: string, payload: DragPayload): Promise<void>;
+    peekDrag(session: string): Promise<DragPayload>;
+    claimDrag(session: string, to: string): Promise<void>;
+    endDrag(session: string, tearOff: boolean): Promise<void>;
+    onDidRelease(handler: (event: ReleaseEvent) => void): Promise<DockviewIDisposable>;
+    takePendingDrag(windowId: string): Promise<DragPayload | null>;
+    reportMove(session, windowId, role: 'from' | 'to', panels, before, after): Promise<void>;
+    onDidMove(handler: (event: MoveEvent) => void): Promise<DockviewIDisposable>;
 
     // The workspace.
-    initialLayout(label: string): Promise<SerializedDockview | null>;
-    layoutChanged(label: string, layout: SerializedDockview): Promise<void>;
+    loadLayout(windowId: string): Promise<SerializedDockview | null>;
+    reportLayout(windowId: string, layout: SerializedDockview): Promise<void>;
 
     // The shared history.
-    historyPush(label: string): Promise<void>;
+    reportLocalStep(windowId: string): Promise<void>;
     undo(): Promise<void>;
     redo(): Promise<void>;
-    historyInfo(): Promise<HistoryInfo | null>;
-    onApplyLayout(handler: (layout: SerializedDockview) => void): Promise<Unsubscribe>;
-    onUndoRequest(handler: () => void): Promise<Unsubscribe>;
-    onRedoRequest(handler: () => void): Promise<Unsubscribe>;
-    onHistoryChanged(handler: (info: HistoryInfo) => void): Promise<Unsubscribe>;
+    getHistory(): Promise<HistoryInfo | null>;
+    onRequestApplyLayout(handler: (layout: SerializedDockview) => void): Promise<DockviewIDisposable>;
+    onRequestUndo(handler: () => void): Promise<DockviewIDisposable>;
+    onRequestRedo(handler: () => void): Promise<DockviewIDisposable>;
+    onDidChangeHistory(handler: (info: HistoryInfo) => void): Promise<DockviewIDisposable>;
 }
 ```
 
@@ -217,7 +217,7 @@ orchestrator.onDidChangeWorkspace((state) =>
 const transport = orchestrator.connect('main');
 
 orchestrator.undo();
-orchestrator.historyInfo;
+orchestrator.history;
 orchestrator.disconnect('main'); // the window closed
 ```
 

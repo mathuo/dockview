@@ -14,7 +14,7 @@
  * applied layout arrives through `fromJSON` and must not wipe the stack.
  */
 
-import type { DockviewApi } from 'dockview';
+import type { DockviewApi, DockviewEvent, DockviewIDisposable } from 'dockview';
 import type { HistoryInfo, MultiWindowTransport } from './types';
 
 export interface SharedHistoryOptions {
@@ -32,7 +32,7 @@ export interface SharedHistory {
     undo(): void;
     redo(): void;
     readonly info: HistoryInfo;
-    onDidChange(listener: (info: HistoryInfo) => void): () => void;
+    onDidChange: DockviewEvent<HistoryInfo>;
     dispose(): void;
 }
 
@@ -44,7 +44,7 @@ export function installSharedHistory(
     const log = options.onLog ?? (() => undefined);
     const teardown: (() => void)[] = [];
     const listeners = new Set<(info: HistoryInfo) => void>();
-    let label = '';
+    let windowId = '';
     let info: HistoryInfo = {
         undoCount: 0,
         redoCount: 0,
@@ -66,24 +66,24 @@ export function installSharedHistory(
     let disposed = false;
 
     /** Keep a transport subscription until dispose, even one that answers after it. */
-    const subscribe = (subscription: Promise<() => void>) => {
+    const subscribe = (subscription: Promise<DockviewIDisposable>) => {
         void subscription.then(
-            (unlisten) => {
+            (subscription) => {
                 if (disposed) {
-                    unlisten();
+                    subscription.dispose();
                 } else {
-                    teardown.push(unlisten);
+                    teardown.push(() => subscription.dispose());
                 }
             },
             (err: unknown) => log(`subscription failed: ${String(err)}`)
         );
     };
 
-    void transport.label().then(
+    void transport.windowId().then(
         (value) => {
-            label = value;
+            windowId = value;
         },
-        (err: unknown) => log(`label failed: ${String(err)}`)
+        (err: unknown) => log(`windowId failed: ${String(err)}`)
     );
 
     // A rise in the local undo count outside an instruction is a step the
@@ -94,9 +94,9 @@ export function installSharedHistory(
             lastUndoCount = event.undoCount;
             if (pushed) {
                 void transport
-                    .historyPush(label)
+                    .reportLocalStep(windowId)
                     .catch((err: unknown) =>
-                        log(`historyPush failed: ${String(err)}`)
+                        log(`reportLocalStep failed: ${String(err)}`)
                     );
             }
         }).dispose
@@ -115,7 +115,7 @@ export function installSharedHistory(
     };
 
     subscribe(
-        transport.onApplyLayout((layout) => {
+        transport.onRequestApplyLayout((layout) => {
             guarded('apply', () => {
                 api.fromJSON(layout, { reuseExistingPanels: true });
                 log(`applied a layout with ${api.panels.length} panel(s)`);
@@ -123,7 +123,7 @@ export function installSharedHistory(
         })
     );
     subscribe(
-        transport.onUndoRequest(() => {
+        transport.onRequestUndo(() => {
             guarded('local undo', () => {
                 api.undo();
                 log('undid a local step');
@@ -131,21 +131,21 @@ export function installSharedHistory(
         })
     );
     subscribe(
-        transport.onRedoRequest(() => {
+        transport.onRequestRedo(() => {
             guarded('local redo', () => {
                 api.redo();
                 log('redid a local step');
             });
         })
     );
-    subscribe(transport.onHistoryChanged((next) => setInfo(next)));
-    void transport.historyInfo().then(
+    subscribe(transport.onDidChangeHistory((next) => setInfo(next)));
+    void transport.getHistory().then(
         (next) => {
             if (next && !disposed) {
                 setInfo(next);
             }
         },
-        (err: unknown) => log(`historyInfo failed: ${String(err)}`)
+        (err: unknown) => log(`getHistory failed: ${String(err)}`)
     );
 
     const undo = () => {
@@ -192,7 +192,11 @@ export function installSharedHistory(
         },
         onDidChange(listener) {
             listeners.add(listener);
-            return () => listeners.delete(listener);
+            return {
+                dispose: () => {
+                    listeners.delete(listener);
+                },
+            };
         },
         dispose() {
             disposed = true;
