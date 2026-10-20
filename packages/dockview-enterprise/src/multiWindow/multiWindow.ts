@@ -6,7 +6,7 @@
  * instance keeps working as before.
  */
 
-import type { DockviewApi, DockviewEvent, DockviewIDisposable } from 'dockview';
+import type { DockviewApi, DockviewEvent } from 'dockview';
 import {
     type CrossWindowDnd,
     type CrossWindowDndCounters,
