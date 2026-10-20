@@ -6,20 +6,22 @@
  * instance keeps working as before.
  */
 
-import type { DockviewApi, DockviewEvent } from 'dockview';
 import {
-    type CrossWindowDnd,
-    type CrossWindowDndCounters,
-    installCrossWindowDnd,
-} from './crossWindowDnd';
-import { installSharedHistory, type SharedHistory } from './sharedHistory';
-import type { HistoryInfo, MoveEvent, MultiWindowTransport } from './types';
-import { installWindowWorkspace } from './windowWorkspace';
+    type DockviewApi,
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewEmitter as Emitter,
+    type DockviewEvent as Event,
+} from 'dockview';
+import { CrossWindowDnd } from './crossWindowDnd';
+import { EMPTY_HISTORY, SharedHistory } from './sharedHistory';
+import type { HistoryInfo, MoveEvent, MultiWindowTransport } from './transport';
+import { WindowWorkspace } from './windowWorkspace';
 
 export interface MultiWindowOptions {
     /**
      * Builds the window's default layout when the orchestrator has none for
-     * it. Without the workspace (`workspace: false`) it is never called.
+     * it. Not called for a window a detach created, which starts with what
+     * was dragged, nor without the workspace (`workspace: false`).
      */
     buildDefaults?(windowId: string): void;
     /**
@@ -42,147 +44,111 @@ export interface MultiWindowOptions {
      * desktop from a cancelled drag.
      */
     detach?: boolean;
-    /** Makes the session id a drag carries. Random by default. */
-    sessionId?: () => string;
-    onLog?(line: string): void;
 }
 
-export interface MultiWindow {
-    /** This window's windowId once the transport has answered; `''` before. */
-    readonly windowId: string;
+export class MultiWindow extends CompositeDisposable {
+    private readonly _api: DockviewApi;
+    private readonly _transport: MultiWindowTransport;
+    private readonly _dnd: CrossWindowDnd;
+    private readonly _history: SharedHistory | undefined;
+
+    private readonly _onDidChangeHistory = new Emitter<HistoryInfo>();
+    readonly onDidChangeHistory: Event<HistoryInfo> =
+        this._onDidChangeHistory.event;
+
+    /** Panels moved between any two windows: by a drop, a detach, or undo or redo. */
+    readonly onDidMoveAcrossWindows: Event<MoveEvent>;
+
     /** Resolves once the window holds its initial layout, restored or default. */
-    readonly ready: Promise<{ windowId: string; restored: boolean }>;
-    readonly counters: Readonly<CrossWindowDndCounters>;
-    /** See {@link MultiWindowOptions.detach}. */
-    detach: boolean;
-    /** Panels moved between any two windows: by a drop, or by undo or redo. */
-    onDidMoveAcrossWindows: DockviewEvent<MoveEvent>;
+    readonly ready: Promise<{ restored: boolean }>;
+
+    get windowId(): string {
+        return this._transport.windowId;
+    }
+
+    /** The shared history's state; empty with `history: false`. */
+    get history(): HistoryInfo {
+        return this._history?.info ?? EMPTY_HISTORY;
+    }
+
+    constructor(
+        api: DockviewApi,
+        transport: MultiWindowTransport,
+        options: MultiWindowOptions = {}
+    ) {
+        super();
+        this._api = api;
+        this._transport = transport;
+
+        this._dnd = new CrossWindowDnd(api, transport, {
+            detach: options.detach,
+        });
+        this.onDidMoveAcrossWindows = this._dnd.onDidMove;
+        this.addDisposables(this._onDidChangeHistory, this._dnd);
+
+        if (options.workspace === false) {
+            this.ready = this._dnd
+                .placeDetachedDrag()
+                .then(() => ({ restored: false }));
+        } else {
+            const workspace = new WindowWorkspace(api, transport, {
+                buildDefaults: async (windowId) => {
+                    if (!(await this._dnd.placeDetachedDrag())) {
+                        options.buildDefaults?.(windowId);
+                    }
+                },
+                debounceMs: options.debounceMs,
+            });
+            this.ready = workspace.ready;
+            this.addDisposables(workspace);
+        }
+
+        if (options.history !== false) {
+            this._history = new SharedHistory(api, transport, {
+                bindKeys:
+                    typeof options.history === 'object' &&
+                    options.history.bindKeys,
+            });
+            this.addDisposables(
+                this._history,
+                this._history.onDidChange((info) =>
+                    this._onDidChangeHistory.fire(info)
+                )
+            );
+        }
+    }
+
     /**
-     * Undo, or redo, the most recent step in any window. With
-     * `history: false` these fall back to this window's own history.
+     * Undo the most recent step in any window. With `history: false` this
+     * falls back to this window's own history.
      */
-    undo(): void;
-    redo(): void;
-    /** The shared history's state; all zeros with `history: false`. */
-    readonly history: HistoryInfo;
-    onDidChangeHistory: DockviewEvent<HistoryInfo>;
-    dispose(): void;
+    undo(): void {
+        if (this._history) {
+            this._history.undo();
+        } else {
+            this._api.undo();
+        }
+    }
+
+    redo(): void {
+        if (this._history) {
+            this._history.redo();
+        } else {
+            this._api.redo();
+        }
+    }
+
+    updateOptions(options: Pick<MultiWindowOptions, 'detach'>): void {
+        if (options.detach !== undefined) {
+            this._dnd.detach = options.detach;
+        }
+    }
 }
 
 export function installMultiWindow(
     api: DockviewApi,
     transport: MultiWindowTransport,
-    options: MultiWindowOptions = {}
+    options?: MultiWindowOptions
 ): MultiWindow {
-    // One windowId lookup for every part. Every other call is forwarded to
-    // the given transport with itself as `this`, so one written as a class
-    // keeps its prototype methods and its state.
-    const windowId = transport.windowId();
-    const shared = forwarding(transport, () => windowId);
-    const onLog = options.onLog;
-
-    const dnd: CrossWindowDnd = installCrossWindowDnd(api, shared, {
-        detach: options.detach,
-        sessionId: options.sessionId,
-        onLog,
-    });
-
-    const workspace =
-        options.workspace === false
-            ? undefined
-            : installWindowWorkspace(api, shared, {
-                  buildDefaults: options.buildDefaults,
-                  debounceMs: options.debounceMs,
-                  onLog,
-              });
-    const ready =
-        workspace?.ready ??
-        windowId.then(
-            (value) => ({ windowId: value, restored: false }),
-            () => ({ windowId: '', restored: false })
-        );
-
-    const history: SharedHistory | undefined =
-        options.history === false
-            ? undefined
-            : installSharedHistory(api, shared, {
-                  bindKeys:
-                      typeof options.history === 'object'
-                          ? options.history.bindKeys
-                          : false,
-                  onLog,
-              });
-
-    const none: HistoryInfo = {
-        undoCount: 0,
-        redoCount: 0,
-        nextUndo: null,
-        nextRedo: null,
-    };
-
-    return {
-        get windowId() {
-            return dnd.windowId;
-        },
-        ready,
-        counters: dnd.counters,
-        get detach() {
-            return dnd.detach;
-        },
-        set detach(value: boolean) {
-            dnd.detach = value;
-        },
-        onDidMoveAcrossWindows: (listener) =>
-            dnd.onDidMoveAcrossWindows(listener),
-        undo: () => (history ? history.undo() : api.undo()),
-        redo: () => (history ? history.redo() : api.redo()),
-        get history() {
-            return history?.info ?? none;
-        },
-        onDidChangeHistory: (listener) =>
-            history
-                ? history.onDidChange(listener)
-                : { dispose: () => undefined },
-        dispose() {
-            history?.dispose();
-            workspace?.dispose();
-            dnd.dispose();
-        },
-    };
-}
-
-const TRANSPORT_METHODS = [
-    'startDrag',
-    'peekDrag',
-    'acceptDrag',
-    'endDrag',
-    'onDidRelease',
-    'takeDetachedDrag',
-    'reportMove',
-    'onDidMove',
-    'loadLayout',
-    'reportLayout',
-    'reportLocalStep',
-    'undo',
-    'redo',
-    'getHistory',
-    'onRequestApplyLayout',
-    'onRequestUndo',
-    'onRequestRedo',
-    'onDidChangeHistory',
-] as const satisfies readonly Exclude<keyof MultiWindowTransport, 'windowId'>[];
-
-function forwarding(
-    transport: MultiWindowTransport,
-    windowId: () => Promise<string>
-): MultiWindowTransport {
-    const shared = { windowId } as Record<string, unknown>;
-    for (const method of TRANSPORT_METHODS) {
-        shared[method] = (...args: unknown[]) =>
-            (transport[method] as (...a: unknown[]) => unknown).apply(
-                transport,
-                args
-            );
-    }
-    return shared as unknown as MultiWindowTransport;
+    return new MultiWindow(api, transport, options);
 }

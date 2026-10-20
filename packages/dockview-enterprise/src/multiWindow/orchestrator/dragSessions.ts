@@ -4,51 +4,57 @@
  * orchestrator decides what to do with each outcome.
  */
 
-import type { DragPayload } from './types';
+import type { DragPayload } from '../transport';
 
 export interface DragSession {
-    from: string;
-    payload: DragPayload;
+    readonly from: string;
+    readonly payload: DragPayload;
 }
 
-interface Tracked extends DragSession {
+interface TrackedSession extends DragSession {
     /** Set once the source reported its drag over; the value is `detach`. */
     ended?: boolean;
 }
 
+/** The source to tell that its drag was taken. */
 export interface Release {
-    from: string;
-    session: string;
-    to: string;
+    readonly from: string;
+    readonly session: string;
+    readonly to: string;
 }
 
 export interface Accept {
-    payload: DragPayload;
-    release: Release;
+    readonly payload: DragPayload;
+    readonly release: Release;
 }
 
 export type DragEnd =
-    | { outcome: 'settled' }
-    | { outcome: 'discarded' }
-    | { outcome: 'detached'; windowId: string; release: Release };
+    | { readonly outcome: 'settled' }
+    | { readonly outcome: 'discarded' }
+    | {
+          readonly outcome: 'detached';
+          readonly windowId: string;
+          readonly release: Release;
+      };
 
 export class DragSessions {
-    private readonly sessions = new Map<string, Tracked>();
-    private readonly pending = new Map<string, DragPayload>();
+    private readonly _sessions = new Map<string, TrackedSession>();
+    /** Payloads of detached drags, by the window created to hold them. */
+    private readonly _detached = new Map<string, DragPayload>();
 
     start(session: string, drag: DragSession): void {
-        this.sessions.set(session, { ...drag });
+        this._sessions.set(session, { ...drag });
     }
 
     /** The payload of a drag in flight; throws otherwise. */
     peek(session: string): DragPayload {
-        return this.inFlight(session).payload;
+        return this._inFlight(session).payload;
     }
 
     /** Take the drag for `to`. The first accept wins; a second throws. */
     accept(session: string, to: string): Accept {
-        const taken = this.inFlight(session);
-        this.sessions.delete(session);
+        const taken = this._inFlight(session);
+        this._sessions.delete(session);
         return {
             payload: taken.payload,
             release: { from: taken.from, session, to },
@@ -61,7 +67,7 @@ export class DragSessions {
      * flight, so an already-accepted drag needs no expiry.
      */
     end(session: string, detach: boolean): boolean {
-        const tracked = this.sessions.get(session);
+        const tracked = this._sessions.get(session);
         if (!tracked) {
             return false;
         }
@@ -71,20 +77,20 @@ export class DragSessions {
 
     /**
      * Settle an ended drag nobody accepted: discard it, or, when the source
-     * asked for a detach, park its payload under a new window windowId from
+     * asked for a detach, park its payload under a window id from
      * `newWindowId` for that window to collect with {@link takeDetachedDrag}.
      */
     expire(session: string, newWindowId: () => string): DragEnd {
-        const tracked = this.sessions.get(session);
+        const tracked = this._sessions.get(session);
         if (tracked?.ended === undefined) {
             return { outcome: 'settled' };
         }
-        this.sessions.delete(session);
+        this._sessions.delete(session);
         if (!tracked.ended) {
             return { outcome: 'discarded' };
         }
         const windowId = newWindowId();
-        this.pending.set(windowId, tracked.payload);
+        this._detached.set(windowId, tracked.payload);
         return {
             outcome: 'detached',
             windowId,
@@ -94,17 +100,17 @@ export class DragSessions {
 
     /** The payload parked for a detached window, left in place. */
     peekDetachedDrag(windowId: string): DragPayload | null {
-        return this.pending.get(windowId) ?? null;
+        return this._detached.get(windowId) ?? null;
     }
 
     takeDetachedDrag(windowId: string): DragPayload | null {
-        const payload = this.pending.get(windowId) ?? null;
-        this.pending.delete(windowId);
+        const payload = this._detached.get(windowId) ?? null;
+        this._detached.delete(windowId);
         return payload;
     }
 
-    private inFlight(session: string): Tracked {
-        const tracked = this.sessions.get(session);
+    private _inFlight(session: string): TrackedSession {
+        const tracked = this._sessions.get(session);
         if (!tracked) {
             throw new Error(`drag session ${session} is not in flight`);
         }

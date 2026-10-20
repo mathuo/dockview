@@ -21,9 +21,9 @@ import {
     MemoryOrchestrator,
     MULTI_WINDOW_DRAG_TYPE,
 } from '../multiWindow';
-import { DragSessions } from '../multiWindow/dragSessions';
-import { HistorySequencer } from '../multiWindow/historySequencer';
-import { WorkspaceRegistry } from '../multiWindow/workspaceState';
+import { DragSessions } from '../multiWindow/orchestrator/dragSessions';
+import { HistorySequencer } from '../multiWindow/orchestrator/historySequencer';
+import { WorkspaceRegistry } from '../multiWindow/orchestrator/workspaceRegistry';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -218,11 +218,23 @@ describe('multi-window: WorkspaceRegistry', () => {
     });
 });
 
+const empty = {
+    canUndo: false,
+    canRedo: false,
+    undoCount: 0,
+    redoCount: 0,
+};
+
 describe('multi-window: HistorySequencer', () => {
     const half = (window: string, before: string[], after: string[]) => ({
         window,
         before: layoutWith(...before),
         after: layoutWith(...after),
+    });
+
+    const apply = (window: string, layout: SerializedDockview) => ({
+        window,
+        request: { type: 'apply-layout', layout },
     });
 
     test('a move undoes destination first and redoes source first', () => {
@@ -232,16 +244,22 @@ describe('multi-window: HistorySequencer', () => {
         history.recordMove('s1', ['p'], 'from', half('main', ['p'], []));
 
         expect(history.info()).toEqual({
+            canUndo: true,
+            canRedo: false,
             undoCount: 1,
             redoCount: 0,
-            nextUndo: 'move of p from main to dock-2',
-            nextRedo: null,
+            nextUndo: {
+                type: 'move',
+                panels: ['p'],
+                from: 'main',
+                to: 'dock-2',
+            },
         });
 
         const undo = history.undo();
         expect(undo.actions).toEqual([
-            { type: 'apply-layout', window: 'dock-2', layout: layoutWith() },
-            { type: 'apply-layout', window: 'main', layout: layoutWith('p') },
+            apply('dock-2', layoutWith()),
+            apply('main', layoutWith('p')),
         ]);
         expect(undo.moved).toEqual({
             session: 's1',
@@ -252,8 +270,8 @@ describe('multi-window: HistorySequencer', () => {
 
         const redo = history.redo();
         expect(redo.actions).toEqual([
-            { type: 'apply-layout', window: 'main', layout: layoutWith() },
-            { type: 'apply-layout', window: 'dock-2', layout: layoutWith('p') },
+            apply('main', layoutWith()),
+            apply('dock-2', layoutWith('p')),
         ]);
         expect(redo.moved?.to).toBe('dock-2');
         expect(() => history.redo()).toThrow('nothing to redo');
@@ -267,15 +285,15 @@ describe('multi-window: HistorySequencer', () => {
         history.pushLocal('dock-2');
 
         expect(history.undo().actions).toEqual([
-            { type: 'undo-local', window: 'dock-2' },
+            { window: 'dock-2', request: { type: 'undo' } },
         ]);
         expect(history.undo().moved?.session).toBe('s1');
         expect(history.undo().actions).toEqual([
-            { type: 'undo-local', window: 'main' },
+            { window: 'main', request: { type: 'undo' } },
         ]);
         expect(() => history.undo()).toThrow('nothing to undo');
         expect(history.redo().actions).toEqual([
-            { type: 'redo-local', window: 'main' },
+            { window: 'main', request: { type: 'redo' } },
         ]);
 
         // A new step clears what could be redone.
@@ -288,12 +306,7 @@ describe('multi-window: HistorySequencer', () => {
         expect(history.info().undoCount).toBe(3);
 
         history.forgetWindow('main');
-        expect(history.info()).toEqual({
-            undoCount: 0,
-            redoCount: 0,
-            nextUndo: null,
-            nextRedo: null,
-        });
+        expect(history.info()).toEqual(empty);
     });
 });
 
@@ -303,11 +316,23 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         dockview: DockviewComponent;
         api: DockviewApi;
         mw: MultiWindow;
-        log: string[];
         dispose(): void;
     }
 
     const windows: Window[] = [];
+    /** What the module reported through the console, as dockview does. */
+    let reported: string[] = [];
+    const report = (...args: unknown[]) => {
+        reported.push(args.map(String).join(' '));
+    };
+    const reportedMatching = (pattern: RegExp) =>
+        reported.filter((line) => pattern.test(line));
+
+    beforeEach(() => {
+        reported = [];
+        jest.spyOn(console, 'warn').mockImplementation(report);
+        jest.spyOn(console, 'error').mockImplementation(report);
+    });
 
     const open = (
         orchestrator: MemoryOrchestrator,
@@ -325,10 +350,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         });
         dockview.layout(800, 600);
         const api = new DockviewApi(dockview);
-        const log: string[] = [];
-        const onLog = (line: string) => log.push(line);
         const mw = installMultiWindow(api, orchestrator.connect(label), {
-            onLog,
             detach: options.detach,
             debounceMs: 0,
             buildDefaults: options.buildDefaults,
@@ -338,7 +360,6 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             dockview,
             api,
             mw,
-            log,
             dispose() {
                 mw.dispose();
                 dockview.dispose();
@@ -432,18 +453,10 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
                 reason: 'drop',
             }),
         ]);
-        expect(
-            main.log.some((line) => line.startsWith('released panel b'))
-        ).toBe(true);
-        expect(other.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(/placed 1 panel\(s\) into group/),
-            ])
-        );
         // Both windows reported their layouts, in whichever order, and the
         // workspace accepted them as the announced move.
         await flush();
-        expect(main.log.concat(other.log).join('\n')).not.toMatch(/refused/);
+        expect(reported).toEqual([]);
         const held = (label: string) =>
             Object.keys(
                 orchestrator
@@ -457,7 +470,12 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(orchestrator.history).toEqual(
             expect.objectContaining({
                 undoCount: 1,
-                nextUndo: 'move of b from main to other',
+                nextUndo: {
+                    type: 'move',
+                    panels: ['b'],
+                    from: 'main',
+                    to: 'other',
+                },
             })
         );
 
@@ -487,7 +505,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             })
         );
         await flush();
-        expect(main.log.concat(other.log).join('\n')).not.toMatch(/refused/);
+        expect(reported).toEqual([]);
     });
 
     test('a drop is refused, and nothing released, when the window already holds the panel', async () => {
@@ -502,11 +520,9 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
 
         expect(ids(main)).toEqual(['same']);
         expect(ids(other)).toEqual(['same']);
-        expect(
-            other.log.some((line) =>
-                line.includes('refused: Error: this window already holds same')
-            )
-        ).toBe(true);
+        expect(reportedMatching(/already holds/)).toEqual([
+            'dockview: refused a drop of same, which this window already holds.',
+        ]);
         expect(orchestrator.history.undoCount).toBe(0);
     });
 
@@ -542,11 +558,6 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(ids(main)).toEqual([]);
         expect(ids(other)).toEqual(['a', 'b', 'x']);
         expect(other.api.groups).toHaveLength(2);
-        expect(other.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(/placed 2 panel\(s\) right of group/),
-            ])
-        );
         expect(
             other.api.getPanel('a')?.group.panels.map((panel) => panel.id)
         ).toEqual(['a', 'b']);
@@ -572,25 +583,23 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(
             other.api.getPanel('y')?.group.panels.map((panel) => panel.id)
         ).toEqual(['x', 'b', 'y']);
-        expect(other.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(
-                    /placed 1 panel\(s\) into group .* at tab 1/
-                ),
-            ])
-        );
     });
 
     test('an unaccepted drag with detach becomes a new window holding the tab', async () => {
         const created: string[] = [];
+        const defaultsBuilt: string[] = [];
         const orchestrator = new MemoryOrchestrator({
             dragEndGraceMs: 0,
             createWindow: (label) => {
                 created.push(label);
-                open(orchestrator, label);
+                open(orchestrator, label, {
+                    buildDefaults: () => defaultsBuilt.push(label),
+                });
             },
         });
-        const main = open(orchestrator, 'main', { detach: true });
+        const main = open(orchestrator, 'main');
+        // Detach can be switched on at any time, as a host's setting would.
+        main.mw.updateOptions({ detach: true });
         await flush();
         main.api.addPanel({ id: 'a', component: 'default' });
         main.api.addPanel({ id: 'b', component: 'default', title: 'Bee' });
@@ -611,6 +620,8 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(detached && ids(detached)).toEqual(['b']);
         expect(detached?.api.getPanel('b')?.title).toBe('Bee');
         expect(ids(main)).toEqual(['a']);
+        // The new window starts with what was dragged, not its defaults.
+        expect(defaultsBuilt).toEqual([]);
     });
 
     test('a local step is ordered against a move, and undone through the window', async () => {
@@ -636,7 +647,10 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(ids(main)).toEqual(['a', 'b']);
         expect(main.dockview.canUndo).toBe(true);
         expect(orchestrator.history).toEqual(
-            expect.objectContaining({ undoCount: 1, nextUndo: 'step in main' })
+            expect.objectContaining({
+                undoCount: 1,
+                nextUndo: { type: 'local', windowId: 'main' },
+            })
         );
 
         await dragAcross(main, 'b', other);
@@ -644,7 +658,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(orchestrator.history).toEqual(
             expect.objectContaining({
                 undoCount: 2,
-                nextUndo: 'move of b from main to other',
+                nextUndo: expect.objectContaining({ type: 'move' }),
             })
         );
 
@@ -681,7 +695,9 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         // Nothing left to redo: reported, not thrown.
         main.mw.redo();
         await flush();
-        expect(main.log).toContain('redo: Error: nothing to redo');
+        expect(reported).toContain(
+            'dockview: could not redo. Error: nothing to redo'
+        );
     });
 
     test('key bindings route to the orchestrator only when asked', async () => {
@@ -735,12 +751,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
         expect(ids(main)).toEqual(['a']);
 
-        expect(local.history).toEqual({
-            undoCount: 0,
-            redoCount: 0,
-            nextUndo: null,
-            nextRedo: null,
-        });
+        expect(local.history).toEqual(empty);
         expect(typeof local.onDidChangeHistory(() => undefined).dispose).toBe(
             'function'
         );
@@ -773,11 +784,10 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
 
         expect(ids(main)).toEqual(['fallback']);
-        expect(main.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(/^could not restore layout: /),
-            ])
-        );
+        await expect(main.mw.ready).resolves.toEqual({ restored: false });
+        expect(
+            reportedMatching(/could not restore the layout; building defaults/)
+        ).toHaveLength(1);
         orchestrator.setGeometry('main', { x: 0, y: 0, width: 10, height: 10 });
         expect(orchestrator.snapshot().windows[0].geometry?.width).toBe(10);
     });
@@ -810,13 +820,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(ids(main)).toEqual([]);
         expect(ids(other)).toEqual(['b', 'x']);
         expect(other.api.groups).toHaveLength(2);
-        expect(other.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(
-                    /placed 1 panel\(s\) at the layout's left edge/
-                ),
-            ])
-        );
+        expect(other.api.getPanel('b')?.group.api.location.type).toBe('grid');
     });
 
     test('a detached group starts the new window with every tab', async () => {
@@ -846,7 +850,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         );
         expect(detached && ids(detached)).toEqual(['a', 'b']);
         expect(ids(main)).toEqual([]);
-        expect(main.log).toContain('released group main-1 to detached-1');
+        expect(main.api.getGroup('main-1')).toBeUndefined();
     });
 
     test('a detach is not a move the shared history records, and the new window reports cleanly', async () => {
@@ -887,68 +891,63 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         ]);
         // Neither window's layout report was refused as a duplicate...
         await flush();
-        expect(main.log.concat(detached?.log ?? []).join('\n')).not.toMatch(
-            /refused/
-        );
+        expect(reported).toEqual([]);
         // ...and the history holds no half-recorded move: undo has nothing
         // to do and says so, rather than failing on an incomplete entry.
         expect(orchestrator.history.undoCount).toBe(0);
         main.mw.undo();
         await flush();
-        expect(main.log).toContain('undo: Error: nothing to undo');
+        expect(reported).toContain(
+            'dockview: could not undo. Error: nothing to undo'
+        );
         expect(ids(main)).toEqual(['a']);
     });
 
     test('a transport written as a class keeps its methods and its this', async () => {
         const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
+        type Transport = MultiWindowTransport;
         class Bridge implements MultiWindowTransport {
             calls = 0;
-            constructor(private readonly inner: MultiWindowTransport) {}
+            constructor(private readonly inner: Transport) {}
+            get windowId() {
+                return this.inner.windowId;
+            }
             private count<T>(value: T): T {
                 this.calls += 1;
                 return value;
             }
-            windowId() {
-                return this.count(this.inner.windowId());
-            }
-            startDrag(...args: Parameters<MultiWindowTransport['startDrag']>) {
+            startDrag(...args: Parameters<Transport['startDrag']>) {
                 return this.count(this.inner.startDrag(...args));
             }
             peekDrag(session: string) {
                 return this.count(this.inner.peekDrag(session));
             }
-            acceptDrag(session: string, to: string) {
-                return this.count(this.inner.acceptDrag(session, to));
+            acceptDrag(session: string) {
+                return this.count(this.inner.acceptDrag(session));
             }
             endDrag(session: string, detach: boolean) {
                 return this.count(this.inner.endDrag(session, detach));
             }
-            onDidRelease(
-                ...args: Parameters<MultiWindowTransport['onDidRelease']>
-            ) {
+            onDidRelease(...args: Parameters<Transport['onDidRelease']>) {
                 return this.count(this.inner.onDidRelease(...args));
             }
-            takeDetachedDrag(label: string) {
-                return this.count(this.inner.takeDetachedDrag(label));
+            takeDetachedDrag() {
+                return this.count(this.inner.takeDetachedDrag());
             }
-            reportMove(
-                ...args: Parameters<MultiWindowTransport['reportMove']>
-            ) {
+            reportMove(...args: Parameters<Transport['reportMove']>) {
                 return this.count(this.inner.reportMove(...args));
             }
-            onDidMove(...args: Parameters<MultiWindowTransport['onDidMove']>) {
+            onDidMove(...args: Parameters<Transport['onDidMove']>) {
                 return this.count(this.inner.onDidMove(...args));
             }
-            loadLayout(label: string) {
-                return this.count(this.inner.loadLayout(label));
+            loadLayout() {
+                return this.count(this.inner.loadLayout());
             }
-            reportLayout(
-                ...args: Parameters<MultiWindowTransport['reportLayout']>
-            ) {
-                return this.count(this.inner.reportLayout(...args));
+            reportLayout(layout: SerializedDockview) {
+                return this.count(this.inner.reportLayout(layout));
             }
-            reportLocalStep(label: string) {
-                return this.count(this.inner.reportLocalStep(label));
+            reportLocalStep() {
+                return this.count(this.inner.reportLocalStep());
             }
             undo() {
                 return this.count(this.inner.undo());
@@ -959,25 +958,13 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             getHistory() {
                 return this.count(this.inner.getHistory());
             }
-            onRequestApplyLayout(
-                ...args: Parameters<
-                    MultiWindowTransport['onRequestApplyLayout']
-                >
+            onDidRequestHistory(
+                ...args: Parameters<Transport['onDidRequestHistory']>
             ) {
-                return this.count(this.inner.onRequestApplyLayout(...args));
-            }
-            onRequestUndo(
-                ...args: Parameters<MultiWindowTransport['onRequestUndo']>
-            ) {
-                return this.count(this.inner.onRequestUndo(...args));
-            }
-            onRequestRedo(
-                ...args: Parameters<MultiWindowTransport['onRequestRedo']>
-            ) {
-                return this.count(this.inner.onRequestRedo(...args));
+                return this.count(this.inner.onDidRequestHistory(...args));
             }
             onDidChangeHistory(
-                ...args: Parameters<MultiWindowTransport['onDidChangeHistory']>
+                ...args: Parameters<Transport['onDidChangeHistory']>
             ) {
                 return this.count(this.inner.onDidChangeHistory(...args));
             }
@@ -1063,19 +1050,15 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             {
                 buildDefaults: () =>
                     main.api.addPanel({ id: 'home', component: 'default' }),
-                onLog: (line) => main.log.push(line),
             }
         );
-        await expect(handle.ready).resolves.toEqual({
-            windowId: 'main',
-            restored: false,
-        });
+        await expect(handle.ready).resolves.toEqual({ restored: false });
         expect(ids(main)).toEqual(['home']);
-        expect(main.log).toEqual(
-            expect.arrayContaining([
-                expect.stringMatching(/^no layout from the orchestrator: /),
-            ])
-        );
+        expect(
+            reportedMatching(
+                /no layout from the orchestrator; building defaults/
+            )
+        ).toHaveLength(1);
         handle.dispose();
     });
 
@@ -1109,15 +1092,13 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
 
         expect(ids(main)).toEqual(['kept']);
-        expect(main.log).toContain('restored layout with 1 panel(s)');
+        await expect(main.mw.ready).resolves.toEqual({ restored: true });
         expect(defaultsBuilt).toBe(1);
         // The second window's defaults collide with the first's panel, so
         // its report is refused and the workspace keeps the first.
-        expect(
-            other.log.some((line) =>
-                line.includes('panel kept is already held by window main')
-            )
-        ).toBe(true);
+        expect(reportedMatching(/layout refused/)).toEqual([
+            'dockview: layout refused. Error: panel kept is already held by window main',
+        ]);
         expect(changes.length).toBeGreaterThan(0);
         expect(orchestrator.windowIds).toEqual(['main', 'other']);
 

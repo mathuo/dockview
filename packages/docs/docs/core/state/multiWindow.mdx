@@ -22,7 +22,7 @@ against a Tauri shell, an Electron main process, a `BroadcastChannel`, or the
 in-memory orchestrator this package includes.
 
 ```ts
-import { installMultiWindow, randomSessionId } from 'dockview-enterprise';
+import { installMultiWindow } from 'dockview-enterprise';
 
 const api = createDockview(element, {
     components,
@@ -31,10 +31,10 @@ const api = createDockview(element, {
     // fromJSON and must not wipe the stack.
     layoutHistory: { enabled: true, clearOnFromJSON: false },
     // Every window numbers its groups from "1" by default, so a group moved
-    // between windows would collide on arrival. `randomSessionId` is a
-    // random id that also works where `crypto.randomUUID` is undefined, as
-    // on a custom-scheme origin such as `tauri://localhost`.
-    groupIdGenerator: randomSessionId,
+    // between windows would collide on arrival. Any unique id will do; note
+    // that `crypto.randomUUID` needs a secure context, which a custom-scheme
+    // origin such as `tauri://localhost` need not be.
+    groupIdGenerator: () => crypto.randomUUID(),
 });
 
 const transport = connectToYourOrchestrator(); // a MultiWindowTransport
@@ -77,22 +77,23 @@ keeps an ended drag acceptable for a grace period before discarding it.
 
 ```ts
 multiWindow.onDidMoveAcrossWindows(({ panels, from, to, reason }) => {
-    // reason is 'drop', 'undo' or 'redo'
+    // reason is 'drop', 'detach', 'undo' or 'redo'
 });
-multiWindow.counters; // drags started, drops accepted and refused, releases
 
 // With an orchestrator that can open windows, an unaccepted drag (one that
 // ended outside every window) becomes a new window holding the tab.
-multiWindow.detach = true;
+multiWindow.updateOptions({ detach: true });
 ```
 
 A detach is reported through `onDidMoveAcrossWindows` with reason
 `'detach'`, but it is not a step the shared history can undo: the new window
 is the host's to create.
 
-If the destination cannot place a accepted payload (a component it does not
+If the destination cannot place an accepted payload (a component it does not
 register, for instance), the source has already let go. The move is still
-recorded, so a shared undo brings the panels back to the source.
+recorded, so a shared undo brings the panels back to the source. A refused
+drop, a failed placement and an unreachable orchestrator are reported on the
+console, as dockview reports its own failures.
 
 Only the HTML5 backend can leave a window. A pointer-backend drag (touch and
 pen, see [strategies](/docs/core/dnd/strategy)) is left alone.
@@ -109,7 +110,7 @@ without reading it, save for the panel ids, to refuse giving two windows the
 same panel.
 
 ```ts
-const { windowId, restored } = await multiWindow.ready;
+const { restored } = await multiWindow.ready;
 ```
 
 Pass `workspace: false` to leave restoring and reporting to your own code.
@@ -135,7 +136,7 @@ local step is only reachable after the move that followed it has been undone.
 // no key either.
 multiWindow.undo();
 multiWindow.redo();
-multiWindow.history; // { undoCount, redoCount, nextUndo, nextRedo }
+multiWindow.history; // { canUndo, canRedo, undoCount, redoCount, nextUndo?, nextRedo? }
 multiWindow.onDidChangeHistory((info) => { /* ... */ });
 ```
 
@@ -148,41 +149,43 @@ windows. Pass `history: false` to keep undo local to each window; the handle's
 
 A window reaches the orchestrator through one interface, `MultiWindowTransport`,
 in three parts. Every call is asynchronous and nothing relies on a result
-arriving inside the DOM event that caused it.
+arriving inside the DOM event that caused it. A transport belongs to one
+window, so no call names the window it comes from: the orchestrator knows that
+from the transport it handed out, or from the window the call arrived on.
 
 ```ts
 interface MultiWindowTransport {
-    windowId(): Promise<string>;
+    readonly windowId: string;
 
     // Drags.
-    startDrag(session: string, from: string, payload: DragPayload): Promise<void>;
+    startDrag(session: string, payload: DragPayload): Promise<void>;
     peekDrag(session: string): Promise<DragPayload>;
-    acceptDrag(session: string, to: string): Promise<void>;
+    acceptDrag(session: string): Promise<void>;
     endDrag(session: string, detach: boolean): Promise<void>;
-    onDidRelease(handler: (event: ReleaseEvent) => void): Promise<DockviewIDisposable>;
-    takeDetachedDrag(windowId: string): Promise<DragPayload | null>;
-    reportMove(session, windowId, role: 'from' | 'to', panels, before, after): Promise<void>;
-    onDidMove(handler: (event: MoveEvent) => void): Promise<DockviewIDisposable>;
+    onDidRelease(listener: (event: ReleaseEvent) => void): Promise<DockviewIDisposable>;
+    takeDetachedDrag(): Promise<DragPayload | null>;
+    reportMove(session, role: 'from' | 'to', panels, before, after): Promise<void>;
+    onDidMove(listener: (event: MoveEvent) => void): Promise<DockviewIDisposable>;
 
     // The workspace.
-    loadLayout(windowId: string): Promise<SerializedDockview | null>;
-    reportLayout(windowId: string, layout: SerializedDockview): Promise<void>;
+    loadLayout(): Promise<SerializedDockview | null>;
+    reportLayout(layout: SerializedDockview): Promise<void>;
 
     // The shared history.
-    reportLocalStep(windowId: string): Promise<void>;
+    reportLocalStep(): Promise<void>;
     undo(): Promise<void>;
     redo(): Promise<void>;
-    getHistory(): Promise<HistoryInfo | null>;
-    onRequestApplyLayout(handler: (layout: SerializedDockview) => void): Promise<DockviewIDisposable>;
-    onRequestUndo(handler: () => void): Promise<DockviewIDisposable>;
-    onRequestRedo(handler: () => void): Promise<DockviewIDisposable>;
-    onDidChangeHistory(handler: (info: HistoryInfo) => void): Promise<DockviewIDisposable>;
+    getHistory(): Promise<HistoryInfo>;
+    onDidRequestHistory(listener: (request: HistoryRequest) => void): Promise<DockviewIDisposable>;
+    onDidChangeHistory(listener: (info: HistoryInfo) => void): Promise<DockviewIDisposable>;
 }
 ```
 
 `DragPayload` is `{ kind: 'panel', panel: GroupviewPanelState }` or
-`{ kind: 'group', group: SerializedDockviewGroup }`; `payloadPanels(payload)`
-lists the panel ids it moves, which is all an orchestrator needs to read.
+`{ kind: 'group', group: SerializedDockviewGroup }`. The panel ids it moves,
+`panel.id` or `group.group.views`, are all an orchestrator needs to read.
+`HistoryRequest` is `{ type: 'undo' }`, `{ type: 'redo' }` or
+`{ type: 'apply-layout', layout }`.
 
 ## Implementing a transport
 
@@ -204,25 +207,25 @@ In both cases the transport must keep to this contract.
 
 | Call | What the orchestrator must do |
 |---|---|
-| `windowId()` | Resolve this window's id, stable for the orchestrator's lifetime. It is the id the orchestrator uses in `from` and `to`, and the one it addresses requests to. |
-| `startDrag(session, from, payload)` | Record the session. Session ids are random; never reject one as a duplicate. |
+| `windowId` | This window's id, stable for the orchestrator's lifetime. It is the id the orchestrator uses in `from` and `to`, and the one it addresses requests to. If finding it is asynchronous, do that before installing. |
+| `startDrag(session, payload)` | Record the session with this window as its source. Session ids are random; never reject one as a duplicate. |
 | `peekDrag(session)` | Resolve the payload. Reject if the session is unknown or already accepted. |
-| `acceptDrag(session, to)` | The first accept wins; a later one rejects. On success: forget the session, tell the workspace a move of `payloadPanels(payload)` from `from` to `to` is under way, deliver `onDidRelease` to the source with reason `'accept'`, and broadcast `onDidMove` with reason `'drop'`. |
-| `endDrag(session, detach)` | Resolve at once; the session stays acceptable for a grace period (the shipped orchestrators use 1.5 s), because the source's `dragend` fires before the destination's accept arrives. When it expires unaccepted: discard it, or, if `detach` and the host can open windows, choose a new window id, park the payload under it, open the window, announce the move to the workspace, deliver `onDidRelease` with reason `'detach'` and broadcast `onDidMove` with reason `'detach'`. |
-| `takeDetachedDrag(windowId)` | The payload parked for a detached window, once; `null` otherwise. A new window calls this at start. |
-| `reportMove(session, windowId, role, panels, before, after)` | One window's half of a move. The history entry is complete when both halves have arrived, in either order. |
-| `loadLayout(windowId)` | The layout stored for the window, or `null` to let it build its defaults. |
-| `reportLayout(windowId, layout)` | Store it. Reject, with a message, when it names a panel another window's stored layout holds, unless an announced move explains that. A source reporting without the panel completes the move. |
-| `reportLocalStep(windowId)` | Push a marker for that window and clear the redo stack. |
-| `undo()` / `redo()` | Pop the top entry. For a marker, deliver `onRequestUndo` or `onRequestRedo` to that window. For a move, deliver `onRequestApplyLayout`: undo applies the destination's `before` then the source's `before`; redo applies the source's `after` then the destination's `after`. Store each layout as the window's before delivering it, so the window's own report afterwards is not refused as a duplicate. Then broadcast `onDidMove` (reason `'undo'` or `'redo'`) and `onDidChangeHistory`. Reject when there is nothing to do or the top move is still being recorded. |
-| `getHistory()` | The current counts and descriptions, or `null` if not available yet. |
-| `onDidRelease`, `onRequestApplyLayout`, `onRequestUndo`, `onRequestRedo` | Delivered only to the window they name. On a bus where every window can hear every message, filter on the window id in the payload. |
+| `acceptDrag(session)` | The first accept wins; a later one rejects. On success: forget the session, tell the workspace a move of the payload's panels from the source to this window is under way, deliver `onDidRelease` to the source with reason `'drop'`, and broadcast `onDidMove` with reason `'drop'`. |
+| `endDrag(session, detach)` | Resolve at once; the session stays acceptable for a grace period (`DRAG_END_GRACE_MS`, 1.5 s, which the windows assume as an upper bound), because the source's `dragend` fires before the destination's accept arrives. When it expires unaccepted: discard it, or, if `detach` and the host can open windows, choose a new window id, park the payload under it, open the window, announce the move to the workspace, deliver `onDidRelease` with reason `'detach'` and broadcast `onDidMove` with reason `'detach'`. |
+| `takeDetachedDrag()` | The payload parked for this window by a detach, once; `null` otherwise. Every window calls this at start. |
+| `reportMove(session, role, panels, before, after)` | This window's half of a move. The history entry is complete when both halves have arrived, in either order. |
+| `loadLayout()` | The layout stored for this window, or `null` to let it build its defaults. |
+| `reportLayout(layout)` | Store it. Reject, with a message, when it names a panel another window's stored layout holds, unless an announced move explains that. A source reporting without the panel completes the move. |
+| `reportLocalStep()` | Push a marker for this window and clear the redo stack. |
+| `undo()` / `redo()` | Pop the top entry. For a marker, send `{ type: 'undo' }` or `{ type: 'redo' }` to that window. For a move, send `{ type: 'apply-layout', layout }`: undo applies the destination's `before` then the source's `before`; redo applies the source's `after` then the destination's `after`. Store each layout as the window's before sending it, so the window's own report afterwards is not refused as a duplicate. Then broadcast `onDidMove` (reason `'undo'` or `'redo'`) and `onDidChangeHistory`. Reject when there is nothing to do or the top move is still being recorded. |
+| `getHistory()` | The current counts, and a summary of the next undo and redo step. |
+| `onDidRelease`, `onDidRequestHistory` | Delivered only to the window they name. On a bus where every window can hear every message, filter on the window id in the payload. |
 | `onDidMove`, `onDidChangeHistory` | Broadcast to every window. |
 
 Two rules hold for every subscription: it resolves to a disposable that stops
 delivery, and a message is delivered on a later turn, never inside the call
 that caused it. The install copes with a transport that answers slowly or
-fails at start (the window builds its defaults and logs the error), and with
+fails at start (the window builds its defaults and reports the error), and with
 one that answers after `dispose()`.
 
 ### Example: an Electron bridge
@@ -237,25 +240,25 @@ import { MemoryOrchestrator, type MultiWindowTransport } from 'dockview-enterpri
 const orchestrator = new MemoryOrchestrator({
     createWindow: (windowId) => open(windowId), // a detach needs a window
 });
-const transports = new Map<string, MultiWindowTransport>();
+// By the sending renderer, so a window cannot speak for another.
+const transports = new Map<number, MultiWindowTransport>();
 
 function open(windowId: string): BrowserWindow {
     const win = new BrowserWindow({ webPreferences: { preload: PRELOAD } });
+    const contentsId = win.webContents.id;
     const transport = orchestrator.connect(windowId);
-    transports.set(windowId, transport);
+    transports.set(contentsId, transport);
 
     // Messages to this window: forward each subscription to its renderer.
     const send = (channel: string) => (payload: unknown) =>
         win.webContents.send(channel, payload);
     void transport.onDidRelease(send('dockview:release'));
     void transport.onDidMove(send('dockview:moved'));
-    void transport.onRequestApplyLayout(send('dockview:apply'));
-    void transport.onRequestUndo(() => send('dockview:undo')(undefined));
-    void transport.onRequestRedo(() => send('dockview:redo')(undefined));
+    void transport.onDidRequestHistory(send('dockview:request'));
     void transport.onDidChangeHistory(send('dockview:history'));
 
     win.on('closed', () => {
-        transports.delete(windowId);
+        transports.delete(contentsId);
         orchestrator.disconnect(windowId);
     });
     win.loadURL(`${APP_URL}?window=${windowId}`);
@@ -263,10 +266,10 @@ function open(windowId: string): BrowserWindow {
 }
 
 // Requests from a window: one channel, the method name selects the call.
-ipcMain.handle('dockview', (_event, windowId: string, method: string, ...args: unknown[]) => {
-    const transport = transports.get(windowId);
+ipcMain.handle('dockview', (event, method: string, ...args: unknown[]) => {
+    const transport = transports.get(event.sender.id);
     if (!transport) {
-        throw new Error(`no window ${windowId}`);
+        throw new Error('not a dockview window');
     }
     return (transport[method as keyof MultiWindowTransport] as (...a: unknown[]) => unknown)(...args);
 });
@@ -280,7 +283,7 @@ subscriptions over `on`, each resolving to a disposable.
 const windowId = new URL(location.href).searchParams.get('window')!;
 
 const request = <K extends keyof MultiWindowTransport>(method: K) =>
-    ((...args: unknown[]) => ipcRenderer.invoke('dockview', windowId, method, ...args)) as MultiWindowTransport[K];
+    ((...args: unknown[]) => ipcRenderer.invoke('dockview', method, ...args)) as MultiWindowTransport[K];
 
 const subscription = (channel: string) => (handler: (payload: any) => void) => {
     const listener = (_event: unknown, payload: unknown) => handler(payload);
@@ -289,7 +292,7 @@ const subscription = (channel: string) => (handler: (payload: any) => void) => {
 };
 
 const transport: MultiWindowTransport = {
-    windowId: () => Promise.resolve(windowId),
+    windowId,
     startDrag: request('startDrag'),
     peekDrag: request('peekDrag'),
     acceptDrag: request('acceptDrag'),
@@ -304,9 +307,7 @@ const transport: MultiWindowTransport = {
     getHistory: request('getHistory'),
     onDidRelease: subscription('dockview:release'),
     onDidMove: subscription('dockview:moved'),
-    onRequestApplyLayout: subscription('dockview:apply'),
-    onRequestUndo: subscription('dockview:undo'),
-    onRequestRedo: subscription('dockview:redo'),
+    onDidRequestHistory: subscription('dockview:request'),
     onDidChangeHistory: subscription('dockview:history'),
 };
 
@@ -360,8 +361,8 @@ dependency) and bridges each window's transport over IPC. A shell in another
 language mirrors its rules instead; the
 [Tauri demo](https://github.com/dockview/dockview/tree/master/packages/dockview-tauri-demo)
 in the repository does that in Rust, from the three pieces the orchestrator is
-built from (`dragSessions.ts`, `workspaceState.ts` and `historySequencer.ts` in the
-package source).
+built from (`dragSessions.ts`, `workspaceRegistry.ts` and `historySequencer.ts`
+under `multiWindow/orchestrator/` in the package source).
 
 ```ts
 import { MemoryOrchestrator } from 'dockview-enterprise';

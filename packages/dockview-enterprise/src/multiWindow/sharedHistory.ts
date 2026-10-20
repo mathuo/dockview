@@ -3,9 +3,9 @@
  *
  * Dockview's own history keeps this window's local steps and knows how to
  * restore them. What it cannot know is the order of those steps against the
- * moves between windows, so the orchestrator sequences: this module reports
- * each local step as it is pushed, forwards undo and redo to the
- * orchestrator, and carries out what comes back, which is either "undo (or
+ * moves between windows, so the orchestrator sequences: this reports each
+ * local step as it is pushed, forwards undo and redo to the orchestrator,
+ * and carries out the requests that come back, which are either "undo (or
  * redo) your own top step" or "take this layout". Ordering is what keeps it
  * safe: an older local step is only reachable once the move after it has
  * been undone.
@@ -14,208 +14,180 @@
  * applied layout arrives through `fromJSON` and must not wipe the stack.
  */
 
-import type { DockviewApi, DockviewEvent, DockviewIDisposable } from 'dockview';
-import type { HistoryInfo, MultiWindowTransport } from './types';
+import {
+    type DockviewApi,
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewDisposable as Disposable,
+    DockviewEmitter as Emitter,
+    type DockviewEvent as Event,
+} from 'dockview';
+import {
+    type HistoryInfo,
+    type HistoryRequest,
+    type MultiWindowTransport,
+    retainSubscription,
+} from './transport';
 
-export interface SharedHistoryOptions {
+export const EMPTY_HISTORY: HistoryInfo = {
+    canUndo: false,
+    canRedo: false,
+    undoCount: 0,
+    redoCount: 0,
+};
+
+export class SharedHistory extends CompositeDisposable {
+    private readonly _api: DockviewApi;
+    private readonly _transport: MultiWindowTransport;
+    private _info: HistoryInfo = EMPTY_HISTORY;
     /**
-     * Route Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y (Cmd on macOS) on the document to
-     * the orchestrator. Off by default, as dockview's own history binds no
-     * key either.
+     * >0 while carrying out a request, so the local history changes it causes
+     * are not reported back as new steps.
      */
-    bindKeys?: boolean;
-    onLog?(line: string): void;
-}
+    private _applyDepth = 0;
+    private _lastUndoCount = 0;
 
-export interface SharedHistory {
-    /** Undo, or redo, the most recent step in any window. */
-    undo(): void;
-    redo(): void;
-    readonly info: HistoryInfo;
-    onDidChange: DockviewEvent<HistoryInfo>;
-    dispose(): void;
-}
+    private readonly _onDidChange = new Emitter<HistoryInfo>();
+    readonly onDidChange: Event<HistoryInfo> = this._onDidChange.event;
 
-export function installSharedHistory(
-    api: DockviewApi,
-    transport: MultiWindowTransport,
-    options: SharedHistoryOptions = {}
-): SharedHistory {
-    const log = options.onLog ?? (() => undefined);
-    const teardown: (() => void)[] = [];
-    const listeners = new Set<(info: HistoryInfo) => void>();
-    let windowId = '';
-    let info: HistoryInfo = {
-        undoCount: 0,
-        redoCount: 0,
-        nextUndo: null,
-        nextRedo: null,
-    };
-    /** >0 while carrying out the orchestrator's instruction, so the local
-     *  history changes that causes are not reported back as new steps. */
-    let applying = 0;
-    let lastUndoCount = 0;
-
-    const setInfo = (next: HistoryInfo) => {
-        info = next;
-        for (const listener of listeners) {
-            listener(info);
-        }
-    };
-
-    let disposed = false;
-
-    /** Keep a transport subscription until dispose, even one that answers after it. */
-    const subscribe = (subscription: Promise<DockviewIDisposable>) => {
-        void subscription.then(
-            (subscription) => {
-                if (disposed) {
-                    subscription.dispose();
-                } else {
-                    teardown.push(() => subscription.dispose());
-                }
-            },
-            (err: unknown) => log(`subscription failed: ${String(err)}`)
-        );
-    };
-
-    void transport.windowId().then(
-        (value) => {
-            windowId = value;
-        },
-        (err: unknown) => log(`windowId failed: ${String(err)}`)
-    );
-
-    // A rise in the local undo count outside an instruction is a step the
-    // user made here; the orchestrator needs it in the global order.
-    teardown.push(
-        api.onDidChangeHistory((event) => {
-            const pushed = event.undoCount > lastUndoCount && applying === 0;
-            lastUndoCount = event.undoCount;
-            if (pushed) {
-                void transport
-                    .reportLocalStep(windowId)
-                    .catch((err: unknown) =>
-                        log(`reportLocalStep failed: ${String(err)}`)
-                    );
-            }
-        }).dispose
-    );
-
-    const guarded = (what: string, fn: () => void) => {
-        applying += 1;
-        try {
-            fn();
-        } catch (err: unknown) {
-            log(`${what} failed: ${String(err)}`);
-        } finally {
-            applying -= 1;
-            lastUndoCount = api.canUndo ? lastUndoCount : 0;
-        }
-    };
-
-    subscribe(
-        transport.onRequestApplyLayout((layout) => {
-            guarded('apply', () => {
-                api.fromJSON(layout, { reuseExistingPanels: true });
-                log(`applied a layout with ${api.panels.length} panel(s)`);
-            });
-        })
-    );
-    subscribe(
-        transport.onRequestUndo(() => {
-            guarded('local undo', () => {
-                api.undo();
-                log('undid a local step');
-            });
-        })
-    );
-    subscribe(
-        transport.onRequestRedo(() => {
-            guarded('local redo', () => {
-                api.redo();
-                log('redid a local step');
-            });
-        })
-    );
-    subscribe(transport.onDidChangeHistory((next) => setInfo(next)));
-    void transport.getHistory().then(
-        (next) => {
-            if (next && !disposed) {
-                setInfo(next);
-            }
-        },
-        (err: unknown) => log(`getHistory failed: ${String(err)}`)
-    );
-
-    const undo = () => {
-        void transport
-            .undo()
-            .catch((err: unknown) => log(`undo: ${String(err)}`));
-    };
-    const redo = () => {
-        void transport
-            .redo()
-            .catch((err: unknown) => log(`redo: ${String(err)}`));
-    };
-
-    if (options.bindKeys) {
-        const onKeyDown = (event: KeyboardEvent) => {
-            const modifier = event.ctrlKey || event.metaKey;
-            if (
-                !modifier ||
-                event.altKey ||
-                event.defaultPrevented ||
-                isEditable(event.target)
-            ) {
-                // Text undo in an editor inside a panel is the editor's.
-                return;
-            }
-            const key = event.key.toLowerCase();
-            if (key === 'z' && !event.shiftKey) {
-                event.preventDefault();
-                undo();
-            } else if ((key === 'z' && event.shiftKey) || key === 'y') {
-                event.preventDefault();
-                redo();
-            }
-        };
-        document.addEventListener('keydown', onKeyDown);
-        teardown.push(() => document.removeEventListener('keydown', onKeyDown));
+    get info(): HistoryInfo {
+        return this._info;
     }
 
-    return {
-        undo,
-        redo,
-        get info() {
-            return info;
-        },
-        onDidChange(listener) {
-            listeners.add(listener);
-            return {
-                dispose: () => {
-                    listeners.delete(listener);
-                },
-            };
-        },
-        dispose() {
-            disposed = true;
-            for (const fn of teardown.splice(0)) {
-                fn();
+    constructor(
+        api: DockviewApi,
+        transport: MultiWindowTransport,
+        options: { bindKeys?: boolean } = {}
+    ) {
+        super();
+        this._api = api;
+        this._transport = transport;
+
+        this.addDisposables(
+            this._onDidChange,
+            // A rise in the local undo count outside a request is a step the
+            // user made here; the orchestrator needs it in the global order.
+            api.onDidChangeHistory((event) => {
+                const pushed =
+                    event.undoCount > this._lastUndoCount &&
+                    this._applyDepth === 0;
+                this._lastUndoCount = event.undoCount;
+                if (pushed) {
+                    transport.reportLocalStep().catch((err: unknown) => {
+                        console.error(
+                            'dockview: could not report a local step.',
+                            err
+                        );
+                    });
+                }
+            })
+        );
+
+        retainSubscription(
+            this,
+            transport.onDidRequestHistory((request) => this._carryOut(request))
+        );
+        retainSubscription(
+            this,
+            transport.onDidChangeHistory((info) => this._setInfo(info))
+        );
+        transport.getHistory().then(
+            (info) => {
+                if (!this.isDisposed) {
+                    this._setInfo(info);
+                }
+            },
+            (err: unknown) => {
+                console.error('dockview: could not read the history.', err);
             }
-        },
-    };
+        );
+
+        if (options.bindKeys) {
+            const onKeyDown = (event: KeyboardEvent) => this._onKeyDown(event);
+            document.addEventListener('keydown', onKeyDown);
+            this.addDisposables(
+                Disposable.from(() =>
+                    document.removeEventListener('keydown', onKeyDown)
+                )
+            );
+        }
+    }
+
+    /** Undo the most recent step in any window. */
+    undo(): void {
+        this._transport.undo().catch((err: unknown) => {
+            console.warn('dockview: could not undo.', err);
+        });
+    }
+
+    /** Redo the most recently undone step in any window. */
+    redo(): void {
+        this._transport.redo().catch((err: unknown) => {
+            console.warn('dockview: could not redo.', err);
+        });
+    }
+
+    private _setInfo(info: HistoryInfo): void {
+        this._info = info;
+        this._onDidChange.fire(info);
+    }
+
+    private _carryOut(request: HistoryRequest): void {
+        this._applyDepth += 1;
+        try {
+            switch (request.type) {
+                case 'undo':
+                    this._api.undo();
+                    break;
+                case 'redo':
+                    this._api.redo();
+                    break;
+                case 'apply-layout':
+                    this._api.fromJSON(request.layout, {
+                        reuseExistingPanels: true,
+                    });
+                    break;
+            }
+        } catch (err: unknown) {
+            console.error(
+                `dockview: could not carry out a history ${request.type}.`,
+                err
+            );
+        } finally {
+            this._applyDepth -= 1;
+            if (!this._api.canUndo) {
+                this._lastUndoCount = 0;
+            }
+        }
+    }
+
+    private _onKeyDown(event: KeyboardEvent): void {
+        const modifier = event.ctrlKey || event.metaKey;
+        if (
+            !modifier ||
+            event.altKey ||
+            event.defaultPrevented ||
+            // Text undo in an editor inside a panel is the editor's.
+            isEditable(event.target)
+        ) {
+            return;
+        }
+        const key = event.key.toLowerCase();
+        if (key === 'z' && !event.shiftKey) {
+            event.preventDefault();
+            this.undo();
+        } else if ((key === 'z' && event.shiftKey) || key === 'y') {
+            event.preventDefault();
+            this.redo();
+        }
+    }
 }
 
 /** Whether a key event's target takes text, so its undo is not the layout's. */
 function isEditable(target: EventTarget | null): boolean {
-    if (!(target instanceof HTMLElement)) {
-        return false;
-    }
     return (
         target instanceof HTMLInputElement ||
         target instanceof HTMLTextAreaElement ||
         target instanceof HTMLSelectElement ||
-        target.isContentEditable
+        (target instanceof HTMLElement && target.isContentEditable)
     );
 }

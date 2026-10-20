@@ -1,20 +1,21 @@
-export type { CrossWindowDndCounters } from './crossWindowDnd';
-export { MULTI_WINDOW_DRAG_TYPE, randomSessionId } from './crossWindowDnd';
-export type { MemoryOrchestratorOptions } from './memoryOrchestrator';
-export { MemoryOrchestrator } from './memoryOrchestrator';
+export { MULTI_WINDOW_DRAG_TYPE } from './crossWindowDnd';
 export type { MultiWindow, MultiWindowOptions } from './multiWindow';
 export { installMultiWindow } from './multiWindow';
-export type {
-    DragPayload,
-    HistoryInfo,
-    MoveEvent,
-    MoveRole,
-    MultiWindowTransport,
-    ReleaseEvent,
-} from './types';
-export { payloadPanels } from './types';
+export type { MemoryOrchestratorOptions } from './orchestrator/memoryOrchestrator';
+export { MemoryOrchestrator } from './orchestrator/memoryOrchestrator';
 export type {
     WindowGeometry,
     WindowRecord,
     WorkspaceState,
-} from './workspaceState';
+} from './orchestrator/workspaceRegistry';
+export type {
+    DragPayload,
+    HistoryInfo,
+    HistoryRequest,
+    HistoryStepInfo,
+    MoveEvent,
+    MoveRole,
+    MultiWindowTransport,
+    ReleaseEvent,
+} from './transport';
+export { DRAG_END_GRACE_MS } from './transport';
