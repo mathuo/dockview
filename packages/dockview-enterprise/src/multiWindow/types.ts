@@ -38,6 +38,13 @@ export interface ReleaseNotice {
     session: string;
     /** The window label that took the payload. */
     to: string;
+    /**
+     * A claim by a window the drop landed in, or a tear-off into a window
+     * the orchestrator opened for an unclaimed drag. Only a claim is a move
+     * the shared history records: the torn-off window is the host's to
+     * create, and its creation is not undone.
+     */
+    reason: 'claim' | 'tear-off';
 }
 
 /** Broadcast after panels moved between any two windows. */
@@ -46,8 +53,8 @@ export interface MovedNotice {
     panels: string[];
     from: string;
     to: string;
-    /** A drop, or the undo or redo of one. */
-    reason: 'drop' | 'undo' | 'redo';
+    /** A drop, a tear-off into a new window, or the undo or redo of a drop. */
+    reason: 'drop' | 'tear-off' | 'undo' | 'redo';
 }
 
 /** Which half of a move a window reports. */

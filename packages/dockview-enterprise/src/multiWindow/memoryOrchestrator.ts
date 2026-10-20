@@ -202,7 +202,11 @@ export class MemoryOrchestrator {
         const claim = this._hub.claim(session, to);
         const panels = payloadPanels(claim.payload);
         this._workspace.expectMove(panels, claim.release.from, to);
-        this._deliver(claim.release.from, 'release', { session, to });
+        this._deliver(claim.release.from, 'release', {
+            session,
+            to,
+            reason: 'claim',
+        });
         this._broadcast(this._moved, {
             session,
             panels,
@@ -251,12 +255,26 @@ export class MemoryOrchestrator {
             return;
         }
         const payload = this._hub.peekPending(ended.label);
-        if (payload) {
-            createWindow(ended.label, payload);
+        if (!payload) {
+            return;
         }
-        this._deliver(ended.release.from, 'release', {
+        const panels = payloadPanels(payload);
+        const from = ended.release.from;
+        // As for a claim: the new window may report the panels before the
+        // source reports them gone.
+        this._workspace.expectMove(panels, from, ended.label);
+        createWindow(ended.label, payload);
+        this._deliver(from, 'release', {
             session,
             to: ended.label,
+            reason: 'tear-off',
+        });
+        this._broadcast(this._moved, {
+            session,
+            panels,
+            from,
+            to: ended.label,
+            reason: 'tear-off',
         });
     }
 

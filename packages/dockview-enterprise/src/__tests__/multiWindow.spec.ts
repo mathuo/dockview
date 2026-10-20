@@ -6,7 +6,12 @@ import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from 'dockview-core';
-import type { DragPayload, MovedNotice, MultiWindow } from '../multiWindow';
+import type {
+    DragPayload,
+    MovedNotice,
+    MultiWindow,
+    MultiWindowTransport,
+} from '../multiWindow';
 import {
     HUB_DRAG_TYPE,
     installMultiWindow,
@@ -824,6 +829,230 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         expect(torn && ids(torn)).toEqual(['a', 'b']);
         expect(ids(main)).toEqual([]);
         expect(main.log).toContain('released group main-1 to torn-off-1');
+    });
+
+    test('a tear-off is not a move the shared history records, and the new window reports cleanly', async () => {
+        const orchestrator = new MemoryOrchestrator({
+            dragEndGraceMs: 0,
+            createWindow: (label) => {
+                open(orchestrator, label);
+            },
+        });
+        const moves: MovedNotice[] = [];
+        orchestrator.onDidMove((notice) => moves.push(notice));
+        const main = open(orchestrator, 'main', { tearOff: true });
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        await flush();
+
+        const dataTransfer = fakeDataTransfer();
+        const tab = main.api.getPanel('b')?.view.tab.element as HTMLElement;
+        fireEvent.dragStart(tab, { dataTransfer });
+        await flush();
+        fireEvent.dragEnd(tab, { dataTransfer });
+        await flush();
+        await flush();
+
+        const torn = windows.find((window) => window.label === 'torn-off-1');
+        expect(torn && ids(torn)).toEqual(['b']);
+        expect(ids(main)).toEqual(['a']);
+        expect(moves).toEqual([
+            expect.objectContaining({
+                panels: ['b'],
+                from: 'main',
+                to: 'torn-off-1',
+                reason: 'tear-off',
+            }),
+        ]);
+        // Neither window's layout report was refused as a duplicate...
+        await flush();
+        expect(main.log.concat(torn?.log ?? []).join('\n')).not.toMatch(
+            /refused/
+        );
+        // ...and the history holds no half-recorded move: undo has nothing
+        // to do and says so, rather than failing on an incomplete entry.
+        expect(orchestrator.historyInfo.undoCount).toBe(0);
+        main.mw.undo();
+        await flush();
+        expect(main.log).toContain('undo: Error: nothing to undo');
+        expect(ids(main)).toEqual(['a']);
+    });
+
+    test('a transport written as a class keeps its methods and its this', async () => {
+        const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
+        class Bridge implements MultiWindowTransport {
+            calls = 0;
+            constructor(private readonly inner: MultiWindowTransport) {}
+            private count<T>(value: T): T {
+                this.calls += 1;
+                return value;
+            }
+            label() {
+                return this.count(this.inner.label());
+            }
+            dragStart(...args: Parameters<MultiWindowTransport['dragStart']>) {
+                return this.count(this.inner.dragStart(...args));
+            }
+            peek(session: string) {
+                return this.count(this.inner.peek(session));
+            }
+            claim(session: string, to: string) {
+                return this.count(this.inner.claim(session, to));
+            }
+            dragEnd(session: string, tearOff: boolean) {
+                return this.count(this.inner.dragEnd(session, tearOff));
+            }
+            onRelease(...args: Parameters<MultiWindowTransport['onRelease']>) {
+                return this.count(this.inner.onRelease(...args));
+            }
+            takePending(label: string) {
+                return this.count(this.inner.takePending(label));
+            }
+            moveRecorded(
+                ...args: Parameters<MultiWindowTransport['moveRecorded']>
+            ) {
+                return this.count(this.inner.moveRecorded(...args));
+            }
+            onMoved(...args: Parameters<MultiWindowTransport['onMoved']>) {
+                return this.count(this.inner.onMoved(...args));
+            }
+            initialLayout(label: string) {
+                return this.count(this.inner.initialLayout(label));
+            }
+            layoutChanged(
+                ...args: Parameters<MultiWindowTransport['layoutChanged']>
+            ) {
+                return this.count(this.inner.layoutChanged(...args));
+            }
+            historyPush(label: string) {
+                return this.count(this.inner.historyPush(label));
+            }
+            undo() {
+                return this.count(this.inner.undo());
+            }
+            redo() {
+                return this.count(this.inner.redo());
+            }
+            historyInfo() {
+                return this.count(this.inner.historyInfo());
+            }
+            onApplyLayout(
+                ...args: Parameters<MultiWindowTransport['onApplyLayout']>
+            ) {
+                return this.count(this.inner.onApplyLayout(...args));
+            }
+            onUndoRequest(
+                ...args: Parameters<MultiWindowTransport['onUndoRequest']>
+            ) {
+                return this.count(this.inner.onUndoRequest(...args));
+            }
+            onRedoRequest(
+                ...args: Parameters<MultiWindowTransport['onRedoRequest']>
+            ) {
+                return this.count(this.inner.onRedoRequest(...args));
+            }
+            onHistoryChanged(
+                ...args: Parameters<MultiWindowTransport['onHistoryChanged']>
+            ) {
+                return this.count(this.inner.onHistoryChanged(...args));
+            }
+        }
+        const bridge = new Bridge(orchestrator.connect('main'));
+        const main = open(orchestrator, 'main');
+        const handle = installMultiWindow(main.api, bridge, {
+            debounceMs: 0,
+        });
+        await flush();
+        const other = open(orchestrator, 'other');
+        await flush();
+        main.api.addPanel({ id: 'b', component: 'default' });
+        other.api.addPanel({ id: 'x', component: 'default' });
+        await flush();
+        expect(bridge.calls).toBeGreaterThan(5);
+
+        await dragAcross(main, 'b', other);
+        expect(ids(other)).toEqual(['b', 'x']);
+        expect(handle.label).toBe('main');
+        handle.dispose();
+    });
+
+    test('a subscription that answers after dispose is dropped at once', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const transport = orchestrator.connect('main');
+        const unlisten = jest.fn();
+        let answer: (value: () => void) => void = () => undefined;
+        const late = new Promise<() => void>((resolve) => {
+            answer = resolve;
+        });
+        const main = open(orchestrator, 'main');
+        const handle = installMultiWindow(
+            main.api,
+            { ...transport, onRelease: () => late },
+            { workspace: false, history: false }
+        );
+        handle.dispose();
+        answer(unlisten);
+        await flush();
+        expect(unlisten).toHaveBeenCalledTimes(1);
+    });
+
+    test('key bindings leave text editing alone', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const transport = orchestrator.connect('main');
+        const undo = jest.fn(async () => undefined);
+        const main = open(orchestrator, 'main');
+        const handle = installMultiWindow(
+            main.api,
+            { ...transport, undo },
+            { history: { bindKeys: true }, workspace: false }
+        );
+        await flush();
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+        fireEvent.keyDown(textarea, { key: 'z', ctrlKey: true });
+        const prevented = new KeyboardEvent('keydown', {
+            key: 'z',
+            ctrlKey: true,
+            cancelable: true,
+            bubbles: true,
+        });
+        prevented.preventDefault();
+        document.dispatchEvent(prevented);
+        expect(undo).not.toHaveBeenCalled();
+        fireEvent.keyDown(document.body, { key: 'z', ctrlKey: true });
+        expect(undo).toHaveBeenCalledTimes(1);
+        textarea.remove();
+        handle.dispose();
+    });
+
+    test('an orchestrator that cannot be reached at start still gets the defaults', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const transport = orchestrator.connect('main');
+        const main = open(orchestrator, 'main');
+        const handle = installMultiWindow(
+            main.api,
+            {
+                ...transport,
+                initialLayout: () => Promise.reject(new Error('not yet')),
+            },
+            {
+                buildDefaults: () =>
+                    main.api.addPanel({ id: 'home', component: 'default' }),
+                onLog: (line) => main.log.push(line),
+            }
+        );
+        await expect(handle.ready).resolves.toEqual({
+            label: 'main',
+            restored: false,
+        });
+        expect(ids(main)).toEqual(['home']);
+        expect(main.log).toEqual(
+            expect.arrayContaining([
+                expect.stringMatching(/^no layout from the orchestrator: /),
+            ])
+        );
+        handle.dispose();
     });
 
     test('the workspace restores a window from the orchestrator and reports changes back', async () => {

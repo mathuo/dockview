@@ -1,5 +1,5 @@
 export type { CrossWindowDndCounters } from './crossWindowDnd';
-export { HUB_DRAG_TYPE } from './crossWindowDnd';
+export { HUB_DRAG_TYPE, randomSessionId } from './crossWindowDnd';
 export type { MemoryOrchestratorOptions } from './memoryOrchestrator';
 export { MemoryOrchestrator } from './memoryOrchestrator';
 export type { MultiWindow, MultiWindowOptions } from './multiWindow';

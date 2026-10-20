@@ -117,6 +117,21 @@ export function installCrossWindowDnd(
     const local = new Map<string, LocalSession>();
     const teardown: (() => void)[] = [];
     let label = '';
+    let disposed = false;
+
+    /** Keep a transport subscription until dispose, even one that answers after it. */
+    const subscribe = (subscription: Promise<() => void>) => {
+        void subscription.then(
+            (unlisten) => {
+                if (disposed) {
+                    unlisten();
+                } else {
+                    teardown.push(unlisten);
+                }
+            },
+            (err: unknown) => log(`subscription failed: ${String(err)}`)
+        );
+    };
 
     const hub: CrossWindowDnd = {
         get label() {
@@ -129,6 +144,7 @@ export function installCrossWindowDnd(
             return () => moveListeners.delete(listener);
         },
         dispose() {
+            disposed = true;
             for (const fn of teardown.splice(0)) {
                 fn();
             }
@@ -259,33 +275,38 @@ export function installCrossWindowDnd(
             return;
         }
 
+        // The source has let go by now. Whatever happens here, this half of
+        // the move is recorded, so a shared undo can restore the source's
+        // layout even when the panels could not be placed.
+        const before = api.toJSON();
         try {
-            const before = api.toJSON();
             place(api, payload, event);
             counters.dropsClaimed += 1;
-            void transport
-                .moveRecorded(
-                    session,
-                    label,
-                    'to',
-                    payloadPanels(payload),
-                    before,
-                    api.toJSON()
-                )
-                .catch((err: unknown) =>
-                    log(`moveRecorded failed: ${String(err)}`)
-                );
             log(
                 `drop ${short(session)} placed ${payloadPanels(payload).length} panel(s) ${describePlacement(event)}`
             );
         } catch (err: unknown) {
             counters.dropsRefused += 1;
-            log(`drop ${short(session)} could not be placed: ${String(err)}`);
+            log(
+                `drop ${short(session)} could not be placed: ${String(err)}; undo restores it to the source`
+            );
         }
+        void transport
+            .moveRecorded(
+                session,
+                label,
+                'to',
+                payloadPanels(payload),
+                before,
+                api.toJSON()
+            )
+            .catch((err: unknown) =>
+                log(`moveRecorded failed: ${String(err)}`)
+            );
     };
 
-    void transport
-        .onRelease((notice) => {
+    subscribe(
+        transport.onRelease((notice) => {
             const session = local.get(notice.session);
             local.delete(notice.session);
             if (!session) {
@@ -296,6 +317,11 @@ export function installCrossWindowDnd(
             const panels = releasedPanels(api, session);
             release(api, session);
             log(`released ${session.kind} ${session.id} to ${notice.to}`);
+            if (notice.reason === 'tear-off') {
+                // The new window is the host's to create; a tear-off is not
+                // a move the shared history can undo.
+                return;
+            }
             void transport
                 .moveRecorded(
                     notice.session,
@@ -309,15 +335,15 @@ export function installCrossWindowDnd(
                     log(`moveRecorded failed: ${String(err)}`)
                 );
         })
-        .then((unlisten) => teardown.push(unlisten));
+    );
 
-    void transport
-        .onMoved((notice) => {
+    subscribe(
+        transport.onMoved((notice) => {
             for (const listener of moveListeners) {
                 listener(notice);
             }
         })
-        .then((unlisten) => teardown.push(unlisten));
+    );
 
     // A window a tear-off created starts with what was dragged.
     void ready
