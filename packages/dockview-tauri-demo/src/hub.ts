@@ -1,23 +1,19 @@
 /**
- * The Tauri transport for the enterprise multi-window interceptors: the
- * shell is the orchestrator, reached through the commands in
+ * The Tauri transport for the enterprise multi-window install: the shell
+ * is the orchestrator, reached through the commands in
  * `src-tauri/src/lib.rs`, and its notices arrive as Tauri events. Outside the
  * shell every call degrades to a no-op or a rejection, so the same build
  * runs in a browser.
  */
 
 import {
-    type CrossWindowDnd,
     type DockviewApi,
     type DragPayload,
-    installCrossWindowDnd,
-    installSharedHistory,
-    installWindowWorkspace,
+    installMultiWindow,
+    type MultiWindow,
+    type MultiWindowOptions,
     type MultiWindowTransport,
     type SerializedDockview,
-    type SharedHistory,
-    type WindowWorkspace,
-    type WindowWorkspaceOptions,
 } from 'dockview-enterprise';
 import {
     claimDrop,
@@ -40,8 +36,6 @@ import {
     undo,
     windowLabel,
 } from './bridge';
-
-export { randomSessionId as randomId } from 'dockview-enterprise';
 
 export const tauriTransport: MultiWindowTransport = {
     label: windowLabel,
@@ -74,14 +68,19 @@ export const tauriTransport: MultiWindowTransport = {
     onHistoryChanged,
 };
 
-/** The cross-window drag, plus the log the demo's panels and harness read. */
-export interface Hub extends CrossWindowDnd {
+/** The multi-window handle, plus the log the demo's panels and harness read. */
+export interface Hub extends MultiWindow {
     onLog(listener: (line: string) => void): () => void;
 }
 
-export function installHub(api: DockviewApi): Hub {
+export function installHub(
+    api: DockviewApi,
+    options: Pick<MultiWindowOptions, 'buildDefaults'>
+): Hub {
     const listeners = new Set<(line: string) => void>();
-    const dnd = installCrossWindowDnd(api, tauriTransport, {
+    const multiWindow = installMultiWindow(api, tauriTransport, {
+        ...options,
+        history: { bindKeys: true },
         onLog: (line) => {
             for (const listener of listeners) {
                 listener(line);
@@ -90,34 +89,27 @@ export function installHub(api: DockviewApi): Hub {
     });
     return {
         get label() {
-            return dnd.label;
+            return multiWindow.label;
         },
-        counters: dnd.counters,
+        ready: multiWindow.ready,
+        counters: multiWindow.counters,
         get tearOff() {
-            return dnd.tearOff;
+            return multiWindow.tearOff;
         },
         set tearOff(value: boolean) {
-            dnd.tearOff = value;
+            multiWindow.tearOff = value;
         },
-        onDidMoveAcrossWindows: dnd.onDidMoveAcrossWindows,
-        dispose: dnd.dispose,
+        onDidMoveAcrossWindows: multiWindow.onDidMoveAcrossWindows,
+        undo: multiWindow.undo,
+        redo: multiWindow.redo,
+        get history() {
+            return multiWindow.history;
+        },
+        onDidChangeHistory: multiWindow.onDidChangeHistory,
+        dispose: multiWindow.dispose,
         onLog(listener) {
             listeners.add(listener);
             return () => listeners.delete(listener);
         },
     };
-}
-
-export function installHistory(
-    api: DockviewApi,
-    onLog?: (line: string) => void
-): SharedHistory {
-    return installSharedHistory(api, tauriTransport, { onLog, bindKeys: true });
-}
-
-export function installWorkspace(
-    api: DockviewApi,
-    options: WindowWorkspaceOptions
-): WindowWorkspace {
-    return installWindowWorkspace(api, tauriTransport, options);
 }

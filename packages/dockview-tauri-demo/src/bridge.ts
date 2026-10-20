@@ -118,13 +118,13 @@ export async function closeNativePopout(win: Window): Promise<void> {
 
 export const RELEASE_EVENT = 'dockview:release';
 
-import type { DragKind, ReleaseNotice } from 'dockview-enterprise';
+import type { DragPayload, ReleaseNotice } from 'dockview-enterprise';
 
 /** The source window announces a drag, handing the shell the serialized group. */
 export async function dragStart(
     session: string,
     from: string,
-    kind: DragKind,
+    kind: DragPayload['kind'],
     envelope: unknown
 ): Promise<void> {
     if (!isTauri()) {

@@ -5,7 +5,6 @@ import type {
     IContentRenderer,
     SerializedDockview,
 } from 'dockview';
-import type { SharedHistory } from 'dockview-enterprise';
 import {
     broadcastLayout,
     nativeHostInfo,
@@ -601,10 +600,7 @@ export class WorkspacePanel extends DemoPanel {
  * to the shell.
  */
 export class HistoryPanel extends DemoPanel {
-    constructor(
-        private readonly history: () => SharedHistory | undefined,
-        private readonly hub: () => Hub | undefined
-    ) {
+    constructor(private readonly hub: () => Hub | undefined) {
         super();
     }
 
@@ -613,7 +609,7 @@ export class HistoryPanel extends DemoPanel {
         const status = el('div');
 
         const render = () => {
-            const info = this.history()?.info;
+            const info = this.hub()?.history;
             status.replaceChildren(
                 field('undo steps', String(info?.undoCount ?? 0)),
                 field('next undo', info?.nextUndo ?? 'nothing'),
@@ -623,12 +619,11 @@ export class HistoryPanel extends DemoPanel {
         };
 
         const subscribe = () => {
-            const history = this.history();
             const hub = this.hub();
-            if (!history || !hub) {
+            if (!hub) {
                 return false;
             }
-            this.onDispose(history.onDidChange(render));
+            this.onDispose(hub.onDidChangeHistory(render));
             this.onDispose(
                 hub.onDidMoveAcrossWindows((notice) => {
                     log.append(
@@ -662,8 +657,8 @@ export class HistoryPanel extends DemoPanel {
                 el(
                     'div',
                     { class: 'demo-buttons' },
-                    button('Undo', () => this.history()?.undo()),
-                    button('Redo', () => this.history()?.redo())
+                    button('Undo', () => this.hub()?.undo()),
+                    button('Redo', () => this.hub()?.redo())
                 ),
                 log.element
             )

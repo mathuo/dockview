@@ -6,17 +6,10 @@ import './styles.css';
 import 'dockview-enterprise';
 
 import { createDockview, type IContentRenderer, themeAbyss } from 'dockview';
-import type { SharedHistory } from 'dockview-enterprise';
 import { installAutotest } from './autotest';
 import { closeNativePopout } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import {
-    type Hub,
-    installHistory,
-    installHub,
-    installWorkspace,
-    randomId,
-} from './hub';
+import { type Hub, installHub } from './hub';
 import {
     HistoryPanel,
     HostPanel,
@@ -28,10 +21,23 @@ import {
     WorkspacePanel,
 } from './panels';
 
+/**
+ * A random id for groups. `randomUUID` is only defined in a secure context,
+ * which a custom-scheme origin such as `tauri://localhost` need not be, so
+ * fall back to raw random bytes.
+ */
+function randomId(): string {
+    if (typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+        byte.toString(16).padStart(2, '0')
+    ).join('');
+}
+
 // Assigned once the instance exists; the hub panel is created lazily by
 // dockview, after that.
 let hub: Hub | undefined;
-let history: SharedHistory | undefined;
 
 const renderers: Record<string, () => IContentRenderer> = {
     host: () => new HostPanel(),
@@ -40,11 +46,7 @@ const renderers: Record<string, () => IContentRenderer> = {
     sync: () => new LayoutSyncPanel(),
     hub: () => new HubPanel(() => hub),
     workspace: () => new WorkspacePanel(),
-    history: () =>
-        new HistoryPanel(
-            () => history,
-            () => hub
-        ),
+    history: () => new HistoryPanel(() => hub),
     scratch: () => new ScratchPanel(),
 };
 
@@ -71,8 +73,7 @@ const api = createDockview(container, {
         renderers[options.name]?.() ?? new ScratchPanel(),
 });
 
-hub = installHub(api);
-history = installHistory(api, (line) => console.info(`history: ${line}`));
+hub = installHub(api, { buildDefaults });
 installAutotest(api, hub);
 
 /**
@@ -158,13 +159,3 @@ function buildDefaults(label: string): void {
         initialHeight: height(0.3),
     });
 }
-
-/**
- * The orchestrator decides what this window starts with: the layout it
- * held for this label, or nothing, in which case the defaults are built.
- * From then on every layout change is reported back to it.
- */
-installWorkspace(api, {
-    buildDefaults,
-    onLog: (line) => console.info(`workspace: ${line}`),
-});
