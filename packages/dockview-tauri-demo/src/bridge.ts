@@ -111,7 +111,7 @@ export async function closeNativePopout(win: Window): Promise<void> {
 }
 
 /*
- * The hub: one drag in flight at a time, brokered by the shell so a group can
+ * The multiWindow: one drag in flight at a time, brokered by the shell so a group can
  * cross from one native window's dockview to another's. The shell holds the
  * serialized group; the OS drag carries only the session id.
  */
@@ -134,7 +134,7 @@ export async function dragStart(
     await invoke('drag_start', { session, from, kind, envelope });
 }
 
-/** The destination window reads a drag's serialized group without claiming it. */
+/** The destination window reads a drag's serialized group without accepting it. */
 export async function peekDrag(session: string): Promise<unknown> {
     if (!isTauri()) {
         throw new Error('reading a drag requires the Tauri shell');
@@ -144,32 +144,32 @@ export async function peekDrag(session: string): Promise<unknown> {
 }
 
 /**
- * The destination window claims a drop. Resolves to the serialized group;
- * rejects when another window claimed it first or the shell never saw it.
+ * The destination window accepts a drop. Resolves to the serialized group;
+ * rejects when another window accepted it first or the shell never saw it.
  */
-export async function claimDrop(session: string, to: string): Promise<unknown> {
+export async function acceptDrop(
+    session: string,
+    to: string
+): Promise<unknown> {
     if (!isTauri()) {
-        throw new Error('claiming a drop requires the Tauri shell');
+        throw new Error('accepting a drop requires the Tauri shell');
     }
     const { invoke } = await import('@tauri-apps/api/core');
-    return invoke<unknown>('claim_drop', { session, to });
+    return invoke<unknown>('accept_drop', { session, to });
 }
 
 /**
  * The source window reports its drag over. The shell keeps the drag
- * claimable for a grace period first; with `tearOff`, an unclaimed drag
+ * acceptable for a grace period first; with `detach`, an unaccepted drag
  * then becomes a new window holding the group, which the source learns
  * through the release event.
  */
-export async function dragEnd(
-    session: string,
-    tearOff: boolean
-): Promise<void> {
+export async function dragEnd(session: string, detach: boolean): Promise<void> {
     if (!isTauri()) {
         return;
     }
     const { invoke } = await import('@tauri-apps/api/core');
-    await invoke('drag_end', { session, tearOff });
+    await invoke('drag_end', { session, detach });
 }
 
 /** Delivered to the source window once another window has taken its group. */
@@ -195,7 +195,7 @@ export async function onRelease(
     );
 }
 
-/** A window created by a tear-off collects the group waiting for it. */
+/** A window created by a detach collects the group waiting for it. */
 export async function takePendingGroup(label: string): Promise<unknown | null> {
     if (!isTauri()) {
         return null;
@@ -388,7 +388,7 @@ export const onHistoryChanged = (handler: (info: HistoryInfo) => void) =>
 export const onMoved = (handler: (notice: MovedNotice) => void) =>
     listenOrIgnore<MovedNotice>('dockview:moved', handler);
 
-/** A harness command to every window (`tear-off` switches tear-off on). */
+/** A harness command to every window (`detach` switches detach on). */
 export const onAutotestCommand = (handler: (command: string) => void) =>
     listenOrIgnore<{ command: string }>('dockview:autotest', (payload) =>
         handler(payload.command)

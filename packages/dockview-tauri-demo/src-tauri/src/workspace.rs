@@ -10,7 +10,7 @@
 //! windows the same panel id, since a drag between them relies on ids being
 //! unique across the whole workspace.
 //!
-//! Like `hub.rs`, this knows nothing about Tauri. The host decides when to
+//! Like `drags.rs`, this knows nothing about Tauri. The host decides when to
 //! load and save, feeds in native geometry, and creates the windows.
 
 use std::fmt;
@@ -394,7 +394,7 @@ mod tests {
         assert!(workspace.set_layout("dock-2", layout(&["c", "b"])).is_ok());
         assert!(workspace.set_layout("main", layout(&["a"])).is_ok());
 
-        // The allowance is spent: a third window may not claim `b` now.
+        // The allowance is spent: a third window may not accept `b` now.
         assert_eq!(
             workspace.set_layout("dock-3", layout(&["b"])),
             Err(WorkspaceError::DuplicatePanel {

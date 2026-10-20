@@ -9,7 +9,7 @@
 
 import type { DockviewApi, IDockviewPanel } from 'dockview';
 import { autotestReport, onAutotestCommand } from './bridge';
-import type { Hub } from './hub';
+import type { ShellMultiWindow } from './transport';
 
 export function isAutotest(): boolean {
     return (
@@ -43,7 +43,10 @@ function describe(panel: IDockviewPanel) {
     };
 }
 
-export function installAutotest(api: DockviewApi, hub: Hub): void {
+export function installAutotest(
+    api: DockviewApi,
+    multiWindow: ShellMultiWindow
+): void {
     if (!isAutotest()) {
         return;
     }
@@ -54,11 +57,11 @@ export function installAutotest(api: DockviewApi, hub: Hub): void {
         });
     };
 
-    hub.onLog((line) => report('log', line));
+    multiWindow.onLog((line) => report('log', line));
     void onAutotestCommand((command) => {
-        if (command === 'tear-off') {
-            hub.tearOff = true;
-            report('log', 'tear-off on');
+        if (command === 'detach') {
+            multiWindow.detach = true;
+            report('log', 'detach on');
         }
     });
 

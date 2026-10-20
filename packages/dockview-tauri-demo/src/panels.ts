@@ -16,9 +16,9 @@ import {
 import { resolveDndStrategy } from './dnd';
 import { button, el, field, LogView, verdict } from './dom';
 import { diagnosePopoutUrl, readHostReport } from './host';
-import type { Hub } from './hub';
 import { describe, probeWindowOpen } from './probes';
 import { RELEASE_ORIGIN_URL, simulateReleaseOriginRestore } from './simulate';
+import type { ShellMultiWindow } from './transport';
 
 abstract class DemoPanel implements IContentRenderer {
     protected readonly root = el('div', { class: 'demo-panel' });
@@ -419,8 +419,10 @@ export class LayoutSyncPanel extends DemoPanel {
  * copy. Only an HTML5 drag can leave a window, so the pointer backend is
  * the first thing to rule out when nothing crosses.
  */
-export class HubPanel extends DemoPanel {
-    constructor(private readonly hub: () => Hub | undefined) {
+export class CrossWindowDragPanel extends DemoPanel {
+    constructor(
+        private readonly multiWindow: () => ShellMultiWindow | undefined
+    ) {
         super();
     }
 
@@ -428,58 +430,61 @@ export class HubPanel extends DemoPanel {
         const log = new LogView();
         const api = parameters.containerApi;
         const status = el('div');
-        const tearOff = el('input', { type: 'checkbox' }) as HTMLInputElement;
+        const detach = el('input', { type: 'checkbox' }) as HTMLInputElement;
 
         const render = () => {
-            const hub = this.hub();
+            const multiWindow = this.multiWindow();
             const caps = api.dndCapabilities;
             status.replaceChildren(
-                field('window id', hub?.windowId ?? 'not installed'),
+                field('window id', multiWindow?.windowId ?? 'not installed'),
                 verdict(
                     caps.html5,
                     caps.html5
                         ? 'HTML5 drag active — a drag can leave this window.'
                         : 'Pointer backend only — a drag stops at the window edge. Force ?dnd=html5.'
                 ),
-                ...(hub
+                ...(multiWindow
                     ? [
                           field(
                               'drags started',
-                              String(hub.counters.dragsStarted)
+                              String(multiWindow.counters.dragsStarted)
                           ),
                           field(
                               'drag-overs accepted',
-                              String(hub.counters.dragOversAccepted)
+                              String(multiWindow.counters.dragOversAccepted)
                           ),
                           field(
-                              'drops claimed',
-                              String(hub.counters.dropsClaimed)
+                              'drops accepted',
+                              String(multiWindow.counters.dropsAccepted)
                           ),
                           field(
                               'drops refused',
-                              String(hub.counters.dropsRefused)
+                              String(multiWindow.counters.dropsRefused)
                           ),
-                          field('releases', String(hub.counters.releases)),
+                          field(
+                              'releases',
+                              String(multiWindow.counters.releases)
+                          ),
                       ]
                     : [])
             );
         };
 
-        tearOff.addEventListener('change', () => {
-            const hub = this.hub();
-            if (hub) {
-                hub.tearOff = tearOff.checked;
+        detach.addEventListener('change', () => {
+            const multiWindow = this.multiWindow();
+            if (multiWindow) {
+                multiWindow.detach = detach.checked;
             }
         });
 
         const subscribe = () => {
-            const hub = this.hub();
-            if (!hub) {
+            const multiWindow = this.multiWindow();
+            if (!multiWindow) {
                 return false;
             }
-            tearOff.checked = hub.tearOff;
+            detach.checked = multiWindow.detach;
             this.onDispose(
-                hub.onLog((line) => {
+                multiWindow.onLog((line) => {
                     log.append(line);
                     render();
                 })
@@ -487,7 +492,7 @@ export class HubPanel extends DemoPanel {
             return true;
         };
 
-        // The hub is installed right after the instance is created, which
+        // The multiWindow is installed right after the instance is created, which
         // is after dockview has asked for this panel.
         if (!subscribe()) {
             const retry = setTimeout(() => {
@@ -506,13 +511,13 @@ export class HubPanel extends DemoPanel {
                 el(
                     'p',
                     { class: 'demo-note' },
-                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds the serialized group and tells the source to let go once the drop is claimed.'
+                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds the serialized group and tells the source to let go once the drop is accepted.'
                 ),
                 status,
                 el(
                     'label',
                     { class: 'demo-field' },
-                    tearOff,
+                    detach,
                     ' open a new window when a drag ends outside every window (an Escape-cancelled drag looks the same to HTML5, so off by default)'
                 ),
                 log.element
@@ -600,7 +605,9 @@ export class WorkspacePanel extends DemoPanel {
  * to the shell.
  */
 export class HistoryPanel extends DemoPanel {
-    constructor(private readonly hub: () => Hub | undefined) {
+    constructor(
+        private readonly multiWindow: () => ShellMultiWindow | undefined
+    ) {
         super();
     }
 
@@ -609,7 +616,7 @@ export class HistoryPanel extends DemoPanel {
         const status = el('div');
 
         const render = () => {
-            const info = this.hub()?.history;
+            const info = this.multiWindow()?.history;
             status.replaceChildren(
                 field('undo steps', String(info?.undoCount ?? 0)),
                 field('next undo', info?.nextUndo ?? 'nothing'),
@@ -619,13 +626,13 @@ export class HistoryPanel extends DemoPanel {
         };
 
         const subscribe = () => {
-            const hub = this.hub();
-            if (!hub) {
+            const multiWindow = this.multiWindow();
+            if (!multiWindow) {
                 return false;
             }
-            const history = hub.onDidChangeHistory(render);
+            const history = multiWindow.onDidChangeHistory(render);
             this.onDispose(() => history.dispose());
-            const moves = hub.onDidMoveAcrossWindows((notice) => {
+            const moves = multiWindow.onDidMoveAcrossWindows((notice) => {
                 log.append(
                     `${notice.reason}: ${notice.panels.join(', ')} ${notice.from} → ${notice.to}`
                 );
@@ -657,8 +664,8 @@ export class HistoryPanel extends DemoPanel {
                 el(
                     'div',
                     { class: 'demo-buttons' },
-                    button('Undo', () => this.hub()?.undo()),
-                    button('Redo', () => this.hub()?.redo())
+                    button('Undo', () => this.multiWindow()?.undo()),
+                    button('Redo', () => this.multiWindow()?.redo())
                 ),
                 log.element
             )

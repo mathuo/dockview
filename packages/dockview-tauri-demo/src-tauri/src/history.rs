@@ -11,7 +11,7 @@
 //! can never resurrect a panel that now lives elsewhere.
 //!
 //! A move is recorded in two halves, one from each window, since each sees
-//! only its own layout before and after. Like `hub.rs` and `workspace.rs`
+//! only its own layout before and after. Like `drags.rs` and `workspace.rs`
 //! this knows nothing about Tauri; layouts are opaque `serde_json::Value`s.
 
 use std::fmt;

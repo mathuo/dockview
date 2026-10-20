@@ -66,7 +66,7 @@ frontend. That webview has its own JavaScript context, so no DOM can be moved
 into it from here.
 
 **Cross-window drag** — drags a tab or a group from one native window's
-dockview into another's, with the shell as the hub. Reports the drag backend
+dockview into another's, with the shell as the orchestrator. Reports the drag backend
 in use, counts each stage of a drag, and logs what crossed. See
 [Dragging between windows](#dragging-between-windows).
 
@@ -165,40 +165,40 @@ mouse.
 
 The window side of all of this (the drag interceptor, the workspace and the
 shared undo) is `installMultiWindow` from `dockview-enterprise`; this demo
-supplies the Tauri transport it reaches the shell through (`src/hub.ts`)
+supplies the Tauri transport it reaches the shell through (`src/transport.ts`)
 and the shell itself. What follows describes the mechanism as it runs here.
 
 Two native windows are two dockview instances in two JavaScript contexts, so
 a tab cannot be dragged between them the way it is dragged between groups.
 What does cross a window boundary is an OS drag session, and only an HTML5
-drag rides one. The demo builds on that, with the shell as a hub and no
+drag rides one. The demo builds on that, with the shell as a orchestrator and no
 window owning any other:
 
 1. **Drag start.** `onWillDragPanel` / `onWillDragGroup` put a session id on
-   the drag's `DataTransfer` under `application/x-dockview-hub`, serialize
+   the drag's `DataTransfer` under `application/x-dockview-orchestrator`, serialize
    the group (`api.serializeGroup`, or a one-panel group for a single tab)
    and hand it to the shell with `drag_start`. Serializing up front means the
    drop can be completed even if the source window is busy by then.
 2. **Drag over.** The destination's dockview sees a drag it did not start
-   and asks through `onUnhandledDragOver`; the demo accepts it when the hub
+   and asks through `onUnhandledDragOver`; the demo accepts it when the orchestrator
    type is present, so the normal drop overlay and compass show. A browser
    exposes a drag's types but not its data until the drop, which is why the
    type carries the meaning and the session id waits.
 3. **Drop.** `onDidDrop` reads the session id, reads the group with
-   `peek_drag` to refuse one whose panel ids it already holds, claims it
-   with `claim_drop`, and rebuilds the group where the drop landed with
+   `peek_drag` to refuse one whose panel ids it already holds, accepts it
+   with `accept_drop`, and rebuilds the group where the drop landed with
    `addGroupFromJSON`: next to the target group or at a layout edge, or,
    for a drop on a group's centre or tab bar, `direction: 'within'` that
    group at the tab index the drop reports. A group's id travels with it;
    every window uses `groupIdGenerator` with random ids so it does not
    collide on arrival.
-4. **Release.** The first claim wins. The shell removes the session and
+4. **Release.** The first accept wins. The shell removes the session and
    emits `dockview:release` to the source window, which removes its copy of
-   the panel or group. A second claim, or a claim for a drag the shell never
+   the panel or group. A second accept, or a accept for a drag the shell never
    saw, is refused and nothing is added.
-5. **Drag end.** The source reports `drag_end`. With the panel's tear-off
-   box ticked, an unclaimed drag becomes a new window that starts with the
-   group (`take_pending_group` on load), the hub's replacement for a popout.
+5. **Drag end.** The source reports `drag_end`. With the panel's detach
+   box ticked, an unaccepted drag becomes a new window that starts with the
+   group (`take_pending_group` on load), the orchestrator's replacement for a popout.
    It is off by default because HTML5 cannot tell a drop on the desktop from
    an Escape-cancelled drag.
 
@@ -207,11 +207,11 @@ from its serialized `params`, so scroll position, half-typed text and focus
 do not survive the crossing. A panel that wants to keep state across windows
 has to put it in `params`.
 
-The shell keeps a drag claimable for 1.5 s after its source reports it
+The shell keeps a drag acceptable for 1.5 s after its source reports it
 over. That is not a nicety: the source's `dragend` fires the instant the
-drop lands in the other window, and the destination's claim is a separate
+drop lands in the other window, and the destination's accept is a separate
 IPC message that routinely arrives after it. Measured before the grace
-period existed, the claim lost that race and was refused as "not in flight".
+period existed, the accept lost that race and was refused as "not in flight".
 
 Measured on Linux (WebKitGTK 2.52.6, debug build, two windows under Xvfb
 driven by `scripts/measure-cross-window-drag.py`): dragging the Scratch tab
@@ -222,7 +222,7 @@ a centre drop merged it into the target group instead. Both windows ran the
 HTML5 backend, forced with `VITE_DND=html5` since Xvfb reports a coarse
 pointer. Every window but the main one names its probe panels with its own
 label as a suffix, because a window that already holds a panel of the same
-id refuses the drop, by design, before anything is claimed. Not measured:
+id refuses the drop, by design, before anything is accepted. Not measured:
 WKWebView and WebView2, and a group-header drag, which the driver does not
 yet perform.
 
@@ -235,7 +235,7 @@ VITE_DND=html5 yarn dev &
 cargo build --manifest-path src-tauri/Cargo.toml
 DISPLAY=:99 python3 scripts/measure-cross-window-drag.py --screenshot after.png
 # --where center|left|right|top|bottom|tab chooses the landing;
-# --where off releases the drag outside every window with tear-off on, so
+# --where off releases the drag outside every window with detach on, so
 # the shell opens a new window holding the tab; --undo and --restart extend
 # the run.
 ```
@@ -246,7 +246,7 @@ panel geometry and the drag log as JSON lines on stdout; the driver turns
 the geometry into a pointer drag and judges the result from the log alone.
 The Cross-window drag panel's counters tell the same story interactively:
 `drags started` rising with nothing on the other side means the drag never
-reached the second window; `drag-overs accepted` rising with `drops claimed`
+reached the second window; `drag-overs accepted` rising with `drops accepted`
 at zero means the drop landed but was refused, and the log says why.
 
 ### Persisting the workspace
@@ -409,14 +409,14 @@ docs/           design notes
 src/            frontend
   main.ts       builds the dockview instance and its panels
   panels.ts     the five probe panels plus a scratch panel
-  hub.ts        the Tauri transport behind dockview-enterprise's installMultiWindow
+  transport.ts        the Tauri transport behind dockview-enterprise's installMultiWindow
   autotest.ts   geometry and log reporting for the measurement driver
 scripts/        measure-cross-window-drag.py drives a real drag between two windows
   host.ts       host-environment detection and the popout URL diagnosis
   probes.ts     window.open probes
   bridge.ts     lazy wrapper over the Tauri IPC surface
 src-tauri/      Rust shell: host info, native window creation, layout broadcast
-  src/hub.rs    the drag orchestrator, Tauri-free and unit tested
+  src/drags.rs    the drag orchestrator, Tauri-free and unit tested
   src/workspace.rs  the workspace: windows, frames and opaque layouts, with an atomic file store
   src/history.rs  the one ordered undo history across windows, markers and move entries
 popout.html     served at /popout.html, dockview's default popout target

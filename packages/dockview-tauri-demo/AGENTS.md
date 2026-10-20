@@ -10,11 +10,11 @@ not a published package and not a supported example.
   framework binding so the probes sit directly on the layer that popouts and
   window handling live in. `dockview-enterprise` is imported for its features.
 - `src-tauri/` — the Rust shell. Commands: `host_info`, `open_dock_window`,
-  `broadcast_layout`, `close_popout`, and the hub's `drag_start`,
-  `peek_drag`, `claim_drop`, `drag_end`, `take_pending_group`. Window creation lives in
+  `broadcast_layout`, `close_popout`, and the orchestrator's `drag_start`,
+  `peek_drag`, `accept_drop`, `drag_end`, `take_pending_group`. Window creation lives in
   Rust so the capability set stays at `core:default`.
-- `src-tauri/src/hub.rs` — the orchestrator: which drag is in flight between
-  windows and who claimed it. It imports nothing from Tauri and returns the
+- `src-tauri/src/drags.rs` — the orchestrator: which drag is in flight between
+  windows and who accepted it. It imports nothing from Tauri and returns the
   release notices for the shell to deliver, so it can one day be lifted into
   a crate of its own behind any host. Keep it that way: no `AppHandle`, no
   window handling, no event emission in this module. `cargo test` covers it;
@@ -24,13 +24,13 @@ not a published package and not a supported example.
   (`packages/dockview-enterprise/src/multiWindow/`). Its in-memory
   orchestrator mirrors the three Rust modules here; keep the two in step,
   including the `DragPayload` shape (`panel` or `group`) and the release
-  notice's `reason` (`claim` or `tear-off`).
-- `src/hub.ts` — the Tauri `MultiWindowTransport`, over the commands and
-  events in `bridge.ts`, plus the `Hub` wrapper the panels and the harness
+  notice's `reason` (`accept` or `detach`).
+- `src/transport.ts` — the Tauri `MultiWindowTransport`, over the commands and
+  events in `bridge.ts`, plus the `ShellMultiWindow` wrapper the panels and the harness
   read the log from.
 - `src-tauri/src/workspace.rs` — the workspace: which windows exist, their
   frames, and each one's dockview layout as opaque JSON, plus the atomic
-  `FileStore`. Tauri-free and unit tested like `hub.rs`. The one field of a
+  `FileStore`. Tauri-free and unit tested like `drags.rs`. The one field of a
   layout it reads is the keys of `panels`, to refuse duplicate panel ids
   across windows. `lib.rs` loads it before any window exists, creates the
   windows from it, records geometry from window events, and writes it on a
@@ -94,9 +94,9 @@ not a published package and not a supported example.
 - `host.ts` asks dockview's exported `getPopoutUrlError` for its verdict rather
   than restating the rules, so the panel cannot drift from the library while
   still explaining *why* a popout would be refused.
-- `hub.ts` is the only file that knows both dockview-enterprise's
+- `transport.ts` is the only file that knows both dockview-enterprise's
   multi-window install and Tauri: the install hangs off dockview's public
-  hooks and reaches the shell only through the transport `hub.ts` builds
+  hooks and reaches the shell only through the transport `transport.ts` builds
   from `bridge.ts`.
 - Closing popout windows goes through `api.onWillClosePopoutWindow` in
   `src/main.ts`, registered once: it covers every popout the component opens,

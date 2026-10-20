@@ -9,17 +9,17 @@ import { createDockview, type IContentRenderer, themeAbyss } from 'dockview';
 import { installAutotest } from './autotest';
 import { closeNativePopout } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import { type Hub, installHub } from './hub';
 import {
+    CrossWindowDragPanel,
     HistoryPanel,
     HostPanel,
-    HubPanel,
     LayoutSyncPanel,
     NativeWindowPanel,
     PopoutPanel,
     ScratchPanel,
     WorkspacePanel,
 } from './panels';
+import { installShellMultiWindow, type ShellMultiWindow } from './transport';
 
 /**
  * A random id for groups. `randomUUID` is only defined in a secure context,
@@ -35,18 +35,18 @@ function randomId(): string {
     ).join('');
 }
 
-// Assigned once the instance exists; the hub panel is created lazily by
+// Assigned once the instance exists; the multiWindow panel is created lazily by
 // dockview, after that.
-let hub: Hub | undefined;
+let multiWindow: ShellMultiWindow | undefined;
 
 const renderers: Record<string, () => IContentRenderer> = {
     host: () => new HostPanel(),
     popout: () => new PopoutPanel(),
     native: () => new NativeWindowPanel(),
     sync: () => new LayoutSyncPanel(),
-    hub: () => new HubPanel(() => hub),
+    crossWindowDrag: () => new CrossWindowDragPanel(() => multiWindow),
     workspace: () => new WorkspacePanel(),
-    history: () => new HistoryPanel(() => hub),
+    history: () => new HistoryPanel(() => multiWindow),
     scratch: () => new ScratchPanel(),
 };
 
@@ -63,7 +63,7 @@ const api = createDockview(container, {
     dndStrategy,
     // Every window numbers its groups from "1" by default, so a group
     // moved between windows would collide on arrival. Random ids let a
-    // group keep its id wherever the hub lands it.
+    // group keep its id wherever the multiWindow lands it.
     groupIdGenerator: randomId,
     // Each window keeps its own undo stack; the shell sequences them with
     // the moves between windows. An applied layout arrives through
@@ -73,8 +73,8 @@ const api = createDockview(container, {
         renderers[options.name]?.() ?? new ScratchPanel(),
 });
 
-hub = installHub(api, { buildDefaults });
-installAutotest(api, hub);
+multiWindow = installShellMultiWindow(api, { buildDefaults });
+installAutotest(api, multiWindow);
 
 /**
  * wry's macOS UI delegate has no `webViewDidClose:`, so the `close()` dockview
@@ -128,8 +128,8 @@ function buildDefaults(label: string): void {
     });
 
     api.addPanel({
-        id: id('hub'),
-        component: 'hub',
+        id: id('crossWindowDrag'),
+        component: 'crossWindowDrag',
         title: 'Cross-window drag',
         position: { referencePanel: id('native'), direction: 'within' },
         inactive: true,

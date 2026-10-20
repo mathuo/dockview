@@ -1,5 +1,5 @@
+mod drags;
 mod history;
-mod hub;
 mod workspace;
 
 use std::path::PathBuf;
@@ -14,8 +14,8 @@ use tauri::{
     WebviewWindowBuilder, WindowEvent,
 };
 
+use drags::{DragEnd, DragSession, DragSessions, Release};
 use history::{Action, History, Role, Step};
-use hub::{DragEnd, DragSession, Hub, Release};
 use workspace::{FileStore, Geometry, Store, Workspace, WorkspaceState};
 
 /// Event carrying a serialized dockview layout between native windows.
@@ -36,8 +36,8 @@ const APPLY_EVENT: &str = "dockview:apply";
 const UNDO_REQUEST_EVENT: &str = "dockview:undo-request";
 const REDO_REQUEST_EVENT: &str = "dockview:redo-request";
 
-/// Labels for the windows a tear-off creates; see `POPOUT_COUNT`.
-static TEAR_OFF_COUNT: AtomicUsize = AtomicUsize::new(0);
+/// Labels for the windows a detach creates; see `POPOUT_COUNT`.
+static DETACH_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// The panel ids a drag payload carries: one tab's `panel.id`, or a group's
 /// `group.group.views` (the `DragPayload` of `dockview-enterprise`). The one
@@ -70,7 +70,7 @@ struct MovedNotice {
     panels: Vec<String>,
     from: String,
     to: String,
-    /// `drop`, `tear-off`, `undo` or `redo`.
+    /// `drop`, `detach`, `undo` or `redo`.
     reason: &'static str,
 }
 
@@ -219,11 +219,11 @@ fn history_info(history: State<History>) -> Result<history::Info, String> {
 
 /// Set in the environment to run the measurement harness: a second window
 /// opens at a known position, and the frontend reports its geometry and the
-/// hub's log as JSON lines on stdout for `scripts/measure-cross-window-drag.py`
+/// drag sessions' log as JSON lines on stdout for `scripts/measure-cross-window-drag.py`
 /// to drive. See the README's "Dragging between windows".
 const AUTOTEST_ENV: &str = "DOCKVIEW_DEMO_AUTOTEST";
 
-/// A command from the harness to every window, such as switching tear-off on.
+/// A command from the harness to every window, such as switching detach on.
 const AUTOTEST_EVENT: &str = "dockview:autotest";
 
 fn autotest() -> bool {
@@ -434,50 +434,51 @@ fn deliver(app: &AppHandle, release: Release) -> Result<(), String> {
 /// `onWillDragGroup`, before the pointer can have left the window.
 #[tauri::command]
 fn drag_start(
-    hub: State<Hub>,
+    drags: State<DragSessions>,
     session: String,
     from: String,
     kind: String,
     envelope: serde_json::Value,
 ) -> Result<(), String> {
-    hub.start(
-        session,
-        DragSession {
-            from,
-            kind,
-            envelope,
-        },
-    )
-    .map_err(|err| err.to_string())
+    drags
+        .start(
+            session,
+            DragSession {
+                from,
+                kind,
+                envelope,
+            },
+        )
+        .map_err(|err| err.to_string())
 }
 
-/// The destination window looks at a drag before claiming it, to refuse a
+/// The destination window looks at a drag before accepting it, to refuse a
 /// group whose panel ids it already holds without taking it from the source.
 #[tauri::command]
-fn peek_drag(hub: State<Hub>, session: String) -> Result<serde_json::Value, String> {
-    hub.peek(&session).map_err(|err| err.to_string())
+fn peek_drag(drags: State<DragSessions>, session: String) -> Result<serde_json::Value, String> {
+    drags.peek(&session).map_err(|err| err.to_string())
 }
 
-/// The destination window claims the drag it just received a drop for. The
-/// first claim wins: the claimant gets the group and the source is told to
-/// release its copy. A second claim, or a claim for a drag the shell never
+/// The destination window accepts the drag it just received a drop for. The
+/// first accept wins: the accepting window gets the group and the source is told to
+/// release its copy. A second accept, or a accept for a drag the shell never
 /// saw, is refused.
 #[tauri::command]
-fn claim_drop(
+fn accept_drop(
     app: AppHandle,
-    hub: State<Hub>,
+    drags: State<DragSessions>,
     session: String,
     to: String,
 ) -> Result<serde_json::Value, String> {
-    let claim = hub
-        .claim(&session, to.clone())
+    let accept = drags
+        .accept(&session, to.clone())
         .map_err(|err| err.to_string())?;
-    let panels = envelope_panels(&claim.envelope);
-    let from = claim.release.from.clone();
+    let panels = envelope_panels(&accept.envelope);
+    let from = accept.release.from.clone();
     app.state::<Workspace>()
         .expect_move(&panels, &from, &to)
         .map_err(|err| err.to_string())?;
-    deliver(&app, claim.release)?;
+    deliver(&app, accept.release)?;
     app.emit(
         MOVED_EVENT,
         MovedNotice {
@@ -489,45 +490,45 @@ fn claim_drop(
         },
     )
     .map_err(|err| err.to_string())?;
-    Ok(claim.envelope)
+    Ok(accept.envelope)
 }
 
-/// How long a drag stays claimable after its source reported it over. The
+/// How long a drag stays acceptable after its source reported it over. The
 /// source's `dragend` fires the instant the drop lands in another window,
-/// and that window's claim is a separate IPC message that routinely arrives
+/// and that window's accept is a separate IPC message that routinely arrives
 /// later.
 const DRAG_END_GRACE: std::time::Duration = std::time::Duration::from_millis(1500);
 
 /// The source window reports the end of its drag. Nothing happens yet: the
-/// drag stays claimable for `DRAG_END_GRACE`, after which an unclaimed one
+/// drag stays acceptable for `DRAG_END_GRACE`, after which an unaccepted one
 /// is discarded, or, when the source asked, turned into a new window holding
-/// the group: the hub's replacement for a popout. The source learns either
+/// the group: the drag sessions's replacement for a popout. The source learns either
 /// outcome through the release event, or through silence.
 #[tauri::command]
 fn drag_end(
     app: AppHandle,
-    hub: State<Hub>,
+    drags: State<DragSessions>,
     session: String,
-    tear_off: bool,
+    detach: bool,
 ) -> Result<(), String> {
-    let in_flight = hub.end(&session, tear_off).map_err(|err| err.to_string())?;
+    let in_flight = drags.end(&session, detach).map_err(|err| err.to_string())?;
     if !in_flight {
         return Ok(());
     }
 
     std::thread::spawn(move || {
         std::thread::sleep(DRAG_END_GRACE);
-        let ended = app.state::<Hub>().expire(&session, || {
+        let ended = app.state::<DragSessions>().expire(&session, || {
             format!(
-                "dock-torn-{}",
-                TEAR_OFF_COUNT.fetch_add(1, Ordering::Relaxed)
+                "dock-detached-{}",
+                DETACH_COUNT.fetch_add(1, Ordering::Relaxed)
             )
         });
         match ended {
-            Ok(DragEnd::TornOff { label, release }) => {
+            Ok(DragEnd::Detached { label, release }) => {
                 let handle = app.clone();
                 let panels = app
-                    .state::<Hub>()
+                    .state::<DragSessions>()
                     .peek_pending(&label)
                     .ok()
                     .flatten()
@@ -542,34 +543,34 @@ fn drag_end(
                         None,
                     ) {
                         Ok(_) => {
-                            // As for a claim: the new window may report the
+                            // As for a accept: the new window may report the
                             // panels before the source reports them gone.
                             if let Err(err) = handle.state::<Workspace>().expect_move(
                                 &panels,
                                 &release.from,
                                 &label,
                             ) {
-                                eprintln!("tear-off: {err}");
+                                eprintln!("detach: {err}");
                             }
                             let moved = MovedNotice {
                                 session: release.session.clone(),
                                 panels,
                                 from: release.from.clone(),
                                 to: label.clone(),
-                                reason: "tear-off",
+                                reason: "detach",
                             };
                             if let Err(err) = deliver(&handle, release) {
-                                eprintln!("tear-off: could not release the source: {err}");
+                                eprintln!("detach: could not release the source: {err}");
                             }
                             if let Err(err) = handle.emit(MOVED_EVENT, moved) {
-                                eprintln!("tear-off: could not announce the move: {err}");
+                                eprintln!("detach: could not announce the move: {err}");
                             }
                         }
-                        Err(err) => eprintln!("tear-off: could not open {label}: {err}"),
+                        Err(err) => eprintln!("detach: could not open {label}: {err}"),
                     }
                 });
                 if let Err(err) = result {
-                    eprintln!("tear-off: {err}");
+                    eprintln!("detach: {err}");
                 }
             }
             Ok(DragEnd::Settled | DragEnd::Discarded) => {}
@@ -584,8 +585,11 @@ fn drag_end(
 /// window's frontend collects it once dockview is ready, since nothing can be
 /// pushed into a webview before it has loaded.
 #[tauri::command]
-fn take_pending_group(hub: State<Hub>, label: String) -> Result<Option<serde_json::Value>, String> {
-    hub.take_pending(&label).map_err(|err| err.to_string())
+fn take_pending_group(
+    drags: State<DragSessions>,
+    label: String,
+) -> Result<Option<serde_json::Value>, String> {
+    drags.take_pending(&label).map_err(|err| err.to_string())
 }
 
 #[tauri::command]
@@ -774,7 +778,7 @@ fn broadcast_layout(app: AppHandle, from: String, layout: serde_json::Value) -> 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
-        .manage(Hub::default())
+        .manage(DragSessions::default())
         .manage(History::default())
         .setup(|app| {
             let handle = app.handle().clone();
@@ -849,10 +853,10 @@ pub fn run() {
                         let result = match line.as_deref().map(str::trim) {
                             Ok("undo") => perform_undo(&driver),
                             Ok("redo") => perform_redo(&driver),
-                            // Turn tear-off on in every window, which the
+                            // Turn detach on in every window, which the
                             // driver cannot click for itself.
-                            Ok("tearoff") => driver
-                                .emit(AUTOTEST_EVENT, serde_json::json!({ "command": "tear-off" }))
+                            Ok("detach") => driver
+                                .emit(AUTOTEST_EVENT, serde_json::json!({ "command": "detach" }))
                                 .map_err(|err| err.to_string()),
                             Ok(_) => Ok(()),
                             Err(_) => break,
@@ -916,7 +920,7 @@ pub fn run() {
             close_popout,
             drag_start,
             peek_drag,
-            claim_drop,
+            accept_drop,
             drag_end,
             take_pending_group,
             layout_changed,

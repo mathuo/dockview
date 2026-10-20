@@ -16,7 +16,7 @@ import {
     type SerializedDockview,
 } from 'dockview-enterprise';
 import {
-    claimDrop,
+    acceptDrop,
     dragEnd,
     dragStart,
     historyInfo,
@@ -47,12 +47,12 @@ export const tauriTransport: MultiWindowTransport = {
     startDrag: (session, from, payload) =>
         dragStart(session, from, payload.kind, payload),
     peekDrag: (session) => peekDrag(session) as Promise<DragPayload>,
-    claimDrag: async (session, to) => {
-        await claimDrop(session, to);
+    acceptDrag: async (session, to) => {
+        await acceptDrop(session, to);
     },
     endDrag: dragEnd,
     onDidRelease: (handler) => disposable(onRelease(handler)),
-    takePendingDrag: (windowId) =>
+    takeDetachedDrag: (windowId) =>
         takePendingGroup(windowId) as Promise<DragPayload | null>,
     reportMove: moveRecorded,
     onDidMove: (handler) => disposable(onMoved(handler)),
@@ -75,14 +75,14 @@ export const tauriTransport: MultiWindowTransport = {
 };
 
 /** The multi-window handle, plus the log the demo's panels and harness read. */
-export interface Hub extends MultiWindow {
+export interface ShellMultiWindow extends MultiWindow {
     onLog(listener: (line: string) => void): () => void;
 }
 
-export function installHub(
+export function installShellMultiWindow(
     api: DockviewApi,
     options: Pick<MultiWindowOptions, 'buildDefaults'>
-): Hub {
+): ShellMultiWindow {
     const listeners = new Set<(line: string) => void>();
     const multiWindow = installMultiWindow(api, tauriTransport, {
         ...options,
@@ -99,11 +99,11 @@ export function installHub(
         },
         ready: multiWindow.ready,
         counters: multiWindow.counters,
-        get tearOff() {
-            return multiWindow.tearOff;
+        get detach() {
+            return multiWindow.detach;
         },
-        set tearOff(value: boolean) {
-            multiWindow.tearOff = value;
+        set detach(value: boolean) {
+            multiWindow.detach = value;
         },
         onDidMoveAcrossWindows: multiWindow.onDidMoveAcrossWindows,
         undo: multiWindow.undo,

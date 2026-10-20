@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Drives a real drag of a tab from one native window into another and judges
-it from the hub's own log. Needs an X display (Xvfb will do), xdotool, the
+it from the shell's own log. Needs an X display (Xvfb will do), xdotool, the
 Vite dev server on port 1420 (start it with VITE_DND=html5: under Xvfb there
 is no pointing device, WebKit reports a coarse pointer, and dockview's 'auto'
 would pick the pointer backend, which cannot leave a window), and a debug
@@ -91,10 +91,10 @@ def main():
     parser.add_argument(
         "--where",
         default="right",
-        choices=["center", "left", "right", "top", "bottom", "tab", "off"],
+        choices=["center", "left", "right", "top", "bottom", "tab", "detach"],
         help="where on the target's content to drop; 'tab' drops on the "
         "left half of the target's own tab, which lands before it; 'off' "
-        "releases the drag outside every window with tear-off on, so the "
+        "releases the drag outside every window with detach on, so the "
         "shell opens a new window holding the tab",
     )
     parser.add_argument("--screenshot", help="write a PNG of the screen after the drop")
@@ -195,13 +195,13 @@ def main():
         tab = rects["main"]["panels"][panel_id]["tab"]
         target = rects["dock-2"]["panels"][target_id]
         src = (mx + tab["x"] + tab["width"] // 2, my + tab["y"] + tab["height"] // 2)
-        if args.where == "off":
-            # Tear-off is a checkbox in the window; the shell switches it on
+        if args.where == "detach":
+            # Detach is a checkbox in the window; the shell switches it on
             # for every window on this command and the windows say so.
-            app.stdin.write("tearoff\n")
+            app.stdin.write("detach\n")
             app.stdin.flush()
-            if not take(lambda: any(line == "tear-off on" for _, line in log)):
-                raise SystemExit("timed out waiting for tear-off to switch on")
+            if not take(lambda: any(line == "detach on" for _, line in log)):
+                raise SystemExit("timed out waiting for detach to switch on")
             box, fx, fy = {"x": 2300, "y": 950, "width": 0, "height": 0}, 0, 0
             sx2, sy2 = 0, 0
         elif args.where == "tab":
@@ -220,9 +220,9 @@ def main():
         before = len(log)
         drag(src, dst)
 
-        if args.where == "off":
+        if args.where == "detach":
             placed = lambda: any(
-                label.startswith("dock-torn-") and "started with torn-off" in line
+                label.startswith("dock-detached-") and "started with detached" in line
                 for label, line in log[before:]
             )
         else:
@@ -254,11 +254,11 @@ def main():
         print()
         for label in sorted(rects):
             print(f"{label} panels:".ljust(15), sorted(rects[label]["panels"]))
-        if args.where == "off":
-            torn = [label for label in rects if label.startswith("dock-torn-")]
-            ok = ok and any(panel_id in rects[label]["panels"] for label in torn)
+        if args.where == "detach":
+            detached = [label for label in rects if label.startswith("dock-detached-")]
+            ok = ok and any(panel_id in rects[label]["panels"] for label in detached)
             ok = ok and panel_id not in rects["main"]["panels"]
-            print("RESULT:", "the tab tore off into a new window" if ok else "the tab did not tear off")
+            print("RESULT:", "the tab detached into a new window" if ok else "the tab did not detach")
             return 0 if ok else 1
         print("RESULT:", "the tab crossed windows" if ok else "the tab did not cross")
         if not ok:
