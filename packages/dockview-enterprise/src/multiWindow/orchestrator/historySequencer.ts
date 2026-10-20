@@ -10,46 +10,57 @@
  */
 
 import type { SerializedDockview } from 'dockview';
-import type { HistoryInfo, MoveEvent, MoveRole } from './types';
+import type {
+    HistoryInfo,
+    HistoryRequest,
+    HistoryStepInfo,
+    MoveEvent,
+    MoveRole,
+} from '../transport';
 
-export const HISTORY_DEPTH = 50;
+export const DEFAULT_HISTORY_DEPTH = 50;
 
+/** One window's side of a move. */
 export interface MoveHalf {
-    window: string;
-    before: SerializedDockview;
-    after: SerializedDockview;
+    readonly window: string;
+    readonly before: SerializedDockview;
+    readonly after: SerializedDockview;
 }
 
-type Entry =
-    | { type: 'local'; window: string }
+type HistoryEntry =
+    | { readonly type: 'local'; readonly window: string }
     | {
-          type: 'move';
-          session: string;
-          panels: string[];
+          readonly type: 'move';
+          readonly session: string;
+          readonly panels: string[];
           from?: MoveHalf;
           to?: MoveHalf;
       };
 
-export type HistoryAction =
-    | { type: 'undo-local'; window: string }
-    | { type: 'redo-local'; window: string }
-    | { type: 'apply-layout'; window: string; layout: SerializedDockview };
+type MoveEntry = Extract<HistoryEntry, { type: 'move' }>;
+
+/** A request for one window, in the order the windows must carry them out. */
+export interface HistoryAction {
+    readonly window: string;
+    readonly request: HistoryRequest;
+}
 
 export interface HistoryStep {
-    actions: HistoryAction[];
-    moved?: Omit<MoveEvent, 'reason'>;
+    readonly actions: HistoryAction[];
+    readonly moved?: Omit<MoveEvent, 'reason'>;
 }
 
 export class HistorySequencer {
-    private readonly undoStack: Entry[] = [];
-    private readonly redoStack: Entry[] = [];
+    private readonly _undo: HistoryEntry[] = [];
+    private readonly _redo: HistoryEntry[] = [];
+    private readonly _depth: number;
 
-    constructor(private readonly depth = HISTORY_DEPTH) {}
+    constructor(depth = DEFAULT_HISTORY_DEPTH) {
+        this._depth = depth;
+    }
 
     pushLocal(window: string): void {
-        this.undoStack.push({ type: 'local', window });
-        this.redoStack.length = 0;
-        this.trim();
+        this._push({ type: 'local', window });
     }
 
     /**
@@ -63,46 +74,39 @@ export class HistorySequencer {
         role: MoveRole,
         half: MoveHalf
     ): void {
-        const existing = this.undoStack.find(
-            (entry) => entry.type === 'move' && entry.session === session
+        const existing = this._undo.find(
+            (entry): entry is MoveEntry =>
+                entry.type === 'move' && entry.session === session
         );
-        if (existing?.type === 'move') {
+        if (existing) {
             existing[role] = half;
             return;
         }
-        this.undoStack.push({
+        this._push({
             type: 'move',
             session,
             panels: [...panels],
             [role]: half,
         });
-        this.redoStack.length = 0;
-        this.trim();
     }
 
     /** Throws when there is nothing to undo or the top move is incomplete. */
     undo(): HistoryStep {
-        const entry = this.undoStack[this.undoStack.length - 1];
+        const entry = this._undo[this._undo.length - 1];
         if (!entry) {
             throw new Error('nothing to undo');
         }
         let step: HistoryStep;
         if (entry.type === 'local') {
-            step = { actions: [{ type: 'undo-local', window: entry.window }] };
+            step = {
+                actions: [{ window: entry.window, request: { type: 'undo' } }],
+            };
         } else {
             const { from, to } = complete(entry);
             step = {
                 actions: [
-                    {
-                        type: 'apply-layout',
-                        window: to.window,
-                        layout: to.before,
-                    },
-                    {
-                        type: 'apply-layout',
-                        window: from.window,
-                        layout: from.before,
-                    },
+                    apply(to.window, to.before),
+                    apply(from.window, from.before),
                 ],
                 moved: {
                     session: entry.session,
@@ -112,33 +116,28 @@ export class HistorySequencer {
                 },
             };
         }
-        this.undoStack.pop();
-        this.redoStack.push(entry);
+        this._undo.pop();
+        this._redo.push(entry);
         return step;
     }
 
+    /** Throws when there is nothing to redo. */
     redo(): HistoryStep {
-        const entry = this.redoStack[this.redoStack.length - 1];
+        const entry = this._redo[this._redo.length - 1];
         if (!entry) {
             throw new Error('nothing to redo');
         }
         let step: HistoryStep;
         if (entry.type === 'local') {
-            step = { actions: [{ type: 'redo-local', window: entry.window }] };
+            step = {
+                actions: [{ window: entry.window, request: { type: 'redo' } }],
+            };
         } else {
             const { from, to } = complete(entry);
             step = {
                 actions: [
-                    {
-                        type: 'apply-layout',
-                        window: from.window,
-                        layout: from.after,
-                    },
-                    {
-                        type: 'apply-layout',
-                        window: to.window,
-                        layout: to.after,
-                    },
+                    apply(from.window, from.after),
+                    apply(to.window, to.after),
                 ],
                 moved: {
                     session: entry.session,
@@ -148,54 +147,64 @@ export class HistorySequencer {
                 },
             };
         }
-        this.redoStack.pop();
-        this.undoStack.push(entry);
+        this._redo.pop();
+        this._undo.push(entry);
         return step;
     }
 
     info(): HistoryInfo {
-        const nextUndo = this.undoStack[this.undoStack.length - 1];
-        const nextRedo = this.redoStack[this.redoStack.length - 1];
+        const nextUndo = this._undo[this._undo.length - 1];
+        const nextRedo = this._redo[this._redo.length - 1];
         return {
-            undoCount: this.undoStack.length,
-            redoCount: this.redoStack.length,
-            nextUndo: nextUndo ? describe(nextUndo) : null,
-            nextRedo: nextRedo ? describe(nextRedo) : null,
+            canUndo: nextUndo !== undefined,
+            canRedo: nextRedo !== undefined,
+            undoCount: this._undo.length,
+            redoCount: this._redo.length,
+            ...(nextUndo && { nextUndo: summarize(nextUndo) }),
+            ...(nextRedo && { nextRedo: summarize(nextRedo) }),
         };
     }
 
     /** Drop every entry that involves a window that is gone. */
     forgetWindow(window: string): void {
-        const involves = (entry: Entry) =>
+        const involves = (entry: HistoryEntry) =>
             entry.type === 'local'
                 ? entry.window === window
                 : entry.from?.window === window || entry.to?.window === window;
-        for (const stack of [this.undoStack, this.redoStack]) {
+        for (const stack of [this._undo, this._redo]) {
             const kept = stack.filter((entry) => !involves(entry));
             stack.splice(0, stack.length, ...kept);
         }
     }
 
-    private trim(): void {
-        while (this.undoStack.length > this.depth) {
-            this.undoStack.shift();
+    private _push(entry: HistoryEntry): void {
+        this._undo.push(entry);
+        this._redo.length = 0;
+        while (this._undo.length > this._depth) {
+            this._undo.shift();
         }
     }
 }
 
-function complete(entry: Extract<Entry, { type: 'move' }>): {
-    from: MoveHalf;
-    to: MoveHalf;
-} {
+function apply(window: string, layout: SerializedDockview): HistoryAction {
+    return { window, request: { type: 'apply-layout', layout } };
+}
+
+function complete(entry: MoveEntry): { from: MoveHalf; to: MoveHalf } {
     if (!entry.from || !entry.to) {
         throw new Error(`move ${entry.session} is still being recorded`);
     }
     return { from: entry.from, to: entry.to };
 }
 
-function describe(entry: Entry): string {
+function summarize(entry: HistoryEntry): HistoryStepInfo {
     if (entry.type === 'local') {
-        return `step in ${entry.window}`;
+        return { type: 'local', windowId: entry.window };
     }
-    return `move of ${entry.panels.join(', ')} from ${entry.from?.window ?? '?'} to ${entry.to?.window ?? '?'}`;
+    return {
+        type: 'move',
+        panels: entry.panels,
+        ...(entry.from && { from: entry.from.window }),
+        ...(entry.to && { to: entry.to.window }),
+    };
 }

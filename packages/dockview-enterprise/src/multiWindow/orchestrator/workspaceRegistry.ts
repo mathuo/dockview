@@ -40,8 +40,8 @@ interface PendingMove {
 }
 
 export class WorkspaceRegistry {
-    private readonly windows: WindowRecord[];
-    private readonly pending: PendingMove[] = [];
+    private readonly _windows: WindowRecord[];
+    private readonly _pending: PendingMove[] = [];
 
     constructor(state?: WorkspaceState) {
         if (state && state.version !== WORKSPACE_FORMAT_VERSION) {
@@ -49,43 +49,38 @@ export class WorkspaceRegistry {
                 `workspace format ${state.version} is not the supported ${WORKSPACE_FORMAT_VERSION}`
             );
         }
-        this.windows = clone(state?.windows ?? []);
+        this._windows = clone(state?.windows ?? []);
     }
 
     snapshot(): WorkspaceState {
         return {
             version: WORKSPACE_FORMAT_VERSION,
-            windows: clone(this.windows),
+            windows: clone(this._windows),
         };
     }
 
     windowIds(): string[] {
-        return this.windows.map((window) => window.id);
-    }
-
-    window(windowId: string): WindowRecord | undefined {
-        const record = this.windows.find((window) => window.id === windowId);
-        return record ? clone(record) : undefined;
+        return this._windows.map((window) => window.id);
     }
 
     ensureWindow(windowId: string): void {
-        this.entry(windowId);
+        this._entry(windowId);
     }
 
     expectMove(panels: string[], from: string, to: string): void {
         for (const panel of panels) {
-            const index = this.pending.findIndex(
+            const index = this._pending.findIndex(
                 (entry) => entry.panel === panel
             );
             if (index !== -1) {
-                this.pending.splice(index, 1);
+                this._pending.splice(index, 1);
             }
-            this.pending.push({ panel, from, to });
+            this._pending.push({ panel, from, to });
         }
     }
 
     setGeometry(windowId: string, geometry: WindowGeometry): void {
-        this.entry(windowId).geometry = { ...geometry };
+        this._entry(windowId).geometry = { ...geometry };
     }
 
     /**
@@ -95,7 +90,7 @@ export class WorkspaceRegistry {
      */
     setLayout(windowId: string, layout: SerializedDockview): void {
         const incoming = panelIds(layout);
-        for (const other of this.windows) {
+        for (const other of this._windows) {
             if (other.id === windowId || !other.layout) {
                 continue;
             }
@@ -103,7 +98,7 @@ export class WorkspaceRegistry {
             const duplicate = incoming.find(
                 (id) =>
                     theirs.has(id) &&
-                    !this.pending.some(
+                    !this._pending.some(
                         (entry) =>
                             entry.panel === id &&
                             entry.from === other.id &&
@@ -117,38 +112,38 @@ export class WorkspaceRegistry {
             }
         }
         // A source reporting without the panel completes the move.
-        const kept = this.pending.filter(
+        const kept = this._pending.filter(
             (entry) => entry.from !== windowId || incoming.includes(entry.panel)
         );
-        this.pending.splice(0, this.pending.length, ...kept);
-        this.entry(windowId).layout = clone(layout);
+        this._pending.splice(0, this._pending.length, ...kept);
+        this._entry(windowId).layout = clone(layout);
     }
 
     /** Store a layout the orchestrator itself applied, which it trusts. */
     setLayoutUnchecked(windowId: string, layout: SerializedDockview): void {
-        this.entry(windowId).layout = clone(layout);
+        this._entry(windowId).layout = clone(layout);
     }
 
     loadLayout(windowId: string): SerializedDockview | null {
-        const record = this.windows.find((window) => window.id === windowId);
+        const record = this._windows.find((window) => window.id === windowId);
         return record?.layout ? clone(record.layout) : null;
     }
 
     removeWindow(windowId: string): WindowRecord | undefined {
-        const index = this.windows.findIndex(
+        const index = this._windows.findIndex(
             (window) => window.id === windowId
         );
         if (index === -1) {
             return undefined;
         }
-        return this.windows.splice(index, 1)[0];
+        return this._windows.splice(index, 1)[0];
     }
 
-    private entry(windowId: string): WindowRecord {
-        let record = this.windows.find((window) => window.id === windowId);
+    private _entry(windowId: string): WindowRecord {
+        let record = this._windows.find((window) => window.id === windowId);
         if (!record) {
             record = { id: windowId };
-            this.windows.push(record);
+            this._windows.push(record);
         }
         return record;
     }

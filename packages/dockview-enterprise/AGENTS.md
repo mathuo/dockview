@@ -37,23 +37,32 @@ calls `registerModules(Modules)` at import (a side effect — hence
 Not a module: one function over the public `DockviewApi`, exported from the
 index with nothing to register. The window side of a layout spread over
 several windows or processes, reaching an orchestrator only through the
-`MultiWindowTransport` interface (`types.ts`):
+`MultiWindowTransport` interface (`transport.ts`). A transport belongs to one
+window: `windowId` is a plain property and no call takes a window id.
 
-- `multiWindow.ts` (`installMultiWindow`): the public install, composing the
-  three internal pieces below over one transport (window id resolved once) and
-  returning one `MultiWindow` handle. The pieces are not exported.
-- `crossWindowDnd.ts`: a drag's `DataTransfer` carries a session id; the
-  orchestrator carries the payload (`DragPayload`: a panel's `toJSON()` or
-  `serializeGroup` output); the drop rebuilds it with `addPanelFromJSON` /
-  `addGroupFromJSON`.
-- `windowWorkspace.ts`: `fromJSON` in at start, `toJSON` out on every change.
-- `sharedHistory.ts`: reports local steps, carries out "undo your top step" /
-  "take this layout".
+Window side, each a `CompositeDisposable` with `Emitter` events like the rest
+of dockview; failures go to `console.error`/`console.warn` with a `dockview:`
+prefix, as core reports its own:
+
+- `multiWindow.ts` (`installMultiWindow` returning a `MultiWindow`): the public
+  install, composing the three internal pieces below. Only the `MultiWindow`
+  type is exported.
+- `crossWindowDnd.ts` (`CrossWindowDnd`): a drag's `DataTransfer` carries a
+  session id; the orchestrator carries the payload (`DragPayload`: a panel's
+  `toJSON()` or `serializeGroup` output); the drop rebuilds it with
+  `addPanelFromJSON` / `addGroupFromJSON`.
+- `windowWorkspace.ts` (`WindowWorkspace`): `fromJSON` in at start, `toJSON`
+  out on every change.
+- `sharedHistory.ts` (`SharedHistory`): reports local steps, carries out the
+  `HistoryRequest`s that come back.
+
+Orchestrator side, `orchestrator/`:
+
 - `memoryOrchestrator.ts` (`MemoryOrchestrator`, exported): an orchestrator
-  for one heap, composed from the pure `dragSessions.ts`, `workspaceState.ts` and
-  `historySequencer.ts` (not exported; tests import them directly), which
-  mirror the Rust modules in `packages/dockview-tauri-demo/src-tauri/src/`.
-  Keep the two in step.
+  for one heap, composed from the pure `dragSessions.ts`,
+  `workspaceRegistry.ts` and `historySequencer.ts` (not exported; tests import
+  them directly), which mirror the Rust modules in
+  `packages/dockview-tauri-demo/src-tauri/src/`. Keep the two in step.
 
 Narrow drag events with a `'dataTransfer' in event` check, not
 `instanceof DragEvent`: jsdom defines neither `DragEvent` nor `DataTransfer`,
