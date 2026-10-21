@@ -37,6 +37,22 @@ const HISTORY_REQUEST_EVENT: &str = "dockview:history-request";
 /// Labels for the windows a detach creates; see `POPOUT_COUNT`.
 static DETACH_COUNT: AtomicUsize = AtomicUsize::new(0);
 
+/// A label for a window a detach creates. Detached windows are on record in
+/// the workspace and come back on the next start, so the count alone is not
+/// enough: skip any label already recorded or open.
+fn new_detach_label(app: &AppHandle) -> String {
+    let recorded = app.state::<Workspace>().window_ids().unwrap_or_default();
+    loop {
+        let label = format!(
+            "dock-detached-{}",
+            DETACH_COUNT.fetch_add(1, Ordering::Relaxed)
+        );
+        if !recorded.contains(&label) && app.get_webview_window(&label).is_none() {
+            return label;
+        }
+    }
+}
+
 /// The panel ids a drag payload carries: one tab's `panel.id`, or a group's
 /// `group.group.views` (the `DragPayload` of `dockview-enterprise`). The one
 /// thing the shell reads out of a payload, for move events and for the
@@ -472,7 +488,9 @@ fn accept_drag(
         .expect_move(&panels, &from, &to)
         .map_err(|err| err.to_string())?;
     deliver(&app, accept.release)?;
-    app.emit(
+    // The source has let go: from here the accept has happened, whatever
+    // becomes of the announcement.
+    if let Err(err) = app.emit(
         MOVED_EVENT,
         MovedNotice {
             session,
@@ -481,8 +499,10 @@ fn accept_drag(
             to,
             reason: "drop",
         },
-    )
-    .map_err(|err| err.to_string())
+    ) {
+        eprintln!("accept_drag: could not announce the move: {err}");
+    }
+    Ok(())
 }
 
 /// How long a drag stays acceptable after its source reported it over. The
@@ -511,12 +531,9 @@ fn end_drag(
 
     std::thread::spawn(move || {
         std::thread::sleep(DRAG_END_GRACE);
-        let ended = app.state::<DragSessions>().expire(&session, || {
-            format!(
-                "dock-detached-{}",
-                DETACH_COUNT.fetch_add(1, Ordering::Relaxed)
-            )
-        });
+        let ended = app
+            .state::<DragSessions>()
+            .expire(&session, || new_detach_label(&app));
         match ended {
             Ok(DragEnd::Detached {
                 window_id: label,
@@ -555,12 +572,21 @@ fn end_drag(
                                 to: label.clone(),
                                 reason: "detach",
                             };
+                            // A detach is no step to undo, and the source's
+                            // earlier steps hold the panels it gave away:
+                            // undoing one would bring them back while the new
+                            // window holds them too. They end here.
+                            if let Err(err) = handle.state::<History>().forget_window(&release.from)
+                            {
+                                eprintln!("detach: {err}");
+                            }
                             if let Err(err) = deliver(&handle, release) {
                                 eprintln!("detach: could not release the source: {err}");
                             }
                             if let Err(err) = handle.emit(MOVED_EVENT, moved) {
                                 eprintln!("detach: could not announce the move: {err}");
                             }
+                            broadcast_history(&handle);
                         }
                         Err(err) => eprintln!("detach: could not open {label}: {err}"),
                     }
@@ -888,10 +914,12 @@ pub fn run() {
                 }
                 WindowEvent::CloseRequested { .. } if label == "main" => {
                     // Closing the main window closes the app, keeping every
-                    // window on record for next time.
+                    // window on record for next time. Tauri would otherwise
+                    // keep running while any other window is open.
                     app.state::<Persistence>()
                         .exiting
                         .store(true, Ordering::Relaxed);
+                    app.exit(0);
                 }
                 WindowEvent::Destroyed => {
                     let persistence = app.state::<Persistence>();

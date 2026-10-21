@@ -322,14 +322,16 @@ impl History {
     }
 
     /// Forget a window's steps, when it closes.
+    /// Also drops every move still missing a half, which may have been that
+    /// window's and could then never complete.
     pub fn forget_window(&self, window: &str) -> Result<(), HistoryError> {
         let mut stacks = self.stacks.lock()?;
         let involves = |entry: &Entry| match entry {
             Entry::Local { window: w } => w == window,
-            Entry::Move { from, to, .. } => {
-                from.as_ref().is_some_and(|half| half.window == window)
-                    || to.as_ref().is_some_and(|half| half.window == window)
-            }
+            Entry::Move { from, to, .. } => match (from, to) {
+                (Some(from), Some(to)) => from.window == window || to.window == window,
+                _ => true,
+            },
         };
         stacks.undo.retain(|entry| !involves(entry));
         stacks.redo.retain(|entry| !involves(entry));
@@ -572,6 +574,27 @@ mod tests {
         assert_eq!(
             serde_json::to_value(apply("main", &json!({})).request).unwrap(),
             json!({ "type": "apply-layout", "layout": {} })
+        );
+    }
+
+    #[test]
+    fn a_move_missing_a_half_is_dropped_with_any_window() {
+        let history = History::default();
+        history.push_local("main").unwrap();
+        // The destination closed before reporting its half.
+        history
+            .record_move("s1", &["p".into()], Role::From, half("main", "A0", "A1"))
+            .unwrap();
+        assert_eq!(history.undo(), Err(HistoryError::Incomplete("s1".into())));
+
+        history.forget_window("dock-2").unwrap();
+
+        assert_eq!(
+            history.undo().unwrap().actions,
+            vec![Action {
+                window: "main".into(),
+                request: Request::Undo,
+            }]
         );
     }
 }
