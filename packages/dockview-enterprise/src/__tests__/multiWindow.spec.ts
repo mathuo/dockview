@@ -311,16 +311,36 @@ describe('multi-window: HistorySequencer', () => {
 
     test('a move missing a half is dropped with any window, so it cannot block undo', () => {
         const history = new HistorySequencer();
-        history.pushLocal('main');
-        // The destination closed before reporting its half.
         history.recordMove('s1', ['p'], 'from', half('main', ['p'], []));
+        // The destination closed before reporting its half.
+        history.pushLocal('main');
+        history.undo();
         expect(() => history.undo()).toThrow('still being recorded');
 
+        history.forgetWindow('dock-2');
+
+        expect(() => history.undo()).toThrow('nothing to undo');
+        expect(history.redo().actions).toEqual([
+            { window: 'main', request: { type: 'redo' } },
+        ]);
+    });
+
+    test('a dropped move takes the steps beyond it, which assume it is undone first', () => {
+        const history = new HistorySequencer();
+        // dock-3 closes a tab while it holds p, then p moves to dock-2.
+        history.pushLocal('dock-3');
+        history.recordMove('s1', ['p'], 'from', half('dock-3', ['p'], []));
+        history.recordMove('s1', ['p'], 'to', half('dock-2', [], ['p']));
+        history.pushLocal('main');
+
+        // dock-2 goes; undoing dock-3's close would now bring p back while
+        // nothing could take it out of dock-2 first.
         history.forgetWindow('dock-2');
 
         expect(history.undo().actions).toEqual([
             { window: 'main', request: { type: 'undo' } },
         ]);
+        expect(() => history.undo()).toThrow('nothing to undo');
     });
 });
 

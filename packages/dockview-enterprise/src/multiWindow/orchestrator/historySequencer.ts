@@ -168,7 +168,9 @@ export class HistorySequencer {
     /**
      * Drop every entry that involves a window, and every move still missing
      * a half, which may have been that window's and could then never
-     * complete.
+     * complete. A dropped move takes everything beyond it with it: the other
+     * window's earlier steps restore layouts from before the move, which are
+     * only safe once the move itself has been undone.
      */
     forgetWindow(window: string): void {
         const involves = (entry: HistoryEntry) =>
@@ -178,8 +180,17 @@ export class HistorySequencer {
                   !entry.to ||
                   entry.from.window === window ||
                   entry.to.window === window;
+        // Both stacks hold the entry furthest from the present first.
         for (const stack of [this._undo, this._redo]) {
-            const kept = stack.filter((entry) => !involves(entry));
+            let cut = -1;
+            stack.forEach((entry, index) => {
+                if (entry.type === 'move' && involves(entry)) {
+                    cut = index;
+                }
+            });
+            const kept = stack.filter(
+                (entry, index) => index > cut && !involves(entry)
+            );
             stack.splice(0, stack.length, ...kept);
         }
     }
