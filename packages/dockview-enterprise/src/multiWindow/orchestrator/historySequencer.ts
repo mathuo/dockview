@@ -165,12 +165,19 @@ export class HistorySequencer {
         };
     }
 
-    /** Drop every entry that involves a window that is gone. */
+    /**
+     * Drop every entry that involves a window, and every move still missing
+     * a half, which may have been that window's and could then never
+     * complete.
+     */
     forgetWindow(window: string): void {
         const involves = (entry: HistoryEntry) =>
             entry.type === 'local'
                 ? entry.window === window
-                : entry.from?.window === window || entry.to?.window === window;
+                : !entry.from ||
+                  !entry.to ||
+                  entry.from.window === window ||
+                  entry.to.window === window;
         for (const stack of [this._undo, this._redo]) {
             const kept = stack.filter((entry) => !involves(entry));
             stack.splice(0, stack.length, ...kept);

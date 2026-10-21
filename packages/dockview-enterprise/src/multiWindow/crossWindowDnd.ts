@@ -100,10 +100,11 @@ export class CrossWindowDnd extends CompositeDisposable {
                     event.accept();
                 }
             }),
+            // Fired only for a drop dockview does not handle itself, so never
+            // for a drag that stays in this window.
             api.onDidDrop((event) => {
                 const session = readSession(event.nativeEvent);
-                // Our own drag landing here is dockview's to handle.
-                if (session && !this._local.has(session)) {
+                if (session) {
                     void this._receive(session, event);
                 }
             })
@@ -164,12 +165,7 @@ export class CrossWindowDnd extends CompositeDisposable {
             (end) => {
                 const dropEffect =
                     (end as DragEvent).dataTransfer?.dropEffect ?? 'none';
-                const detach = this.detach && dropEffect === 'none';
-                this._transport
-                    .endDrag(session, detach)
-                    .catch((err: unknown) => {
-                        console.error('dockview: could not end a drag.', err);
-                    });
+                this._endDrag(session, this.detach && dropEffect === 'none');
                 // Only conclude the drag stayed here once a late accept would
                 // have shown up as a release.
                 setTimeout(
@@ -179,6 +175,12 @@ export class CrossWindowDnd extends CompositeDisposable {
             },
             { once: true }
         );
+    }
+
+    private _endDrag(session: string, detach: boolean): void {
+        this._transport.endDrag(session, detach).catch((err: unknown) => {
+            console.error('dockview: could not end a drag.', err);
+        });
     }
 
     /**
