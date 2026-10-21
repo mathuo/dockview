@@ -227,7 +227,7 @@ export class LayoutHistoryService
         while (this._undo.length > depth) {
             this._undo.shift();
         }
-        this._fire();
+        this._fire('push');
     }
 
     // --- resize coalescing ---
@@ -303,7 +303,7 @@ export class LayoutHistoryService
         }
         this._apply(entry.before);
         this._redo.push(entry);
-        this._fire();
+        this._fire('undo');
     }
 
     redo(): void {
@@ -314,7 +314,7 @@ export class LayoutHistoryService
         }
         this._apply(entry.after);
         this._undo.push(entry);
-        this._fire();
+        this._fire('redo');
     }
 
     /**
@@ -360,13 +360,14 @@ export class LayoutHistoryService
         this._pendingResize = undefined;
         this._clearResizeTimer();
         if (had) {
-            this._fire();
+            this._fire('clear');
         }
     }
 
-    private _fire(): void {
+    private _fire(reason: LayoutHistoryChangeEvent['reason']): void {
         const last = this._undo[this._undo.length - 1];
         this._onDidChangeHistory.fire({
+            reason,
             canUndo: this.canUndo,
             canRedo: this.canRedo,
             undoCount: this._undo.length,

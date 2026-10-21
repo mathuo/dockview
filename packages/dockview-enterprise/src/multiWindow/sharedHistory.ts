@@ -44,7 +44,7 @@ export class SharedHistory extends CompositeDisposable {
      * are not reported back as new steps.
      */
     private _applyDepth = 0;
-    private _lastUndoCount = 0;
+    private _warnedCleared = false;
 
     private readonly _onDidChange = new Emitter<HistoryInfo>();
     readonly onDidChange: Event<HistoryInfo> = this._onDidChange.event;
@@ -64,14 +64,16 @@ export class SharedHistory extends CompositeDisposable {
 
         this.addDisposables(
             this._onDidChange,
-            // A rise in the local undo count outside a request is a step the
-            // user made here; the orchestrator needs it in the global order.
             api.onDidChangeHistory((event) => {
-                const pushed =
-                    event.undoCount > this._lastUndoCount &&
-                    this._applyDepth === 0;
-                this._lastUndoCount = event.undoCount;
-                if (pushed) {
+                if (this._applyDepth > 0) {
+                    if (event.reason === 'clear') {
+                        this._warnCleared();
+                    }
+                    return;
+                }
+                // A step the user made here; the orchestrator needs it in the
+                // global order.
+                if (event.reason === 'push') {
                     transport.reportLocalStep().catch((err: unknown) => {
                         console.error(
                             'dockview: could not report a local step.',
@@ -154,9 +156,19 @@ export class SharedHistory extends CompositeDisposable {
             );
         } finally {
             this._applyDepth -= 1;
-            if (!this._api.canUndo) {
-                this._lastUndoCount = 0;
-            }
+        }
+    }
+
+    /**
+     * An applied layout cleared this window's own history, so the steps the
+     * orchestrator has on record for it can no longer be undone here.
+     */
+    private _warnCleared(): void {
+        if (!this._warnedCleared) {
+            this._warnedCleared = true;
+            console.warn(
+                "dockview: the shared history needs layoutHistory.clearOnFromJSON set to false; an applied layout cleared this window's own history."
+            );
         }
     }
 

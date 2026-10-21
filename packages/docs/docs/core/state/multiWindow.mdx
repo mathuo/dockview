@@ -87,7 +87,9 @@ multiWindow.updateOptions({ detach: true });
 
 A detach is reported through `onDidMoveAcrossWindows` with reason
 `'detach'`, but it is not a step the shared history can undo: the new window
-is the host's to create.
+is the host's to create. It also ends the source window's earlier steps,
+since each of them restores a layout that still holds the panels the new
+window now has.
 
 If the destination cannot place an accepted payload (a component it does not
 register, for instance), the source has already let go. The move is still

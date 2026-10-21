@@ -308,6 +308,20 @@ describe('multi-window: HistorySequencer', () => {
         history.forgetWindow('main');
         expect(history.info()).toEqual(empty);
     });
+
+    test('a move missing a half is dropped with any window, so it cannot block undo', () => {
+        const history = new HistorySequencer();
+        history.pushLocal('main');
+        // The destination closed before reporting its half.
+        history.recordMove('s1', ['p'], 'from', half('main', ['p'], []));
+        expect(() => history.undo()).toThrow('still being recorded');
+
+        history.forgetWindow('dock-2');
+
+        expect(history.undo().actions).toEqual([
+            { window: 'main', request: { type: 'undo' } },
+        ]);
+    });
 });
 
 describe('multi-window: two dockviews through the in-memory orchestrator', () => {
@@ -337,14 +351,22 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
     const open = (
         orchestrator: MemoryOrchestrator,
         label: string,
-        options: { buildDefaults?: () => void; detach?: boolean } = {}
+        options: {
+            buildDefaults?: () => void;
+            detach?: boolean;
+            layoutHistory?: { depth?: number; clearOnFromJSON?: boolean };
+        } = {}
     ): Window => {
         const container = document.createElement('div');
         document.body.appendChild(container);
         let nextGroup = 0;
         const dockview = new DockviewComponent(container, {
             createComponent: () => new TestPanel(),
-            layoutHistory: { enabled: true, clearOnFromJSON: false },
+            layoutHistory: {
+                enabled: true,
+                clearOnFromJSON: false,
+                ...options.layoutHistory,
+            },
             // Group ids travel with a group; make them unique per window.
             groupIdGenerator: () => `${label}-${++nextGroup}`,
         });
@@ -1104,5 +1126,108 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
 
         orchestrator.disconnect('other');
         expect(orchestrator.windowIds).toEqual(['main']);
+    });
+
+    const closeTab = (window: Window, id: string) =>
+        fireEvent.click(
+            window.api
+                .getPanel(id)
+                ?.view.tab.element.querySelector(
+                    '.dv-default-tab-action'
+                ) as HTMLElement
+        );
+
+    test('local steps keep reaching the orchestrator once the local history is full', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const main = open(orchestrator, 'main', {
+            layoutHistory: { depth: 2 },
+        });
+        await flush();
+        for (const id of ['a', 'b', 'c', 'd']) {
+            main.api.addPanel({ id, component: 'default' });
+        }
+        for (const id of ['d', 'c', 'b']) {
+            closeTab(main, id);
+            await flush();
+        }
+        // The local stack holds two; every step was still sequenced.
+        expect(main.dockview.canUndo).toBe(true);
+        expect(orchestrator.history.undoCount).toBe(3);
+    });
+
+    test('an applied layout that clears the local history is reported once', async () => {
+        const orchestrator = new MemoryOrchestrator({ dragEndGraceMs: 0 });
+        const main = open(orchestrator, 'main', {
+            layoutHistory: { clearOnFromJSON: true },
+        });
+        const other = open(orchestrator, 'other');
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        other.api.addPanel({ id: 'x', component: 'default' });
+        closeTab(main, 'a');
+        await flush();
+
+        await dragAcross(main, 'b', other);
+        orchestrator.undo();
+        await flush();
+
+        expect(
+            reportedMatching(/layoutHistory.clearOnFromJSON set to false/)
+        ).toHaveLength(1);
+    });
+
+    test("a detach ends the source window's earlier steps", async () => {
+        const orchestrator = new MemoryOrchestrator({
+            dragEndGraceMs: 0,
+            createWindow: (label) => {
+                open(orchestrator, label);
+            },
+        });
+        const main = open(orchestrator, 'main', { detach: true });
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        main.api.addPanel({ id: 'c', component: 'default' });
+        closeTab(main, 'c');
+        await flush();
+        expect(orchestrator.history.undoCount).toBe(1);
+
+        const dataTransfer = fakeDataTransfer();
+        const tab = main.api.getPanel('b')?.view.tab.element as HTMLElement;
+        fireEvent.dragStart(tab, { dataTransfer });
+        await flush();
+        fireEvent.dragEnd(tab, { dataTransfer });
+        await flush();
+        await flush();
+
+        // Undoing the close would restore a layout that still holds b.
+        expect(orchestrator.history.undoCount).toBe(0);
+        expect(ids(main)).toEqual(['a']);
+    });
+
+    test('a detached window never takes the id of a window on record', async () => {
+        const created: string[] = [];
+        const orchestrator = new MemoryOrchestrator({
+            dragEndGraceMs: 0,
+            workspace: { version: 1, windows: [{ id: 'detached-1' }] },
+            createWindow: (label) => {
+                created.push(label);
+                open(orchestrator, label);
+            },
+        });
+        const main = open(orchestrator, 'main', { detach: true });
+        await flush();
+        main.api.addPanel({ id: 'b', component: 'default' });
+
+        const dataTransfer = fakeDataTransfer();
+        const tab = main.api.getPanel('b')?.view.tab.element as HTMLElement;
+        fireEvent.dragStart(tab, { dataTransfer });
+        await flush();
+        fireEvent.dragEnd(tab, { dataTransfer });
+        await flush();
+        await flush();
+
+        expect(created).toEqual(['detached-2']);
     });
 });

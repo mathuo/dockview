@@ -226,10 +226,7 @@ export class MemoryOrchestrator extends CompositeDisposable {
     }
 
     private _expire(session: string): void {
-        const ended = this._drags.expire(
-            session,
-            () => `detached-${++this._detachedCount}`
-        );
+        const ended = this._drags.expire(session, () => this._newWindowId());
         if (ended.outcome !== 'detached') {
             return;
         }
@@ -247,6 +244,21 @@ export class MemoryOrchestrator extends CompositeDisposable {
             payloadPanels(payload),
             'detach'
         );
+        // A detach is no step to undo, and the source's earlier steps hold
+        // the panels it gave away: undoing one would bring them back while
+        // the new window holds them too. They end here.
+        this._history.forgetWindow(ended.release.from);
+        this._historyDidChange();
+    }
+
+    /** An id for a detached window, unused by any window on record. */
+    private _newWindowId(): string {
+        const taken = new Set(this._workspace.windowIds());
+        let windowId: string;
+        do {
+            windowId = `detached-${++this._detachedCount}`;
+        } while (taken.has(windowId) || this._channels.has(windowId));
+        return windowId;
     }
 
     /**
