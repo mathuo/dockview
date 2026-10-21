@@ -323,7 +323,10 @@ impl History {
 
     /// Forget a window's steps, when it closes.
     /// Also drops every move still missing a half, which may have been that
-    /// window's and could then never complete.
+    /// window's and could then never complete. A dropped move takes
+    /// everything beyond it with it: the other window's earlier steps
+    /// restore layouts from before the move, which are only safe once the
+    /// move itself has been undone.
     pub fn forget_window(&self, window: &str) -> Result<(), HistoryError> {
         let mut stacks = self.stacks.lock()?;
         let involves = |entry: &Entry| match entry {
@@ -333,8 +336,20 @@ impl History {
                 _ => true,
             },
         };
-        stacks.undo.retain(|entry| !involves(entry));
-        stacks.redo.retain(|entry| !involves(entry));
+        // Both stacks hold the entry furthest from the present first.
+        let stacks = &mut *stacks;
+        for stack in [&mut stacks.undo, &mut stacks.redo] {
+            let cut = stack
+                .iter()
+                .rposition(|entry| matches!(entry, Entry::Move { .. }) && involves(entry))
+                .map_or(0, |index| index + 1);
+            let kept: Vec<Entry> = stack
+                .drain(..)
+                .skip(cut)
+                .filter(|entry| !involves(entry))
+                .collect();
+            *stack = kept;
+        }
         Ok(())
     }
 }
@@ -533,10 +548,16 @@ mod tests {
 
         history.forget_window("dock-2").unwrap();
 
+        // main's step predates the move into dock-2, so it goes too: undoing
+        // it would restore a layout that still holds p.
         let info = history.info().unwrap();
-        assert_eq!(info.undo_count, 1);
+        assert_eq!(info.undo_count, 0);
+        assert_eq!(info.next_undo, None);
+
+        history.push_local("main").unwrap();
+        history.forget_window("dock-2").unwrap();
         assert_eq!(
-            info.next_undo,
+            history.info().unwrap().next_undo,
             Some(StepInfo::Local {
                 window_id: "main".into()
             })
@@ -580,12 +601,38 @@ mod tests {
     #[test]
     fn a_move_missing_a_half_is_dropped_with_any_window() {
         let history = History::default();
-        history.push_local("main").unwrap();
-        // The destination closed before reporting its half.
         history
             .record_move("s1", &["p".into()], Role::From, half("main", "A0", "A1"))
             .unwrap();
+        // The destination closed before reporting its half.
+        history.push_local("main").unwrap();
+        history.undo().unwrap();
         assert_eq!(history.undo(), Err(HistoryError::Incomplete("s1".into())));
+
+        history.forget_window("dock-2").unwrap();
+
+        assert_eq!(history.undo(), Err(HistoryError::Nothing));
+        assert_eq!(
+            history.redo().unwrap().actions,
+            vec![Action {
+                window: "main".into(),
+                request: Request::Redo,
+            }]
+        );
+    }
+
+    #[test]
+    fn a_dropped_move_takes_the_steps_beyond_it() {
+        let history = History::default();
+        // dock-3 closes a tab while it holds p, then p moves to dock-2.
+        history.push_local("dock-3").unwrap();
+        history
+            .record_move("s1", &["p".into()], Role::From, half("dock-3", "C0", "C1"))
+            .unwrap();
+        history
+            .record_move("s1", &["p".into()], Role::To, half("dock-2", "B0", "B1"))
+            .unwrap();
+        history.push_local("main").unwrap();
 
         history.forget_window("dock-2").unwrap();
 
@@ -596,5 +643,6 @@ mod tests {
                 request: Request::Undo,
             }]
         );
+        assert_eq!(history.undo(), Err(HistoryError::Nothing));
     }
 }
