@@ -19,13 +19,20 @@
 
 use std::fmt;
 use std::sync::{Mutex, PoisonError};
+use std::time::{Duration, Instant};
 
 use serde::Serialize;
 use serde_json::Value;
 
-/// How many steps are kept. Each move holds four layouts, so this bounds
-/// memory as well as reach.
-pub const DEPTH: usize = 50;
+/// How many steps are kept: dockview's own `layoutHistory.depth` default,
+/// which no window's depth should be below. Each move holds four layouts, so
+/// this bounds memory as well as reach.
+pub const DEPTH: usize = 25;
+
+/// How long a move may wait for its second half. Both halves normally arrive
+/// within milliseconds; one still missing after this never will. Mirrors
+/// `ABANDONED_MOVE_MS` in `historySequencer.ts`.
+pub const ABANDONED_MOVE: Duration = Duration::from_secs(10);
 
 /// Which end of a move a window reported.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -51,6 +58,8 @@ pub enum Entry {
     Move {
         session: String,
         panels: Vec<String>,
+        /// When the first half arrived.
+        opened: Instant,
         from: Option<Half>,
         to: Option<Half>,
     },
@@ -148,6 +157,9 @@ pub enum HistoryError {
     Nothing,
     /// The top step is a move one window has not finished reporting.
     Incomplete(String),
+    /// The top step was a move one window never finished reporting; it and
+    /// the history before it are gone.
+    Abandoned(String),
     Poisoned,
 }
 
@@ -158,6 +170,10 @@ impl fmt::Display for HistoryError {
             HistoryError::Incomplete(session) => {
                 write!(f, "move {session} is still being recorded")
             }
+            HistoryError::Abandoned(session) => write!(
+                f,
+                "move {session} was never completed; the history before it is dropped"
+            ),
             HistoryError::Poisoned => write!(f, "the history's state is poisoned"),
         }
     }
@@ -177,9 +193,18 @@ struct Stacks {
     redo: Vec<Entry>,
 }
 
-#[derive(Default)]
 pub struct History {
     stacks: Mutex<Stacks>,
+    abandon_after: Duration,
+}
+
+impl Default for History {
+    fn default() -> Self {
+        History {
+            stacks: Mutex::default(),
+            abandon_after: ABANDONED_MOVE,
+        }
+    }
 }
 
 impl History {
@@ -222,6 +247,7 @@ impl History {
                 stacks.undo.push(Entry::Move {
                     session: session.to_string(),
                     panels: panels.to_vec(),
+                    opened: Instant::now(),
                     from,
                     to,
                 });
@@ -234,6 +260,22 @@ impl History {
 
     pub fn undo(&self) -> Result<Step, HistoryError> {
         let mut stacks = self.stacks.lock()?;
+        if let Some(Entry::Move {
+            session,
+            opened,
+            from,
+            to,
+            ..
+        }) = stacks.undo.last()
+        {
+            if (from.is_none() || to.is_none()) && opened.elapsed() >= self.abandon_after {
+                // It will never complete. Everything before it goes too:
+                // those steps restore layouts from before the move.
+                let session = session.clone();
+                stacks.undo.clear();
+                return Err(HistoryError::Abandoned(session));
+            }
+        }
         let entry = stacks.undo.last().ok_or(HistoryError::Nothing)?;
         let step = match entry {
             Entry::Local { window } => Step {
@@ -248,6 +290,7 @@ impl History {
                 panels,
                 from,
                 to,
+                ..
             } => {
                 let (from, to) = complete(session, from, to)?;
                 // Take the panels out of the destination before putting them
@@ -288,6 +331,7 @@ impl History {
                 panels,
                 from,
                 to,
+                ..
             } => {
                 let (from, to) = complete(session, from, to)?;
                 Step {
@@ -644,5 +688,20 @@ mod tests {
             }]
         );
         assert_eq!(history.undo(), Err(HistoryError::Nothing));
+    }
+
+    #[test]
+    fn a_move_never_completed_is_dropped_once_abandoned() {
+        let history = History {
+            abandon_after: Duration::ZERO,
+            ..History::default()
+        };
+        history.push_local("main").unwrap();
+        history
+            .record_move("s1", &["p".into()], Role::To, half("dock-2", "B0", "B1"))
+            .unwrap();
+
+        assert_eq!(history.undo(), Err(HistoryError::Abandoned("s1".into())));
+        assert_eq!(history.info().unwrap().undo_count, 0);
     }
 }

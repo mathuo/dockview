@@ -71,7 +71,13 @@ const api = createDockview(container, {
     // Each window keeps its own undo stack; the shell sequences them with
     // the moves between windows. An applied layout arrives through
     // fromJSON and must not wipe the stack.
-    layoutHistory: { enabled: true, clearOnFromJSON: false },
+    layoutHistory: {
+        enabled: true,
+        clearOnFromJSON: false,
+        // A resize settles into a step too late to sequence with the other
+        // windows, so it is not undoable here.
+        recordResize: false,
+    },
     createComponent: (options) =>
         renderers[options.name]?.() ?? new ScratchPanel(),
 });
