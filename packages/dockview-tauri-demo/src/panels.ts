@@ -5,18 +5,21 @@ import type {
     IContentRenderer,
     SerializedDockview,
 } from 'dockview';
+import type { HistoryStepInfo, MultiWindow } from 'dockview-enterprise';
 import {
     broadcastLayout,
     nativeHostInfo,
     onLayoutBroadcast,
     openNativeWindow,
     windowLabel,
+    workspaceInfo,
 } from './bridge';
 import { resolveDndStrategy } from './dnd';
-import { LogView, button, el, field, verdict } from './dom';
+import { button, el, field, LogView, verdict } from './dom';
 import { diagnosePopoutUrl, readHostReport } from './host';
 import { describe, probeWindowOpen } from './probes';
 import { RELEASE_ORIGIN_URL, simulateReleaseOriginRestore } from './simulate';
+import type { ShellMultiWindow } from './transport';
 
 abstract class DemoPanel implements IContentRenderer {
     protected readonly root = el('div', { class: 'demo-panel' });
@@ -349,7 +352,7 @@ export class NativeWindowPanel extends DemoPanel {
                 el(
                     'p',
                     { class: 'demo-note' },
-                    'The second window runs a separate webview with its own dockview instance. Panels cannot be dragged between the two — share layout state over IPC instead.'
+                    'The second window runs a separate webview with its own dockview instance, so no DOM can move between the two. Tabs and groups can still be dragged across: the Cross-window drag panel explains how.'
                 ),
                 log.element
             )
@@ -408,6 +411,232 @@ export class LayoutSyncPanel extends DemoPanel {
             )
         );
     }
+}
+
+/**
+ * Drag between native windows, brokered by the shell. The OS drag carries a
+ * session id; the shell holds what the drag carries; the window the drop
+ * lands in rebuilds it and the source removes its copy. Only an HTML5 drag
+ * can leave a window, so the pointer backend is the first thing to rule out
+ * when nothing crosses.
+ */
+export class CrossWindowDragPanel extends DemoPanel {
+    constructor(private readonly shell: Promise<ShellMultiWindow>) {
+        super();
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        const log = new LogView();
+        const api = parameters.containerApi;
+        const status = el('div');
+        const detach = el('input', { type: 'checkbox' }) as HTMLInputElement;
+        let shell: ShellMultiWindow | undefined;
+
+        const render = () => {
+            const caps = api.dndCapabilities;
+            const counters = shell?.counters;
+            status.replaceChildren(
+                field('window id', shell?.multiWindow.windowId ?? 'starting'),
+                verdict(
+                    caps.html5,
+                    caps.html5
+                        ? 'HTML5 drag active — a drag can leave this window.'
+                        : 'Pointer backend only — a drag stops at the window edge. Force ?dnd=html5.'
+                ),
+                ...(counters
+                    ? [
+                          field('drags started', String(counters.dragsStarted)),
+                          field(
+                              'drops accepted',
+                              String(counters.dropsAccepted)
+                          ),
+                          field('drops refused', String(counters.dropsRefused)),
+                          field('releases', String(counters.releases)),
+                      ]
+                    : [])
+            );
+        };
+
+        detach.addEventListener('change', () => {
+            shell?.multiWindow.updateOptions({ detach: detach.checked });
+        });
+
+        void this.shell.then((ready) => {
+            shell = ready;
+            this.onDispose(
+                ready.onLog((line) => {
+                    log.append(line);
+                    render();
+                })
+            );
+            render();
+        });
+
+        render();
+        this.onDispose(api.onDidLayoutChange(render).dispose);
+
+        this.root.append(
+            section(
+                'Cross-window drag',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'Open a second native window, then drag a tab or a group header from one window into the other. The drag carries only a session id; the shell holds what it carries and tells the source to let go once the drop is accepted.'
+                ),
+                status,
+                el(
+                    'label',
+                    { class: 'demo-field' },
+                    detach,
+                    ' open a new window when a drag ends outside every window (an Escape-cancelled drag looks the same to HTML5, so off by default)'
+                ),
+                log.element
+            )
+        );
+    }
+}
+
+/**
+ * What the orchestrator has on record: the file, when it was last written,
+ * and every window with its frame and whether it has reported a layout.
+ * Read back from the shell rather than from this window, since the point is
+ * that the shell is the one that knows.
+ */
+export class WorkspacePanel extends DemoPanel {
+    init(parameters: GroupPanelPartInitParameters): void {
+        const api = parameters.containerApi;
+        const body = el('div');
+
+        const render = async () => {
+            const info = await workspaceInfo();
+            if (!info) {
+                body.replaceChildren(field('shell', 'not running under Tauri'));
+                return;
+            }
+            body.replaceChildren(
+                field('file', info.path),
+                field(
+                    'last saved',
+                    info.lastSaved
+                        ? new Date(info.lastSaved).toLocaleTimeString()
+                        : 'not yet this run'
+                ),
+                ...info.windows.map((window) =>
+                    field(
+                        window.label,
+                        `${
+                            window.geometry
+                                ? `${window.geometry.width}×${window.geometry.height} at ${window.geometry.x},${window.geometry.y}`
+                                : 'no geometry yet'
+                        } — ${window.hasLayout ? 'layout on record' : 'no layout yet'}`
+                    )
+                )
+            );
+        };
+
+        const refresh = () => {
+            void render().catch((err: unknown) => {
+                body.replaceChildren(
+                    field('workspace_info failed', describe(err))
+                );
+            });
+        };
+
+        // The save is debounced in the shell; look a moment after a change.
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        this.onDispose(
+            api.onDidLayoutChange(() => {
+                clearTimeout(timer);
+                timer = setTimeout(refresh, 1200);
+            }).dispose
+        );
+        this.onDispose(() => clearTimeout(timer));
+        refresh();
+
+        this.root.append(
+            section(
+                'Workspace',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'The shell owns one file naming every window, its frame and its dockview layout. Each window receives its layout from the shell at start and reports changes back; close the app and reopen it to see every window return.'
+                ),
+                body,
+                button('Re-read', refresh)
+            )
+        );
+    }
+}
+
+/**
+ * The one undo history across every window. Each window keeps dockview's
+ * own stack for its local steps; the shell orders them with the moves
+ * between windows and says which window undoes next. Ctrl+Z anywhere goes
+ * to the shell.
+ */
+export class HistoryPanel extends DemoPanel {
+    constructor(private readonly shell: Promise<ShellMultiWindow>) {
+        super();
+    }
+
+    init(): void {
+        const log = new LogView();
+        const status = el('div');
+        let multiWindow: MultiWindow | undefined;
+
+        const render = () => {
+            const info = multiWindow?.history;
+            status.replaceChildren(
+                field('undo steps', String(info?.undoCount ?? 0)),
+                field('next undo', describeStep(info?.nextUndo)),
+                field('redo steps', String(info?.redoCount ?? 0)),
+                field('next redo', describeStep(info?.nextRedo))
+            );
+        };
+
+        void this.shell.then((shell) => {
+            multiWindow = shell.multiWindow;
+            const history = multiWindow.onDidChangeHistory(render);
+            this.onDispose(() => history.dispose());
+            const moves = multiWindow.onDidMoveAcrossWindows((event) => {
+                log.append(
+                    `${event.reason}: ${event.panels.join(', ')} ${event.from} → ${event.to}`
+                );
+            });
+            this.onDispose(() => moves.dispose());
+            render();
+        });
+        render();
+
+        this.root.append(
+            section(
+                'Undo across windows',
+                el(
+                    'p',
+                    { class: 'demo-note' },
+                    'One history for every window. Ctrl+Z here undoes the most recent step wherever it happened, including a tab that crossed to another window.'
+                ),
+                status,
+                el(
+                    'div',
+                    { class: 'demo-buttons' },
+                    button('Undo', () => multiWindow?.undo()),
+                    button('Redo', () => multiWindow?.redo())
+                ),
+                log.element
+            )
+        );
+    }
+}
+
+function describeStep(step: HistoryStepInfo | undefined): string {
+    if (!step) {
+        return 'nothing';
+    }
+    if (step.type === 'local') {
+        return `a step in ${step.windowId}`;
+    }
+    return `move of ${step.panels.join(', ')} from ${step.from ?? '?'} to ${step.to ?? '?'}`;
 }
 
 /** Plain content, so the layout has something ordinary to dock around. */
