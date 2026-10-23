@@ -96,23 +96,31 @@ interface IOrthogonalSashCandidate {
     readonly isOuter: boolean;
 }
 
+interface IJunctionSash {
+    readonly splitview: Splitview;
+    readonly sash: ISashItem;
+}
+
 // owned by the sash that found it; only the owner clears it
-let activeMultidrag: { owner: HTMLElement; partner: HTMLElement } | undefined;
+let activeMultidrag: { owner: HTMLElement; sashes: HTMLElement[] } | undefined;
 
 function setActiveMultidrag(
-    pair: { owner: HTMLElement; partner: HTMLElement } | undefined
+    next: { owner: HTMLElement; sashes: HTMLElement[] } | undefined
 ): void {
     if (
-        activeMultidrag?.owner === pair?.owner &&
-        activeMultidrag?.partner === pair?.partner
+        activeMultidrag?.owner === next?.owner &&
+        activeMultidrag?.sashes.length === next?.sashes.length &&
+        activeMultidrag?.sashes.every((s, i) => s === next?.sashes[i])
     ) {
         return;
     }
-    activeMultidrag?.owner.classList.remove('dv-sash-multidrag');
-    activeMultidrag?.partner.classList.remove('dv-sash-multidrag');
-    activeMultidrag = pair;
-    pair?.owner.classList.add('dv-sash-multidrag');
-    pair?.partner.classList.add('dv-sash-multidrag');
+    for (const element of activeMultidrag?.sashes ?? []) {
+        element.classList.remove('dv-sash-multidrag');
+    }
+    activeMultidrag = next;
+    for (const element of next?.sashes ?? []) {
+        element.classList.add('dv-sash-multidrag');
+    }
 }
 
 function clearActiveMultidrag(owner: HTMLElement): void {
@@ -576,27 +584,27 @@ export class Splitview {
             // cached per hover
             let candidates: IOrthogonalSashCandidate[] | undefined;
 
-            const findOrthogonal = (event: PointerEvent) => {
+            const findJunction = (event: PointerEvent) => {
                 candidates ??= this.getOrthogonalSashCandidates();
-                const orthogonal = this.findOrthogonalSash(
+                const junction = this.findJunctionSashes(
                     sash,
                     event,
                     candidates
                 );
-                if (orthogonal) {
+                if (junction) {
                     setActiveMultidrag({
                         owner: sash,
-                        partner: orthogonal.sash.container,
+                        sashes: junction.map((j) => j.sash.container),
                     });
                 } else {
                     clearActiveMultidrag(sash);
                 }
-                return orthogonal;
+                return junction;
             };
 
             const onPointerMove = (event: PointerEvent) => {
                 if (!dragging && event.buttons === 0) {
-                    findOrthogonal(event);
+                    findJunction(event);
                 }
             };
 
@@ -615,29 +623,13 @@ export class Splitview {
                     (s) => s.container === sash
                 );
 
-                const orthogonal = findOrthogonal(event);
+                const junction = findJunction(event);
                 dragging = true;
 
-                const targets: {
-                    splitview: Splitview;
-                    sashIndex: number;
-                }[] = [{ splitview: this, sashIndex }];
-
-                if (orthogonal) {
-                    const orthogonalTarget = {
-                        splitview: orthogonal.splitview,
-                        sashIndex: orthogonal.splitview.sashes.indexOf(
-                            orthogonal.sash
-                        ),
-                    };
-                    // the outer layout resets the inner from its proportions,
-                    // so the inner drag must update last
-                    if (orthogonal.isOuter) {
-                        targets.unshift(orthogonalTarget);
-                    } else {
-                        targets.push(orthogonalTarget);
-                    }
-                }
+                const targets = junction?.map((j) => ({
+                    splitview: j.splitview,
+                    sashIndex: j.splitview.sashes.indexOf(j.sash),
+                })) ?? [{ splitview: this, sashIndex }];
 
                 this.startPointerDrag(sash, event, targets, () => {
                     dragging = false;
@@ -1228,13 +1220,19 @@ export class Splitview {
         return candidates;
     }
 
-    /** The orthogonal sash that `sash` meets nearest the pointer, if any. */
-    private findOrthogonalSash(
+    /**
+     * Every sash meeting at the junction nearest the pointer, outermost
+     * first: the outer layout resets the inner ones from their proportions,
+     * so inner drags must update last.
+     */
+    private findJunctionSashes(
         sash: HTMLElement,
         event: PointerEvent,
         candidates: IOrthogonalSashCandidate[]
-    ): { splitview: Splitview; sash: ISashItem; isOuter: boolean } | undefined {
+    ): IJunctionSash[] | undefined {
+        const own = this.sashes.find((item) => item.container === sash);
         if (
+            !own ||
             candidates.length === 0 ||
             this._disabled ||
             sash.classList.contains('dv-disabled') ||
@@ -1248,16 +1246,73 @@ export class Splitview {
                 ? MULTIDRAG_TOUCH_REACH
                 : MULTIDRAG_POINTER_REACH;
         // with a margin, sashes stop short of the sash they meet
-        const gap = this._margin;
-        const horizontal = this._orientation === Orientation.HORIZONTAL;
-        const own = sash.getBoundingClientRect();
+        const slack = this._margin + reach;
 
-        let best:
-            | { splitview: Splitview; sash: ISashItem; isOuter: boolean }
+        let nearest:
+            | {
+                  other: IJunctionSash & { isOuter: boolean };
+                  x: number;
+                  y: number;
+              }
             | undefined;
-        let bestDistance = Number.POSITIVE_INFINITY;
+        let nearestDistance = Number.POSITIVE_INFINITY;
 
-        const others = candidates
+        for (const { other, x, y } of this.findSashesMeeting(
+            own,
+            candidates,
+            slack
+        )) {
+            const distance = Math.max(
+                Math.abs(event.clientX - x),
+                Math.abs(event.clientY - y)
+            );
+            if (
+                distance <= reach + this._margin / 2 &&
+                distance < nearestDistance
+            ) {
+                nearestDistance = distance;
+                nearest = { other, x, y };
+            }
+        }
+
+        if (!nearest) {
+            return undefined;
+        }
+
+        // the sash running through the junction; gather everything meeting it
+        // there, e.g. both halves of a '+'
+        const outer: IJunctionSash = nearest.other.isOuter
+            ? nearest.other
+            : { splitview: this, sash: own };
+        const { x, y } = nearest;
+        const inner = outer.splitview
+            .findSashesMeeting(
+                outer.sash,
+                outer.splitview
+                    .getOrthogonalSashCandidates()
+                    .filter((candidate) => !candidate.isOuter),
+                slack
+            )
+            .filter(
+                (meeting) =>
+                    Math.abs(meeting.x - x) <= reach &&
+                    Math.abs(meeting.y - y) <= reach
+            )
+            .map((meeting) => meeting.other);
+
+        return [outer, ...inner];
+    }
+
+    /** The usable candidate sashes that meet `sash`, and where. */
+    private findSashesMeeting(
+        sash: ISashItem,
+        candidates: IOrthogonalSashCandidate[],
+        slack: number
+    ): { other: IJunctionSash & { isOuter: boolean }; x: number; y: number }[] {
+        const own = sash.container.getBoundingClientRect();
+        const horizontal = this._orientation === Orientation.HORIZONTAL;
+
+        return candidates
             .filter(({ splitview }) => !splitview._disabled)
             .flatMap(({ splitview, isOuter }) =>
                 splitview.sashes
@@ -1266,30 +1321,16 @@ export class Splitview {
                             !item.container.classList.contains('dv-disabled')
                     )
                     .map((item) => ({ splitview, sash: item, isOuter }))
-            );
-
-        for (const other of others) {
-            const junction = findSashJunction(
-                own,
-                other.sash.container.getBoundingClientRect(),
-                horizontal,
-                gap + reach
-            );
-            if (!junction) {
-                continue;
-            }
-
-            const distance = Math.max(
-                Math.abs(event.clientX - junction.x),
-                Math.abs(event.clientY - junction.y)
-            );
-            if (distance <= reach + gap / 2 && distance < bestDistance) {
-                bestDistance = distance;
-                best = other;
-            }
-        }
-
-        return best;
+            )
+            .flatMap((other) => {
+                const junction = findSashJunction(
+                    own,
+                    other.sash.container.getBoundingClientRect(),
+                    horizontal,
+                    slack
+                );
+                return junction ? [{ other, ...junction }] : [];
+            });
     }
 
     private updateSashEnablement(): void {

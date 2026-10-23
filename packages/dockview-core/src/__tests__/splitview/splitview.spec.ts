@@ -1302,6 +1302,74 @@ describe('splitview', () => {
             expect(isMultidrag(outerSash)).toBe(false);
         });
 
+        // two nested vertical splitviews side by side, their sashes aligned
+        // so all three sashes meet in a '+'
+        const setupCross = () => {
+            const outer = new Splitview(document.createElement('div'), {
+                orientation: Orientation.HORIZONTAL,
+                proportionalLayout: true,
+            });
+            outer.layout(400, 300);
+
+            const left = new NestedView();
+            const right = new NestedView();
+            outer.addView(left, Sizing.Distribute);
+            outer.addView(right, Sizing.Distribute);
+
+            const scope = {};
+            outer.multidragScope = () => scope;
+            const tops = [left, right].map((nested) => {
+                const top = new Testview(0, 1000);
+                nested.inner.addView(top, Sizing.Distribute);
+                nested.inner.addView(new Testview(0, 1000), Sizing.Distribute);
+                nested.inner.multidragScope = () => scope;
+                return top;
+            });
+
+            const sashOf = (splitview: Splitview) =>
+                (splitview as any).element.querySelector(
+                    ':scope > .dv-sash-container > .dv-sash'
+                ) as HTMLElement;
+            const outerSash = sashOf(outer);
+            const leftSash = sashOf(left.inner);
+            const rightSash = sashOf(right.inner);
+            setRect(outerSash, 198, 0, 4, 300);
+            setRect(leftSash, 0, 148, 198, 4);
+            setRect(rightSash, 202, 148, 198, 4);
+
+            return { outer, tops, outerSash, leftSash, rightSash };
+        };
+
+        test.each([
+            ['the outer sash', 'outerSash'],
+            ['one half of the crossing sash', 'leftSash'],
+        ] as const)("hovering a '+' from %s marks every sash meeting there", (_, from) => {
+            const ctx = setupCross();
+
+            hover(ctx[from], 199, 150);
+
+            expect(isMultidrag(ctx.outerSash)).toBe(true);
+            expect(isMultidrag(ctx.leftSash)).toBe(true);
+            expect(isMultidrag(ctx.rightSash)).toBe(true);
+        });
+
+        test("dragging a '+' moves every sash meeting there", () => {
+            const { outer, tops, leftSash } = setupCross();
+
+            fireEvent(
+                leftSash,
+                new MouseEvent('pointerdown', { clientX: 199, clientY: 150 })
+            );
+            fireEvent(
+                document,
+                new MouseEvent('pointermove', { clientX: 229, clientY: 190 })
+            );
+            fireEvent(document, new MouseEvent('pointerup'));
+
+            expect(outer.getViewSize(0)).toBe(230);
+            expect(tops.map((top) => top.size)).toEqual([190, 190]);
+        });
+
         test('away from the junction it is a plain sash', () => {
             const { outerSash, innerSash } = setup();
 
