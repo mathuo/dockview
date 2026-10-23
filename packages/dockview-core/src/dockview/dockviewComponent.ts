@@ -1612,6 +1612,8 @@ export class DockviewComponent
             locked: options.locked,
             margin: options.theme?.gap ?? 0,
             className: options.className,
+            disableOrthogonalSashMultidrag:
+                options.disableOrthogonalSashMultidrag,
         });
 
         this._options = options;
@@ -2954,6 +2956,13 @@ export class DockviewComponent
         }
     }
 
+    private syncNestedOrthogonalSashMultidrag(): void {
+        for (const gridview of this.nestedGridviews()) {
+            gridview.orthogonalSashMultidrag =
+                this.gridview.orthogonalSashMultidrag;
+        }
+    }
+
     /** The gridviews hosted by open floating and popout windows. */
     private nestedGridviews(): Gridview[] {
         return [
@@ -2972,7 +2981,7 @@ export class DockviewComponent
     private createNestedGridview(
         orientation: Orientation = Orientation.HORIZONTAL
     ): Gridview {
-        return new Gridview(
+        const gridview = new Gridview(
             this.gridview.proportionalLayout,
             this.options.hideBorders
                 ? { separatorBorder: 'transparent' }
@@ -2981,6 +2990,9 @@ export class DockviewComponent
             this.gridview.locked,
             this.options.theme?.gap ?? 0
         );
+        gridview.orthogonalSashMultidrag =
+            this.gridview.orthogonalSashMultidrag;
+        return gridview;
     }
 
     /**
@@ -3186,6 +3198,10 @@ export class DockviewComponent
             for (const gridview of this.nestedGridviews()) {
                 gridview.proportionalLayout = proportionalLayout;
             }
+        }
+
+        if ('disableOrthogonalSashMultidrag' in options) {
+            this.syncNestedOrthogonalSashMultidrag();
         }
 
         if ('theme' in options) {
