@@ -96,6 +96,10 @@ export type HistoryRequest =
  * How a window reaches the orchestrator. One object, in three parts: the
  * drags, the workspace, and the shared history. Subscriptions resolve to a
  * disposable, since most message buses register a listener asynchronously.
+ *
+ * Messages may take any time to arrive, but those between one window and
+ * the orchestrator must arrive in the order they were sent, in each
+ * direction: a drag's end, for one, has to follow its start.
  */
 export interface MultiWindowTransport {
     /** This window's id, as the orchestrator and other windows name it. */
