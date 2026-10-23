@@ -38,7 +38,7 @@
     "resolutions": {
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "vite": "^7.3.3"
+        "vite": "^7.3.7"
     },
     "devDependencies": {
         "@angular/common": "^21.2.12",
@@ -84,7 +84,7 @@
         "tslib": "^2.6.2",
         "typedoc": "^0.28.19",
         "typescript": "~5.9.0",
-        "vite": "^7.3.3",
+        "vite": "^7.3.7",
         "vitest": "^4.1.6",
         "vue": "^3.5.34",
         "vue-tsc": "^3.2.8",
