@@ -233,10 +233,17 @@ impl Workspace {
     /// an undo or redo does. It is trusted as is: the orchestrator computed
     /// it from layouts it already held, and applies the two windows' halves
     /// in an order that never leaves a panel in both.
-    pub fn set_layout_unchecked(&self, label: &str, layout: Value) -> Result<(), WorkspaceError> {
+    /// Store several layouts the orchestrator applies together, at once: a
+    /// report arriving between them could otherwise pass the duplicate check
+    /// against a half-written step.
+    pub fn set_layouts_unchecked(
+        &self,
+        layouts: Vec<(String, Value)>,
+    ) -> Result<(), WorkspaceError> {
         let mut state = self.state.lock()?;
-        let window = entry(&mut state, label);
-        window.layout = Some(layout);
+        for (label, layout) in layouts {
+            entry(&mut state, &label).layout = Some(layout);
+        }
         Ok(())
     }
 
@@ -424,7 +431,7 @@ mod tests {
         workspace.set_layout("main", layout(&["a", "b"])).unwrap();
 
         assert!(workspace
-            .set_layout_unchecked("dock-2", layout(&["b"]))
+            .set_layouts_unchecked(vec![("dock-2".into(), layout(&["b"]))])
             .is_ok());
         assert_eq!(
             workspace.load_layout("dock-2").unwrap(),

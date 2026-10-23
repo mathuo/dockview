@@ -101,15 +101,25 @@ fn broadcast_history(app: &AppHandle) {
 
 /// Carries out an undo or redo step the history handed back.
 fn carry_out(app: &AppHandle, step: Step, reason: &'static str) -> Result<(), String> {
+    // Every layout the step applies is stored before any window is told, so
+    // a window's own report afterwards never reads as a duplicate, and all
+    // of them at once, so a stale report arriving meanwhile is checked
+    // against the whole step rather than half of it.
+    let layouts: Vec<(String, serde_json::Value)> = step
+        .actions
+        .iter()
+        .filter_map(|action| match &action.request {
+            Request::ApplyLayout { layout } => Some((action.window.clone(), layout.clone())),
+            _ => None,
+        })
+        .collect();
+    if !layouts.is_empty() {
+        app.state::<Workspace>()
+            .set_layouts_unchecked(layouts)
+            .map_err(|err| err.to_string())?;
+        app.state::<Persistence>().mark_dirty();
+    }
     for action in step.actions {
-        if let Request::ApplyLayout { layout } = &action.request {
-            // Stored before it is applied, so the window's own report
-            // afterwards never reads as a duplicate.
-            app.state::<Workspace>()
-                .set_layout_unchecked(&action.window, layout.clone())
-                .map_err(|err| err.to_string())?;
-            app.state::<Persistence>().mark_dirty();
-        }
         // The payload names its window: a listener registered for "any"
         // target hears events emitted to every window, so the receiver
         // filters as well as the sender targeting.
