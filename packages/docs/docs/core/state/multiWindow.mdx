@@ -27,9 +27,13 @@ import { installMultiWindow } from 'dockview-enterprise';
 const api = createDockview(element, {
     components,
     // Each window keeps its own undo stack; the orchestrator sequences them
-    // with the moves between windows. An applied layout arrives through
-    // fromJSON and must not wipe the stack.
-    layoutHistory: { enabled: true, clearOnFromJSON: false },
+    // with the moves between windows. See "Undo across windows" for why
+    // each of these is needed.
+    layoutHistory: {
+        enabled: true,
+        clearOnFromJSON: false,
+        recordResize: false,
+    },
     // Every window numbers its groups from "1" by default, so a group moved
     // between windows would collide on arrival. Any unique id will do; note
     // that `crypto.randomUUID` needs a secure context, which a custom-scheme
@@ -146,6 +150,22 @@ Use `multiWindow.undo()` rather than `api.undo()` for an undo button: the
 api's undo is this window's own stack, which bypasses the order across
 windows. Pass `history: false` to keep undo local to each window; the handle's
 `undo` and `redo` then fall back to the api's.
+
+The shared history relies on each window's own history keeping in step with
+the markers the orchestrator holds for it, which needs these `layoutHistory`
+options. Each one left on is reported once on the console.
+
+- `clearOnFromJSON: false`. An undone or redone move arrives through
+  `fromJSON`, which would otherwise clear the window's own stack.
+- `recordResize: false`. Dockview records a run of sash drags as one step
+  only once the run settles. An undo or redo that reaches the window before
+  then is carried out against a stack without it, and the late step can later
+  restore a layout from before a move. Resizes are not undoable across
+  windows.
+- `undoableProgrammaticMutations: false` (the default). The install adds and
+  removes panels through the api; those must not become steps of their own.
+- `depth` at least the orchestrator's history depth (25 for both by default),
+  so every marker still has its step.
 
 ## The transport
 
@@ -353,9 +373,12 @@ implementation of the same three.
   before and after). A local step pushes a marker and clears redo; a half
   arriving for a session already on the stack completes it in place,
   otherwise it opens a new entry. Undo and redo pop and push between the two
-  stacks and yield the actions in the table above. Bound the stack (50 in the
-  shipped orchestrators) and drop every entry that involves a window that
-  closed.
+  stacks and yield the actions in the table above. Bound the stack (25 in the
+  shipped orchestrators, dockview's own default depth) and drop every entry
+  that involves a window that closed, together with every entry before a
+  move it drops. A move still missing a half long after its first arrived
+  (10 s in the shipped orchestrators) will never complete; drop it the same
+  way rather than let it block undo.
 
 The orchestrator also owns what no window can: creating and placing windows,
 and persisting the workspace. Record a window's frame when the host moves it,
@@ -402,12 +425,8 @@ message bus.
   not on its layout edges: the root drop target refuses an in-page drag that
   belongs to another dockview. Separate windows are unaffected, since the
   other window never sees that data.
-- **A resize still being coalesced when a shared undo arrives.** Dockview's
-  history coalesces a run of sash drags into one step when the next step
-  begins. A shared undo that reaches the window inside that interval
-  finalises the resize first and undoes it, rather than the step the
-  orchestrator meant, and the resize is never reported. Give a resize its
-  coalescing interval before undoing.
+- **Resizes are not undoable across windows.** See the required options
+  under [Undo across windows](#undo-across-windows).
 
 ## See also
 

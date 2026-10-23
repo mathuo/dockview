@@ -11,7 +11,12 @@
  * been undone.
  *
  * Needs `layoutHistory` enabled with `clearOnFromJSON: false`, since an
- * applied layout arrives through `fromJSON` and must not wipe the stack.
+ * applied layout arrives through `fromJSON` and must not wipe the stack;
+ * `recordResize: false`, since a resize is only recorded once its run of
+ * sash drags settles, which can fall after a request has already been
+ * carried out against the stack without it; and
+ * `undoableProgrammaticMutations: false`, since the install's own adds and
+ * removes must not become local steps. Each is reported once if broken.
  */
 
 import {
@@ -44,7 +49,7 @@ export class SharedHistory extends CompositeDisposable {
      * are not reported back as new steps.
      */
     private _applyDepth = 0;
-    private _warnedCleared = false;
+    private readonly _warned = new Set<string>();
 
     private readonly _onDidChange = new Emitter<HistoryInfo>();
     readonly onDidChange: Event<HistoryInfo> = this._onDidChange.event;
@@ -65,9 +70,19 @@ export class SharedHistory extends CompositeDisposable {
         this.addDisposables(
             this._onDidChange,
             api.onDidChangeHistory((event) => {
+                if (event.reason === 'push') {
+                    if (event.lastEntry?.kind === 'resize') {
+                        this._warnOption('recordResize');
+                    } else if (event.lastEntry?.origin === 'api') {
+                        this._warnOption('undoableProgrammaticMutations');
+                    }
+                }
                 if (this._applyDepth > 0) {
                     if (event.reason === 'clear') {
-                        this._warnCleared();
+                        // An applied layout cleared this window's own
+                        // history, so the steps the orchestrator has on
+                        // record for it can no longer be undone here.
+                        this._warnOption('clearOnFromJSON');
                     }
                     return;
                 }
@@ -159,15 +174,17 @@ export class SharedHistory extends CompositeDisposable {
         }
     }
 
-    /**
-     * An applied layout cleared this window's own history, so the steps the
-     * orchestrator has on record for it can no longer be undone here.
-     */
-    private _warnCleared(): void {
-        if (!this._warnedCleared) {
-            this._warnedCleared = true;
+    /** A `layoutHistory` option the shared history needs off is on. */
+    private _warnOption(
+        option:
+            | 'clearOnFromJSON'
+            | 'recordResize'
+            | 'undoableProgrammaticMutations'
+    ): void {
+        if (!this._warned.has(option)) {
+            this._warned.add(option);
             console.warn(
-                "dockview: the shared history needs layoutHistory.clearOnFromJSON set to false; an applied layout cleared this window's own history."
+                `dockview: the shared history needs layoutHistory.${option} set to false; undo across windows can restore the wrong layout while it is on.`
             );
         }
     }
