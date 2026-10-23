@@ -1,0 +1,105 @@
+/**
+ * A window's side of the workspace. The orchestrator owns the whole: it
+ * knows every window, hands each one its layout at start, and each window
+ * reports its layout back whenever it changes. The dockview part stays
+ * here, `fromJSON` on the way in and `toJSON` on the way out; the
+ * orchestrator stores the result without reading it.
+ */
+
+import {
+    type DockviewApi,
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewDisposable as Disposable,
+    type SerializedDockview,
+} from 'dockview';
+import type { MultiWindowTransport } from './transport';
+
+const DEFAULT_DEBOUNCE_MS = 300;
+
+export interface WindowWorkspaceOptions {
+    /** Fills a window the orchestrator holds no layout for. */
+    buildDefaults(windowId: string): void | Promise<void>;
+    debounceMs?: number;
+}
+
+export class WindowWorkspace extends CompositeDisposable {
+    private readonly _api: DockviewApi;
+    private readonly _transport: MultiWindowTransport;
+    private readonly _debounceMs: number;
+    private _timer: ReturnType<typeof setTimeout> | undefined;
+
+    /** Resolves once the window holds its initial layout, restored or default. */
+    readonly ready: Promise<{ restored: boolean }>;
+
+    constructor(
+        api: DockviewApi,
+        transport: MultiWindowTransport,
+        options: WindowWorkspaceOptions
+    ) {
+        super();
+        this._api = api;
+        this._transport = transport;
+        this._debounceMs = options.debounceMs ?? DEFAULT_DEBOUNCE_MS;
+        this.addDisposables(Disposable.from(() => clearTimeout(this._timer)));
+        this.ready = this._restore(options.buildDefaults);
+    }
+
+    private async _restore(
+        buildDefaults: WindowWorkspaceOptions['buildDefaults']
+    ): Promise<{ restored: boolean }> {
+        const windowId = this._transport.windowId;
+        let layout: SerializedDockview | null = null;
+        try {
+            layout = await this._transport.loadLayout();
+        } catch (err: unknown) {
+            // The window still has to show something.
+            console.error(
+                'dockview: no layout from the orchestrator; building defaults.',
+                err
+            );
+        }
+
+        if (this.isDisposed) {
+            return { restored: false };
+        }
+
+        let restored = false;
+        if (layout) {
+            try {
+                this._api.fromJSON(layout);
+                restored = true;
+            } catch (err: unknown) {
+                console.error(
+                    'dockview: could not restore the layout; building defaults.',
+                    err
+                );
+                this._api.clear();
+                await buildDefaults(windowId);
+            }
+        } else {
+            await buildDefaults(windowId);
+        }
+
+        // Only report from here on, so a half-built default layout and the
+        // restore itself are not written back over what the orchestrator
+        // held.
+        if (!this.isDisposed) {
+            this.addDisposables(
+                this._api.onDidLayoutChange(() => this._scheduleReport())
+            );
+            this._scheduleReport();
+        }
+        return { restored };
+    }
+
+    private _scheduleReport(): void {
+        clearTimeout(this._timer);
+        this._timer = setTimeout(() => {
+            this._transport
+                .reportLayout(this._api.toJSON())
+                .catch((err: unknown) => {
+                    console.warn('dockview: layout refused.', err);
+                });
+        }, this._debounceMs);
+    }
+}
