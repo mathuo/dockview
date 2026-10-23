@@ -230,6 +230,13 @@ that caused it. The install copes with a transport that answers slowly or
 fails at start (the window builds its defaults and reports the error), and with
 one that answers after `dispose()`.
 
+Messages may take any time to arrive, but those between one window and the
+orchestrator must arrive in the order they were sent, in each direction. A
+drag's end has to follow its start, for instance, or the drag is never
+settled. Tauri commands and events, Electron's `invoke` and `send`, and a
+`BroadcastChannel` all keep that order; a bus that does not needs a sequence
+number per window to restore it.
+
 ### Example: an Electron bridge
 
 The main process runs the orchestrator and owns the windows:
