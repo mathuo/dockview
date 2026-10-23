@@ -608,6 +608,8 @@ export class Splitview {
             };
 
             const onPointerStart = (event: PointerEvent) => {
+                // the layout may have changed since the hover began
+                candidates = undefined;
                 const sashIndex = firstIndex(
                     this.sashes,
                     (s) => s.container === sash

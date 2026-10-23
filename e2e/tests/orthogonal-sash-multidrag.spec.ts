@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
-// #1228. Needs real layout. `setupTwoByTwo`: two columns of two rows.
+// Needs real layout. `setupTwoByTwo`: two columns of two rows.
 test.describe('orthogonal sash multidrag', () => {
     const setup = async (page: Page, query = '') => {
         await page.goto(`/e2e/fixtures/index.html${query}`);

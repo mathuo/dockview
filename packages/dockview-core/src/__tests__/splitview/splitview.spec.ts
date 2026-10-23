@@ -1277,6 +1277,31 @@ describe('splitview', () => {
             expect(isMultidrag(outerSash)).toBe(false);
         });
 
+        test('pointerdown re-finds candidates that changed during the hover', () => {
+            const { outer, top, outerSash, innerSash } = setup();
+            const scope = outer.multidragScope;
+            outer.multidragScope = undefined;
+
+            hover(innerSash);
+            expect(isMultidrag(innerSash)).toBe(false);
+
+            // linked while the pointer rests on the sash
+            outer.multidragScope = scope;
+            fireEvent(
+                innerSash,
+                new MouseEvent('pointerdown', { clientX: 200, clientY: 150 })
+            );
+            fireEvent(
+                document,
+                new MouseEvent('pointermove', { clientX: 230, clientY: 190 })
+            );
+            fireEvent(document, new MouseEvent('pointerup'));
+
+            expect(outer.getViewSize(0)).toBe(230);
+            expect(top.size).toBe(190);
+            expect(isMultidrag(outerSash)).toBe(false);
+        });
+
         test('away from the junction it is a plain sash', () => {
             const { outerSash, innerSash } = setup();
 
