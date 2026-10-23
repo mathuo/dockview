@@ -12,11 +12,15 @@ import {
     PopoutGroupChangePositionEvent,
     PopoutGroupChangeSizeEvent,
     SerializedDockview,
+    SerializedDockviewGroup,
 } from '../dockview/dockviewComponent';
 import { PopoutWindowEvent, PopoutWindowFailure } from '../popoutWindow';
 import { DndCapabilities } from '../dockview/dndCapabilities';
+import { GroupviewPanelState } from '../dockview/types';
 import {
     AddGroupOptions,
+    AddGroupFromJSONOptions,
+    AddPanelFromJSONOptions,
     AddPanelOptions,
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
@@ -1005,10 +1009,17 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     /**
      * Remove a panel given the panel object.
+     *
+     * `removeEmptyGroup` overrides the `closeEmptyGroups` option for this
+     * call: `false` keeps the group if the panel was its last one, `true`
+     * removes it.
      */
-    removePanel(panel: IDockviewPanel): void {
+    removePanel(
+        panel: IDockviewPanel,
+        options?: { removeEmptyGroup?: boolean }
+    ): void {
         this.component.withOrigin('api', () =>
-            this.component.removePanel(panel)
+            this.component.removePanel(panel, options)
         );
     }
 
@@ -1018,6 +1029,46 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
         return this.component.withOrigin('api', () =>
             this.component.addGroup(options)
+        );
+    }
+
+    /**
+     * Serialize one group together with the state of every panel it holds.
+     * The result is self-contained and can be rehydrated with
+     * `addGroupFromJSON`, on this instance or another one.
+     */
+    serializeGroup(group: IDockviewGroupPanel): SerializedDockviewGroup {
+        return this.component.serializeGroup(<DockviewGroupPanel>group);
+    }
+
+    /**
+     * Rebuild a group from `serializeGroup` output and add it to the live
+     * layout, positioned as for `addGroup`, leaving the rest of the layout
+     * untouched. Throws before changing anything if a panel id is already in
+     * use.
+     */
+    addGroupFromJSON(
+        data: SerializedDockviewGroup,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        return this.component.withOrigin('api', () =>
+            this.component.addGroupFromJSON(data, options)
+        );
+    }
+
+    /**
+     * Add a panel from its `toJSON()` state, placed as `addPanel` places
+     * one: the counterpart to `panel.toJSON()` for a single tab moving
+     * between layouts or instances, as `addGroupFromJSON` is to
+     * `serializeGroup`. Throws before changing anything if the panel id is
+     * already in use.
+     */
+    addPanelFromJSON(
+        state: GroupviewPanelState,
+        options?: AddPanelFromJSONOptions
+    ): IDockviewPanel {
+        return this.component.withOrigin('api', () =>
+            this.component.addPanelFromJSON(state, options)
         );
     }
 

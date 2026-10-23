@@ -231,7 +231,7 @@ describe('EdgeGroupView', () => {
                 { id: 'test', collapsedSize: 44 },
                 group,
                 'vertical',
-                5
+                { marginShare: 5, size: 1000 }
             );
             expect(view.collapsedSize).toBe(49);
 
@@ -333,6 +333,14 @@ describe('ShellManager', () => {
             }
         }
         return shell;
+    }
+
+    /** The view's slot size in its splitview. */
+    function sizeOf(
+        shell: ShellManager,
+        position: 'top' | 'bottom' | 'left' | 'right'
+    ): number {
+        return (shell as any)._slotSize(position);
     }
 
     describe('hasEdgeGroup', () => {
@@ -554,19 +562,6 @@ describe('ShellManager', () => {
     });
 
     describe('resizeEdgeGroup', () => {
-        function sizeOf(
-            shell: ShellManager,
-            position: 'top' | 'bottom' | 'left' | 'right'
-        ): number {
-            const s = shell as any;
-            if (position === 'left' || position === 'right') {
-                return s._outerSplitview.getViewSize(
-                    position === 'left' ? s._leftIndex : s._rightIndex
-                );
-            }
-            return s._middleColumn.getViewSize(position);
-        }
-
         describe.each([
             'left',
             'right',
@@ -581,6 +576,29 @@ describe('ShellManager', () => {
                         ...extra,
                     },
                 }) as Parameters<typeof makeShell>[0];
+
+            test('a collapse and expand before the first layout keep initialSize', () => {
+                const shell = makeShell(cfg(), 10);
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupCollapsed(position, false);
+                expect((shell.toJSON() as any)[position].size).toBe(260);
+
+                shell.layout(1000, 800);
+                expect(sizeOf(shell, position)).toBe(260);
+                shell.dispose();
+            });
+
+            test('a collapse and expand under a gap keep its size', () => {
+                const shell = makeShell(cfg(), 10);
+                shell.layout(1000, 800);
+                const before = sizeOf(shell, position);
+
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupCollapsed(position, false);
+
+                expect(sizeOf(shell, position)).toBe(before);
+                shell.dispose();
+            });
 
             test('resizes along its own axis', () => {
                 const shell = makeShell(cfg());
@@ -906,19 +924,210 @@ describe('ShellManager', () => {
                 10
             );
             shell.layout(1000, 600);
-            const size = () =>
-                (shell as any)._outerSplitview.getViewSize(
-                    (shell as any)._leftIndex
-                );
-            expect(size()).toBe(300);
+            expect(sizeOf(shell, 'left')).toBe(300);
             for (let i = 0; i < 3; i++) {
                 shell.setEdgeGroupCollapsed('left', true);
                 shell.setEdgeGroupCollapsed('left', false);
             }
-            expect(size()).toBe(300);
+            expect(sizeOf(shell, 'left')).toBe(300);
             // The peek uses the group's own size, without the gap share.
             expect(shell.getEdgeGroupExpandedSize('left')).toBe(295);
             shell.dispose();
+        });
+
+        test('a lone collapsed group shown again takes its strip with the share', () => {
+            const shell = makeShell(
+                { left: { id: 'left', initialSize: 260 } },
+                10
+            );
+            shell.layout(1000, 800);
+            shell.setEdgeGroupCollapsed('left', true);
+            shell.setEdgeGroupVisible('left', false);
+
+            shell.setEdgeGroupVisible('left', true);
+
+            // 35 plus the share of the one margin it has next to the center
+            expect(sizeOf(shell, 'left')).toBe(40);
+            shell.dispose();
+        });
+
+        test('a gap change after a direct layout re-lays out the groups', () => {
+            const shell = makeShell({ left: { id: 'left', initialSize: 260 } });
+            shell.layout(1000, 800);
+            const group = (shell as any)._leftView._group as {
+                layout: jest.Mock;
+            };
+            group.layout.mockClear();
+
+            shell.updateTheme(10, 35);
+
+            // the group now gives up its share of the new margin
+            expect(group.layout).toHaveBeenLastCalledWith(255, 800);
+            shell.dispose();
+        });
+
+        describe.each([
+            ['left', 'right'],
+            ['right', 'left'],
+            ['top', 'bottom'],
+            ['bottom', 'top'],
+        ] as const)('%s with a hidden %s', (position, sibling) => {
+            // the share, as the collapsed strip carries it over the base 35
+            const shareOf = (shell: ShellManager, pos: typeof position) =>
+                (shell as any)[`_${pos}View`].collapsedSize - 35;
+            const cycle = (shell: ShellManager) => {
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupCollapsed(position, false);
+            };
+            const two = () =>
+                ({
+                    [position]: { id: position, initialSize: 260 },
+                    [sibling]: { id: sibling, initialSize: 200 },
+                }) as Parameters<typeof makeShell>[0];
+
+            test('the gap share follows the visible views on the axis', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                // three visible views share two margins
+                expect(shareOf(shell, position)).toBeCloseTo(20 / 3);
+
+                shell.setEdgeGroupVisible(sibling, false);
+                // two visible views share one margin
+                expect(shareOf(shell, position)).toBe(5);
+
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(shareOf(shell, position)).toBeCloseTo(20 / 3);
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size after the sibling is hidden', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                expect(sizeOf(shell, position)).toBe(260);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(260);
+                }
+                expect((shell.toJSON() as any)[position].size).toBe(260);
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size when the sibling is hidden before layout', () => {
+                const shell = makeShell(two(), 10);
+                shell.setEdgeGroupVisible(sibling, false);
+                shell.layout(1000, 800);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(260);
+                }
+                shell.dispose();
+            });
+
+            test('collapse and expand keep the size after the sibling is shown again', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                cycle(shell);
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(sizeOf(shell, position)).toBe(260);
+                expect(sizeOf(shell, sibling)).toBe(200);
+                for (let i = 0; i < 3; i++) {
+                    cycle(shell);
+                    expect(sizeOf(shell, position)).toBe(260);
+                }
+                shell.dispose();
+            });
+
+            test('a collapsed strip tracks the share when the sibling is hidden', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupCollapsed(position, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(35 + 20 / 3);
+
+                shell.setEdgeGroupVisible(sibling, false);
+                expect(sizeOf(shell, position)).toBe(40);
+
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(35 + 20 / 3);
+                shell.dispose();
+            });
+
+            test('a group hidden while expanded keeps its expanded size', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                expect((shell as any)[`_${sibling}View`].lastExpandedSize).toBe(
+                    200
+                );
+                expect((shell.toJSON() as any)[sibling].size).toBe(200);
+
+                // collapsed while hidden, shown, then expanded
+                shell.setEdgeGroupCollapsed(sibling, true);
+                shell.setEdgeGroupVisible(sibling, true);
+                shell.setEdgeGroupCollapsed(sibling, false);
+                expect(sizeOf(shell, sibling)).toBe(200);
+                shell.dispose();
+            });
+
+            test('a hidden collapsed group takes the current share when shown', () => {
+                const shell = makeShell(two(), 10);
+                shell.layout(1000, 800);
+                shell.setEdgeGroupCollapsed(position, true);
+                shell.setEdgeGroupVisible(position, false);
+                shell.setEdgeGroupVisible(sibling, false);
+
+                // shown next to the center alone: one margin shared by two
+                shell.setEdgeGroupVisible(position, true);
+                expect(sizeOf(shell, position)).toBe(40);
+
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(35 + 20 / 3);
+                shell.dispose();
+            });
+
+            test('a visibility toggle keeps the sizes on the other axis', () => {
+                const other =
+                    position === 'left' || position === 'right'
+                        ? 'top'
+                        : 'left';
+                const shell = makeShell(
+                    { ...two(), [other]: { id: other, initialSize: 150 } },
+                    10
+                );
+                shell.layout(1000, 800);
+                shell.setEdgeGroupCollapsed(other, true);
+                const before = sizeOf(shell, other);
+
+                shell.setEdgeGroupVisible(sibling, false);
+
+                expect(sizeOf(shell, other)).toBe(before);
+                shell.dispose();
+            });
+
+            test('a group at its minimum follows the share when the sibling is shown', () => {
+                const shell = makeShell(
+                    {
+                        ...two(),
+                        [position]: {
+                            id: position,
+                            initialSize: 260,
+                            minimumSize: 100,
+                        },
+                    },
+                    10
+                );
+                shell.layout(1000, 800);
+                shell.setEdgeGroupVisible(sibling, false);
+                // the minimum carries the share of one margin
+                shell.resizeEdgeGroup(position, 100);
+                expect(sizeOf(shell, position)).toBe(105);
+
+                // and of two once the sibling is back
+                shell.setEdgeGroupVisible(sibling, true);
+                expect(sizeOf(shell, position)).toBeCloseTo(100 + 20 / 3);
+                shell.dispose();
+            });
         });
 
         test('gap is added to collapsedSize for all four positions', () => {
@@ -982,6 +1191,98 @@ describe('ShellManager', () => {
             const shell = makeShell({ top: { id: 'top' } }, 10, 44);
             // no minimumSize provided → defaults to collapsedSize + 50 = 49 + 50 = 99
             expect((shell as any)._topView.minimumSize).toBe(99);
+            shell.dispose();
+        });
+    });
+
+    describe('locked', () => {
+        /**
+         * The shell's two splitviews: the outer one hosts the left/right edge
+         * groups and the middle column's hosts the top/bottom ones. A disabled
+         * splitview carries `dv-splitview-disabled`, which is what turns its
+         * sashes inert (`pointer-events: none`).
+         */
+        function splitviews(shell: ShellManager): {
+            outer: HTMLElement;
+            middle: HTMLElement;
+        } {
+            const outer = shell.element.querySelector<HTMLElement>(
+                ':scope > .dv-split-view-container'
+            )!;
+            const middle = shell.element.querySelector<HTMLElement>(
+                '.dv-shell-middle-column > .dv-split-view-container'
+            )!;
+            expect(outer).toBeTruthy();
+            expect(middle).toBeTruthy();
+            return { outer, middle };
+        }
+
+        test('is unlocked by default', () => {
+            const shell = makeShell({
+                left: { id: 'left' },
+                top: { id: 'top' },
+            });
+            const { outer, middle } = splitviews(shell);
+
+            expect(shell.locked).toBe(false);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            shell.dispose();
+        });
+
+        test('locking disables both the outer and the middle-column splitview (#1671)', () => {
+            const shell = makeShell({
+                left: { id: 'left' },
+                right: { id: 'right' },
+                top: { id: 'top' },
+                bottom: { id: 'bottom' },
+            });
+            const { outer, middle } = splitviews(shell);
+
+            shell.locked = true;
+
+            expect(shell.locked).toBe(true);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+
+            shell.locked = false;
+
+            expect(shell.locked).toBe(false);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                false
+            );
+            shell.dispose();
+        });
+
+        test('edge groups added after locking are hosted by the disabled splitviews', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                layoutGrid
+            );
+            shell.locked = true;
+
+            shell.addEdgeView('left', { id: 'left' }, makeGroup());
+            shell.addEdgeView('bottom', { id: 'bottom' }, makeGroup());
+
+            const { outer, middle } = splitviews(shell);
+            expect(outer.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
+            expect(middle.classList.contains('dv-splitview-disabled')).toBe(
+                true
+            );
             shell.dispose();
         });
     });

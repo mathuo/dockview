@@ -202,6 +202,11 @@
                         : {}),
                     dndStrategy:
                         params.get('dnd') === 'html5' ? 'html5' : 'pointer',
+                    // `?closeEmptyGroups=0` keeps a group in the grid once its
+                    // last panel leaves. Inert when absent (the default).
+                    ...(params.get('closeEmptyGroups') === '0'
+                        ? { closeEmptyGroups: false }
+                        : {}),
                     // Custom drop-position resolver (opt-in via `?resolver=`),
                     // which takes precedence over the compass at the same seam.
                     dropPositionResolver,
@@ -879,6 +884,21 @@
                         return { left, right };
                     },
                     groupOf: (id) => panels[id] && panels[id].group.id,
+                    // A group's laid-out box, panel ids and whether it is
+                    // showing its watermark; null once the group is gone.
+                    groupState: (groupId) => {
+                        const group = dockview.getPanel(groupId);
+                        if (!group) return null;
+                        const r = group.element.getBoundingClientRect();
+                        return {
+                            x: r.x,
+                            y: r.y,
+                            width: r.width,
+                            height: r.height,
+                            panels: group.panels.map((p) => p.id),
+                            watermark: group.model.hasWatermark,
+                        };
+                    },
                     setupTwoTabGroupChips: () => {
                         for (const id of ['red', 'green', 'blue', 'yellow']) {
                             panels[id] = dockview.addPanel({
@@ -1024,6 +1044,16 @@
                     setGroupConstraints: (id, constraints) =>
                         panels[id] &&
                         panels[id].group.api.setConstraints(constraints),
+                    // Programmatic group sizing/visibility for the pending-size
+                    // tests: a size set on a visible group must not come back
+                    // after that group is hidden and shown again.
+                    setGroupSize: (id, size) =>
+                        panels[id] && panels[id].group.api.setSize(size),
+                    setGroupVisible: (id, visible) =>
+                        panels[id] && panels[id].group.api.setVisible(visible),
+                    exitMaximizedGroup: () => dockview.exitMaximizedGroup(),
+                    groupWidth: (id) =>
+                        panels[id] ? panels[id].group.api.width : -1,
                     // A docked `main` panel plus a `floater` pulled out into a
                     // floating group at a fixed box — for floating-group
                     // lifecycle + serialization tests.

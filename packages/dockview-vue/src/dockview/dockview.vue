@@ -39,6 +39,7 @@ import {
     createSlotReference,
 } from '../slots';
 import DockviewPortals from '../dockviewPortals.vue';
+import { undefinedDefaults } from '../props';
 import type { DockviewVueSlots, IDockviewVueProps, VueEvents } from './types';
 
 const DEFAULT_VUE_TAB = 'props.defaultTabComponent';
@@ -68,7 +69,10 @@ defineOptions({ inheritAttrs: false });
 
 const emit = defineEmits<VueEvents>();
 
-const props = defineProps<IDockviewVueProps>();
+const props = withDefaults(
+    defineProps<IDockviewVueProps>(),
+    undefinedDefaults(PROPERTY_KEYS_DOCKVIEW)
+);
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);

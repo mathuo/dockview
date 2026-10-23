@@ -457,6 +457,24 @@ export interface DockviewOptions {
      * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
      */
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
+    /**
+     * Whether a group is removed once its last panel is closed or moved out.
+     * Defaults to `true`. When `false` the empty group stays in the layout
+     * (rendering the watermark) until it is closed explicitly.
+     */
+    closeEmptyGroups?: boolean;
+    /**
+     * Supplies the id for every group dockview creates without an explicit
+     * id: a panel added at a new position, a drop that splits the layout, a
+     * group popped out or floated, `addGroup()` without an `id`. Defaults to
+     * a sequential counter starting at `"1"`, which is unique only within one
+     * instance. Supply your own generator, for example
+     * `() => crypto.randomUUID()`, when groups move between instances such
+     * as separate windows, so a group keeps its id wherever it lands. An id
+     * already in use is retried; a generator that keeps returning live ids
+     * throws.
+     */
+    groupIdGenerator?: () => string;
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
     /**
@@ -813,6 +831,8 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndStrategy: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
+        closeEmptyGroups: undefined,
+        groupIdGenerator: undefined,
         dndEdges: undefined,
         dropPositionResolver: undefined,
         dndCompass: undefined,
@@ -995,6 +1015,45 @@ export type AddGroupOptions = (
     | AbsolutePosition
 ) &
     GroupOptions;
+
+/**
+ * Placement for `addPanelFromJSON`: everything `addPanel` takes beyond what
+ * the serialized panel state already carries.
+ */
+export type AddPanelFromJSONOptions = Pick<
+    AddPanelOptions,
+    'position' | 'floating' | 'inactive' | 'initialWidth' | 'initialHeight'
+>;
+
+/**
+ * Placement for `addGroupFromJSON`: where the rehydrated group goes in the
+ * grid, as for `addGroup`. The group's own shape (id, locked, hidden header,
+ * header position) comes from the serialized state, so it is not repeated
+ * here. Omit the options to append the group to the layout.
+ *
+ * A reference group or panel with `direction: 'within'`, or with no
+ * direction, merges the serialized panels into that group instead of
+ * creating one, as `addPanel` does; `index` then says where in its tab bar
+ * they go.
+ */
+export type AddGroupFromJSONOptions = (
+    | {
+          referenceGroup: string | DockviewGroupPanel;
+          /** Defaults to `'within'`: merge into the reference group. */
+          direction?: Direction;
+          /** Tab index to merge at; only with `'within'`. */
+          index?: number;
+      }
+    | {
+          referencePanel: string | IDockviewPanel;
+          /** Defaults to `'within'`: merge into the reference panel's group. */
+          direction?: Direction;
+          /** Tab index to merge at; only with `'within'`. */
+          index?: number;
+      }
+    | AbsolutePosition
+) &
+    Pick<GroupOptions, 'skipSetActive' | 'initialWidth' | 'initialHeight'>;
 
 export function isGroupOptionsWithPanel(
     data: AddGroupOptions

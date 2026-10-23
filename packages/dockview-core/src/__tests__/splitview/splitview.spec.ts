@@ -492,6 +492,38 @@ describe('splitview', () => {
         splitview.dispose();
     });
 
+    test('views added with skipLayout adopt their proportions on the first layout (#1692)', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        splitview.layout(300, 500);
+
+        const view1 = new Testview(20, Number.POSITIVE_INFINITY);
+        const view2 = new Testview(20, Number.POSITIVE_INFINITY);
+        const view3 = new Testview(20, Number.POSITIVE_INFINITY);
+
+        // a batch add (as the gridview's clone/flip of a branch does) never
+        // runs the relayout that captures proportions
+        splitview.addView(view1, 100, 0, true);
+        splitview.addView(view2, 100, 1, true);
+        splitview.addView(view3, 100, 2, true);
+        expect(splitview.proportions).toBeUndefined();
+
+        splitview.layout(300, 500);
+        expect(splitview.proportions).toEqual([1 / 3, 1 / 3, 1 / 3]);
+
+        // shrinking and growing scales every view, rather than pushing the
+        // whole delta onto the last one
+        splitview.layout(600, 500);
+        expect([view1.size, view2.size, view3.size]).toEqual([200, 200, 200]);
+
+        splitview.layout(300, 500);
+        expect([view1.size, view2.size, view3.size]).toEqual([100, 100, 100]);
+
+        splitview.dispose();
+    });
+
     test('high priority', () => {
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
@@ -927,6 +959,42 @@ describe('splitview', () => {
 
         view1.fireChangeEvent({ size: 300 });
         expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+    });
+
+    test('marginShare is the margin each visible view gives up', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+            margin: 24,
+        });
+        splitview.layout(924, 500);
+        expect(splitview.marginShare).toBe(0);
+
+        const views = [
+            new Testview(0, 1000),
+            new Testview(0, 1000),
+            new Testview(0, 1000),
+            new Testview(0, 1000),
+        ];
+        splitview.addView(views[0]);
+        expect(splitview.marginShare).toBe(0);
+
+        splitview.addView(views[1]);
+        splitview.addView(views[2]);
+        splitview.addView(views[3]);
+        // four views, three margins
+        expect(splitview.marginShare).toBe(18);
+        expect(views[0].size).toBe(splitview.getViewSize(0) - 18);
+
+        splitview.setViewVisible(1, false);
+        // three visible views, two margins
+        expect(splitview.marginShare).toBe(16);
+        expect(views[0].size).toBe(splitview.getViewSize(0) - 16);
+        // a hidden view is laid out at zero, not at minus the share
+        expect(views[1].size).toBe(0);
+
+        splitview.setViewVisible(1, true);
+        expect(splitview.marginShare).toBe(18);
     });
 
     test('that margins are applied to view sizing', () => {

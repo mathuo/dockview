@@ -31,6 +31,8 @@ import { sequentialNumberGenerator } from '../math';
 import { DefaultDockviewDeserialzier } from './deserializer';
 import {
     AddGroupOptions,
+    AddGroupFromJSONOptions,
+    AddPanelFromJSONOptions,
     AddPanelOptions,
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
@@ -144,6 +146,7 @@ import {
     SerializedEdgeGroups,
     ShellManager,
     IEdgeGroupHost,
+    isHorizontal,
 } from './dockviewShell';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 import {
@@ -277,6 +280,21 @@ export interface SerializedDockview {
     floatingGroups?: SerializedFloatingGroup[];
     popoutGroups?: SerializedPopoutGroup[];
     edgeGroups?: SerializedEdgeGroups;
+}
+
+/**
+ * One group together with the state of every panel it holds, as a
+ * self-contained unit that can be rehydrated into another layout, or another
+ * dockview instance, with `addGroupFromJSON`.
+ *
+ * `group.views` lists panel ids in tab order and `panels` holds the state for
+ * each of them, mirroring the split between a grid leaf and the `panels` map
+ * of a whole `SerializedDockview`. The group's size is deliberately absent:
+ * it only has meaning in the grid the group came from.
+ */
+export interface SerializedDockviewGroup {
+    group: GroupPanelViewState;
+    panels: Record<string, GroupviewPanelState>;
 }
 
 export interface MovePanelEvent {
@@ -468,11 +486,23 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): IDockviewPanel;
-    removePanel(panel: IDockviewPanel): void;
+    removePanel(
+        panel: IDockviewPanel,
+        options?: { removeEmptyGroup?: boolean }
+    ): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
     addGroup(options?: AddGroupOptions): DockviewGroupPanel;
+    serializeGroup(group: DockviewGroupPanel): SerializedDockviewGroup;
+    addGroupFromJSON(
+        data: SerializedDockviewGroup,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel;
+    addPanelFromJSON(
+        state: GroupviewPanelState,
+        options?: AddPanelFromJSONOptions
+    ): IDockviewPanel;
     closeAllGroups(): void;
     adjacentGroupInDirection(
         group: DockviewGroupPanel,
@@ -551,6 +581,9 @@ const NO_EVENT: Event<any> = () => ({
 /** A never-firing history-change event, the fallback `onDidChangeHistory`
  *  returns when the LayoutHistory module is absent. */
 const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = NO_EVENT;
+
+/** How many live ids a custom `groupIdGenerator` may return before giving up. */
+const MAX_GROUP_ID_ATTEMPTS = 100;
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
@@ -1644,6 +1677,9 @@ export class DockviewComponent
             options.theme?.gap ?? 0,
             options.theme?.edgeGroupCollapsedSize
         );
+        // The base grid took `locked` from the options; the shell's splitviews
+        // host the edge groups and need it too.
+        this._shellManager.locked = !!options.locked;
         // The shell wraps the dockview element, so move the popup anchor
         // into the shell so overflow dropdowns in edge groups position correctly
         this.popupService.updateRoot(this._shellManager.element);
@@ -1964,9 +2000,12 @@ export class DockviewComponent
             return Promise.resolve(false);
         }
 
+        // a lone panel takes its whole group along, unless that group is to
+        // stay in place as an empty group
         if (
             itemToPopout instanceof DockviewPanel &&
-            itemToPopout.group.size === 1
+            itemToPopout.group.size === 1 &&
+            this.closeEmptyGroups
         ) {
             return this.addPopoutGroup(itemToPopout.group, options);
         }
@@ -2135,7 +2174,11 @@ export class DockviewComponent
                 const popoutGridview =
                     options?.overridePopoutGridview ??
                     this.createNestedGridview();
-                if (!options?.overridePopoutGridview) {
+                if (options?.overridePopoutGridview) {
+                    // A restored gridview was built when fromJSON ran, before
+                    // the window opened; the lock may have changed in between.
+                    popoutGridview.locked = this.gridview.locked;
+                } else {
                     popoutGridview.addView(group, Sizing.Distribute, [0]);
                 }
                 // Fill the popout window. Unlike the main grid (explicit px) and
@@ -2878,21 +2921,56 @@ export class DockviewComponent
         }
     }
 
+    /** The `closeEmptyGroups` option: remove a group once it empties. */
+    private get closeEmptyGroups(): boolean {
+        return this.options.closeEmptyGroups !== false;
+    }
+
+    /** Whether a move leaves its emptied source group in place. */
+    private keepEmptyGroups(options: { keepEmptyGroups?: boolean }): boolean {
+        return options.keepEmptyGroups ?? !this.closeEmptyGroups;
+    }
+
     private removeGroupIfEmpty(group: DockviewGroupPanel): void {
-        if (group.model.size === 0) {
+        if (group.model.size === 0 && this.closeEmptyGroups) {
             this.doRemoveGroup(group, { skipActive: true });
         }
     }
 
-    private forEachNestedGridview(
-        callback: (gridview: Gridview) => void
-    ): void {
-        for (const floating of this.floatingGroups) {
-            callback(floating.gridview);
+    /**
+     * Locks the main grid, the shell whose splitviews host the edge groups,
+     * and the nested gridviews of floating and popout windows. The base
+     * setter stops at the main grid; `updateOptions` reaches this override.
+     */
+    override get locked(): boolean {
+        return this.gridview.locked;
+    }
+
+    override set locked(value: boolean) {
+        this.gridview.locked = value;
+        if (this._shellManager) {
+            this._shellManager.locked = value;
         }
-        for (const entry of this._popoutWindowService?.entries ?? []) {
-            callback(entry.gridview);
+        for (const gridview of this.nestedGridviews()) {
+            gridview.locked = value;
         }
+    }
+
+    private syncNestedOrthogonalSashMultidrag(): void {
+        for (const gridview of this.nestedGridviews()) {
+            gridview.orthogonalSashMultidrag =
+                this.gridview.orthogonalSashMultidrag;
+        }
+    }
+
+    /** The gridviews hosted by open floating and popout windows. */
+    private nestedGridviews(): Gridview[] {
+        return [
+            ...this.floatingGroups.map((floating) => floating.gridview),
+            ...(this._popoutWindowService?.entries ?? []).map(
+                (entry) => entry.gridview
+            ),
+        ];
     }
 
     /**
@@ -2909,7 +2987,7 @@ export class DockviewComponent
                 ? { separatorBorder: 'transparent' }
                 : undefined,
             orientation,
-            false,
+            this.gridview.locked,
             this.options.theme?.gap ?? 0
         );
         gridview.orthogonalSashMultidrag =
@@ -3114,20 +3192,16 @@ export class DockviewComponent
             this.updateDragAndDropState();
         }
 
-        // floating and popout windows have their own gridviews
         if ('proportionalLayout' in options) {
+            // super.updateOptions has already updated the main grid
             const proportionalLayout = this.gridview.proportionalLayout;
-            this.forEachNestedGridview((gridview) => {
+            for (const gridview of this.nestedGridviews()) {
                 gridview.proportionalLayout = proportionalLayout;
-            });
+            }
         }
 
         if ('disableOrthogonalSashMultidrag' in options) {
-            const orthogonalSashMultidrag =
-                this.gridview.orthogonalSashMultidrag;
-            this.forEachNestedGridview((gridview) => {
-                gridview.orthogonalSashMultidrag = orthogonalSashMultidrag;
-            });
+            this.syncNestedOrthogonalSashMultidrag();
         }
 
         if ('theme' in options) {
@@ -3256,10 +3330,9 @@ export class DockviewComponent
                     // constraint change, not a size request
                     return;
                 }
-                const size =
-                    position === 'left' || position === 'right'
-                        ? event.width
-                        : event.height;
+                const size = isHorizontal(position)
+                    ? event.width
+                    : event.height;
                 if (typeof size !== 'number') {
                     // cross axis, which the shell splitview does not own
                     return;
@@ -3945,7 +4018,10 @@ export class DockviewComponent
 
                 const group = this.createGroup({
                     id,
-                    locked: !!locked,
+                    // `locked` is `boolean | 'no-drop-target'`; coercing it
+                    // to a boolean would restore `'no-drop-target'` as a
+                    // plain `true` and re-enable dropping on the group.
+                    locked: locked ?? false,
                     hideHeader: !!hideHeader,
                     headerPosition,
                 });
@@ -4440,10 +4516,32 @@ export class DockviewComponent
         // One transaction; the per-panel removals inside nest via the depth
         // counter, so consumers (undo, announcements) see a single mutation.
         this.mutation('remove', () => {
-            for (const entry of this._groups.entries()) {
-                const [_, group] = entry;
+            const groups = Array.from(this._groups.values()).map(
+                (_) => _.value
+            );
+            for (const group of groups) {
+                // closing one group can remove another (e.g. a popout's
+                // hidden reference group)
+                if (!this._groups.has(group.id)) {
+                    continue;
+                }
 
-                group.value.model.closeAllPanels();
+                group.model.closeAllPanels();
+
+                // with `closeEmptyGroups: false` the panels' removal leaves
+                // the group behind; closing all groups still removes it,
+                // keeping the last one when `noPanelsOverlay` asks for it
+                const keepLast =
+                    this.options.noPanelsOverlay === 'emptyGroup' &&
+                    this._groups.size === 1;
+                if (
+                    !this.closeEmptyGroups &&
+                    !keepLast &&
+                    this._groups.has(group.id) &&
+                    group.model.size === 0
+                ) {
+                    this.removeGroup(group, { skipActive: true });
+                }
             }
         });
     }
@@ -4452,6 +4550,48 @@ export class DockviewComponent
         options: AddPanelOptions<T>
     ): DockviewPanel {
         return this.mutation('add', () => this._doAddPanel(options));
+    }
+
+    /**
+     * Add a panel from its `toJSON()` state, placed as `addPanel` places
+     * one: the counterpart to `panel.toJSON()` for a single tab moving
+     * between layouts or instances, as `addGroupFromJSON` is to
+     * `serializeGroup`. Throws before changing anything if the panel id is
+     * already in use.
+     */
+    addPanelFromJSON(
+        state: GroupviewPanelState,
+        options?: AddPanelFromJSONOptions
+    ): DockviewPanel {
+        if (!state.contentComponent) {
+            throw new Error(
+                `dockview: serialized panel ${state.id} has no contentComponent`
+            );
+        }
+
+        return this.mutation('add', () => {
+            const panel = this._doAddPanel({
+                ...options,
+                id: state.id,
+                component: state.contentComponent,
+                tabComponent: state.tabComponent,
+                title: state.title,
+                renderer: state.renderer,
+                params: state.params,
+                minimumWidth: state.minimumWidth,
+                minimumHeight: state.minimumHeight,
+                maximumWidth: state.maximumWidth,
+                maximumHeight: state.maximumHeight,
+            } as AddPanelOptions);
+
+            // As on load, the pinned flag only applies where pinning is on;
+            // `setPanelPinned` ignores it otherwise.
+            if (state.pinned) {
+                this.setPanelPinned(panel, true);
+            }
+
+            return panel;
+        });
     }
 
     private _doAddPanel<T extends object = Parameters>(
@@ -4675,7 +4815,8 @@ export class DockviewComponent
     ): void {
         this.mutation('remove', () =>
             this._doRemovePanel(panel, {
-                removeEmptyGroup: options?.removeEmptyGroup ?? true,
+                removeEmptyGroup:
+                    options?.removeEmptyGroup ?? this.closeEmptyGroups,
                 skipDispose: options?.skipDispose,
                 skipSetActiveGroup: options?.skipSetActiveGroup,
             })
@@ -4721,6 +4862,271 @@ export class DockviewComponent
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
         return this.mutation('add', () => this._doAddGroup(options));
+    }
+
+    /**
+     * Serialize one group and the state of every panel it holds. The result
+     * is self-contained: `addGroupFromJSON` on any dockview instance rebuilds
+     * the group from it, with the same tab order, active tab, panel titles,
+     * parameters and renderers.
+     */
+    serializeGroup(group: DockviewGroupPanel): SerializedDockviewGroup {
+        const panels: Record<string, GroupviewPanelState> = {};
+
+        for (const panel of group.panels) {
+            panels[panel.id] = panel.toJSON();
+        }
+
+        return { group: group.model.toJSON(), panels };
+    }
+
+    /**
+     * Rebuild a group from `serializeGroup` output and add it to the live
+     * layout at `options` (as for `addGroup`), without touching the rest of
+     * the layout. This is the counterpart to `fromJSON`, which replaces the
+     * whole layout, for moving one group between layouts or instances.
+     *
+     * With `direction: 'within'` and a reference group or panel, no group is
+     * created: the serialized panels are merged into that group, in their
+     * order, at `index` if given, and the serialized active panel becomes
+     * the group's. The serialized group's own shape (id, locked, header,
+     * tab groups) does not apply then. This is what a drop on a group's
+     * centre or tab bar calls for, and the only form that works against a
+     * floating or edge group, which has no grid neighbours.
+     *
+     * A panel id that is already live throws, as `addPanel` does, before
+     * anything is changed. A group id that is already live is reassigned with
+     * a warning, as `addGroup` does.
+     */
+    addGroupFromJSON(
+        data: SerializedDockviewGroup,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        this.validateSerializedGroup(data);
+        return this.mutation('add', () =>
+            this._doAddGroupFromJSON(data, options)
+        );
+    }
+
+    /**
+     * Refuse an envelope that cannot be applied cleanly, before any mutation
+     * is opened, so a refused call leaves no trace in the layout or its
+     * events.
+     */
+    private validateSerializedGroup(data: SerializedDockviewGroup): void {
+        const state = data?.group;
+
+        if (typeof state?.id !== 'string') {
+            throw new TypeError('dockview: group id must be of type string');
+        }
+
+        if (!Array.isArray(state.views)) {
+            throw new TypeError(
+                `dockview: serialized group ${state.id} has no views`
+            );
+        }
+
+        for (const id of state.views) {
+            if (!data.panels?.[id]) {
+                throw new Error(
+                    `dockview: serialized group ${state.id} is missing panel state for ${id}`
+                );
+            }
+
+            if (this.panels.some((panel) => panel.id === id)) {
+                throw new Error(`dockview: panel with id ${id} already exists`);
+            }
+        }
+    }
+
+    private _doAddGroupFromJSON(
+        data: SerializedDockviewGroup,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        const {
+            id,
+            locked,
+            hideHeader,
+            headerPosition,
+            constraints,
+            activeView,
+            tabGroups,
+        } = data.group;
+
+        // A reference with no direction means "within" it, as for
+        // `addPanel`; an absolute `within` has nothing to be within and
+        // falls through to appending the group.
+        if (options && (options.direction ?? 'within') === 'within') {
+            const target = this.resolveReferenceGroup(options);
+            if (target) {
+                return this.mergeGroupFromJSON(data, target, options);
+            }
+        }
+
+        const groupOptions: GroupOptions = {
+            id,
+            locked: locked ?? false,
+            hideHeader: !!hideHeader,
+            headerPosition,
+            constraints,
+            initialWidth: options?.initialWidth,
+            initialHeight: options?.initialHeight,
+            // The group is empty until its panels are opened below; activate
+            // it once it has something to activate.
+            skipSetActive: true,
+        };
+
+        const group = this.addEmptyGroupAt(groupOptions, options);
+
+        // On failure take the empty group out again so the layout is left
+        // as it was found.
+        let panels: IDockviewPanel[];
+
+        try {
+            panels = this.deserializePanels(data, group);
+        } catch (err) {
+            this.doRemoveGroup(group, { skipActive: true });
+            throw err;
+        }
+
+        for (const panel of panels) {
+            group.model.openPanel(panel, {
+                skipSetActive: panel.id !== activeView,
+                skipSetGroupActive: true,
+            });
+        }
+
+        // Restore tab groups before activating a fallback panel so that
+        // collapsed groups can clear the active panel correctly.
+        if (tabGroups && tabGroups.length > 0) {
+            group.model.restoreTabGroups(tabGroups);
+        }
+
+        if (!group.activePanel && group.panels.length > 0) {
+            group.model.openPanel(group.panels[group.panels.length - 1], {
+                skipSetGroupActive: true,
+            });
+        }
+
+        if (!options?.skipSetActive) {
+            this.doSetGroupAndPanelActive(group);
+        }
+
+        return group;
+    }
+
+    /**
+     * Add an empty group at the placement `options` names, or append it
+     * when they name none.
+     */
+    private addEmptyGroupAt(
+        groupOptions: GroupOptions,
+        options?: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        const hasPlacement =
+            options !== undefined &&
+            (isGroupOptionsWithPanel(options) ||
+                isGroupOptionsWithGroup(options) ||
+                typeof options.direction === 'string');
+
+        if (hasPlacement) {
+            return this._doAddGroup({ ...options, ...groupOptions });
+        }
+
+        const group = this.createGroup(groupOptions);
+        this.doAddGroup(group);
+        return group;
+    }
+
+    /**
+     * Create every panel of a serialized group in `group`, in tab order,
+     * before any is opened, so a corrupt panel state fails before a single
+     * add event has fired (the ordering `fromJSON` uses). On failure the
+     * panels made so far are disposed and the error rethrown.
+     */
+    private deserializePanels(
+        data: SerializedDockviewGroup,
+        group: DockviewGroupPanel
+    ): IDockviewPanel[] {
+        const panels: IDockviewPanel[] = [];
+        try {
+            for (const child of data.group.views) {
+                panels.push(
+                    this._deserializer.fromJSON(data.panels[child], group)
+                );
+            }
+        } catch (err) {
+            for (const panel of panels) {
+                panel.dispose();
+            }
+            throw err;
+        }
+        return panels;
+    }
+
+    /**
+     * The group an `AddGroupOptions` placement names, or `undefined` for an
+     * absolute placement. Throws for a reference that names nothing.
+     */
+    private resolveReferenceGroup(
+        options: AddGroupFromJSONOptions
+    ): DockviewGroupPanel | undefined {
+        if (isGroupOptionsWithPanel(options)) {
+            const referencePanelId =
+                typeof options.referencePanel === 'string'
+                    ? options.referencePanel
+                    : options.referencePanel.id;
+            const referencePanel = this.getGroupPanel(referencePanelId);
+            if (!referencePanel) {
+                throw new Error(
+                    `dockview: reference panel ${referencePanelId} does not exist`
+                );
+            }
+            return referencePanel.group;
+        }
+        if (isGroupOptionsWithGroup(options)) {
+            const referenceId =
+                typeof options.referenceGroup === 'string'
+                    ? options.referenceGroup
+                    : options.referenceGroup.id;
+            const referenceGroup = this.getPanel(referenceId);
+            if (!referenceGroup) {
+                throw new Error(
+                    `dockview: reference group ${referenceId} does not exist`
+                );
+            }
+            return referenceGroup;
+        }
+        return undefined;
+    }
+
+    /**
+     * The `direction: 'within'` form of `addGroupFromJSON`: the serialized
+     * panels join `target` rather than a group of their own.
+     */
+    private mergeGroupFromJSON(
+        data: SerializedDockviewGroup,
+        target: DockviewGroupPanel,
+        options: AddGroupFromJSONOptions
+    ): DockviewGroupPanel {
+        const { activeView } = data.group;
+        const index = (options as { index?: number }).index;
+
+        const panels = this.deserializePanels(data, target);
+
+        panels.forEach((panel, offset) => {
+            target.model.openPanel(panel, {
+                index: index === undefined ? undefined : index + offset,
+                skipSetActive: panel.id !== activeView,
+                skipSetGroupActive: true,
+            });
+        });
+
+        if (!options.skipSetActive) {
+            this.doSetGroupAndPanelActive(target);
+        }
+
+        return target;
     }
 
     private _doAddGroup(options?: AddGroupOptions): DockviewGroupPanel {
@@ -4991,7 +5397,10 @@ export class DockviewComponent
                     const refGroup = selectedGroup.referenceGroup
                         ? this.getPanel(selectedGroup.referenceGroup)
                         : undefined;
-                    if (refGroup?.panels.length === 0) {
+                    if (
+                        refGroup?.panels.length === 0 &&
+                        (this.closeEmptyGroups || !refGroup.api.isVisible)
+                    ) {
                         this.removeGroup(refGroup);
                     }
                 }
@@ -5329,7 +5738,7 @@ export class DockviewComponent
 
             // keep the source group when moving within it
             if (
-                !options.keepEmptyGroups &&
+                !this.keepEmptyGroups(options) &&
                 sourceGroup.model.size === 0 &&
                 sourceGroup !== destinationGroup
             ) {
@@ -5373,10 +5782,12 @@ export class DockviewComponent
                 destinationTarget
             );
 
-            if (sourceGroup.size < 2) {
+            if (sourceGroup.size < 2 && !this.keepEmptyGroups(options)) {
                 /**
                  * If we are moving from a group which only has one panel left we will consider
-                 * moving the group itself rather than moving the panel into a newly created group
+                 * moving the group itself rather than moving the panel into a newly created group.
+                 * When empty groups are kept the group must stay where it is, so the panel is
+                 * moved into a newly created group like any other panel.
                  */
 
                 const [targetParentLocation, to] = tail(targetLocation);
@@ -5698,7 +6109,7 @@ export class DockviewComponent
         // so a tab-group drag onto its own group's edge still cleans up
         // the now-empty source.
         if (
-            !options.keepEmptyGroups &&
+            !this.keepEmptyGroups(options) &&
             sourceGroup.model.size === 0 &&
             sourceGroup !== targetGroup
         ) {
@@ -6071,13 +6482,41 @@ export class DockviewComponent
         }
     }
 
+    /**
+     * The id for a group created without one: from `groupIdGenerator` when
+     * the option is set, else the sequential counter. An id already in use is
+     * skipped. The counter never repeats, so it can skip any number of live
+     * ids (a restored layout may hold many); a custom generator is given a
+     * bounded number of tries so a broken one cannot hang the call.
+     */
     private getNextGroupId(): string {
-        let id = this.nextGroupId.next();
-        while (this._groups.has(id)) {
-            id = this.nextGroupId.next();
+        const generate = this.options.groupIdGenerator;
+
+        if (!generate) {
+            let id = this.nextGroupId.next();
+            while (this._groups.has(id)) {
+                id = this.nextGroupId.next();
+            }
+            return id;
         }
 
-        return id;
+        for (let attempt = 0; attempt < MAX_GROUP_ID_ATTEMPTS; attempt++) {
+            const id = generate();
+
+            if (typeof id !== 'string' || id.length === 0) {
+                throw new TypeError(
+                    'dockview: groupIdGenerator must return a non-empty string'
+                );
+            }
+
+            if (!this._groups.has(id)) {
+                return id;
+            }
+        }
+
+        throw new Error(
+            `dockview: groupIdGenerator returned an id already in use ${MAX_GROUP_ID_ATTEMPTS} times in a row`
+        );
     }
 
     createGroup(options?: GroupOptions): DockviewGroupPanel {
@@ -6093,10 +6532,7 @@ export class DockviewComponent
         }
 
         if (!id) {
-            id = this.nextGroupId.next();
-            while (this._groups.has(id)) {
-                id = this.nextGroupId.next();
-            }
+            id = this.getNextGroupId();
         }
 
         const view = new DockviewGroupPanel(this, id, options);
@@ -6353,13 +6789,8 @@ export class DockviewComponent
 
         const gap = theme.gap ?? 0;
         this.gridview.margin = gap;
-        // Floating / popout windows host their own nested gridviews; keep their
-        // gap in sync with the main grid when the theme changes at runtime.
-        for (const floating of this.floatingGroups) {
-            floating.gridview.margin = gap;
-        }
-        for (const entry of this._popoutWindowService?.entries ?? []) {
-            entry.gridview.margin = gap;
+        for (const gridview of this.nestedGridviews()) {
+            gridview.margin = gap;
         }
         this._shellManager?.updateTheme(
             gap,
