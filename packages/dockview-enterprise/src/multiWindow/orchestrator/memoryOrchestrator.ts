@@ -42,7 +42,10 @@ export interface MemoryOrchestratorOptions {
     workspace?: WorkspaceState;
     /** How long a drag stays acceptable after its source reported it over. Default {@link DRAG_END_GRACE_MS}. */
     dragEndGraceMs?: number;
-    /** How many steps the shared history keeps. Default 50. */
+    /**
+     * How many steps the shared history keeps. Default 25, as dockview's own
+     * `layoutHistory.depth`; no window's depth should be lower.
+     */
     historyDepth?: number;
     /**
      * Called when an unaccepted drag ended with `detach`: the host opens a

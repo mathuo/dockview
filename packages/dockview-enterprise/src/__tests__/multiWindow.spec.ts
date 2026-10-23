@@ -325,6 +325,23 @@ describe('multi-window: HistorySequencer', () => {
         ]);
     });
 
+    test('a move one window never completes is dropped once abandoned, so it cannot block undo', () => {
+        let now = 1000;
+        const history = new HistorySequencer(undefined, () => now);
+        history.pushLocal('main');
+        history.recordMove('s1', ['p'], 'to', half('dock-2', [], ['p']));
+
+        now += 5000;
+        expect(() => history.undo()).toThrow('still being recorded');
+        expect(history.info().undoCount).toBe(2);
+
+        now += 5000;
+        expect(() => history.undo()).toThrow(
+            'move s1 was never completed; the history before it is dropped'
+        );
+        expect(history.info().undoCount).toBe(0);
+    });
+
     test('a dropped move takes the steps beyond it, which assume it is undone first', () => {
         const history = new HistorySequencer();
         // dock-3 closes a tab while it holds p, then p moves to dock-2.
@@ -374,7 +391,11 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         options: {
             buildDefaults?: () => void;
             detach?: boolean;
-            layoutHistory?: { depth?: number; clearOnFromJSON?: boolean };
+            layoutHistory?: {
+                depth?: number;
+                clearOnFromJSON?: boolean;
+                undoableProgrammaticMutations?: boolean;
+            };
         } = {}
     ): Window => {
         const container = document.createElement('div');
@@ -385,6 +406,7 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
             layoutHistory: {
                 enabled: true,
                 clearOnFromJSON: false,
+                recordResize: false,
                 ...options.layoutHistory,
             },
             // Group ids travel with a group; make them unique per window.
@@ -1249,5 +1271,20 @@ describe('multi-window: two dockviews through the in-memory orchestrator', () =>
         await flush();
 
         expect(created).toEqual(['detached-2']);
+    });
+
+    test('a recorded programmatic mutation is reported once as a broken option', async () => {
+        const orchestrator = new MemoryOrchestrator();
+        const main = open(orchestrator, 'main', {
+            layoutHistory: { undoableProgrammaticMutations: true },
+        });
+        await flush();
+        main.api.addPanel({ id: 'a', component: 'default' });
+        main.api.addPanel({ id: 'b', component: 'default' });
+        await flush();
+
+        expect(
+            reportedMatching(/undoableProgrammaticMutations set to false/)
+        ).toHaveLength(1);
     });
 });

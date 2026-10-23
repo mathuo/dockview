@@ -18,7 +18,19 @@ import type {
     MoveRole,
 } from '../transport';
 
-export const DEFAULT_HISTORY_DEPTH = 50;
+/**
+ * The same as dockview's own `layoutHistory.depth` default. A window whose
+ * own history keeps fewer steps than this leaves markers it can no longer
+ * undo.
+ */
+export const DEFAULT_HISTORY_DEPTH = 25;
+
+/**
+ * How long a move may wait for its second half. Both halves normally arrive
+ * within milliseconds; one still missing after this never will (its window
+ * reloaded mid-drag, or the report was lost).
+ */
+export const ABANDONED_MOVE_MS = 10_000;
 
 /** One window's side of a move. */
 export interface MoveHalf {
@@ -33,6 +45,8 @@ type HistoryEntry =
           readonly type: 'move';
           readonly session: string;
           readonly panels: string[];
+          /** When the first half arrived. */
+          readonly opened: number;
           from?: MoveHalf;
           to?: MoveHalf;
       };
@@ -54,9 +68,11 @@ export class HistorySequencer {
     private readonly _undo: HistoryEntry[] = [];
     private readonly _redo: HistoryEntry[] = [];
     private readonly _depth: number;
+    private readonly _now: () => number;
 
-    constructor(depth = DEFAULT_HISTORY_DEPTH) {
+    constructor(depth = DEFAULT_HISTORY_DEPTH, now: () => number = Date.now) {
         this._depth = depth;
+        this._now = now;
     }
 
     pushLocal(window: string): void {
@@ -86,6 +102,7 @@ export class HistorySequencer {
             type: 'move',
             session,
             panels: [...panels],
+            opened: this._now(),
             [role]: half,
         });
     }
@@ -95,6 +112,18 @@ export class HistorySequencer {
         const entry = this._undo[this._undo.length - 1];
         if (!entry) {
             throw new Error('nothing to undo');
+        }
+        if (
+            entry.type === 'move' &&
+            (!entry.from || !entry.to) &&
+            this._now() - entry.opened >= ABANDONED_MOVE_MS
+        ) {
+            // It will never complete. Everything before it goes too: those
+            // steps restore layouts from before the move.
+            this._undo.length = 0;
+            throw new Error(
+                `move ${entry.session} was never completed; the history before it is dropped`
+            );
         }
         let step: HistoryStep;
         if (entry.type === 'local') {
